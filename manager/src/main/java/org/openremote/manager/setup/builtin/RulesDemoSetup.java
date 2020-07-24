@@ -109,12 +109,12 @@ public class RulesDemoSetup extends AbstractManagerSetup {
         }
 
         // People counter
-        try (InputStream inputStream = RulesDemoSetup.class.getResourceAsStream("/demo/rules/DemoSmartCityCamera.groovy")) {
-            String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-            Ruleset ruleset = new AssetRuleset(
-                managerDemoSetup.peopleCounter3AssetId, "PeopleCounter 3 Rules", GROOVY, rules
-            );
-            rulesetStorageService.merge(ruleset);
-        }
+//        try (InputStream inputStream = RulesDemoSetup.class.getResourceAsStream("/demo/rules/DemoSmartCityCamera.groovy")) {
+//            String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+//            Ruleset ruleset = new AssetRuleset(
+//                managerDemoSetup.peopleCounter3AssetId, "PeopleCounter 3 Rules", GROOVY, rules
+//            );
+//            rulesetStorageService.merge(ruleset);
+//        }
     }
 }
