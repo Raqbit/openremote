@@ -19,8 +19,8 @@
  */
 package org.openremote.test.protocol.websocket
 
-import org.openremote.agent.protocol.Protocol
-import org.openremote.container.web.OAuthPasswordGrant
+import org.openremote.model.asset.agent.Protocol
+import org.openremote.model.auth.OAuthPasswordGrant
 import org.openremote.agent.protocol.simulator.SimulatorProtocol
 import org.openremote.agent.protocol.websocket.WebsocketClientProtocol
 import org.openremote.agent.protocol.websocket.WebsocketHttpSubscription
@@ -128,7 +128,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig"), WebsocketClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute("protocolConfig"), WebsocketClientProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(
                         WebsocketClientProtocol.META_PROTOCOL_CONNECT_URI,
@@ -185,7 +185,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
             // write attribute value
-            new AssetAttribute("readWriteTargetTemp", AttributeValueType.NUMBER)
+            new Attribute("readWriteTargetTemp", AttributeValueType.NUMBER)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem(Protocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("\'" + SharedEvent.MESSAGE_PREFIX +
@@ -213,11 +213,11 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
                         Values.convertToValue(
                             [
                                 new WebsocketSubscription().body(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(
-                                    new ReadAssetAttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature")
+                                    new ReadAttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature")
                                 ))
                             ], Container.JSON.writer()).orElse(null))
                 ),
-            new AssetAttribute("readCo2Level", AttributeValueType.NUMBER)
+            new Attribute("readCo2Level", AttributeValueType.NUMBER)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                         new MetaItem(MetaItemType.READ_ONLY),
@@ -241,7 +241,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
                         Values.convertToValue(
                             [
                                 new WebsocketSubscription().body(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(
-                                    new ReadAssetAttributeEvent(managerTestSetup.apartment1LivingroomId, "co2Level")
+                                    new ReadAttributeEvent(managerTestSetup.apartment1LivingroomId, "co2Level")
                                 ))
                             ]
                             , Container.JSON.writer()).orElse(null))

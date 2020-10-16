@@ -11,7 +11,7 @@ org.openremote.manager.rules.RulesetStorageService
 org.openremote.manager.rules.RulesService
 org.openremote.manager.asset.AssetStorageService
 org.openremote.manager.datapoint.AssetDatapointService
-org.openremote.manager.asset.AssetAttributeLinkingService
+org.openremote.manager.attribute.AttributeLinkingService
 org.openremote.manager.asset.AssetProcessingService
 org.openremote.container.message.MessageBrokerService
 org.openremote.manager.system.HealthStatusService

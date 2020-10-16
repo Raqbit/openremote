@@ -24,7 +24,7 @@ import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.simulator.SimulatorElement;
@@ -209,11 +209,6 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
-    @Override
     protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
         return PROTOCOL_META_ITEM_DESCRIPTORS;
     }
@@ -224,7 +219,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         instances.computeIfAbsent(
@@ -257,13 +252,13 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef configRef = protocolConfiguration.getReferenceOrThrow();
         instances.remove(configRef);
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
         // Get element type from the attribute meta
         Optional<String> elementType = getElementType(attribute);
         if (!elementType.isPresent()) {
@@ -271,7 +266,7 @@ public class SimulatorProtocol extends AbstractProtocol {
             return;
         }
 
-        AttributeRef configRef = protocolConfiguration.getReferenceOrThrow();
+        AttributeRef configRef = agent.getReferenceOrThrow();
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         SimulatorElement element = createElement(elementType.get(), attribute);
@@ -310,7 +305,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         elements.remove(attributeRef);
         attributeInstanceMap.remove(attributeRef);
@@ -321,7 +316,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         if (putValue(event.getAttributeState())) {
             // Notify listener when write was successful
             if (protocolConfigurationValuesChangedHandler != null)
@@ -531,7 +526,7 @@ public class SimulatorProtocol extends AbstractProtocol {
         });
     }
 
-    protected SimulatorElement createElement(String elementType, AssetAttribute attribute) {
+    protected SimulatorElement createElement(String elementType, Attribute attribute) {
         switch (elementType.toLowerCase(Locale.ROOT)) {
             case SwitchSimulatorElement.ELEMENT_NAME:
                 return new SwitchSimulatorElement(attribute.getReferenceOrThrow());
@@ -580,7 +575,7 @@ public class SimulatorProtocol extends AbstractProtocol {
         }
     }
 
-    public static Optional<String> getElementType(AssetAttribute attribute) {
+    public static Optional<String> getElementType(Attribute attribute) {
         return
             attribute.getMetaItem(SIMULATOR_ELEMENT)
                 .flatMap(AbstractValueHolder::getValueAsString);

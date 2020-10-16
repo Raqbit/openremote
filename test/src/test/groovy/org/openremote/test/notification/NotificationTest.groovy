@@ -12,7 +12,7 @@ import org.openremote.manager.rules.geofence.ORConsoleGeofenceAssetAdapter
 import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.AttributeRef
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.console.ConsoleProvider
@@ -567,7 +567,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
 
         when: "an email attribute is added to an asset"
         def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId)
-        kitchen.addAttributes(new AssetAttribute(AttributeType.EMAIL, Values.create("kitchen@openremote.local")))
+        kitchen.addAttributes(new Attribute(AttributeType.EMAIL, Values.create("kitchen@openremote.local")))
         kitchen = assetStorageService.merge(kitchen)
 
         and: "an email notification is sent to a parent asset"

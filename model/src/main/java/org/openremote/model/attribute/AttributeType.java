@@ -43,6 +43,9 @@ public enum AttributeType implements AttributeDescriptor {
     CONSOLE_PROVIDERS("consoleProviders", AttributeValueType.OBJECT,
         LABEL.withInitialValue(Values.create("Console providers"))),
 
+    DISABLED("disabled", AttributeValueType.BOOLEAN,
+        LABEL.withInitialValue(Values.create("Disabled"))),
+
     EMAIL("email", AttributeValueType.EMAIL, LABEL.withInitialValue(Values.create("Email"))),
 
     GEO_CITY("city", AttributeValueType.STRING,
@@ -69,6 +72,12 @@ public enum AttributeType implements AttributeDescriptor {
         LABEL.withInitialValue(Values.create("Surface area")),
         DESCRIPTION.withInitialValue(Values.create("Floor area of building measured in m²")),
         ABOUT.withInitialValue(Values.create("http://project-haystack.org/tag/area"))),
+
+    AGENT_STATUS(
+        "agentStatus", AttributeValueType.CONNECTION_STATUS,
+        LABEL.withInitialValue(Values.create("Agent status")),
+        DESCRIPTION.withInitialValue(Values.create("Defines the connection status for the containing agent"))
+    ),
 
     ASSET_STATUS(
         "assetStatus", AttributeValueType.ASSET_STATUS,

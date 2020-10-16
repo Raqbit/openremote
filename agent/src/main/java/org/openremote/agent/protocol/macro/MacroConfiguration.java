@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.macro;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.MetaItem;
 
@@ -51,17 +51,17 @@ final public class MacroConfiguration {
     private MacroConfiguration() {
     }
 
-    public static AssetAttribute initMacroConfiguration(AssetAttribute attribute) {
+    public static Attribute initMacroConfiguration(Attribute attribute) {
         return initProtocolConfiguration(attribute, MacroProtocol.PROTOCOL_NAME);
     }
 
-    public static boolean isMacroConfiguration(AssetAttribute attribute) {
+    public static boolean isMacroConfiguration(Attribute attribute) {
         return getProtocolName(attribute)
             .map(MacroProtocol.PROTOCOL_NAME::equals)
             .orElse(false);
     }
 
-    public static boolean validateMacroConfiguration(AssetAttribute attribute, AttributeValidationResult result) {
+    public static boolean validateMacroConfiguration(Attribute attribute, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isMacroConfiguration(attribute)) {
@@ -102,12 +102,12 @@ final public class MacroConfiguration {
         return !failure;
     }
 
-    public static boolean isValidMacroConfiguration(AssetAttribute attribute) {
+    public static boolean isValidMacroConfiguration(Attribute attribute) {
 
         return validateMacroConfiguration(attribute, null);
     }
 
-    public static Stream<MacroAction> getMacroActionsStream(AssetAttribute attribute) {
+    public static Stream<MacroAction> getMacroActionsStream(Attribute attribute) {
         return attribute == null ? Stream.empty() :
             attribute
                 .getMetaStream()
@@ -118,28 +118,28 @@ final public class MacroConfiguration {
                 .map(Optional::get);
     }
 
-    public static List<MacroAction> getMacroActions(AssetAttribute attribute) {
+    public static List<MacroAction> getMacroActions(Attribute attribute) {
         return getMacroActionsStream(attribute)
             .collect(Collectors.toList());
     }
 
-    public static AssetAttribute setMacroActions(AssetAttribute attribute, MacroAction... actions) {
+    public static Attribute setMacroActions(Attribute attribute, MacroAction... actions) {
         return setMacroActions(attribute, Arrays.stream(actions));
     }
 
-    public static UnaryOperator<AssetAttribute> setMacroActions(MacroAction... actions) {
+    public static UnaryOperator<Attribute> setMacroActions(MacroAction... actions) {
         return attribute -> setMacroActions(attribute, actions);
     }
 
-    public static AssetAttribute setMacroActions(AssetAttribute attribute, Collection<MacroAction> actions) {
+    public static Attribute setMacroActions(Attribute attribute, Collection<MacroAction> actions) {
         return setMacroActions(attribute, actions.stream());
     }
 
-    public static UnaryOperator<AssetAttribute> setMacroActions(Collection<MacroAction> actions) {
+    public static UnaryOperator<Attribute> setMacroActions(Collection<MacroAction> actions) {
         return attribute -> setMacroActions(attribute, actions);
     }
 
-    public static AssetAttribute setMacroActions(AssetAttribute attribute, Stream<MacroAction> actions) {
+    public static Attribute setMacroActions(Attribute attribute, Stream<MacroAction> actions) {
         if (attribute == null)
             return null;
 
@@ -152,7 +152,7 @@ final public class MacroConfiguration {
         return attribute;
     }
 
-    public static Optional<Integer> getMacroActionIndex(AssetAttribute attribute) {
+    public static Optional<Integer> getMacroActionIndex(Attribute attribute) {
         return attribute == null ? Optional.empty()
             : attribute.getMetaItem(MacroProtocol.META_MACRO_ACTION_INDEX)
                 .flatMap(AbstractValueHolder::getValueAsInteger);

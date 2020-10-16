@@ -19,13 +19,13 @@
  */
 package org.openremote.manager.asset;
 
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.manager.agent.AgentService;
 import org.openremote.manager.asset.AssetProcessingException.Reason;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.*;
 import org.openremote.model.attribute.AttributeEvent.Source;
 import org.openremote.model.query.AssetQuery;
@@ -84,10 +84,10 @@ import static org.openremote.model.query.AssetQuery.Select;
  * ]
  * }</pre></blockquote>
  */
-// TODO: Improve AssetAttributeLinkingService so that outbound events are synchronsied with inbound
-public class AssetAttributeLinkingService implements ContainerService, AssetUpdateProcessor {
+// TODO: Improve AttributeLinkingService so that outbound events are synchronsied with inbound
+public class AttributeLinkingService implements ContainerService, AssetUpdateProcessor {
 
-    private static final Logger LOG = Logger.getLogger(AssetAttributeLinkingService.class.getName());
+    private static final Logger LOG = Logger.getLogger(AttributeLinkingService.class.getName());
     protected AssetProcessingService assetProcessingService;
     protected AssetStorageService assetStorageService;
     protected AgentService agentService;
@@ -98,24 +98,24 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         assetProcessingService = container.getService(AssetProcessingService.class);
         assetStorageService = container.getService(AssetStorageService.class);
         agentService = container.getService(AgentService.class);
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
     }
 
     @Override
     public boolean processAssetUpdate(EntityManager em,
                                       Asset asset,
-                                      AssetAttribute attribute,
+                                      Attribute attribute,
                                       Source source) throws AssetProcessingException {
         if (source == ATTRIBUTE_LINKING_SERVICE) {
             LOG.fine("Attribute update came from this service so ignoring to avoid infinite loops: " + attribute);
@@ -124,7 +124,7 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
 
         attribute.getMetaStream()
             .filter(isMetaNameEqualTo(MetaItemType.ATTRIBUTE_LINK))
-            .forEach(metaItem -> processLinkedAttributeUpdate(em, metaItem, attribute.getState().orElse(null)));
+            .forEach(metaItem -> processLinkedAttributeUpdate(em, metaItem, new AttributeState(asset.getId(), attribute)));
 
         return false;
     }
@@ -166,7 +166,7 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
 
         Value value = sendConvertedValue.value;
 
-        Optional<AssetAttribute> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
+        Optional<Attribute> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
         if (attribute.isPresent()) {
             // Do built in value conversion
             Optional<ValueType> attributeValueType = attribute.get().getType().map(AttributeValueDescriptor::getValueType);
@@ -204,7 +204,7 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
         return attributeLink.getConverter()
             .map(
                 converter -> {
-                    Pair<Boolean, Value> converterValue = Protocol.applyValueConverter(finalOriginalValue, converter);
+                    Pair<Boolean, Value> converterValue = ProtocolUtil.applyValueConverter(finalOriginalValue, converter);
 
                     if (converterValue.key) {
                         return converterValue;
@@ -275,7 +275,7 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
         }
     }
 
-    protected static Optional<AssetAttribute> getAttribute(EntityManager em,
+    protected static Optional<Attribute> getAttribute(EntityManager em,
                                                  AssetStorageService assetStorageService,
                                                  AttributeRef attributeRef) {
         Asset asset = assetStorageService.find(
@@ -285,7 +285,7 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
                 .select(new Select().attributes(attributeRef.getAttributeName()))
         );
 
-        AssetAttribute attribute = asset != null ? asset.getAttribute(attributeRef.getAttributeName()).orElse(null) : null;
+        Attribute attribute = asset != null ? asset.getAttribute(attributeRef.getAttributeName()).orElse(null) : null;
 
         if (attribute == null) {
             LOG.warning("Attribute or asset could not be found: " + attributeRef);
@@ -297,8 +297,8 @@ public class AssetAttributeLinkingService implements ContainerService, AssetUpda
     protected static Value getCurrentValue(EntityManager em,
                                            AssetStorageService assetStorageService,
                                            AttributeRef attributeRef) {
-        Optional<AssetAttribute> attribute = getAttribute(em, assetStorageService, attributeRef);
-        return attribute.flatMap(AssetAttribute::getValue).orElse(null);
+        Optional<Attribute> attribute = getAttribute(em, assetStorageService, attributeRef);
+        return attribute.flatMap(Attribute::getValue).orElse(null);
     }
 
     @Override

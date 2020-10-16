@@ -68,7 +68,7 @@ public class AttributeRefEditor extends FlowPanel {
         }
     }
 
-    protected final String[] currentAssetAttribute;
+    protected final String[] currentAttribute;
     protected final FormListBox assetList;
     protected final FormListBox attributeList;
     protected final String attributeWatermark;
@@ -97,7 +97,7 @@ public class AttributeRefEditor extends FlowPanel {
         attributeList = new FormListBox();
         attributeList.setEnabled(!readOnly);
 
-        currentAssetAttribute = currentValue != null ?
+        currentAttribute = currentValue != null ?
             new String[]{currentValue.getEntityId(), currentValue.getAttributeName()} :
             new String[2];
 
@@ -120,7 +120,7 @@ public class AttributeRefEditor extends FlowPanel {
 
             retrievedAssetsAndAttributes.forEach((assetInfo, attributeNameLabel) -> {
                 assetList.addItem(assetInfo.getName(), assetInfo.getId());
-                if (assetInfo.getId().equals(currentAssetAttribute[0])) {
+                if (assetInfo.getId().equals(currentAttribute[0])) {
                     indexes[1] = indexes[0] + 1;
                 }
                 indexes[0]++;
@@ -142,12 +142,12 @@ public class AttributeRefEditor extends FlowPanel {
 
         if (selectedIndex == 0) {
             attributeList.setVisible(false);
-            currentAssetAttribute[0] = null;
-            currentAssetAttribute[1] = null;
+            currentAttribute[0] = null;
+            currentAttribute[1] = null;
         } else {
-            if (!assetList.getSelectedValue().equals(currentAssetAttribute[0])) {
-                currentAssetAttribute[0] = assetList.getSelectedValue();
-                currentAssetAttribute[1] = null;
+            if (!assetList.getSelectedValue().equals(currentAttribute[0])) {
+                currentAttribute[0] = assetList.getSelectedValue();
+                currentAttribute[1] = null;
             }
 
             // Populate attribute list
@@ -161,7 +161,7 @@ public class AttributeRefEditor extends FlowPanel {
                 .forEach(i -> {
                     AttributeInfo attributeInfo = attributeInfos.get(i);
                     attributeList.addItem(attributeInfo.getLabel(), attributeInfo.getName());
-                    if (attributeInfo.getName().equals(currentAssetAttribute[1])) {
+                    if (attributeInfo.getName().equals(currentAttribute[1])) {
                         attributeSelectedIndex[0] = i + 1;
                     }
                 });
@@ -175,13 +175,13 @@ public class AttributeRefEditor extends FlowPanel {
     protected void onAttributeListChanged() {
         int selectedIndex = attributeList.getSelectedIndex();
         if (selectedIndex == 0) {
-            currentAssetAttribute[1] = null;
+            currentAttribute[1] = null;
         } else {
-            currentAssetAttribute[1] = attributeList.getSelectedValue();
+            currentAttribute[1] = attributeList.getSelectedValue();
         }
 
         if (onValueModified != null) {
-            onValueModified.accept(!isNullOrEmpty(currentAssetAttribute[0]) && !isNullOrEmpty(currentAssetAttribute[1]) ? new AttributeRef(currentAssetAttribute[0], currentAssetAttribute[1]) : null);
+            onValueModified.accept(!isNullOrEmpty(currentAttribute[0]) && !isNullOrEmpty(currentAttribute[1]) ? new AttributeRef(currentAttribute[0], currentAttribute[1]) : null);
         }
     }
 }

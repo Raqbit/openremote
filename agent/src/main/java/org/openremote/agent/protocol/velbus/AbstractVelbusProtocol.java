@@ -26,7 +26,7 @@ import org.openremote.agent.protocol.velbus.device.FeatureProcessor;
 import org.openremote.agent.protocol.velbus.device.VelbusDeviceType;
 import org.openremote.container.util.CodecUtil;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.AgentLink;
@@ -108,11 +108,6 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     );
 
     @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
-    @Override
     protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
         return new ArrayList<>(META_ITEM_DESCRIPTORS);
     }
@@ -123,7 +118,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         // Look for existing network
@@ -159,7 +154,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkAndConsumer = networkConfigurationMap.remove(protocolRef);
@@ -179,14 +174,14 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
 
-        if (!protocolConfiguration.isEnabled()) {
-            LOG.info("Protocol configuration is disabled so ignoring: " + protocolConfiguration.getReferenceOrThrow());
+        if (!agent.isEnabled()) {
+            LOG.info("Protocol configuration is disabled so ignoring: " + agent.getReferenceOrThrow());
             return;
         }
 
-        Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
+        Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (velbusNetworkConsumerPair == null) {
             LOG.info("Protocol Configuration doesn't have a valid VelbusNetwork so cannot link");
@@ -213,8 +208,8 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+        Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (velbusNetworkConsumerPair == null) {
             return;
@@ -234,7 +229,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
 
         if (velbusNetworkConsumerPair == null) {
@@ -242,7 +237,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
         }
 
         VelbusNetwork velbusNetwork = velbusNetworkConsumerPair.key;
-        AssetAttribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (attribute == null) {
             return;
@@ -258,13 +253,13 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration) {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration) {
         // TODO: Implement asset attribute discovery using the bus
         return new AssetTreeNode[0];
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
         Document xmlDoc;
         try {
             String xmlStr = fileInfo.isBinary() ? new String(CodecUtil.decodeBase64(fileInfo.getContents()), "UTF8") : fileInfo.getContents();
@@ -305,12 +300,12 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
             name = isNullOrEmpty(name) ? deviceType.toString() : name;
             Asset device = new Asset(name, AssetType.THING);
             device.setAttributes(
-                new AssetAttribute("build", AttributeValueType.STRING, Values.create(build))
+                new Attribute("build", AttributeValueType.STRING, Values.create(build))
                     .setMeta(
                         new MetaItem(MetaItemType.LABEL, Values.create("Build")),
                         new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
                     ),
-                new AssetAttribute("serialNumber", AttributeValueType.STRING, Values.create(serial))
+                new Attribute("serialNumber", AttributeValueType.STRING, Values.create(serial))
                     .setMeta(
                         new MetaItem(MetaItemType.LABEL, Values.create("Serial No")),
                         new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
@@ -319,7 +314,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
 
             getLinkedAttributeDescriptors(deviceType.get(), baseAddress)
                 .forEach(descriptor -> {
-                    AssetAttribute attribute = new AssetAttribute(descriptor.getName(), descriptor.getAttributeValueDescriptor())
+                    Attribute attribute = new Attribute(descriptor.getName(), descriptor.getAttributeValueDescriptor())
                         .setMeta(
                             agentLink,
                             new MetaItem(MetaItemType.LABEL, Values.create(descriptor.getDisplayName()))
@@ -344,14 +339,14 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     /**
      * Should return an instance of {@link IoClient} for the supplied protocolConfiguration
      */
-    protected abstract IoClient<VelbusPacket> createIoClient(AssetAttribute protocolConfiguration) throws RuntimeException;
+    protected abstract IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException;
 
 
     /**
      * Should return a String key that uniquely identifies the VelbusNetwork that corresponds with the supplied
      * {@link org.openremote.model.asset.agent.ProtocolConfiguration}
      */
-    protected abstract String getUniqueNetworkIdentifier(AssetAttribute protocolConfiguration);
+    protected abstract String getUniqueNetworkIdentifier(Attribute protocolConfiguration);
 
     public static List<LinkedAttributeDescriptor> getLinkedAttributeDescriptors(VelbusDeviceType deviceType, int deviceAddress) {
         List<LinkedAttributeDescriptor> descriptors = new ArrayList<>();

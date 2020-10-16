@@ -1,11 +1,11 @@
 package org.openremote.model.apps;
 
 import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.ObjectValue;
 
 import javax.persistence.*;
 
-import static org.openremote.model.Constants.*;
+import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
+import static org.openremote.model.Constants.PERSISTENCE_SEQUENCE_ID_GENERATOR;
 
 @Entity
 @Table(name = "CONSOLE_APP_CONFIG")
@@ -64,6 +64,6 @@ public class ConsoleAppConfig {
     protected String secondaryColor;
 
     @Column(name = "LINKS", columnDefinition = "jsonb")
-    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_ARRAY_TYPE)
+    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
     protected ArrayValue links;
 }

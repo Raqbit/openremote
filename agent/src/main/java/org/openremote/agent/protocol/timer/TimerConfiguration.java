@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.timer;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.MetaItem;
@@ -45,20 +45,20 @@ final public class TimerConfiguration {
     private TimerConfiguration() {
     }
 
-    public static AssetAttribute initTimerConfiguration(AssetAttribute attribute, String cronExpression, AttributeState action) {
+    public static Attribute initTimerConfiguration(Attribute attribute, String cronExpression, AttributeState action) {
         initProtocolConfiguration(attribute, TimerProtocol.PROTOCOL_NAME);
         setCronExpression(attribute, cronExpression);
         setAction(attribute, action);
         return attribute;
     }
 
-    public static boolean isTimerConfiguration(AssetAttribute attribute) {
+    public static boolean isTimerConfiguration(Attribute attribute) {
         return getProtocolName(attribute)
             .map(TimerProtocol.PROTOCOL_NAME::equals)
             .orElse(false);
     }
 
-    public static boolean validateTimerConfiguration(AssetAttribute attribute, AttributeValidationResult result) {
+    public static boolean validateTimerConfiguration(Attribute attribute, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isTimerConfiguration(attribute)) {
@@ -121,17 +121,17 @@ final public class TimerConfiguration {
         return !failure;
     }
 
-    public static boolean isValidTimerConfiguration(AssetAttribute attribute) {
+    public static boolean isValidTimerConfiguration(Attribute attribute) {
         return isTimerConfiguration(attribute)
             && isActionValid(attribute)
             && isCronExpressionValid(attribute);
     }
 
-    public static boolean hasCronExpression(AssetAttribute attribute) {
+    public static boolean hasCronExpression(Attribute attribute) {
         return attribute != null && attribute.hasMetaItem(META_TIMER_CRON_EXPRESSION);
     }
 
-    public static boolean isCronExpressionValid(AssetAttribute attribute) {
+    public static boolean isCronExpressionValid(Attribute attribute) {
         return attribute != null && attribute
             .getMetaItem(META_TIMER_CRON_EXPRESSION)
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -143,31 +143,31 @@ final public class TimerConfiguration {
         return !isNullOrEmpty(cronExpression) && createCronExpression(cronExpression) != null;
     }
 
-    public static Optional<String> getCronExpression(AssetAttribute attribute) {
+    public static Optional<String> getCronExpression(Attribute attribute) {
         return attribute == null ? Optional.empty() : attribute
             .getMetaItem(META_TIMER_CRON_EXPRESSION)
             .flatMap(AbstractValueHolder::getValueAsString);
     }
 
-    public static void setCronExpression(AssetAttribute attribute, String cronExpression) {
+    public static void setCronExpression(Attribute attribute, String cronExpression) {
         if (attribute == null)
             return;
 
         replaceMetaByName(attribute.getMeta(), META_TIMER_CRON_EXPRESSION, Values.create(cronExpression));
     }
 
-    public static boolean hasAction(AssetAttribute attribute) {
+    public static boolean hasAction(Attribute attribute) {
         return attribute != null && attribute.hasMetaItem(META_TIMER_ACTION);
     }
 
-    public static boolean isActionValid(AssetAttribute attribute) {
+    public static boolean isActionValid(Attribute attribute) {
         return attribute != null && attribute.getMetaItem(META_TIMER_ACTION)
             .flatMap(AbstractValueHolder::getValue)
             .map(AttributeState::isAttributeState)
             .orElse(false);
     }
 
-    public static Optional<AttributeState> getAction(AssetAttribute attribute) {
+    public static Optional<AttributeState> getAction(Attribute attribute) {
         return attribute == null ? Optional.empty() : attribute
             .getMetaItem(META_TIMER_ACTION)
             .flatMap(TimerConfiguration::getAction);
@@ -178,13 +178,13 @@ final public class TimerConfiguration {
             .flatMap(AttributeState::fromValue);
     }
 
-    public static void setAction(AssetAttribute attribute, AttributeState action) {
+    public static void setAction(Attribute attribute, AttributeState action) {
         if (attribute == null)
             return;
         replaceMetaByName(attribute.getMeta(), META_TIMER_ACTION, action.toObjectValue());
     }
 
-    public static void removeTimer(AssetAttribute attribute) {
+    public static void removeTimer(Attribute attribute) {
         if (attribute == null)
             return;
 
@@ -196,7 +196,7 @@ final public class TimerConfiguration {
             );
     }
 
-    public static Optional<TimerValue> getValue(AssetAttribute attribute) {
+    public static Optional<TimerValue> getValue(Attribute attribute) {
         return attribute == null ? Optional.empty() : attribute
             .getMetaItem(META_TIMER_VALUE_LINK)
             .flatMap(AbstractValueHolder::getValueAsString)

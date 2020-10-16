@@ -42,14 +42,12 @@ public interface Constants {
     int ACCESS_TOKEN_LIFESPAN_SECONDS = 60; // 1 minute
     String PERSISTENCE_SEQUENCE_ID_GENERATOR = "SEQUENCE_ID_GENERATOR";
     String PERSISTENCE_UNIQUE_ID_GENERATOR = "UNIQUE_ID_GENERATOR";
-    String PERSISTENCE_JSON_VALUE_TYPE = "json_value";
-    String PERSISTENCE_JSON_OBJECT_TYPE = "json_object";
-    String PERSISTENCE_JSON_ARRAY_TYPE = "json_array";
-    String PERSISTENCE_STRING_ARRAY_TYPE = "string_array";
+    String PERSISTENCE_JSON_VALUE_TYPE = "jsonb";
+    String PERSISTENCE_STRING_ARRAY_TYPE = "string-array";
     String NAMESPACE = "urn:openremote";
     String PROTOCOL_NAMESPACE = NAMESPACE + ":protocol";
     String ASSET_NAMESPACE = NAMESPACE + ":asset";
-    String AGENT_ASSET_NAMESPACE = ASSET_NAMESPACE + ":agent";
+    String AGENT_NAMESPACE = NAMESPACE + ":agent";
     String ASSET_META_NAMESPACE = ASSET_NAMESPACE + ":meta";
     String DEFAULT_DATETIME_FORMAT ="dd. MMM yyyy HH:mm:ss zzz";
     String DEFAULT_DATETIME_FORMAT_MILLIS ="dd. MMM yyyy HH:mm:ss:SSS zzz";

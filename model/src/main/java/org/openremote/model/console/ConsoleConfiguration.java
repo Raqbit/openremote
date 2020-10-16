@@ -23,7 +23,7 @@ import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.AttributeType;
 import org.openremote.model.attribute.Meta;
@@ -78,7 +78,7 @@ public final class ConsoleConfiguration {
             locationMeta.add(new MetaItem(ACCESS_RESTRICTED_WRITE));
         }
         asset.replaceAttribute(
-            new AssetAttribute(AttributeType.LOCATION)
+            new Attribute(AttributeType.LOCATION)
                 .setMeta(locationMeta)
         );
 
@@ -173,7 +173,7 @@ public final class ConsoleConfiguration {
     public static Asset setConsoleName(Asset asset, String name) {
         Objects.requireNonNull(asset);
         TextUtil.requireNonNullAndNonEmpty(name);
-        asset.replaceAttribute(new AssetAttribute(AttributeType.CONSOLE_NAME,
+        asset.replaceAttribute(new Attribute(AttributeType.CONSOLE_NAME,
                                Values.create(name)));
         return asset;
     }
@@ -185,7 +185,7 @@ public final class ConsoleConfiguration {
     public static Asset setConsoleVersion(Asset asset, String version) {
         Objects.requireNonNull(asset);
         TextUtil.requireNonNullAndNonEmpty(version);
-        asset.replaceAttribute(new AssetAttribute(AttributeType.CONSOLE_VERSION,
+        asset.replaceAttribute(new Attribute(AttributeType.CONSOLE_VERSION,
                                                                    Values.create(version)));
         return asset;
     }
@@ -197,7 +197,7 @@ public final class ConsoleConfiguration {
     public static Asset setConsolePlatform(Asset asset, String platform) {
         Objects.requireNonNull(asset);
         TextUtil.requireNonNullAndNonEmpty(platform);
-        asset.replaceAttribute(new AssetAttribute(AttributeType.CONSOLE_PLATFORM,
+        asset.replaceAttribute(new Attribute(AttributeType.CONSOLE_PLATFORM,
                                                                    Values.create(platform)));
         return asset;
     }
@@ -221,7 +221,7 @@ public final class ConsoleConfiguration {
             return asset;
         }
 
-        asset.replaceAttribute(new AssetAttribute(AttributeType.CONSOLE_PROVIDERS,
+        asset.replaceAttribute(new Attribute(AttributeType.CONSOLE_PROVIDERS,
                                                                    ConsoleProvider.toValue(consoleProviderMap)));
         return asset;
     }
@@ -229,8 +229,8 @@ public final class ConsoleConfiguration {
     public static void addOrReplaceConsoleProvider(Asset asset, String name, ConsoleProvider consoleProvider) {
         Objects.requireNonNull(asset);
         TextUtil.requireNonNullAndNonEmpty(name);
-        AssetAttribute providerAttribute = asset.getAttribute(AttributeType.CONSOLE_PROVIDERS).orElseGet(() -> {
-            AssetAttribute attr = new AssetAttribute(AttributeType.CONSOLE_PROVIDERS, Values.createObject());
+        Attribute providerAttribute = asset.getAttribute(AttributeType.CONSOLE_PROVIDERS).orElseGet(() -> {
+            Attribute attr = new Attribute(AttributeType.CONSOLE_PROVIDERS, Values.createObject());
             asset.addAttributes(attr);
             return attr;
         });
@@ -252,7 +252,7 @@ public final class ConsoleConfiguration {
         }
     }
 
-    public static Optional<Map<String, ConsoleProvider>> getConsoleProviders(AssetAttribute attribute) {
+    public static Optional<Map<String, ConsoleProvider>> getConsoleProviders(Attribute attribute) {
         if (attribute == null || !AttributeType.CONSOLE_PROVIDERS.getAttributeName().equals(attribute.getName().orElse(null))) {
             return Optional.empty();
         }

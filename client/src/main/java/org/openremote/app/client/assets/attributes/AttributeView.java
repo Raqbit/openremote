@@ -22,7 +22,7 @@ package org.openremote.app.client.assets.attributes;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.interop.Consumer;
@@ -30,7 +30,7 @@ import org.openremote.model.value.Value;
 import org.openremote.model.value.ValueType;
 
 /**
- * The presenter will deal with validating the {@link AssetAttribute}s and will notify the individual
+ * The presenter will deal with validating the {@link Attribute}s and will notify the individual
  * {@link AttributeView}s when the validation state changes for an attribute.
  */
 public interface AttributeView extends IsWidget {
@@ -65,13 +65,13 @@ public interface AttributeView extends IsWidget {
     /**
      * Get the attribute associated with this view.
      */
-    AssetAttribute getAttribute();
+    Attribute getAttribute();
 
     /**
      * This callback should be used by the view to notify the presenter that the attribute has been modified. Could be
      * a value change or meta item create, update or delete.
      */
-    void setAttributeModifiedCallback(Consumer<AssetAttribute> attributeModifiedCallback);
+    void setAttributeModifiedCallback(Consumer<Attribute> attributeModifiedCallback);
 
     /**
      * This {@link ValueEditorSupplier} should be used to get a basic value editor/viewer for a {@link ValueHolder}.

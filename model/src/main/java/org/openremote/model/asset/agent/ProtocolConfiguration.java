@@ -20,7 +20,7 @@
 package org.openremote.model.asset.agent;
 
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.attribute.MetaItem;
@@ -51,7 +51,7 @@ final public class ProtocolConfiguration {
     private ProtocolConfiguration() {
     }
 
-    public static AssetAttribute initProtocolConfiguration(AssetAttribute attribute, String protocolName) throws IllegalArgumentException {
+    public static Attribute initProtocolConfiguration(Attribute attribute, String protocolName) throws IllegalArgumentException {
         if (attribute == null) {
             return null;
         }
@@ -63,7 +63,7 @@ final public class ProtocolConfiguration {
         return attribute;
     }
 
-    public static UnaryOperator<AssetAttribute> initProtocolConfiguration(String protocolName) throws IllegalArgumentException {
+    public static UnaryOperator<Attribute> initProtocolConfiguration(String protocolName) throws IllegalArgumentException {
         return attribute -> initProtocolConfiguration(attribute, protocolName);
     }
 
@@ -77,7 +77,7 @@ final public class ProtocolConfiguration {
         }
     }
 
-    public static boolean isProtocolConfiguration(AssetAttribute attribute) {
+    public static boolean isProtocolConfiguration(Attribute attribute) {
         return getProtocolName(attribute).isPresent()
             && attribute.getMetaStream().filter(isMetaNameEqualTo(PROTOCOL_CONFIGURATION))
             .findFirst()
@@ -85,7 +85,7 @@ final public class ProtocolConfiguration {
             .orElse(false);
     }
 
-    public static Optional<String> getProtocolName(AssetAttribute attribute) {
+    public static Optional<String> getProtocolName(Attribute attribute) {
         if (attribute == null) {
             return Optional.empty();
         }
@@ -95,7 +95,7 @@ final public class ProtocolConfiguration {
             .map(name -> isValidProtocolName(name) ? name : null);
     }
 
-    public static AssetAttribute setProtocolName(AssetAttribute attribute, String protocolName) throws IllegalArgumentException {
+    public static Attribute setProtocolName(Attribute attribute, String protocolName) throws IllegalArgumentException {
         if (attribute == null) {
             return null;
         }
@@ -104,7 +104,7 @@ final public class ProtocolConfiguration {
         return attribute;
     }
 
-    public static UnaryOperator<AssetAttribute> setProtocolName(String protocolName) throws IllegalArgumentException {
+    public static UnaryOperator<Attribute> setProtocolName(String protocolName) throws IllegalArgumentException {
         return attribute -> setProtocolName(attribute, protocolName);
     }
 }

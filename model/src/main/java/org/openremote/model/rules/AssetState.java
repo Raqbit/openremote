@@ -23,7 +23,7 @@ import javaemul.internal.annotations.GwtIncompatible;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.AbstractValueTimestampHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeValueDescriptor;
@@ -107,7 +107,7 @@ public class AssetState implements Comparable<AssetState> {
         this.meta = that.meta;
     }
 
-    public AssetState(Asset asset, AssetAttribute attribute, AttributeEvent.Source source) {
+    public AssetState(Asset asset, Attribute attribute, AttributeEvent.Source source) {
         this.attributeName = attribute.getNameOrThrow();
         this.attributeValueType = attribute.getTypeOrThrow();
         this.value = attribute.getValue().orElse(null);

@@ -20,7 +20,7 @@
 package org.openremote.manager.datapoint;
 
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.ContainerHealthStatusProvider;
 import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Value;
@@ -38,17 +38,17 @@ public class AssetDatapointHealthStatusProvider implements ContainerHealthStatus
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         assetDatapointService = container.getService(AssetDatapointService.class);
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

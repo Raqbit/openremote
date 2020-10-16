@@ -7,7 +7,7 @@ import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetResource
 import org.openremote.model.attribute.MetaItem
 import org.openremote.model.query.AssetQuery
@@ -53,10 +53,10 @@ class AssetPublicQueryTest extends Specification implements ManagerContainerTrai
             somePublicAsset.setParentId(managerTestSetup.smartOfficeId)
             somePublicAsset.setAccessPublicRead(true)
             somePublicAsset.setAttributes(
-                    new AssetAttribute("somePrivateAttribute", NUMBER, Values.create(123)).addMeta(
+                    new Attribute("somePrivateAttribute", NUMBER, Values.create(123)).addMeta(
                             new MetaItem(LABEL, Values.create("Some Private Attribute"))
                     ),
-                    new AssetAttribute("somePublicAttribute", NUMBER, Values.create(456)).addMeta(
+                    new Attribute("somePublicAttribute", NUMBER, Values.create(456)).addMeta(
                             new MetaItem(LABEL, Values.create("Some Public Attribute")),
                             new MetaItem(ACCESS_PUBLIC_READ, Values.create(true))
                     ),

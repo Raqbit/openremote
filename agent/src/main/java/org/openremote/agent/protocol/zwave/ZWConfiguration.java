@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.zwave;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.attribute.MetaItem;
@@ -40,21 +40,21 @@ import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 
 public class ZWConfiguration {
 
-    public static int getZWNodeId(AssetAttribute assetAttribute) {
+    public static int getZWNodeId(Attribute assetAttribute) {
         return assetAttribute
             .getMetaItem(META_ZWAVE_DEVICE_NODE_ID)
             .flatMap(AbstractValueHolder::getValueAsInteger)
             .orElse(0);
     }
 
-    public static int getZWEndpoint(AssetAttribute assetAttribute) {
+    public static int getZWEndpoint(Attribute assetAttribute) {
         return assetAttribute
             .getMetaItem(META_ZWAVE_DEVICE_ENDPOINT)
             .flatMap(AbstractValueHolder::getValueAsInteger)
             .orElse(0);
     }
 
-    public static String getZWLinkName(AssetAttribute assetAttribute) {
+    public static String getZWLinkName(Attribute assetAttribute) {
         return assetAttribute
             .getMetaItem(META_ZWAVE_DEVICE_VALUE_LINK)
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -62,12 +62,12 @@ public class ZWConfiguration {
             .orElse("");
     }
 
-    public static String getEndpointIdAsString(AssetAttribute assetAttribute)
+    public static String getEndpointIdAsString(Attribute assetAttribute)
     {
       return getZWNodeId(assetAttribute) + ":" + getZWEndpoint(assetAttribute);
     }
 
-    public static boolean validateSerialConfiguration(AssetAttribute protocolConfiguration, AttributeValidationResult result) {
+    public static boolean validateSerialConfiguration(Attribute protocolConfiguration, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isSerialConfiguration(protocolConfiguration)) {
@@ -111,7 +111,7 @@ public class ZWConfiguration {
         return !failure;
     }
 
-    public static boolean isSerialConfiguration(AssetAttribute attribute) {
+    public static boolean isSerialConfiguration(Attribute attribute) {
         return attribute != null && attribute.getValueAsString().map(value -> value.equals(ZWProtocol.PROTOCOL_NAME)).orElse(false);
     }
 
@@ -125,7 +125,7 @@ public class ZWConfiguration {
         }
     }
 
-    public static AssetAttribute initProtocolConfiguration(AssetAttribute attribute, String protocolName) throws IllegalArgumentException {
+    public static Attribute initProtocolConfiguration(Attribute attribute, String protocolName) throws IllegalArgumentException {
         if (attribute == null) {
             return null;
         }

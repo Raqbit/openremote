@@ -21,7 +21,7 @@ package org.openremote.manager.agent;
 
 import org.openremote.container.Container;
 import org.openremote.container.ContainerHealthStatusProvider;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
@@ -45,17 +45,17 @@ public class AgentHealthStatusProvider implements ContainerHealthStatusProvider 
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         agentService = container.getService(AgentService.class);
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

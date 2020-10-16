@@ -40,6 +40,7 @@ import org.keycloak.representations.idm.PublishedRealmRepresentation;
 import org.openremote.container.Container;
 import org.openremote.container.security.IdentityProvider;
 import org.openremote.container.web.*;
+import org.openremote.model.auth.OAuthPasswordGrant;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.NotFoundException;

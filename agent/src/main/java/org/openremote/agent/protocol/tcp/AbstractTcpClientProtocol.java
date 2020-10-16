@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.tcp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.syslog.SyslogCategory;
@@ -52,7 +52,7 @@ public abstract class AbstractTcpClientProtocol<T> extends AbstractIoClientProto
     );
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_PROTOCOL_HOST, null),
@@ -61,7 +61,7 @@ public abstract class AbstractTcpClientProtocol<T> extends AbstractIoClientProto
     }
 
     @Override
-    protected TcpIoClient<T> createIoClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected TcpIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
 
         String host = Values.getMetaItemValueOrThrow(
             protocolConfiguration,

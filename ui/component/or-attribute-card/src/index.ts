@@ -1,6 +1,6 @@
 import {css, customElement, html, LitElement, property, PropertyValues, query, unsafeCSS} from "lit-element";
 import i18next from "i18next";
-import {Asset, AssetAttribute, AssetEvent, DatapointInterval, MetaItemType, ValueDatapoint} from "@openremote/model";
+import {Asset, Attribute, AssetEvent, DatapointInterval, MetaItemType, ValueDatapoint} from "@openremote/model";
 import {AssetModelUtil, DefaultColor3, DefaultColor4, manager, Util} from "@openremote/core";
 import Chart, {ChartTooltipCallback} from "chart.js";
 import {OrChartConfig} from "@openremote/or-chart";
@@ -188,7 +188,7 @@ export class OrAttributeCard extends LitElement {
     protected _style!: CSSStyleDeclaration;
 
     @property({type: Object})
-    private assetAttributes: AssetAttribute[] = [];
+    private assetAttributes: Attribute[] = [];
 
     @property()
     private data: ValueDatapoint<any>[] = [];
@@ -462,7 +462,7 @@ export class OrAttributeCard extends LitElement {
                 }
             }).then((ev) => {
                 this.asset = (ev as AssetEvent).asset;
-                const attributes = [...Util.getAssetAttributes(this.asset!)];
+                const attributes = [...Util.getAttributes(this.asset!)];
                 this.assetAttributes = [...attributes];
             }).catch(() => this.asset = undefined);
         }
@@ -478,11 +478,11 @@ export class OrAttributeCard extends LitElement {
             elm.value = "";
         }
 
-        let attributes = [...Util.getAssetAttributes(this.asset)];
+        let attributes = [...Util.getAttributes(this.asset)];
         if (attributes && attributes.length > 0) {
             attributes = attributes
-                .filter((attr: AssetAttribute) => Util.getFirstMetaItem(attr, MetaItemType.STORE_DATA_POINTS.urn!));
-            const options = attributes.map((attr: AssetAttribute) => {
+                .filter((attr: Attribute) => Util.getFirstMetaItem(attr, MetaItemType.STORE_DATA_POINTS.urn!));
+            const options = attributes.map((attr: Attribute) => {
                 const descriptors = AssetModelUtil.getAttributeAndValueDescriptors(this.asset!.type, attr);
                 return [attr.name, Util.getAttributeLabel(attr, descriptors[0], descriptors[1], false)];
             });
@@ -492,7 +492,7 @@ export class OrAttributeCard extends LitElement {
 
     private _setAttribute(event:OrAttributeCardAddAttributeEvent) {
         if (this.asset && event) {
-            const attr = Util.getAssetAttribute(this.asset , event.detail);
+            const attr = Util.getAttribute(this.asset , event.detail);
             if (attr) {
                 this.assetId = this.asset.id;
                 this.attributeName = attr.name;
@@ -527,7 +527,7 @@ export class OrAttributeCard extends LitElement {
         manager.rest.api.AssetResource.queryAssets(query).then((response) => {
             const assets = response.data;
             if(assets.length > 0) {
-                this.assetAttributes = view.attributes.map((attr: string, index: number)  => Util.getAssetAttribute(assets[index], attr));
+                this.assetAttributes = view.attributes.map((attr: string, index: number)  => Util.getAttribute(assets[index], attr));
                 if(this.assetAttributes && this.assetAttributes.length > 0) {
                     this.assetId = assets[0].id;
                     this.period = view.period;

@@ -22,8 +22,7 @@ package org.openremote.manager.rules;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
-import org.openremote.container.message.MessageBrokerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
@@ -73,7 +72,7 @@ public class RulesetStorageService implements ContainerService {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         persistenceService = container.getService(PersistenceService.class);
         identityService = container.getService(ManagerIdentityService.class);
 
@@ -89,11 +88,11 @@ public class RulesetStorageService implements ContainerService {
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

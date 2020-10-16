@@ -19,7 +19,7 @@
  */
 package org.openremote.container;
 
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 
 public interface ContainerHealthStatusProvider extends HealthStatusProvider, ContainerService {

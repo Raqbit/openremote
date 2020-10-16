@@ -5,7 +5,7 @@ import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.Constants
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.*
 import org.openremote.model.value.JsonPathFilter
@@ -17,7 +17,7 @@ import spock.util.concurrent.PollingConditions
 
 import java.util.concurrent.TimeUnit
 
-class AssetAttributeLinkingTest extends Specification implements ManagerContainerTrait {
+class AttributeLinkingTest extends Specification implements ManagerContainerTrait {
 
     def "Check processing of asset attributes that are linked to other attributes"() {
 
@@ -37,15 +37,15 @@ class AssetAttributeLinkingTest extends Specification implements ManagerContaine
         when: "assets are created"
         def asset1 = new Asset("Asset 1", AssetType.THING, null, Constants.MASTER_REALM)
         asset1.setAttributes(
-            new AssetAttribute("button", AttributeValueType.STRING, Values.create("RELEASED"), getClockTimeOf(container)),
-            new AssetAttribute("array", AttributeValueType.ARRAY, null)
+            new Attribute("button", AttributeValueType.STRING, Values.create("RELEASED"), getClockTimeOf(container)),
+            new Attribute("array", AttributeValueType.ARRAY, null)
         )
         asset1 = assetStorageService.merge(asset1)
         def asset2 = new Asset("Asset 2", AssetType.THING, null, Constants.MASTER_REALM)
         asset2.setAttributes(
-            new AssetAttribute("lightOnOff", AttributeValueType.BOOLEAN, Values.create(false), getClockTimeOf(container)),
-            new AssetAttribute("counter", AttributeValueType.NUMBER, Values.create(0), getClockTimeOf(container)),
-            new AssetAttribute("item2Prop1", AttributeValueType.BOOLEAN, null)
+            new Attribute("lightOnOff", AttributeValueType.BOOLEAN, Values.create(false), getClockTimeOf(container)),
+            new Attribute("counter", AttributeValueType.NUMBER, Values.create(0), getClockTimeOf(container)),
+            new Attribute("item2Prop1", AttributeValueType.BOOLEAN, null)
         )
         asset2 = assetStorageService.merge(asset2)
 

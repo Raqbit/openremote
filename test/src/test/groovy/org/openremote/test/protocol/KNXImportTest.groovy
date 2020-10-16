@@ -35,7 +35,7 @@ import org.openremote.manager.asset.AssetStorageService
 
 import org.openremote.model.asset.agent.AgentResource
 import org.openremote.model.Constants
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.AgentLink
 import org.openremote.model.asset.agent.ProtocolConfiguration
@@ -69,7 +69,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
         knxAgent.setName("KNX Agent")
         knxAgent.setType(AssetType.AGENT)
         knxAgent.setAttributes(
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("knxConfigError1"), KNXProtocol.PROTOCOL_NAME)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("knxConfigError1"), KNXProtocol.PROTOCOL_NAME)
         )
         knxAgent.setRealm(Constants.MASTER_REALM)
         knxAgent = assetStorageService.merge(knxAgent)

@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.udp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
@@ -62,7 +62,7 @@ public abstract class AbstractUdpClientProtocol<T> extends AbstractIoClientProto
     );
 
     @Override
-    protected UdpIoClient<T> createIoClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected UdpIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
         String host = Values.getMetaItemValueOrThrow(
             protocolConfiguration,
             META_PROTOCOL_HOST,

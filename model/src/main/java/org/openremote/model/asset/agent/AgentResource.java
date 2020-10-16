@@ -22,7 +22,7 @@ package org.openremote.model.asset.agent;
 import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetResource;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.attribute.AttributeValidationResult;
@@ -98,7 +98,7 @@ public interface AgentResource {
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
     @SuppressWarnings("unusable-by-js")
-    AssetAttribute[] getDiscoveredProtocolConfigurations(
+    Attribute[] getDiscoveredProtocolConfigurations(
         @BeanParam RequestParams requestParams,
         @PathParam("agentId") String agentId,
         @PathParam("protocolName") String protocolName
@@ -116,7 +116,7 @@ public interface AgentResource {
     AttributeValidationResult validateProtocolConfiguration(
         @BeanParam RequestParams requestParams,
         @PathParam("agentId") String agentId,
-        AssetAttribute protocolConfiguration
+        Attribute protocolConfiguration
     );
 
     /**

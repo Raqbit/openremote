@@ -20,15 +20,18 @@
 package org.openremote.model.asset;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Formula;
 import org.openremote.model.AbstractValueHolder;
+import org.openremote.model.Constants;
 import org.openremote.model.IdentifiableEntity;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeDescriptor;
+import org.openremote.model.attribute.AttributeList;
+import org.openremote.model.attribute.NamedList;
 import org.openremote.model.geo.GeoJSON;
 import org.openremote.model.geo.GeoJSONFeature;
 import org.openremote.model.geo.GeoJSONFeatureCollection;
@@ -49,9 +52,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.openremote.model.Constants.PERSISTENCE_JSON_OBJECT_TYPE;
+import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
-import static org.openremote.model.asset.AssetAttribute.*;
+import static org.openremote.model.attribute.Attribute.isAttributeNameEqualTo;
 import static org.openremote.model.attribute.AttributeType.LOCATION;
 
 // @formatter:off
@@ -220,7 +223,11 @@ import static org.openremote.model.attribute.AttributeType.LOCATION;
 // @formatter:on
 @Entity
 @Table(name = "ASSET")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "ASSET_TYPE")
+@DiscriminatorValue("non null")
 @Check(constraints = "ID != PARENT_ID")
+@JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, use = JsonTypeInfo.Id.CLASS, defaultImpl = Asset.class)
 public class Asset implements IdentifiableEntity {
 
     public enum AssetTypeFailureReason implements ValidationFailure.Reason {
@@ -234,7 +241,7 @@ public class Asset implements IdentifiableEntity {
     protected String id;
 
     @Version
-    @Column(name = "OBJ_VERSION", nullable = false)
+    @Column(name = "VERSION", nullable = false)
     protected long version;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -258,28 +265,24 @@ public class Asset implements IdentifiableEntity {
     @Column(name = "PARENT_ID", length = 36)
     protected String parentId;
 
+    @Column(name = "REALM", nullable = false)
+    protected String realm;
+
     @Transient
     protected String parentName;
 
     @Transient
     protected String parentType;
 
-    @Column(name = "REALM", nullable = false)
-    protected String realm;
-
-    @Transient
-    @JsonIgnore
-    protected ObservableList<AssetAttribute> attributeList;
-
     // The following are expensive to query, so if they are null, they might not have been loaded
 
     @Formula("get_asset_tree_path(ID)")
-    @org.hibernate.annotations.Type(type = "org.openremote.container.persistence.ArrayUserType")
+    @org.hibernate.annotations.Type(type = Constants.PERSISTENCE_STRING_ARRAY_TYPE)
     protected String[] path;
 
     @Column(name = "ATTRIBUTES", columnDefinition = "jsonb")
-    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_OBJECT_TYPE)
-    public ObjectValue attributes;
+    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
+    protected AttributeList attributes;
 
     public Asset() {
     }
@@ -303,7 +306,7 @@ public class Asset implements IdentifiableEntity {
     public Asset(@NotNull String name, @NotNull AssetDescriptor type, Asset parent, String realm) {
         this(name, type.getType(), false, parent, realm);
         if (type.getAttributeDescriptors() != null) {
-            addAttributes(Arrays.stream(type.getAttributeDescriptors()).map(AssetAttribute::new).toArray(AssetAttribute[]::new));
+            addAttributes(Arrays.stream(type.getAttributeDescriptors()).map(Attribute::new).toArray(Attribute[]::new));
         }
     }
 
@@ -322,18 +325,18 @@ public class Asset implements IdentifiableEntity {
     }
 
     @JsonCreator
-    public Asset(@JsonProperty("id") String id,
-                 @JsonProperty("version") long version,
-                 @JsonProperty("createdOn") Date createdOn,
-                 @JsonProperty("name") String name,
-                 @JsonProperty("type") String type,
-                 @JsonProperty("accessPublicRead") boolean accessPublicRead,
-                 @JsonProperty("parentId") String parentId,
-                 @JsonProperty("parentName") String parentName,
-                 @JsonProperty("parentType") String parentType,
-                 @JsonProperty("realm") String realm,
-                 @JsonProperty("path") String[] path,
-                 @JsonProperty("attributes") ObjectValue attributes) {
+    protected Asset(@JsonProperty("id") String id,
+                    @JsonProperty("version") long version,
+                    @JsonProperty("createdOn") Date createdOn,
+                    @JsonProperty("name") String name,
+                    @JsonProperty("type") String type,
+                    @JsonProperty("accessPublicRead") boolean accessPublicRead,
+                    @JsonProperty("parentId") String parentId,
+                    @JsonProperty("parentName") String parentName,
+                    @JsonProperty("parentType") String parentType,
+                    @JsonProperty("realm") String realm,
+                    @JsonProperty("path") String[] path,
+                    @JsonProperty("attributes") NamedList attributes) {
         this(name, type, accessPublicRead, null, realm);
         this.id = id;
         this.version = version;
@@ -345,7 +348,7 @@ public class Asset implements IdentifiableEntity {
         this.attributes = attributes;
     }
 
-    public Asset addAttributes(AssetAttribute... attributes) throws IllegalArgumentException {
+    public Asset addAttributes(Attribute... attributes) throws IllegalArgumentException {
         Arrays.asList(attributes).forEach(
             attribute -> {
                 if (getAttributesStream().anyMatch(attr -> isAttributeNameEqualTo(attr, attribute.getName().orElse(null)))) {
@@ -361,12 +364,12 @@ public class Asset implements IdentifiableEntity {
     /**
      * Replaces existing or adds the attribute if it does not exist.
      */
-    public Asset replaceAttribute(AssetAttribute attribute) throws IllegalArgumentException {
+    public Asset replaceAttribute(Attribute attribute) throws IllegalArgumentException {
         if (attribute == null || !attribute.getName().isPresent() || !attribute.getType().isPresent())
             throw new IllegalArgumentException("Attribute cannot be null and must have a name and type");
 
         attribute.assetId = getId();
-        List<AssetAttribute> attributeList = getAttributesList();
+        List<Attribute> attributeList = getAttributesList();
         attributeList.removeIf(attr -> attr.getName().orElse("").equals(attribute.getName().orElse("")));
         attributeList.add(attribute);
 
@@ -374,7 +377,7 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Asset removeAttribute(String name) {
-        List<AssetAttribute> attributeList = getAttributesList();
+        List<Attribute> attributeList = getAttributesList();
         attributeList.removeIf(attr -> attr.getName().orElse("").equals(name));
         return this;
     }
@@ -389,8 +392,6 @@ public class Asset implements IdentifiableEntity {
 
     public void setId(String id) {
         this.id = id;
-        // Must clear the cached list of attributes they can be recreated with the new identifier
-        this.attributeList = null;
     }
 
     public long getVersion() {
@@ -419,24 +420,6 @@ public class Asset implements IdentifiableEntity {
 
     public String getType() {
         return type;
-    }
-
-    public boolean hasTypeWellKnown() {
-        //TODO replace with AssetModel getValues, through a http request
-        return AssetType.getByValue(getType()).isPresent();
-    }
-
-    public AssetType getWellKnownType() {
-        //TODO replace with AssetModel getValues, through a http request
-        return AssetType.getByValue(getType()).orElse(null);
-    }
-
-    public void setType(String type) throws IllegalArgumentException {
-        this.type = type;
-    }
-
-    public void setType(AssetDescriptor type) {
-        setType(type != null ? type.getType() : null);
     }
 
     public boolean isAccessPublicRead() {
@@ -539,15 +522,15 @@ public class Asset implements IdentifiableEntity {
         return path != null && Arrays.asList(getPath()).contains(assetId);
     }
 
-    public ObjectValue getAttributes() {
+    public AttributeList getAttributes() {
         return attributes;
     }
 
-    public Stream<AssetAttribute> getAttributesStream() {
+    public Stream<Attribute> getAttributesStream() {
         return getAttributesList().stream();
     }
 
-    public List<AssetAttribute> getAttributesList() {
+    public List<Attribute> getAttributesList() {
         if (attributeList == null) {
             attributeList = new ObservableList<>(attributesFromJson(attributes, id).collect(Collectors.toList()),
                     () -> this.attributes = attributesToJson(attributeList).orElse(Values.createObject()));
@@ -559,13 +542,13 @@ public class Asset implements IdentifiableEntity {
         return attributes != null && attributes.hasKey(name);
     }
 
-    public Optional<AssetAttribute> getAttribute(AttributeDescriptor descriptor) {
+    public Optional<Attribute> getAttribute(AttributeDescriptor descriptor) {
         return getAttribute(descriptor.getAttributeName());
     }
 
-    public Optional<AssetAttribute> getAttribute(String name) {
+    public Optional<Attribute> getAttribute(String name) {
         return attributes == null ? Optional.empty() : attributes.getObject(name)
-            .flatMap(objectValue -> AssetAttribute.attributeFromJson(objectValue, id, name));
+            .flatMap(objectValue -> Attribute.attributeFromJson(objectValue, id, name));
     }
 
     public Asset setAttributes(ObjectValue attributes) {
@@ -573,13 +556,13 @@ public class Asset implements IdentifiableEntity {
         return this;
     }
 
-    public Asset setAttributes(List<AssetAttribute> attributes) {
+    public Asset setAttributes(List<Attribute> attributes) {
         ((ObservableList) getAttributesList()).clear(false);
         getAttributesList().addAll(attributes);
         return this;
     }
 
-    public Asset setAttributes(AssetAttribute... attributes) {
+    public Asset setAttributes(Attribute... attributes) {
         return setAttributes(Arrays.asList(attributes));
     }
 
@@ -631,9 +614,9 @@ public class Asset implements IdentifiableEntity {
      * Complies to the GeoJSON specification RFC 7946
      */
     public void setCoordinates(GeoJSONPoint coordinates) {
-        AssetAttribute locationAttribute = getAttributesStream()
+        Attribute locationAttribute = getAttributesStream()
             .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
-            .findFirst().orElse(new AssetAttribute(LOCATION));
+            .findFirst().orElse(new Attribute(LOCATION));
 
         locationAttribute.setValue(coordinates == null ? null : coordinates.toValue());
         replaceAttribute(locationAttribute);
@@ -670,7 +653,7 @@ public class Asset implements IdentifiableEntity {
         return asset != null && asset.getWellKnownType() == assetType;
     }
 
-    public static void removeAttributes(Asset asset, Predicate<AssetAttribute> filter) {
+    public static void removeAttributes(Asset asset, Predicate<Attribute> filter) {
         if (asset == null)
             return;
 

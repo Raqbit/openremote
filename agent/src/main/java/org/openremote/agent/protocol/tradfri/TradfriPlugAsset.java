@@ -5,7 +5,7 @@ import org.openremote.agent.protocol.tradfri.device.Plug;
 import org.openremote.agent.protocol.tradfri.device.event.EventHandler;
 import org.openremote.agent.protocol.tradfri.device.event.PlugChangeOnEvent;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.Values;
@@ -32,8 +32,8 @@ public class TradfriPlugAsset extends TradfriAsset {
      * Method to create the asset attributes
      */
     @Override
-    public void createAssetAttributes() {
-        AssetAttribute plugStatus = new AssetAttribute("plugStatus", BOOLEAN, Values.create(false));
+    public void createAttributes() {
+        Attribute plugStatus = new Attribute("plugStatus", BOOLEAN, Values.create(false));
         plugStatus.addMeta(
                 new MetaItem(LABEL, Values.create("Plug Status")),
                 new MetaItem(DESCRIPTION, Values.create("The state of the TRÅDFRI plug (Checked means on, unchecked means off)")),
@@ -56,7 +56,7 @@ public class TradfriPlugAsset extends TradfriAsset {
         EventHandler<PlugChangeOnEvent> plugOnOffEventHandler = new EventHandler<PlugChangeOnEvent>() {
             @Override
             public void handle(PlugChangeOnEvent event) {
-                Optional<AssetAttribute> plugStatus = getAttribute("plugStatus");
+                Optional<Attribute> plugStatus = getAttribute("plugStatus");
                 Plug plug = device.toPlug();
                 if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
                 assetService.mergeAsset(asset);
@@ -71,7 +71,7 @@ public class TradfriPlugAsset extends TradfriAsset {
     @Override
     public void setInitialValues() {
         Plug plug = device.toPlug();
-        Optional<AssetAttribute> plugStatus = getAttribute("plugStatus");
+        Optional<Attribute> plugStatus = getAttribute("plugStatus");
         if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
     }
 }

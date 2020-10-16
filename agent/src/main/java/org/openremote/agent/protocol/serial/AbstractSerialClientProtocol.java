@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.serial;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.syslog.SyslogCategory;
@@ -50,7 +50,7 @@ public abstract class AbstractSerialClientProtocol<T> extends AbstractIoClientPr
     );
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_PROTOCOL_SERIAL_PORT, null)
@@ -58,7 +58,7 @@ public abstract class AbstractSerialClientProtocol<T> extends AbstractIoClientPr
     }
 
     @Override
-    protected SerialIoClient<T> createIoClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected SerialIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
 
         String port = Values.getMetaItemValueOrThrow(
             protocolConfiguration,

@@ -1,13 +1,13 @@
 package org.openremote.model.rules.flow;
 
-public class AssetAttributeInternalValue {
+public class AttributeInternalValue {
     private String assetId;
     private String attributeName;
 
-    public AssetAttributeInternalValue() {
+    public AttributeInternalValue() {
     }
 
-    public AssetAttributeInternalValue(String assetId, String attributeName) {
+    public AttributeInternalValue(String assetId, String attributeName) {
         this.assetId = assetId;
         this.attributeName = attributeName;
     }

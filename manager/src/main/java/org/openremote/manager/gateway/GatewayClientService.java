@@ -22,11 +22,11 @@ package org.openremote.manager.gateway;
 import io.netty.channel.ChannelHandler;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.http.client.utils.URIBuilder;
-import org.openremote.container.web.OAuthClientCredentialsGrant;
+import org.openremote.model.auth.OAuthClientCredentialsGrant;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.websocket.WebsocketIoClient;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;
@@ -84,7 +84,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         assetStorageService = container.getService(AssetStorageService.class);
         assetProcessingService = container.getService(AssetProcessingService.class);
         persistenceService = container.getService(PersistenceService.class);
@@ -116,7 +116,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
         // Get existing connections
         connectionRealmMap.putAll(persistenceService.doReturningTransaction(entityManager ->
@@ -133,7 +133,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
         clientRealmMap.forEach((realm, client) -> {
             if (client != null) {
                 destroyGatewayClient(connectionRealmMap.get(realm), client);

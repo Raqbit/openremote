@@ -28,7 +28,7 @@ import org.openremote.app.client.assets.attributes.AttributeView;
 import org.openremote.app.client.assets.attributes.MetaEditor;
 import org.openremote.app.client.assets.attributes.ValueFilterArrayMapper;
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.*;
 import org.openremote.model.interop.Consumer;
 import org.openremote.model.util.EnumUtil;
@@ -59,7 +59,7 @@ public class AttributeLinkEditor extends FlowPanel {
     protected final AttributeView.ValidationErrorConsumer validationErrorConsumer;
 
     // This is used to map converter values to attribute meta so we can use the meta editor
-    protected final AssetAttribute converterAttribute;
+    protected final Attribute converterAttribute;
     protected AttributeRef attributeRef;
     protected ValueFilter[] filters;
     ValueFilterArrayMapper filterMapper = GWT.create(ValueFilterArrayMapper.class);
@@ -98,7 +98,7 @@ public class AttributeLinkEditor extends FlowPanel {
 
         // Create the meta editor (although converter is not meta the editor fits here so convert the converter
         // into compatible data - ideally the meta editor would be more generic but this will do for now)
-        converterAttribute = new AssetAttribute(parentView.getAttribute().getName().orElse(""));
+        converterAttribute = new Attribute(parentView.getAttribute().getName().orElse(""));
         if (currentValue != null) {
             currentValue.getConverter()
                 .map(AttributeLinkEditor::convertConverterToMeta)
@@ -291,7 +291,7 @@ public class AttributeLinkEditor extends FlowPanel {
     }
 
     @SuppressWarnings("unused")
-    protected void onConverterModified(AssetAttribute converterAttribute) {
+    protected void onConverterModified(Attribute converterAttribute) {
         updateAttributeLink();
     }
 

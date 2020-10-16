@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 import elemental.client.Browser;
 import org.openremote.app.client.widget.*;
 import org.openremote.app.client.Environment;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.AttributeValueDescriptor;
 import org.openremote.model.attribute.AttributeValueType;
@@ -44,8 +44,8 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
 
     protected final Environment environment;
     protected final AttributeView.Style style;
-    protected Consumer<AssetAttribute> attributeModifiedCallback;
-    protected AssetAttribute attribute;
+    protected Consumer<Attribute> attributeModifiedCallback;
+    protected Attribute attribute;
     protected List<FormButton> attributeActions;
     protected List<AbstractAttributeViewExtension> attributeExtensions;
     protected ConnectionStatus connectionStatus;
@@ -55,7 +55,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
 
     public AttributeViewImpl(Environment environment,
                              AttributeView.Style style,
-                             AssetAttribute attribute) {
+                             Attribute attribute) {
         this.environment = environment;
         this.style = style;
         this.attribute = attribute;
@@ -106,7 +106,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
     }
 
     @Override
-    public AssetAttribute getAttribute() {
+    public Attribute getAttribute() {
         return attribute;
     }
 
@@ -119,7 +119,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
     }
 
     @Override
-    public void setAttributeModifiedCallback(Consumer<AssetAttribute> attributeModifiedCallback) {
+    public void setAttributeModifiedCallback(Consumer<Attribute> attributeModifiedCallback) {
         this.attributeModifiedCallback = attributeModifiedCallback;
     }
 

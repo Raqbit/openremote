@@ -15,7 +15,7 @@ open class ORAssetResoure: NSObject, URLSessionDelegate {
         super.init()
     }
 
-    open func updateAssetAttribute(assetId : String, attributeName : String, rawJson : Data) {
+    open func updateAttribute(assetId : String, attributeName : String, rawJson : Data) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         TokenManager.sharedInstance.getAccessToken { (accessTokenResult) in
             switch accessTokenResult {
@@ -23,16 +23,16 @@ open class ORAssetResoure: NSObject, URLSessionDelegate {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 ErrorManager.showError(error: error!)
             case .Success(let accessToken) :
-                self.updateAssetAttribute(assetId: assetId, attributeName: attributeName, accessToken: accessToken, rawJson: rawJson)
+                self.updateAttribute(assetId: assetId, attributeName: attributeName, accessToken: accessToken, rawJson: rawJson)
             }
         }
     }
 
     open func updatePublicAssetAttibute(assetId : String, attributeName : String, rawJson : Data) {
-        updateAssetAttribute(assetId: assetId, attributeName: attributeName, accessToken: nil, rawJson: rawJson)
+        updateAttribute(assetId: assetId, attributeName: attributeName, accessToken: nil, rawJson: rawJson)
     }
 
-    private func updateAssetAttribute(assetId : String, attributeName : String, accessToken :String?, rawJson : Data) {
+    private func updateAttribute(assetId : String, attributeName : String, accessToken :String?, rawJson : Data) {
         guard let urlRequest = URL(string: String(String(format: "\(ORServer.scheme)://%@/%@/asset/%@/attribute/%@", ORServer.hostURL, ORServer.realm, assetId, attributeName))) else { return }
         let request = NSMutableURLRequest(url: urlRequest)
         request.httpMethod = "PUT"

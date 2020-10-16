@@ -19,7 +19,7 @@
  */
 package org.openremote.manager.asset;
 
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.AttributeExecuteStatus;
 
@@ -73,7 +73,7 @@ public class AssetProcessingException extends RuntimeException {
         ILLEGAL_AGENT_UPDATE,
 
         /**
-         * Invalid {@link AttributeExecuteStatus} for {@link AssetAttribute#isExecutable()} attribute,
+         * Invalid {@link AttributeExecuteStatus} for {@link Attribute#isExecutable()} attribute,
          * must be {@link AttributeExecuteStatus#isWrite()}.
          */
         INVALID_ATTRIBUTE_EXECUTE_STATUS,

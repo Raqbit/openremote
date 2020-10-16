@@ -19,7 +19,7 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 
 /**
  * To be used by protocols that support {@link org.openremote.model.asset.agent.ProtocolConfiguration} discovery.
@@ -29,5 +29,5 @@ public interface ProtocolConfigurationDiscovery {
     /**
      * Get discovered {@link org.openremote.model.asset.agent.ProtocolConfiguration}s.
      */
-    AssetAttribute[] discoverProtocolConfigurations();
+    Attribute[] discoverProtocolConfigurations();
 }

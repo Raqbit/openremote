@@ -31,16 +31,16 @@ import java.util.Arrays;
  * answer "soon" with an {@link AttributeEvent}. If the server decides that the client doesn't have the right
  * permissions, or if anything else is not in order (e.g. the asset doesn't exist), the server might not react at all.
  */
-public class ReadAssetAttributeEvent extends SharedEvent {
+public class ReadAttributeEvent extends SharedEvent {
 
     protected AttributeRef attributeRef;
 
     @JsonCreator
-    public ReadAssetAttributeEvent(AttributeRef attributeRef) {
+    public ReadAttributeEvent(AttributeRef attributeRef) {
         this.attributeRef = attributeRef;
     }
 
-    public ReadAssetAttributeEvent(String assetId, String attributeName) {
+    public ReadAttributeEvent(String assetId, String attributeName) {
         this.attributeRef = new AttributeRef(assetId, attributeName);
     }
 

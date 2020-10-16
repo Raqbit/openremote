@@ -6,7 +6,7 @@ import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.Constants
 import org.openremote.model.asset.AssetResource
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.query.AssetQuery
 import org.openremote.model.asset.AssetType
@@ -798,7 +798,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a non-writable attribute is updated on a user asset"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.replaceAttribute(new AssetAttribute("presenceDetected", BOOLEAN, Values.create(true)))
+        testAsset.replaceAttribute(new Attribute("presenceDetected", BOOLEAN, Values.create(true)))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
@@ -824,7 +824,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a new attribute is added on a user asset"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.addAttributes(new AssetAttribute("myCustomAttribute", NUMBER, Values.create(123)))
+        testAsset.addAttributes(new Attribute("myCustomAttribute", NUMBER, Values.create(123)))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 

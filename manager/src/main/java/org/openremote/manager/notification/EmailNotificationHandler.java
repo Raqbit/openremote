@@ -20,7 +20,7 @@
 package org.openremote.manager.notification;
 
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.model.AbstractValueHolder;
@@ -80,7 +80,7 @@ public class EmailNotificationHandler implements NotificationHandler {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
 
         managerIdentityService = container.getService(ManagerIdentityService.class);
         assetStorageService = container.getService(AssetStorageService.class);
@@ -109,12 +109,12 @@ public class EmailNotificationHandler implements NotificationHandler {
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

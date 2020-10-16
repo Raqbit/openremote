@@ -2,14 +2,14 @@ package org.openremote.test.assets
 
 import org.openremote.container.util.UniqueIdentifierGenerator
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.value.Values
 import spock.lang.Specification
 
 import java.util.stream.Collectors
 
 import static org.openremote.model.AbstractValueTimestampHolder.VALUE_TIMESTAMP_FIELD_NAME
-import static org.openremote.model.asset.AssetAttribute.getAddedOrModifiedAttributes
+import static org.openremote.model.attribute.Attribute.getAddedOrModifiedAttributes
 import static org.openremote.model.asset.AssetType.THING
 import static org.openremote.model.attribute.AttributeValueType.STRING
 
@@ -19,8 +19,8 @@ class AssetModelTest extends Specification {
 
         when: "an asset is created without identifier"
         Asset asset = new Asset("foo", THING).setAttributes(
-                new AssetAttribute("foo1", STRING, Values.create("foo111")),
-                new AssetAttribute("foo2", STRING, Values.create("foo222"))
+                new Attribute("foo1", STRING, Values.create("foo111")),
+                new Attribute("foo2", STRING, Values.create("foo222"))
         )
 
         then: "the attributes should not have an identifier"
@@ -46,8 +46,8 @@ class AssetModelTest extends Specification {
         def timestamp = System.currentTimeMillis()
         def timestamp2 = timestamp + 1000
 
-        def attributeA = new AssetAttribute("a", STRING, Values.create("foo"), timestamp)
-        def attributeB = new AssetAttribute("b", STRING, Values.create("foo"), timestamp2)
+        def attributeA = new Attribute("a", STRING, Values.create("foo"), timestamp)
+        def attributeB = new Attribute("b", STRING, Values.create("foo"), timestamp2)
 
         then: "they should be different"
         !attributeA.getObjectValue().equalsIgnoreKeys(attributeB.getObjectValue(), null)
@@ -56,7 +56,7 @@ class AssetModelTest extends Specification {
         attributeA.getObjectValue().equalsIgnoreKeys(attributeB.getObjectValue(), { key -> key == VALUE_TIMESTAMP_FIELD_NAME })
 
         when: "an attribute has no timestamp"
-        def attributeC = new AssetAttribute("c", STRING, Values.create("foo"))
+        def attributeC = new Attribute("c", STRING, Values.create("foo"))
 
         then: "it should be different than attributes with a timestamp"
         !attributeA.getObjectValue().equalsIgnoreKeys(attributeC.getObjectValue(), null)
@@ -72,15 +72,15 @@ class AssetModelTest extends Specification {
         when: "two lists of asset attributes are compared"
         def timestamp = System.currentTimeMillis()
         def attributesA = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
         ]
         def attributesB = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
-                new AssetAttribute("a3", STRING, Values.create("a333"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a3", STRING, Values.create("a333"), timestamp),
         ]
-        List<AssetAttribute> addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB).collect(Collectors.toList())
+        List<Attribute> addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB).collect(Collectors.toList())
 
         then: "they should be different"
         addedOrModifiedAttributes.size() == 1
@@ -89,13 +89,13 @@ class AssetModelTest extends Specification {
         when: "two lists of asset attributes are compared, ignoring some"
         timestamp = System.currentTimeMillis()
         attributesA = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
         ]
         attributesB = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
-                new AssetAttribute("a3", STRING, Values.create("a333"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a3", STRING, Values.create("a333"), timestamp),
         ]
         addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB, { name -> name == "a3" }, { key -> false }).collect(Collectors.toList())
 
@@ -107,12 +107,12 @@ class AssetModelTest extends Specification {
         def timestamp2 = timestamp + 1000
 
         attributesA = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
         ]
         attributesB = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp2),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp2),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp2),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp2),
         ]
         addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB).collect(Collectors.toList())
 
@@ -126,12 +126,12 @@ class AssetModelTest extends Specification {
         timestamp2 = timestamp + 1000
 
         attributesA = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp),
         ]
         attributesB = [
-                new AssetAttribute("a1", STRING, Values.create("a111"), timestamp2),
-                new AssetAttribute("a2", STRING, Values.create("a222"), timestamp2),
+                new Attribute("a1", STRING, Values.create("a111"), timestamp2),
+                new Attribute("a2", STRING, Values.create("a222"), timestamp2),
         ]
         addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB, { key -> key == VALUE_TIMESTAMP_FIELD_NAME }).collect(Collectors.toList())
 

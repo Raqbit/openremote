@@ -25,17 +25,10 @@ import org.openremote.agent.protocol.ProtocolLinkedAttributeDiscovery;
 import org.openremote.agent.protocol.ProtocolLinkedAttributeImport;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.AttributeEvent;
-import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.AttributeState;
-import org.openremote.model.attribute.AttributeValidationResult;
-import org.openremote.model.attribute.AttributeValueType;
-import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.attribute.MetaItemDescriptor;
-import org.openremote.model.attribute.MetaItemDescriptorImpl;
+import org.openremote.model.attribute.*;
 import org.openremote.model.file.FileInfo;
 import org.openremote.model.util.Pair;
 import org.openremote.model.value.ArrayValue;
@@ -155,11 +148,6 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
         return PROTOCOL_DISPLAY_NAME;
     }
 
-    @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
 
     // Implements AbstractProtocol ------------------------------------------------------------------
 
@@ -171,7 +159,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             ZWConfiguration.validateSerialConfiguration(protocolConfiguration, result);
@@ -180,7 +168,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(new MetaItem(META_ZWAVE_SERIAL_PORT, null));
     }
@@ -193,7 +181,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         Optional<String> networkId = getUniqueNetworkIdentifier(protocolConfiguration);
 
@@ -228,7 +216,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         String networkId = getUniqueNetworkIdentifier(protocolConfiguration).orElse("");
 
@@ -260,8 +248,8 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    protected synchronized void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
+    protected synchronized void doLinkAttribute(Asset asset, Attribute attribute) {
+        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {
             LOG.info("Protocol Configuration doesn't have a valid ZWNetwork so cannot link");
@@ -286,8 +274,8 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    protected synchronized void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
+    protected synchronized void doUnlinkAttribute(Asset asset, Attribute attribute) {
+        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {
             return;
@@ -300,7 +288,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {
@@ -308,7 +296,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
         }
 
         ZWNetwork zwNetwork = zwNetworkConsumerPair.key;
-        AssetAttribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (attribute == null) {
             return;
@@ -325,9 +313,9 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     // Implements ProtocolConfigurationDiscovery --------------------------------------------------
 
     @Override
-    public AssetAttribute[] discoverProtocolConfigurations() {
-        return new AssetAttribute[] {
-            initProtocolConfiguration(new AssetAttribute(), PROTOCOL_NAME)
+    public Attribute[] discoverProtocolConfigurations() {
+        return new Attribute[] {
+            initProtocolConfiguration(new Attribute(), PROTOCOL_NAME)
         };
     }
 
@@ -335,7 +323,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     // Implements ProtocolLinkedAttributeDiscovery ------------------------------------------------
 
     @Override
-    public synchronized AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration) {
+    public synchronized AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration) {
         Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {
@@ -357,7 +345,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
     // Implements ProtocolLinkedAttributeImport ---------------------------------------------------
 
     @Override
-    public AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
         // TODO : remove the ProtocolLinkedAttributeImport interface implementation. It has only been added because
         //        the manager GUI doesn't (currently) work at all without it.
         return new AssetTreeNode[0];
@@ -377,7 +365,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
 
     // Private Instance Methods -------------------------------------------------------------------
 
-    private Optional<String> getUniqueNetworkIdentifier(AssetAttribute protocolConfiguration) {
+    private Optional<String> getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
 
         // TODO : Z-Wave Home ID
 

@@ -25,7 +25,7 @@ import io.netty.channel.socket.DatagramChannel
 import io.netty.handler.codec.FixedLengthFrameDecoder
 import io.netty.handler.codec.MessageToMessageEncoder
 import io.netty.handler.codec.bytes.ByteArrayDecoder
-import org.openremote.agent.protocol.Protocol
+import org.openremote.model.asset.agent.Protocol
 import org.openremote.agent.protocol.ProtocolExecutorService
 import org.openremote.agent.protocol.udp.AbstractUdpServer
 import org.openremote.agent.protocol.udp.UdpClientProtocol
@@ -35,7 +35,6 @@ import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.Constants
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.attribute.*
@@ -103,7 +102,7 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig"), UdpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute("protocolConfig"), UdpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(
                         UdpClientProtocol.META_PROTOCOL_HOST,
@@ -139,24 +138,24 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         when: "an asset is created with attributes linked to the protocol configuration"
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
-            new AssetAttribute("echoHello", AttributeValueType.STRING)
+            new Attribute("echoHello", AttributeValueType.STRING)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"Hello {$value};"')),
                     new MetaItem(MetaItemType.EXECUTABLE)
                 ),
-            new AssetAttribute("echoWorld", AttributeValueType.STRING)
+            new Attribute("echoWorld", AttributeValueType.STRING)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("World;"))
                 ),
-            new AssetAttribute("responseHello", AttributeValueType.STRING)
+            new Attribute("responseHello", AttributeValueType.STRING)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
                         new StringPredicate(AssetQuery.Match.BEGIN, true, "Hello").toModelValue())
                 ),
-            new AssetAttribute("responseWorld", AttributeValueType.STRING)
+            new Attribute("responseWorld", AttributeValueType.STRING)
                 .addMeta(
                     new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,

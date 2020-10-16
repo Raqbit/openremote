@@ -8,7 +8,7 @@ import org.openremote.manager.asset.AssetStorageService
 import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.query.AssetQuery
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.AgentLink
@@ -135,7 +135,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
 
         when: "an attribute is added that links to a timers cron expression"
         apartment1.addAttributes(
-                new AssetAttribute("daySceneCronFRIDAY", AttributeValueType.STRING)
+                new Attribute("daySceneCronFRIDAY", AttributeValueType.STRING)
                     .addMeta(
                         AgentLink.asAgentLinkMetaItem(new AttributeRef(sceneAgent.id, "daySceneFRIDAY")),
                         TimerValue.CRON_EXPRESSION.asMetaItem()

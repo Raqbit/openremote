@@ -31,7 +31,7 @@ import org.openremote.app.client.assets.browser.AssetBrowser;
 import org.openremote.app.client.assets.browser.AssetSelector;
 import org.openremote.app.client.assets.browser.AssetTreeNode;
 import org.openremote.app.client.assets.browser.TenantTreeNode;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolDescriptor;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.file.FileInfo;
@@ -81,7 +81,7 @@ public class ProtocolDiscoveryView extends AbstractAttributeViewExtension {
         Environment environment,
         Style style,
         AttributeViewImpl parentView,
-        AssetAttribute attribute,
+        Attribute attribute,
         AssetBrowser assetBrowser,
         ProtocolDescriptor protocolDescriptor,
         BiConsumer<DiscoveryRequest, Runnable> discoveryRequestConsumer) {

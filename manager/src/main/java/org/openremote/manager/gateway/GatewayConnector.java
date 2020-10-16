@@ -130,7 +130,7 @@ public class GatewayConnector {
         this.assetStorageService = assetStorageService;
         this.assetProcessingService = assetProcessingService;
         this.executorService = executorService;
-        boolean disabled = gateway.getAttribute("disabled").flatMap(AssetAttribute::getValueAsBoolean).orElse(false);
+        boolean disabled = gateway.getAttribute("disabled").flatMap(Attribute::getValueAsBoolean).orElse(false);
         this.realm = gateway.getRealm();
         this.gatewayId = gateway.getId();
         this.disabled = disabled;

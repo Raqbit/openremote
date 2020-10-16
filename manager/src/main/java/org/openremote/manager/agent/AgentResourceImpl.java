@@ -25,7 +25,7 @@ import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.AgentResource;
 import org.openremote.model.asset.agent.AgentStatusEvent;
@@ -118,12 +118,12 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
     }
 
     @Override
-    public AssetAttribute[] getDiscoveredProtocolConfigurations(RequestParams requestParams, String agentId, String protocolName) {
-        return new AssetAttribute[0];
+    public Attribute[] getDiscoveredProtocolConfigurations(RequestParams requestParams, String agentId, String protocolName) {
+        return new Attribute[0];
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(RequestParams requestParams, String agentId, AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(RequestParams requestParams, String agentId, Attribute protocolConfiguration) {
         return withAgentConnector(agentId, agentConnector -> agentConnector.value.validateProtocolConfiguration(protocolConfiguration), () -> null);
     }
 

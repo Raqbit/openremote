@@ -34,7 +34,7 @@ import io.netty.util.CharsetUtil;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.openremote.agent.protocol.ProtocolExecutorService;
 import org.openremote.container.web.OAuthFilter;
-import org.openremote.container.web.OAuthGrant;
+import org.openremote.model.auth.OAuthGrant;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.syslog.SyslogCategory;

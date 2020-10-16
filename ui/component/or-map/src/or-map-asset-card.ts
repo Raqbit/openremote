@@ -160,7 +160,7 @@ export class OrMapAssetCard extends subscribe(manager)(LitElement) {
         const color = this.getColor();
         const styleStr = color ? "--internal-or-map-asset-card-header-color: #" + color + ";" : "";
         const cardConfig = this.getCardConfig();
-        const attributes = Util.getAssetAttributes(this.asset).filter((attr) => attr.name !== AttributeType.LOCATION.attributeName);
+        const attributes = Util.getAttributes(this.asset).filter((attr) => attr.name !== AttributeType.LOCATION.attributeName);
         const includedAttributes = cardConfig && cardConfig.include ? cardConfig.include : undefined;
         const excludedAttributes = cardConfig && cardConfig.exclude ? cardConfig.exclude : [];
         const attrs = attributes.filter((attr) =>

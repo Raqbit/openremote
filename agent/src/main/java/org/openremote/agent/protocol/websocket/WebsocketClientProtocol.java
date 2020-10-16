@@ -20,11 +20,11 @@
 package org.openremote.agent.protocol.websocket;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
 import org.openremote.model.syslog.SyslogCategory;
@@ -80,11 +80,6 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
-
-    @Override
     protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
         return new ArrayList<>(PROTOCOL_META_ITEM_DESCRIPTORS);
     }
@@ -95,7 +90,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
                         new MetaItem(META_PROTOCOL_CONNECT_URI, null)
@@ -103,11 +98,11 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             try {
-                Protocol.getOAuthGrant(protocolConfiguration);
+                ProtocolUtil.getOAuthGrant(protocolConfiguration);
                 getUsernameAndPassword(protocolConfiguration);
             } catch (IllegalArgumentException e) {
                 result.addAttributeFailure(
@@ -119,19 +114,19 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         synchronized (protocolMessageConsumers) {
             protocolMessageConsumers.remove(protocolConfiguration.getReferenceOrThrow());
         }
-        super.doUnlinkProtocolConfiguration(agent, protocolConfiguration);
+        super.doDisconnect();
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        super.doLinkAttribute(attribute, protocolConfiguration);
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        super.doLinkAttribute(asset, attribute);
 
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
-        Consumer<String> messageConsumer = Protocol.createGenericAttributeMessageConsumer(attribute, assetService, this::updateLinkedAttribute);
+        AttributeRef protocolRef = agent.getReferenceOrThrow();
+        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(attribute, assetService, this::updateLinkedAttribute);
 
         if (messageConsumer != null) {
             synchronized (protocolMessageConsumers) {
@@ -150,21 +145,21 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         synchronized (protocolMessageConsumers) {
-            protocolMessageConsumers.compute(protocolConfiguration.getReferenceOrThrow(), (ref, consumers) -> {
+            protocolMessageConsumers.compute(agent.getReferenceOrThrow(), (ref, consumers) -> {
                 if (consumers != null) {
                     consumers.removeIf((attrRefConsumer) -> attrRefConsumer.key.equals(attributeRef));
                 }
                 return consumers;
             });
         }
-        super.doUnlinkAttribute(attribute, protocolConfiguration);
+        super.doUnlinkAttribute(asset, attribute);
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(WebsocketIoClient<String> client, AssetAttribute protocolConfiguration) {
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(WebsocketIoClient<String> client, Attribute protocolConfiguration) {
         return getGenericStringEncodersAndDecoders(client, protocolConfiguration);
     }
 
@@ -186,7 +181,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected String createWriteMessage(AssetAttribute protocolConfiguration, AssetAttribute attribute, AttributeEvent event, Value processedValue) {
+    protected String createWriteMessage(Attribute protocolConfiguration, Attribute attribute, AttributeEvent event, Value processedValue) {
         if (attribute.isReadOnly()) {
             LOG.fine("Attempt to write to an attribute that doesn't support writes: " + event.getAttributeRef());
             return null;

@@ -28,10 +28,10 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
 import org.openremote.container.Container;
-import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
- * This is an abstract {@link org.openremote.agent.protocol.Protocol} for protocols that require an {@link IoClient}.
+ * This is an abstract {@link Protocol} for protocols that require an {@link IoClient}.
  */
 public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends AbstractProtocol {
 
@@ -71,7 +71,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
     /**
      * Supplies a set of encoders/decoders that convert from/to {@link String} to/from {@link ByteBuf} based on the generic protocol {@link MetaItem}s
      */
-    public static Supplier<ChannelHandler[]> getGenericStringEncodersAndDecoders(AbstractNettyIoClient<String, ?> client, AssetAttribute protocolConfiguration) {
+    public static Supplier<ChannelHandler[]> getGenericStringEncodersAndDecoders(AbstractNettyIoClient<String, ?> client, Attribute protocolConfiguration) {
 
         boolean hexMode = Values.getMetaItemValueOrThrow(
             protocolConfiguration,
@@ -122,7 +122,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
                         String.class,
                         client,
                         (msg, out) -> {
-                            byte[] bytes = hexMode ? Protocol.bytesFromHexString(msg) : Protocol.bytesFromBinaryString(msg);
+                            byte[] bytes = hexMode ? ProtocolUtil.bytesFromHexString(msg) : ProtocolUtil.bytesFromBinaryString(msg);
                             out.writeBytes(bytes);
                         }
                     ));
@@ -130,7 +130,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
                 if (!delimiters.isEmpty()) {
                     ByteBuf[] byteDelimiters = delimiters
                         .stream()
-                        .map(delim -> Unpooled.wrappedBuffer(hexMode ? Protocol.bytesFromHexString(delim) : Protocol.bytesFromBinaryString(delim)))
+                        .map(delim -> Unpooled.wrappedBuffer(hexMode ? ProtocolUtil.bytesFromHexString(delim) : ProtocolUtil.bytesFromBinaryString(delim)))
                         .toArray(ByteBuf[]::new);
                     encodersDecoders.add(new DelimiterBasedFrameDecoder(maxLength, stripDelimiter, byteDelimiters));
                 } else {
@@ -144,7 +144,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
                         (byteBuf, messages) -> {
                             byte[] bytes = new byte[byteBuf.readableBytes()];
                             byteBuf.readBytes(bytes);
-                            String msg = hexMode ? Protocol.bytesToHexString(bytes) : Protocol.bytesToBinaryString(bytes);
+                            String msg = hexMode ? ProtocolUtil.bytesToHexString(bytes) : ProtocolUtil.bytesToBinaryString(bytes);
                             messages.add(msg);
                         }
                     )
@@ -223,7 +223,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         ProtocolIoClient<T, U> protocolIoClient = null;
@@ -243,7 +243,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         ProtocolIoClient<T, U> protocolIoClient = protocolIoClientMap.remove(protocolRef);
 
@@ -254,9 +254,9 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         ProtocolIoClient<T, U> protocolIoClient = protocolIoClientMap.get(protocolConfiguration.getReferenceOrThrow());
-        AssetAttribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (protocolIoClient == null || attribute == null) {
             return;
@@ -272,7 +272,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
         protocolIoClient.send(message);
     }
 
-    protected ProtocolIoClient<T, U> createProtocolClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected ProtocolIoClient<T, U> createProtocolClient(Attribute protocolConfiguration) throws Exception {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         U client = createIoClient(protocolConfiguration);
         Supplier<ChannelHandler[]> encoderDecoderProvider = getEncoderDecoderProvider(client, protocolConfiguration);
@@ -291,9 +291,9 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
      * Should return an instance of {@link IoClient} for the supplied protocolConfiguration; the configuration of
      * encoders/decoders is handled by the separate call to {@link #getEncoderDecoderProvider}
      */
-    protected abstract U createIoClient(AssetAttribute protocolConfiguration) throws Exception;
+    protected abstract U createIoClient(Attribute protocolConfiguration) throws Exception;
 
-    protected abstract Supplier<ChannelHandler[]> getEncoderDecoderProvider(U client, AssetAttribute protocolConfiguration);
+    protected abstract Supplier<ChannelHandler[]> getEncoderDecoderProvider(U client, Attribute protocolConfiguration);
 
     /**
      * Called when the {@link IoClient} receives a message from the server
@@ -303,5 +303,5 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>> extends
     /**
      * Generate the actual message to send to the {@link IoClient} for this {@link AttributeEvent}
      */
-    protected abstract T createWriteMessage(AssetAttribute protocolConfiguration, AssetAttribute attribute, AttributeEvent event, Value processedValue);
+    protected abstract T createWriteMessage(Attribute protocolConfiguration, Attribute attribute, AttributeEvent event, Value processedValue);
 }

@@ -246,7 +246,7 @@ public interface ManagerMessages extends Messages {
 
     String customItem();
 
-    String enterCustomAssetAttributeMetaName();
+    String enterCustomAttributeMetaName();
 
     String selectType();
 

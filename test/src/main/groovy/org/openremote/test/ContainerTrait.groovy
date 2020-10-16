@@ -26,11 +26,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget
 import org.keycloak.representations.AccessTokenResponse
-import org.openremote.agent.protocol.AbstractProtocol
 import org.openremote.container.Container
-import org.openremote.container.ContainerService
+import org.openremote.model.ContainerService
 import org.openremote.container.message.MessageBrokerService
-import org.openremote.container.persistence.PersistenceService
 import org.openremote.container.security.IdentityService
 import org.openremote.container.security.PasswordAuthForm
 import org.openremote.container.security.keycloak.KeycloakIdentityProvider
@@ -41,7 +39,6 @@ import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.manager.rules.RulesService
 import org.openremote.manager.rules.RulesetStorageService
-import org.openremote.manager.setup.SetupService
 import org.openremote.manager.web.ManagerWebService
 import org.openremote.model.Constants
 import org.openremote.model.asset.Asset
@@ -59,7 +56,6 @@ import javax.websocket.Session
 import javax.websocket.WebSocketContainer
 import javax.ws.rs.core.UriBuilder
 import java.util.logging.Handler
-import java.util.stream.Collectors
 import java.util.stream.IntStream
 
 import static java.util.concurrent.TimeUnit.SECONDS

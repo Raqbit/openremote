@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@JsonSerialize(using = ModelModule.ValueJsonSerializer.class)
 public class ObjectValueImpl extends ValueImpl implements ObjectValue {
 
     private static List<String> stringifyOrder(String[] keys) {

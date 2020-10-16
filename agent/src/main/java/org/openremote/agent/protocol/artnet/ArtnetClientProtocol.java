@@ -13,7 +13,7 @@ import org.openremote.container.Container;
 import org.openremote.container.util.CodecUtil;
 import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.*;
@@ -94,11 +94,6 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
         return PROTOCOL_DISPLAY_NAME;
     }
 
-    @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
-
     public List<ArtnetLight> getLightMemory() { return artnetLightMemory; }
 
     @Override
@@ -112,7 +107,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
                         new MetaItem(META_PROTOCOL_HOST, null),
@@ -121,15 +116,15 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         synchronized (protocolMessageConsumers) {
             protocolMessageConsumers.remove(protocolConfiguration.getReferenceOrThrow());
         }
-        super.doUnlinkProtocolConfiguration(agent, protocolConfiguration);
+        super.doDisconnect();
     }
 
     @Override
-    protected UdpIoClient<ArtnetPacket> createIoClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected UdpIoClient<ArtnetPacket> createIoClient(Attribute protocolConfiguration) throws Exception {
         String host = Values.getMetaItemValueOrThrow(
                 protocolConfiguration,
                 META_PROTOCOL_HOST,
@@ -163,7 +158,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(UdpIoClient<ArtnetPacket> client, AssetAttribute protocolConfiguration) {
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(UdpIoClient<ArtnetPacket> client, Attribute protocolConfiguration) {
         Supplier<ChannelHandler[]> encoderDecoderProvider = () -> {
             List<ChannelHandler> encodersDecoders = new ArrayList<>();
             encodersDecoders.add(new AbstractNettyIoClient.MessageToByteEncoder<ArtnetPacket>(ArtnetPacket.class, client, new BiConsumer<ArtnetPacket, ByteBuf>() {
@@ -178,8 +173,8 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        AttributeRef protocolRef = agent.getReferenceOrThrow();
 
         if(getLinkedAttribute(attribute.getReference().orElse(null)) == null)
             return;
@@ -223,8 +218,8 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AssetAttribute assetAttribute = getLinkedAttribute(attribute.getReference().orElse(null));
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+        Attribute assetAttribute = getLinkedAttribute(attribute.getReference().orElse(null));
         if(assetAttribute != null) {
             String assetId = assetAttribute.getAssetId().orElse(null);
             if(assetId != null) {
@@ -260,67 +255,64 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected ArtnetPacket createWriteMessage(AssetAttribute protocolConfiguration, AssetAttribute attribute, AttributeEvent event, Value processedValue) {
+    protected ArtnetPacket createWriteMessage(Attribute protocolConfiguration, Attribute attribute, AttributeEvent event, Value processedValue) {
         //Todo check for group later here
-        AttributeRef attributeRef = attribute.getReference().orElse(null);
-        if(attributeRef != null) {
-            AssetAttribute linkedAttribute = getLinkedAttribute(attributeRef);
-            if(linkedAttribute != null) {
-                String parentAssetId = linkedAttribute.getAssetId().orElse(null);
-                if(parentAssetId != null) {
-                    Asset parentAsset = assetService.findAsset(parentAssetId);
-                    Attribute universeAttribute = parentAsset.getAttribute("Universe").orElse(null);
-                    Attribute lightAttribute = parentAsset.getAttribute("Id").orElse(null);
-                    if(universeAttribute != null && lightAttribute != null) {
-                        int universeId = universeAttribute.getValueAsInteger().orElse(-1);
-                        int lightId = lightAttribute.getValueAsInteger().orElse(-1);
-                        if(universeId != -1 && lightId != -1) {
-                            ArtnetLight updatedLight = (ArtnetLight) artnetLightMemory.stream().filter(light -> light.getLightId() == lightId).findFirst().orElse(null);
-                            if(updatedLight != null) {
-                                ArtnetLightState oldLightState = (ArtnetLightState) updatedLight.getLightState();
-                                //UPDATE LIGHT VALUES (R,G,B FOR EXAMPLE)
-                                if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Values")) {
-                                    Map<String, Integer> valuesToUpdate = new LinkedHashMap<String, Integer>();
-                                    for(String requiredKey : updatedLight.getRequiredValues()) {
-                                        try {
-                                            JsonNode node = Container.JSON.readTree(processedValue.toJson());
-                                            JsonNode requiredKeyValue = node.get(requiredKey);
-                                            if(requiredKeyValue == null)
-                                                throw new NullPointerException("Could not find key: " + requiredKey.toString() + " in the json-file.");
-                                            valuesToUpdate.put(requiredKey, requiredKeyValue.asInt());
-                                        } catch (JsonProcessingException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    updateLightStateInMemory(lightId, new ArtnetLightState(lightId, valuesToUpdate, oldLightState.getDim(), oldLightState.isEnabled()));
-                                }
-                                //UPDATE DIM
-                                else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Dim")) {
+        AttributeRef attributeRef = event.getAttributeRef();
+        Attribute linkedAttribute = getLinkedAttribute(attributeRef);
+
+        if(linkedAttribute != null) {
+            String parentAssetId = linkedAttribute.getAssetId().orElse(null);
+            if(parentAssetId != null) {
+                Asset parentAsset = assetService.findAsset(parentAssetId);
+                Attribute universeAttribute = parentAsset.getAttribute("Universe").orElse(null);
+                Attribute lightAttribute = parentAsset.getAttribute("Id").orElse(null);
+                if(universeAttribute != null && lightAttribute != null) {
+                    int universeId = universeAttribute.getValueAsInteger().orElse(-1);
+                    int lightId = lightAttribute.getValueAsInteger().orElse(-1);
+                    if(universeId != -1 && lightId != -1) {
+                        ArtnetLight updatedLight = artnetLightMemory.stream().filter(light -> light.getLightId() == lightId).findFirst().orElse(null);
+                        if(updatedLight != null) {
+                            ArtnetLightState oldLightState = updatedLight.getLightState();
+                            //UPDATE LIGHT VALUES (R,G,B FOR EXAMPLE)
+                            if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Values")) {
+                                Map<String, Integer> valuesToUpdate = new LinkedHashMap<>();
+                                for(String requiredKey : updatedLight.getRequiredValues()) {
                                     try {
                                         JsonNode node = Container.JSON.readTree(processedValue.toJson());
-                                        int dimValue = node.asInt();
-                                        updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), dimValue, oldLightState.isEnabled()));
+                                        JsonNode requiredKeyValue = node.get(requiredKey);
+                                        if(requiredKeyValue == null)
+                                            throw new NullPointerException("Could not find key: " + requiredKey + " in the json-file.");
+                                        valuesToUpdate.put(requiredKey, requiredKeyValue.asInt());
                                     } catch (JsonProcessingException e) {
                                         e.printStackTrace();
                                     }
                                 }
-                                //UPDATE ENABLED/DISABLED
-                                else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Switch")) {
-                                    try{
-                                        JsonNode node = Container.JSON.readTree(processedValue.toJson());
-                                        boolean enabled = node.asBoolean();
-                                        updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), oldLightState.getDim(), enabled));
-                                    } catch (JsonProcessingException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                //SEND ALL LIGHTS TO UPDATE TO THE ENCODER
-                                List<ArtnetLight> lightsToSend = new ArrayList<ArtnetLight>();
-                                for(ArtnetLight abstractLight : artnetLightMemory.stream().filter(light -> light.getUniverse() == universeId).collect(Collectors.toList()))
-                                    lightsToSend.add((ArtnetLight)abstractLight);
-                                updateLinkedAttribute(event.getAttributeState());
-                                return new ArtnetPacket(universeId, lightsToSend);
+                                updateLightStateInMemory(lightId, new ArtnetLightState(lightId, valuesToUpdate, oldLightState.getDim(), oldLightState.isEnabled()));
                             }
+                            //UPDATE DIM
+                            else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Dim")) {
+                                try {
+                                    JsonNode node = Container.JSON.readTree(processedValue.toJson());
+                                    int dimValue = node.asInt();
+                                    updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), dimValue, oldLightState.isEnabled()));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            //UPDATE ENABLED/DISABLED
+                            else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Switch")) {
+                                try{
+                                    JsonNode node = Container.JSON.readTree(processedValue.toJson());
+                                    boolean enabled = node.asBoolean();
+                                    updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), oldLightState.getDim(), enabled));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            //SEND ALL LIGHTS TO UPDATE TO THE ENCODER
+                            List<ArtnetLight> lightsToSend = artnetLightMemory.stream().filter(light -> light.getUniverse() == universeId).collect(Collectors.toList());
+                            updateLinkedAttribute(event.getAttributeState());
+                            return new ArtnetPacket(universeId, lightsToSend);
                         }
                     }
                 }
@@ -331,12 +323,13 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
 
     public void updateLightStateInMemory(Integer lightId, ArtnetLightState updatedLightState)
     {
-        if(artnetLightMemory.stream().anyMatch(light -> light.getLightId() == lightId))
+        if (artnetLightMemory.stream().anyMatch(light -> light.getLightId() == lightId)) {
             artnetLightMemory.stream().filter(light -> light.getLightId() == lightId).findFirst().ifPresent(artnetLight -> Objects.requireNonNull(artnetLightMemory.stream().filter(light -> light.getLightId() == lightId).findFirst().orElse(null)).setLightState(updatedLightState));
+        }
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
         String jsonString;
         if(fileInfo.isBinary())//Read any file that isn't an XML file
         {
@@ -408,7 +401,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
         }
     }
 
-    private AssetTreeNode[] syncLightsToAssets(List<ArtnetLight> lights, AssetAttribute protocolConfiguration) throws Exception
+    private AssetTreeNode[] syncLightsToAssets(List<ArtnetLight> lights, Attribute protocolConfiguration) throws Exception
     {
         List<AssetTreeNode> output = new ArrayList<AssetTreeNode>();
 
@@ -427,7 +420,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                     continue;
 
                 //Asset is valid
-                AssetAttribute lightAttribute = asset.getAttribute("Id").orElse(null);
+                Attribute lightAttribute = asset.getAttribute("Id").orElse(null);
                 if(lightAttribute != null) {
                     int lightId = lightAttribute.getValueAsInteger().orElse(-1);
                     if(lightId != -1) {
@@ -437,19 +430,19 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                                 Map<String, Integer> values = new HashMap<>();
                                 for(String key : updatedLight.getRequiredValues())
                                     values.put(key, 0);
-                                List<AssetAttribute> artNetLightAttributes = Arrays.asList(
-                                        new AssetAttribute("Id", NUMBER, Values.create(updatedLight.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new AssetAttribute("GroupId", NUMBER, Values.create(updatedLight.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new AssetAttribute("Universe", NUMBER, Values.create(updatedLight.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new AssetAttribute("AmountOfLeds", NUMBER, Values.create(updatedLight.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new AssetAttribute("RequiredValues", STRING, Values.create(String.join(",", updatedLight.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new AssetAttribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
+                                List<Attribute> artNetLightAttributes = Arrays.asList(
+                                        new Attribute("Id", NUMBER, Values.create(updatedLight.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                                        new Attribute("GroupId", NUMBER, Values.create(updatedLight.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                                        new Attribute("Universe", NUMBER, Values.create(updatedLight.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                                        new Attribute("AmountOfLeds", NUMBER, Values.create(updatedLight.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                                        new Attribute("RequiredValues", STRING, Values.create(String.join(",", updatedLight.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                                        new Attribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
                                                 new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                                         ),
-                                        new AssetAttribute("Switch", BOOLEAN, Values.create(true)).addMeta(
+                                        new Attribute("Switch", BOOLEAN, Values.create(true)).addMeta(
                                                 new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                                         ),
-                                        new AssetAttribute("Dim", NUMBER, Values.create(100)).addMeta(
+                                        new Attribute("Dim", NUMBER, Values.create(100)).addMeta(
                                                 new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                                         )
                                 );
@@ -478,7 +471,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                     if(!asset.hasAttribute("Id"))
                         continue;
 
-                    AssetAttribute lightIdAttribute = asset.getAttribute("Id").orElse(null);
+                    Attribute lightIdAttribute = asset.getAttribute("Id").orElse(null);
                     if(lightIdAttribute != null) {
                         int lightId = lightIdAttribute.getValueAsInteger().orElse(-1);
                         if(lightId != -1) {
@@ -505,19 +498,19 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
         Map<String, Integer> values = new HashMap<>();
         for(String key : light.getRequiredValues())
             values.put(key, 0);
-        List<AssetAttribute> artNetLightAttributes = Arrays.asList(
-                new AssetAttribute("Id", NUMBER, Values.create(light.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new AssetAttribute("GroupId", NUMBER, Values.create(light.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new AssetAttribute("Universe", NUMBER, Values.create(light.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new AssetAttribute("AmountOfLeds", NUMBER, Values.create(light.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new AssetAttribute("RequiredValues", STRING, Values.create(String.join(",", light.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new AssetAttribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
+        List<Attribute> artNetLightAttributes = Arrays.asList(
+                new Attribute("Id", NUMBER, Values.create(light.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                new Attribute("GroupId", NUMBER, Values.create(light.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                new Attribute("Universe", NUMBER, Values.create(light.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                new Attribute("AmountOfLeds", NUMBER, Values.create(light.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                new Attribute("RequiredValues", STRING, Values.create(String.join(",", light.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
+                new Attribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
                         new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                 ),
-                new AssetAttribute("Switch", BOOLEAN, Values.create(true)).addMeta(
+                new Attribute("Switch", BOOLEAN, Values.create(true)).addMeta(
                         new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                 ),
-                new AssetAttribute("Dim", NUMBER, Values.create(100)).addMeta(
+                new Attribute("Dim", NUMBER, Values.create(100)).addMeta(
                         new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                 )
         );

@@ -29,6 +29,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
 import org.openremote.container.json.JacksonConfig;
+import org.openremote.model.auth.OAuthGrant;
 
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.WebTarget;

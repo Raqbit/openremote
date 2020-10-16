@@ -12,7 +12,7 @@ import {
 import {ifDefined} from "lit-html/directives/if-defined";
 import {i18next, translate} from "@openremote/or-translate";
 import {
-    AssetAttribute,
+    Attribute,
     AttributeDescriptor,
     AttributeEvent,
     AttributeRef,
@@ -67,7 +67,7 @@ declare global {
 
 export type AttributeInputCustomProviderResult = ((value: any, timestamp: number | undefined, loading: boolean, sending: boolean, error: boolean) => TemplateResult) | undefined;
 
-export type AttributeInputCustomProvider = (assetType: string | undefined, attribute: AssetAttribute | undefined, attributeDescriptor: AttributeDescriptor | undefined, valueDescriptor: AttributeValueDescriptor | undefined, valueChangeNotifier: (value: any | undefined) => void, attributeInput: OrAttributeInput) => AttributeInputCustomProviderResult;
+export type AttributeInputCustomProvider = (assetType: string | undefined, attribute: Attribute | undefined, attributeDescriptor: AttributeDescriptor | undefined, valueDescriptor: AttributeValueDescriptor | undefined, valueChangeNotifier: (value: any | undefined) => void, attributeInput: OrAttributeInput) => AttributeInputCustomProviderResult;
 
 export class CenterControl {
     protected map?: MapGL;
@@ -543,7 +543,7 @@ export class OrAttributeInput extends subscribe(manager)(translate(i18next)(LitE
     }
 
     @property({type: Object, reflect: false})
-    public attribute?: AssetAttribute;
+    public attribute?: Attribute;
 
     @property({type: Object})
     public attributeRef?: AttributeRef;
@@ -637,7 +637,7 @@ export class OrAttributeInput extends subscribe(manager)(translate(i18next)(LitE
         }
 
         if (_changedProperties.has("attribute")) {
-            const oldAttr = {..._changedProperties.get("attribute") as AssetAttribute};
+            const oldAttr = {..._changedProperties.get("attribute") as Attribute};
             const attr = this.attribute;
 
             if (oldAttr && attr) {

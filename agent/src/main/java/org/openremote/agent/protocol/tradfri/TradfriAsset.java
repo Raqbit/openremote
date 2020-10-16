@@ -44,7 +44,7 @@ public abstract class TradfriAsset extends Asset {
             setRealm(assetService.findAsset(parentId).getRealm());
         }
         setId(UniqueIdentifierGenerator.generateId("tradfri_" + device.getInstanceId()));
-        this.createAssetAttributes();
+        this.createAttributes();
         this.setInitialValues();
         this.createEventHandlers();
         device.enableObserve();
@@ -54,7 +54,7 @@ public abstract class TradfriAsset extends Asset {
     /**
      * Method to create the asset attributes
      */
-    public abstract void createAssetAttributes();
+    public abstract void createAttributes();
 
     /**
      * Method to create the event handlers

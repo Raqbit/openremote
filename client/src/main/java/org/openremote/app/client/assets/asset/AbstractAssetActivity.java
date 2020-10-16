@@ -44,7 +44,7 @@ import org.openremote.app.client.widget.ValueEditors;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
@@ -214,7 +214,7 @@ public abstract class AbstractAssetActivity<V
     @Override
     public void writeAttributesToView() {
         if (asset != null && asset.getAttributesList().size() > 0) {
-            for (AssetAttribute attribute : asset.getAttributesList()) {
+            for (Attribute attribute : asset.getAttributesList()) {
                 writeAttributeToView(attribute, false);
             }
         }
@@ -239,7 +239,7 @@ public abstract class AbstractAssetActivity<V
         return activePlace;
     }
 
-    protected void writeAttributeToView(AssetAttribute attribute, boolean addToView) {
+    protected void writeAttributeToView(Attribute attribute, boolean addToView) {
         AttributeView attributeView = createAttributeView(attribute);
         attributeViews.add(attributeView);
 
@@ -249,7 +249,7 @@ public abstract class AbstractAssetActivity<V
         }
     }
 
-    protected AttributeView createAttributeView(AssetAttribute attribute) {
+    protected AttributeView createAttributeView(Attribute attribute) {
 
         AttributeViewImpl attributeView = new AttributeViewImpl(environment,
             view.getStyle(),
@@ -267,9 +267,9 @@ public abstract class AbstractAssetActivity<V
         return attributeView;
     }
 
-    abstract protected List<AbstractAttributeViewExtension> createAttributeExtensions(AssetAttribute attribute, AttributeViewImpl view);
+    abstract protected List<AbstractAttributeViewExtension> createAttributeExtensions(Attribute attribute, AttributeViewImpl view);
 
-    abstract protected List<FormButton> createAttributeActions(AssetAttribute attribute, AttributeViewImpl view);
+    abstract protected List<FormButton> createAttributeActions(Attribute attribute, AttributeViewImpl view);
 
     protected void linkAttributeView(AttributeView attributeView) {
         attributeView.setValueEditorSupplier(this::createValueEditor);
@@ -281,7 +281,7 @@ public abstract class AbstractAssetActivity<V
     /**
      * Attribute view action button is requesting the value be written to the server
      */
-    protected void writeAttributeValue(AssetAttribute attribute) {
+    protected void writeAttributeValue(Attribute attribute) {
 
         getAttributeView(attribute)
             .ifPresent(
@@ -295,27 +295,20 @@ public abstract class AbstractAssetActivity<V
                         attributeView.setBusy(false);
 
                         if (result.isValid()) {
-                            attribute
-                                .getReference()
-                                .map(attributeRef -> {
-                                    // Clear timestamp and let the server set it
-                                    attribute.setValueTimestamp(null);
-                                    return new AttributeState(attributeRef, attribute.getValue().orElse(null));
-                                })
-                                .map(attributeState -> new AttributeEvent(attributeState, attribute.getValueTimestamp().orElse(0L)))
-                                .ifPresent(attributeEvent -> {
-                                    environment.getEventService().dispatch(attributeEvent);
-                                    if (attribute.isExecutable()) {
-                                        showSuccess(environment
-                                            .getMessages()
-                                            .commandRequestSent(attribute.getLabelOrName().orElse("")));
-                                    } else {
-                                        showSuccess(
-                                            environment
-                                                .getMessages()
-                                                .attributeWriteSent(attribute.getLabelOrName().orElse("")));
-                                    }
-                                });
+                            AttributeEvent attributeEvent = new AttributeEvent(assetId, attribute.getNameOrThrow(), attribute.getValue().orElse(null));
+
+                            environment.getEventService().dispatch(attributeEvent);
+
+                            if (attribute.isExecutable()) {
+                                showSuccess(environment
+                                    .getMessages()
+                                    .commandRequestSent(attribute.getLabelOrName().orElse("")));
+                            } else {
+                                showSuccess(
+                                    environment
+                                        .getMessages()
+                                        .attributeWriteSent(attribute.getLabelOrName().orElse("")));
+                            }
                         }
                     });
                 }
@@ -340,7 +333,7 @@ public abstract class AbstractAssetActivity<V
         asset.getAttributesList().forEach(attribute -> validateAttribute(clientSideOnly, attribute, resultConsumer));
     }
 
-    protected void validateAttribute(boolean clientSideOny, AssetAttribute attribute, Consumer<AttributeValidationResult> resultConsumer) {
+    protected void validateAttribute(boolean clientSideOny, Attribute attribute, Consumer<AttributeValidationResult> resultConsumer) {
         List<ValidationFailure> attributeFailures = attribute.getValidationFailures(false);
         Map<Integer, List<ValidationFailure>> metaFailures = new HashMap<>(attribute.getMeta().size());
         String attributeName = attribute.getName().orElseThrow(() -> new IllegalStateException("Attribute name cannot be null"));
@@ -379,7 +372,7 @@ public abstract class AbstractAssetActivity<V
             .ifPresent(attrView -> attrView.onValidationStateChange(result)));
     }
 
-    protected Optional<AttributeView> getAttributeView(AssetAttribute attribute) {
+    protected Optional<AttributeView> getAttributeView(Attribute attribute) {
         return attributeViews
             .stream()
             .filter(attributeView -> attributeView.getAttribute() == attribute)
@@ -405,9 +398,9 @@ public abstract class AbstractAssetActivity<V
                 .findFirst().orElse(false);
         }
 
-        if (valueHolder instanceof AssetAttribute) {
+        if (valueHolder instanceof Attribute) {
             // Attribute Value is read only if it is readonly or a protocol configuration
-            AssetAttribute attribute = (AssetAttribute) valueHolder;
+            Attribute attribute = (Attribute) valueHolder;
             return attribute.isReadOnly() || ProtocolConfiguration.isProtocolConfiguration(attribute);
         }
 
@@ -415,12 +408,12 @@ public abstract class AbstractAssetActivity<V
     }
 
     protected Optional<Long> getTimestamp(ValueHolder valueHolder) {
-        return editMode || !(valueHolder instanceof AssetAttribute) ?
+        return editMode || !(valueHolder instanceof Attribute) ?
             Optional.empty() :
-            ((AssetAttribute)valueHolder).getValueTimestamp();
+            ((Attribute)valueHolder).getValueTimestamp();
     }
 
-    abstract protected void onAttributeModified(AssetAttribute attribute);
+    abstract protected void onAttributeModified(Attribute attribute);
 
     /**
      * Creates editors for {@link ValueHolder}s.

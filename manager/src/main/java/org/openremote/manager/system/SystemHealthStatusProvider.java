@@ -21,7 +21,7 @@ package org.openremote.manager.system;
 
 import org.openremote.container.Container;
 import org.openremote.container.ContainerHealthStatusProvider;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Value;
 import org.openremote.model.value.Values;
@@ -40,17 +40,17 @@ public class SystemHealthStatusProvider implements ContainerHealthStatusProvider
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

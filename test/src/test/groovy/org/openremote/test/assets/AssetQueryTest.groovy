@@ -8,7 +8,7 @@ import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.attribute.AttributeValueType
@@ -845,7 +845,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         def recur = new RecurrenceRule(RecurrenceRule.Frequency.DAILY, 2, 5, null)
 
         lobby.addAttributes(
-            new AssetAttribute("test", AttributeValueType.CALENDAR_EVENT, new CalendarEvent(start, end, recur).toValue())
+            new Attribute("test", AttributeValueType.CALENDAR_EVENT, new CalendarEvent(start, end, recur).toValue())
         )
         lobby = assetStorageService.merge(lobby)
 
@@ -923,7 +923,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         def lobby = assetStorageService.find(managerTestSetup.lobbyId, true)
 
         lobby.addAttributes(
-                new AssetAttribute("openingDate", TIMESTAMP_ISO8601, Values.create("2018-01-28T15:00:00+00:00"))
+                new Attribute("openingDate", TIMESTAMP_ISO8601, Values.create("2018-01-28T15:00:00+00:00"))
         )
         lobby = assetStorageService.merge(lobby)
 

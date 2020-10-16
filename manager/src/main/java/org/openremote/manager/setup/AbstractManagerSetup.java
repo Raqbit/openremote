@@ -32,7 +32,7 @@ import org.openremote.manager.predicted.AssetPredictedDatapointService;
 import org.openremote.manager.rules.RulesetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.*;
 import org.openremote.model.geo.GeoJSON;
 import org.openremote.model.geo.GeoJSONPoint;
@@ -83,7 +83,7 @@ public abstract class AbstractManagerSetup implements Setup {
     protected Asset createDemoApartment(Asset parent, String name, GeoJSONPoint location) {
         Asset apartment = new Asset(name, RESIDENCE, parent);
         apartment.setAttributes(
-            new AssetAttribute("alarmEnabled", AttributeValueType.BOOLEAN)
+            new Attribute("alarmEnabled", AttributeValueType.BOOLEAN)
                 .setMeta(new Meta(
                     new MetaItem(LABEL, Values.create("Alarm enabled")),
                     new MetaItem(DESCRIPTION, Values.create("Send notifications when presence is detected")),
@@ -92,7 +92,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true)),
                     new MetaItem(SHOW_ON_DASHBOARD, Values.create(true))
                 )),
-            new AssetAttribute("presenceDetected", AttributeValueType.BOOLEAN)
+            new Attribute("presenceDetected", AttributeValueType.BOOLEAN)
                 .setMeta(new Meta(
                     new MetaItem(LABEL, Values.create("Presence detected")),
                     new MetaItem(DESCRIPTION, Values.create("Presence detected in any room")),
@@ -102,7 +102,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(STORE_DATA_POINTS, Values.create(true)),
                     new MetaItem(SHOW_ON_DASHBOARD, Values.create(true))
                 )),
-            new AssetAttribute("vacationUntil", TIMESTAMP)
+            new Attribute("vacationUntil", TIMESTAMP)
                 .setMeta(new Meta(
                     new MetaItem(LABEL, Values.create("Vacation until")),
                     new MetaItem(DESCRIPTION, Values.create("Vacation mode enabled until")),
@@ -110,7 +110,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
                     new MetaItem(RULE_STATE, Values.create(true))
                 )),
-            new AssetAttribute("lastExecutedScene", AttributeValueType.STRING)
+            new Attribute("lastExecutedScene", AttributeValueType.STRING)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Last executed scene")),
                     new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
@@ -118,10 +118,10 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true)),
                     new MetaItem(SHOW_ON_DASHBOARD, Values.create(true))
                 ),
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
                     .setMeta(new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)))
             /* TODO Unused, can be removed? Port schedule prediction from DRL...
-            new AssetAttribute("autoSceneSchedule", AttributeValueType.BOOLEAN)
+            new Attribute("autoSceneSchedule", AttributeValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Automatic scene schedule")),
                     new MetaItem(DESCRIPTION, Values.create("Predict presence and automatically adjust scene schedule")),
@@ -129,7 +129,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
                     new MetaItem(RULE_STATE, Values.create(true))
                 ),
-            new AssetAttribute("lastDetectedScene", AttributeValueType.STRING)
+            new Attribute("lastDetectedScene", AttributeValueType.STRING)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Last detected scene by rules")),
                     new MetaItem(READ_ONLY, Values.create(true)),
@@ -147,7 +147,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected void addDemoApartmentRoomMotionSensor(Asset room, boolean shouldBeLinked, Supplier<MetaItem[]> agentLinker) {
         room.addAttributes(
-            new AssetAttribute("motionSensor", NUMBER)
+            new Attribute("motionSensor", NUMBER)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Motion sensor")),
                     new MetaItem(DESCRIPTION, Values.create("Greater than zero when motion is sensed")),
@@ -155,7 +155,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true)),
                     new MetaItem(STORE_DATA_POINTS)
                 ).addMeta(shouldBeLinked ? agentLinker.get() : null),
-            new AssetAttribute("presenceDetected", AttributeValueType.BOOLEAN)
+            new Attribute("presenceDetected", AttributeValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Presence detected")),
                     new MetaItem(DESCRIPTION, Values.create("Someone is moving or resting in the room")),
@@ -165,13 +165,13 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(STORE_DATA_POINTS, Values.create(true)),
                     new MetaItem(SHOW_ON_DASHBOARD, Values.create(true))
                 ),
-            new AssetAttribute("firstPresenceDetected", TIMESTAMP)
+            new Attribute("firstPresenceDetected", TIMESTAMP)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("First time movement was detected")),
                     new MetaItem(READ_ONLY, Values.create(true)),
                     new MetaItem(RULE_STATE, Values.create(true))
                 ),
-            new AssetAttribute("lastPresenceDetected", TIMESTAMP)
+            new Attribute("lastPresenceDetected", TIMESTAMP)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Last time movement was detected")),
                     new MetaItem(READ_ONLY, Values.create(true)),
@@ -182,7 +182,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected void addDemoApartmentRoomCO2Sensor(Asset room, boolean shouldBeLinked, Supplier<MetaItem[]> agentLinker) {
         room.addAttributes(
-            new AssetAttribute("co2Level", CO2)
+            new Attribute("co2Level", CO2)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("CO2 level")),
                     new MetaItem(RULE_STATE, Values.create(true)),
@@ -199,7 +199,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected void addDemoApartmentRoomHumiditySensor(Asset room, boolean shouldBeLinked, Supplier<MetaItem[]> agentLinker) {
         room.addAttributes(
-            new AssetAttribute("humidity", HUMIDITY)
+            new Attribute("humidity", HUMIDITY)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Humidity")),
                     new MetaItem(RULE_STATE, Values.create(true)),
@@ -218,7 +218,7 @@ public abstract class AbstractManagerSetup implements Setup {
                                                    boolean shouldBeLinked,
                                                    Supplier<MetaItem[]> agentLinker) {
         room.addAttributes(
-            new AssetAttribute("currentTemperature", TEMPERATURE)
+            new Attribute("currentTemperature", TEMPERATURE)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Current temperature")),
                     new MetaItem(RULE_STATE, Values.create(true)),
@@ -236,7 +236,7 @@ public abstract class AbstractManagerSetup implements Setup {
                                                       boolean shouldBeLinked,
                                                       Supplier<MetaItem[]> agentLinker) {
         room.addAttributes(
-            new AssetAttribute("targetTemperature", TEMPERATURE)
+            new Attribute("targetTemperature", TEMPERATURE)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Target temperature")),
                     new MetaItem(RULE_STATE, Values.create(true)),
@@ -263,7 +263,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
         room.addAttributes(
             // Mode
-            new AssetAttribute("smartSwitchMode" + switchName, STRING)
+            new Attribute("smartSwitchMode" + switchName, STRING)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Smart Switch mode " + switchName)),
                     new MetaItem(DESCRIPTION, Values.create("NOW_ON (default when empty) or ON_AT or READY_AT")),
@@ -274,7 +274,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_EVENT_EXPIRES, Values.create("48h"))
                 ).addMeta(shouldBeLinked ? agentLinker.apply(0) : null),
             // Time
-            new AssetAttribute("smartSwitchBeginEnd" + switchName, TIMESTAMP)
+            new Attribute("smartSwitchBeginEnd" + switchName, TIMESTAMP)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Smart Switch begin/end cycle " + switchName)),
                     new MetaItem(DESCRIPTION, Values.create("User-provided begin/end time of appliance cycle")),
@@ -283,7 +283,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true))
                 ).addMeta(shouldBeLinked ? agentLinker.apply(1) : null),
             // StartTime
-            new AssetAttribute("smartSwitchStartTime" + switchName, TIMESTAMP)
+            new Attribute("smartSwitchStartTime" + switchName, TIMESTAMP)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Smart Switch actuator earliest start time " + switchName)),
                     new MetaItem(DESCRIPTION, Values.create("Earliest computed start time sent to actuator")),
@@ -292,7 +292,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true))
                 ).addMeta(shouldBeLinked ? agentLinker.apply(2) : null),
             // StopTime
-            new AssetAttribute("smartSwitchStopTime" + switchName, TIMESTAMP)
+            new Attribute("smartSwitchStopTime" + switchName, TIMESTAMP)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Smart Switch actuator latest stop time " + switchName)),
                     new MetaItem(DESCRIPTION, Values.create("Latest computed stop time sent to actuator")),
@@ -301,7 +301,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(RULE_STATE, Values.create(true))
                 ).addMeta(shouldBeLinked ? agentLinker.apply(3) : null),
             // Enabled
-            new AssetAttribute("smartSwitchEnabled" + switchName, NUMBER)
+            new Attribute("smartSwitchEnabled" + switchName, NUMBER)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Smart Switch actuator enabled " + switchName)),
                     new MetaItem(DESCRIPTION, Values.create("1 if actuator only provides power at ideal time between start/stop")),
@@ -315,7 +315,7 @@ public abstract class AbstractManagerSetup implements Setup {
                                                boolean shouldBeLinked,
                                                Supplier<MetaItem[]> agentLinker) {
         apartment.addAttributes(
-            new AssetAttribute("ventilationLevel", NUMBER)
+            new Attribute("ventilationLevel", NUMBER)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Ventilation level")),
                     new MetaItem(RANGE_MIN, Values.create(0)),
@@ -326,7 +326,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(FORMAT, Values.create("%d")),
                     new MetaItem(STORE_DATA_POINTS)
                 ).addMeta(shouldBeLinked ? agentLinker.get() : null),
-            new AssetAttribute("ventilationAuto", BOOLEAN)
+            new Attribute("ventilationAuto", BOOLEAN)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Ventilation auto")),
                     new MetaItem(RULE_STATE, Values.create(true)),
@@ -359,8 +359,8 @@ public abstract class AbstractManagerSetup implements Setup {
             this.targetTemperature = targetTemperature;
         }
 
-        AssetAttribute createMacroAttribute(Asset apartment, Asset... rooms) {
-            AssetAttribute attribute = initProtocolConfiguration(new AssetAttribute(attributeName), MacroProtocol.PROTOCOL_NAME)
+        Attribute createMacroAttribute(Asset apartment, Asset... rooms) {
+            Attribute attribute = initProtocolConfiguration(new Attribute(attributeName), MacroProtocol.PROTOCOL_NAME)
                 .addMeta(new MetaItem(LABEL, Values.create(attributeLabel)));
             attribute.getMeta().add(
                 new MacroAction(new AttributeState(new AttributeRef(apartment.getId(), "alarmEnabled"), Values.create(alarmEnabled))).toMetaItem()
@@ -378,20 +378,20 @@ public abstract class AbstractManagerSetup implements Setup {
             return attribute;
         }
 
-        AssetAttribute[] createTimerAttributes(Asset apartment) {
-            List<AssetAttribute> attributes = new ArrayList<>();
+        Attribute[] createTimerAttributes(Asset apartment) {
+            List<Attribute> attributes = new ArrayList<>();
             for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
                 // "MONDAY" => "Monday"
                 String dayOfWeekLabel = dayOfWeek.name().substring(0, 1) + dayOfWeek.name().substring(1).toLowerCase(Locale.ROOT);
                 // "0 0 7 ? *" => "0 0 7 ? * MON *"
                 String timePattern = startTime + " " + dayOfWeek.name().substring(0, 3).toUpperCase(Locale.ROOT) + " *";
                 attributes.add(
-                    initTimerConfiguration(new AssetAttribute(attributeName + dayOfWeek.name()), timePattern,
+                    initTimerConfiguration(new Attribute(attributeName + dayOfWeek.name()), timePattern,
                         new AttributeState(apartment.getId(), attributeName, Values.create("REQUEST_START")))
                         .addMeta(new MetaItem(LABEL, Values.create(attributeLabel + " trigger " + dayOfWeekLabel)))
                 );
             }
-            return attributes.toArray(new AssetAttribute[attributes.size()]);
+            return attributes.toArray(new Attribute[attributes.size()]);
         }
     }
 
@@ -413,7 +413,7 @@ public abstract class AbstractManagerSetup implements Setup {
     }
 
     protected static void addDemoApartmentSceneEnableDisableTimer(Asset apartment, Asset agent, Scene[] scenes) {
-        AssetAttribute enableAllMacro = initProtocolConfiguration(new AssetAttribute("enableSceneTimer"), MacroProtocol.PROTOCOL_NAME)
+        Attribute enableAllMacro = initProtocolConfiguration(new Attribute("enableSceneTimer"), MacroProtocol.PROTOCOL_NAME)
             .addMeta(new MetaItem(LABEL, Values.create("Enable scene timer")));
         for (Scene scene : scenes) {
             for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
@@ -428,7 +428,7 @@ public abstract class AbstractManagerSetup implements Setup {
         );
         agent.addAttributes(enableAllMacro);
 
-        AssetAttribute disableAllMacro = initProtocolConfiguration(new AssetAttribute("disableSceneTimer"), MacroProtocol.PROTOCOL_NAME)
+        Attribute disableAllMacro = initProtocolConfiguration(new Attribute("disableSceneTimer"), MacroProtocol.PROTOCOL_NAME)
             .addMeta(new MetaItem(LABEL, Values.create("Disable scene timer")));
         for (Scene scene : scenes) {
             for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
@@ -447,7 +447,7 @@ public abstract class AbstractManagerSetup implements Setup {
     protected static void linkDemoApartmentWithSceneAgent(Asset apartment, Asset agent, Scene[] scenes) {
         for (Scene scene : scenes) {
             apartment.addAttributes(
-                new AssetAttribute(scene.attributeName, AttributeValueType.STRING, Values.create(AttributeExecuteStatus.READY.name()))
+                new Attribute(scene.attributeName, AttributeValueType.STRING, Values.create(AttributeExecuteStatus.READY.name()))
                     .setMeta(
                         new MetaItem(LABEL, Values.create(scene.attributeLabel)),
                         new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
@@ -455,7 +455,7 @@ public abstract class AbstractManagerSetup implements Setup {
                         new MetaItem(EXECUTABLE, Values.create(true)),
                         new MetaItem(AGENT_LINK, new AttributeRef(agent.getId(), scene.attributeName).toArrayValue())
                     ),
-                new AssetAttribute(scene.attributeName + "AlarmEnabled", AttributeValueType.BOOLEAN)
+                new Attribute(scene.attributeName + "AlarmEnabled", AttributeValueType.BOOLEAN)
                     .setMeta(
                         new MetaItem(LABEL, Values.create(scene.attributeLabel + " alarm enabled")),
                         new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
@@ -463,7 +463,7 @@ public abstract class AbstractManagerSetup implements Setup {
                         new MetaItem(META_MACRO_ACTION_INDEX, Values.create(0)),
                         new MetaItem(AGENT_LINK, new AttributeRef(agent.getId(), scene.attributeName).toArrayValue())
                     ),
-                new AssetAttribute(scene.attributeName + "TargetTemperature", AttributeValueType.NUMBER)
+                new Attribute(scene.attributeName + "TargetTemperature", AttributeValueType.NUMBER)
                     .setMeta(
                         new MetaItem(LABEL, Values.create(scene.attributeLabel + " target temperature")),
                         new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
@@ -476,7 +476,7 @@ public abstract class AbstractManagerSetup implements Setup {
                 // "MONDAY" => "Monday"
                 String dayOfWeekLabel = dayOfWeek.name().substring(0, 1) + dayOfWeek.name().substring(1).toLowerCase(Locale.ROOT);
                 apartment.addAttributes(
-                    new AssetAttribute(scene.attributeName + "Time" + dayOfWeek.name(), AttributeValueType.STRING)
+                    new Attribute(scene.attributeName + "Time" + dayOfWeek.name(), AttributeValueType.STRING)
                         .setMeta(
                             new MetaItem(LABEL, Values.create(scene.attributeLabel + " time " + dayOfWeekLabel)),
                             new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
@@ -485,7 +485,7 @@ public abstract class AbstractManagerSetup implements Setup {
                             new MetaItem(META_TIMER_VALUE_LINK, Values.create(TimerValue.TIME.toString())),
                             new MetaItem(AGENT_LINK, new AttributeRef(agent.getId(), scene.attributeName + dayOfWeek.name()).toArrayValue())
                         ),
-                    new AssetAttribute(scene.attributeName + "Enabled" + dayOfWeek.name(), AttributeValueType.BOOLEAN)
+                    new Attribute(scene.attributeName + "Enabled" + dayOfWeek.name(), AttributeValueType.BOOLEAN)
                         .setMeta(
                             new MetaItem(LABEL, Values.create(scene.attributeLabel + " enabled " + dayOfWeekLabel)),
                             new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
@@ -497,14 +497,14 @@ public abstract class AbstractManagerSetup implements Setup {
             }
         }
         apartment.addAttributes(
-            new AssetAttribute("sceneTimerEnabled", AttributeValueType.BOOLEAN, Values.create(true)) // The scene timer is enabled when the timer protocol starts
+            new Attribute("sceneTimerEnabled", AttributeValueType.BOOLEAN, Values.create(true)) // The scene timer is enabled when the timer protocol starts
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Scene timer enabled")),
                     new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
                     new MetaItem(SHOW_ON_DASHBOARD, Values.create(true)),
                     new MetaItem(READ_ONLY, Values.create(true))
                 ),
-            new AssetAttribute("enableSceneTimer", AttributeValueType.STRING)
+            new Attribute("enableSceneTimer", AttributeValueType.STRING)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Enable scene timer")),
                     new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
@@ -512,7 +512,7 @@ public abstract class AbstractManagerSetup implements Setup {
                     new MetaItem(EXECUTABLE, Values.create(true)),
                     new MetaItem(AGENT_LINK, new AttributeRef(agent.getId(), "enableSceneTimer").toArrayValue())
                 ),
-            new AssetAttribute("disableSceneTimer", AttributeValueType.STRING)
+            new Attribute("disableSceneTimer", AttributeValueType.STRING)
                 .setMeta(
                     new MetaItem(LABEL, Values.create("Disable scene timer")),
                     new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
@@ -525,7 +525,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoPeopleCounterAsset(String name, Asset area, GeoJSON location, Supplier<MetaItem[]> agentLinker) {
         Asset peopleCounterAsset = new Asset(name, PEOPLE_COUNTER, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
         peopleCounterAsset.getAttribute("peopleCountIn").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
@@ -578,7 +578,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoMicrophoneAsset(String name, Asset area, GeoJSON location, Supplier<MetaItem[]> agentLinker) {
         Asset microphoneAsset = new Asset(name, MICROPHONE, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
         microphoneAsset.getAttribute("microphoneLevel").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
@@ -596,7 +596,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoSoundEventAsset(String name, Asset area, GeoJSON location, Supplier<MetaItem[]> agentLinker) {
         Asset soundEventAsset = new Asset(name, SOUND_EVENT, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
         soundEventAsset.getAttribute("lastAggressionEvent").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
@@ -649,7 +649,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoEnvironmentAsset(String name, Asset area, GeoJSON location, Supplier<MetaItem[]> agentLinker) {
         Asset environmentAsset = new Asset(name, ENVIRONMENT_SENSOR, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
         environmentAsset.getAttribute("temperature").ifPresent(assetAttribute -> assetAttribute
             .addMeta(agentLinker.get()));
@@ -669,7 +669,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoLightAsset(String name, Asset area, GeoJSON location) {
         Asset lightAsset = new Asset(name, LIGHT, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
                 .addMeta(SHOW_ON_DASHBOARD)
         );
         lightAsset.getAttribute("lightStatus").ifPresent(assetAttribute -> assetAttribute.addMeta(
@@ -697,7 +697,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoLightControllerAsset(String name, Asset area, GeoJSON location) {
         Asset lightAsset = new Asset(name, LIGHT_CONTROLLER, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
         lightAsset.getAttribute("lightAllStatus").ifPresent(assetAttribute -> assetAttribute.addMeta(
             new MetaItem(RULE_STATE),
@@ -720,7 +720,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoElectricityStorageAsset(String name, Asset area, GeoJSON location) {
         Asset electricityStorageAsset = new Asset(name, ELECTRICITY_STORAGE, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
     return electricityStorageAsset;
@@ -728,7 +728,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoElectricityProducerAsset(String name, Asset area, GeoJSON location) {
         Asset electricityProducerAsset = new Asset(name, ELECTRICITY_PRODUCER, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
     return electricityProducerAsset;
@@ -736,7 +736,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoElectricityConsumerAsset(String name, Asset area, GeoJSON location) {
         Asset electricityConsumerAsset = new Asset(name, ELECTRICITY_CONSUMER, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
     return electricityConsumerAsset;
@@ -744,7 +744,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoElectricityChargerAsset(String name, Asset area, GeoJSON location) {
         Asset electricityConsumerAsset = new Asset(name, ELECTRICITY_CHARGER, area).addAttributes(
-                new AssetAttribute(AttributeType.LOCATION, location.toValue())
+                new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
         return electricityConsumerAsset;
@@ -752,7 +752,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoGroundwaterAsset(String name, Asset area, GeoJSON location) {
         Asset groundwaterAsset = new Asset(name, GROUNDWATER, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
     return groundwaterAsset;
@@ -760,7 +760,7 @@ public abstract class AbstractManagerSetup implements Setup {
 
     protected Asset createDemoParkingAsset(String name, Asset area, GeoJSON location) {
         Asset parkingAsset = new Asset(name, PARKING, area).addAttributes(
-            new AssetAttribute(AttributeType.LOCATION, location.toValue())
+            new Attribute(AttributeType.LOCATION, location.toValue())
         );
 
     return parkingAsset;

@@ -26,7 +26,7 @@ import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.manager.setup.AbstractManagerSetup;
 import org.openremote.model.apps.ConsoleAppConfig;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.ElectricityProducerOrientationType;
 import org.openremote.model.attribute.AttributeLink;
@@ -102,7 +102,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         smartcitySimulatorAgent.setRealm(this.realmCityTenant);
         smartcitySimulatorAgent
                 .addAttributes(
-                        initProtocolConfiguration(new AssetAttribute("inputSimulator"), SimulatorProtocol.PROTOCOL_NAME)
+                        initProtocolConfiguration(new Attribute("inputSimulator"), SimulatorProtocol.PROTOCOL_NAME)
                                 .addMeta(
                                         new MetaItem(
                                                 SimulatorProtocol.CONFIG_MODE,
@@ -110,7 +110,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                                         ))
                 )
                 .addAttributes(
-                        initProtocolConfiguration(new AssetAttribute("replaySimulator"), SimulatorProtocol.PROTOCOL_NAME)
+                        initProtocolConfiguration(new Attribute("replaySimulator"), SimulatorProtocol.PROTOCOL_NAME)
                                 .addMeta(
                                         new MetaItem(
                                                 SimulatorProtocol.CONFIG_MODE,
@@ -130,13 +130,13 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         energyManagement.setName("Energy Management");
         energyManagement.setType(THING);
         energyManagement.addAttributes(
-                new AssetAttribute("totalPowerProducers", POWER).addMeta(
+                new Attribute("totalPowerProducers", POWER).addMeta(
                         LABEL.withInitialValue("Combined power of all producers"),
                         UNIT_TYPE.withInitialValue(UNITS_POWER_KILOWATT),
                         STORE_DATA_POINTS,
                         READ_ONLY,
                         RULE_STATE),
-                new AssetAttribute("totalPowerConsumers", POWER).addMeta(
+                new Attribute("totalPowerConsumers", POWER).addMeta(
                         LABEL.withInitialValue("Combined power use of all consumers"),
                         UNIT_TYPE.withInitialValue(UNITS_POWER_KILOWATT),
                         STORE_DATA_POINTS,
@@ -150,13 +150,13 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         // ### De Rotterdam ###
         Asset building1Asset = new Asset("De Rotterdam", BUILDING, energyManagement);
         building1Asset.setAttributes(
-                new AssetAttribute(AttributeType.GEO_STREET, Values.create("Wilhelminakade 139")),
-                new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3072 AP")),
-                new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
-                new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.488324, 51.906577).toValue())
+                new Attribute(AttributeType.GEO_STREET, Values.create("Wilhelminakade 139")),
+                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3072 AP")),
+                new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
+                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.488324, 51.906577).toValue())
                         .removeMeta(SHOW_ON_DASHBOARD),
-                new AssetAttribute("powerBalance", POWER).addMeta(
+                new Attribute("powerBalance", POWER).addMeta(
                         LABEL.withInitialValue("Balance of power production and use"),
                         UNIT_TYPE.withInitialValue(UNITS_POWER_KILOWATT),
                         STORE_DATA_POINTS,
@@ -272,11 +272,11 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset building2Asset = new Asset("Stadhuis", BUILDING, energyManagement);
         building2Asset.setAttributes(
-                new AssetAttribute(AttributeType.GEO_STREET, Values.create("Coolsingel 40")),
-                new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3011 AD")),
-                new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
-                new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.47985, 51.92274).toValue())
+                new Attribute(AttributeType.GEO_STREET, Values.create("Coolsingel 40")),
+                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3011 AD")),
+                new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
+                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.47985, 51.92274).toValue())
                         .removeMeta(SHOW_ON_DASHBOARD)
         );
         building2Asset.setId(UniqueIdentifierGenerator.generateId(building2Asset.getName() + "building"));
@@ -388,13 +388,13 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset building3Asset = new Asset("Markthal", BUILDING, energyManagement);
         building3Asset.setAttributes(
-                new AssetAttribute(AttributeType.GEO_STREET, Values.create("Dominee Jan Scharpstraat 298")),
-                new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3011 GZ")),
-                new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
-                new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.47945, 51.92301).toValue())
+                new Attribute(AttributeType.GEO_STREET, Values.create("Dominee Jan Scharpstraat 298")),
+                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3011 GZ")),
+                new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
+                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.47945, 51.92301).toValue())
                         .removeMeta(SHOW_ON_DASHBOARD),
-                new AssetAttribute("allChargersInUse", BOOLEAN)
+                new Attribute("allChargersInUse", BOOLEAN)
                         .addMeta(
                                 LABEL.withInitialValue("All chargers in use"),
                                 RULE_STATE,
@@ -646,11 +646,11 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset building4Asset = new Asset("Erasmianum", BUILDING, energyManagement);
         building4Asset.setAttributes(
-                new AssetAttribute(AttributeType.GEO_STREET, Values.create("Wytemaweg 25")),
-                new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3015 CN")),
-                new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
-                new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.468324, 51.912062).toValue())
+                new Attribute(AttributeType.GEO_STREET, Values.create("Wytemaweg 25")),
+                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3015 CN")),
+                new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
+                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.468324, 51.912062).toValue())
                         .removeMeta(SHOW_ON_DASHBOARD)
         );
         building4Asset.setId(UniqueIdentifierGenerator.generateId(building4Asset.getName() + "building"));
@@ -705,11 +705,11 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset building5Asset = new Asset("Oostelijk zwembad", BUILDING, energyManagement);
         building5Asset.setAttributes(
-                new AssetAttribute(AttributeType.GEO_STREET, Values.create("Gerdesiaweg 480")),
-                new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3061 RA")),
-                new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
-                new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.498048, 51.925770).toValue())
+                new Attribute(AttributeType.GEO_STREET, Values.create("Gerdesiaweg 480")),
+                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3061 RA")),
+                new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands")),
+                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.498048, 51.925770).toValue())
                         .removeMeta(SHOW_ON_DASHBOARD)
         );
         building5Asset.setId(UniqueIdentifierGenerator.generateId(building5Asset.getName() + "building"));
@@ -815,7 +815,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset weatherHttpApiAgent = new Asset("Weather Agent", AssetType.AGENT, energyManagement);
         weatherHttpApiAgent.addAttributes(
-                initProtocolConfiguration(new AssetAttribute("weatherApiClient"), HttpClientProtocol.PROTOCOL_NAME)
+                initProtocolConfiguration(new Attribute("weatherApiClient"), HttpClientProtocol.PROTOCOL_NAME)
                         .addMeta(
                                 new MetaItem(META_PROTOCOL_BASE_URI, Values.create("https://api.openweathermap.org/data/2.5/")),
                                 new MetaItem(META_QUERY_PARAMETERS, Values.createObject()
@@ -834,7 +834,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         Asset weather = new Asset("Weather", WEATHER, energyManagement);
         weather.setId(UniqueIdentifierGenerator.generateId(weather.getName()));
         weather.addAttributes(
-                new AssetAttribute("currentWeather", OBJECT)
+                new Attribute("currentWeather", OBJECT)
                         .setMeta(
                                 new MetaItem(
                                         AGENT_LINK,
@@ -848,7 +848,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                                 new MetaItem(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "wind", "speed", "windSpeed")),
                                 new MetaItem(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "wind", "deg", "windDirection"))
                         ));
-        new AssetAttribute(AttributeType.LOCATION, new GeoJSONPoint(4.463250, 51.918849).toValue());
+        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(4.463250, 51.918849).toValue());
         weather = assetStorageService.merge(weather);
 
         // ################################ Realm smartcity - Environment monitor ###################################
@@ -1031,7 +1031,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         Asset parkingGroupAsset = new Asset("Parking group", GROUP, mobilityAndSafety);
         parkingGroupAsset.getAttribute("childAssetType").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create("urn:openremote:asset:parking")));
         parkingGroupAsset.addAttributes(
-                new AssetAttribute("totalOccupancy", PERCENTAGE)
+                new Attribute("totalOccupancy", PERCENTAGE)
                         .addMeta(
                                 LABEL.withInitialValue("Percentage of total parking spaces in use"),
                                 RULE_STATE,
@@ -1191,10 +1191,10 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         Asset assetAreaStation = new Asset("Stationsplein", AREA, mobilityAndSafety)
                 .setAttributes(
-                        new AssetAttribute(AttributeType.LOCATION, STATIONSPLEIN_LOCATION.toValue()),
-                        new AssetAttribute(AttributeType.GEO_POSTAL_CODE, Values.create("3013 AK")),
-                        new AssetAttribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
-                        new AssetAttribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                        new Attribute(AttributeType.LOCATION, STATIONSPLEIN_LOCATION.toValue()),
+                        new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("3013 AK")),
+                        new Attribute(AttributeType.GEO_CITY, Values.create("Rotterdam")),
+                        new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
                 );
         assetAreaStation.setId(UniqueIdentifierGenerator.generateId(assetAreaStation.getName()));
         assetAreaStation = assetStorageService.merge(assetAreaStation);

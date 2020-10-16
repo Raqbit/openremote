@@ -21,7 +21,7 @@ package org.openremote.manager.rules;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;
@@ -41,7 +41,7 @@ import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent.Source;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.query.AssetQuery;
@@ -70,18 +70,18 @@ import static org.openremote.container.concurrent.GlobalLock.withLockReturning;
 import static org.openremote.container.persistence.PersistenceEvent.PERSISTENCE_TOPIC;
 import static org.openremote.container.persistence.PersistenceEvent.isPersistenceEventForEntityType;
 import static org.openremote.container.util.MapAccess.getString;
-import static org.openremote.model.asset.AssetAttribute.attributesFromJson;
-import static org.openremote.model.asset.AssetAttribute.getAddedOrModifiedAttributes;
+import static org.openremote.model.attribute.Attribute.attributesFromJson;
+import static org.openremote.model.attribute.Attribute.getAddedOrModifiedAttributes;
 
 /**
  * Manages {@link RulesEngine}s for stored {@link Ruleset}s and processes asset attribute updates.
  * <p>
- * If an updated attribute {@link AssetAttribute#isRuleState}, this implementation of {@link AssetUpdateProcessor}
+ * If an updated attribute {@link Attribute#isRuleState}, this implementation of {@link AssetUpdateProcessor}
  * converts the update message to an {@link AssetState} fact. This service keeps the facts and thus the state of rule
  * facts are in sync with the asset state changes that occur. If an asset attribute value changes, the {@link
  * AssetState} in the rules engines will be updated to reflect the change.
  * <p>
- * If an updated attribute {@link AssetAttribute#isRuleEvent}, another temporary {@link AssetState} fact is inserted in
+ * If an updated attribute {@link Attribute#isRuleEvent}, another temporary {@link AssetState} fact is inserted in
  * the rules engines in scope. This fact expires automatically if the lifetime set in {@link
  * RulesService#RULE_EVENT_EXPIRES} is reached, or if the lifetime set in the attribute {@link
  * MetaItemType#RULE_EVENT_EXPIRES} is reached.
@@ -133,7 +133,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         timerService = container.getService(TimerService.class);
         executorService = container.getService(ManagerExecutorService.class);
         persistenceService = container.getService(PersistenceService.class);
@@ -225,7 +225,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
         if (!geofenceAssetAdapters.isEmpty()) {
             LOG.info("GeoefenceAssetAdapters found: " + geofenceAssetAdapters.size());
@@ -268,7 +268,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             .count();//Needed in order to execute the stream. TODO: can this be done differently?
 
         LOG.info("Loading all assets with fact attributes to initialize state of rules engines");
-        Stream<Pair<Asset, Stream<AssetAttribute>>> stateAttributes = findRuleStateAttributes();
+        Stream<Pair<Asset, Stream<Attribute>>> stateAttributes = findRuleStateAttributes();
 
         // Push each attribute as an asset update through the rule engine chain
         // that will ensure the insert only happens to the engines in scope
@@ -290,7 +290,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
         withLock(getClass().getSimpleName() + "::stop", () -> {
             for (GeofenceAssetAdapter geofenceAssetAdapter : geofenceAssetAdapters) {
                 try {
@@ -321,7 +321,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     @Override
     public boolean processAssetUpdate(EntityManager em,
                                       Asset asset,
-                                      AssetAttribute attribute,
+                                      Attribute attribute,
                                       Source source) throws AssetProcessingException {
         // We might process two facts for a single attribute update, if that is what the user wants
 
@@ -419,14 +419,14 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
             // We must load the asset from database (only when required), as the
             // persistence event might not contain a completely loaded asset
-            BiFunction<Asset, AssetAttribute, AssetState> buildAssetState = (loadedAsset, attribute) ->
+            BiFunction<Asset, Attribute, AssetState> buildAssetState = (loadedAsset, attribute) ->
                 new AssetState(loadedAsset, attribute.deepCopy(), Source.INTERNAL);
 
             switch (persistenceEvent.getCause()) {
                 case CREATE: {
                     // New asset has been created so get attributes that have RULE_STATE meta
-                    List<AssetAttribute> ruleStateAttributes =
-                        asset.getAttributesStream().filter(AssetAttribute::isRuleState).collect(Collectors.toList());
+                    List<Attribute> ruleStateAttributes =
+                        asset.getAttributesStream().filter(Attribute::isRuleState).collect(Collectors.toList());
 
                     // Asset used to be loaded for each attribute which is inefficient
                     Asset loadedAsset = ruleStateAttributes.isEmpty() ? null : assetStorageService.find(asset.getId(),
@@ -459,17 +459,17 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
                     // Attributes have possibly changed so need to compare old and new attributes
                     // to determine which facts to retract and which to insert
-                    List<AssetAttribute> oldRuleStateAttributes =
+                    List<Attribute> oldRuleStateAttributes =
                         attributesFromJson(
                             (ObjectValue) persistenceEvent.getPreviousState()[attributesIndex],
                             asset.getId()
-                        ).filter(AssetAttribute::isRuleState).collect(Collectors.toList());
+                        ).filter(Attribute::isRuleState).collect(Collectors.toList());
 
-                    List<AssetAttribute> newRuleStateAttributes =
+                    List<Attribute> newRuleStateAttributes =
                         attributesFromJson(
                             (ObjectValue) persistenceEvent.getCurrentState()[attributesIndex],
                             asset.getId()
-                        ).filter(AssetAttribute::isRuleState).collect(Collectors.toList());
+                        ).filter(Attribute::isRuleState).collect(Collectors.toList());
 
                     // Retract facts for attributes that are obsolete
                     getAddedOrModifiedAttributes(newRuleStateAttributes,
@@ -493,7 +493,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
                 case DELETE:
                     // Retract any facts that were associated with this asset
                     asset.getAttributesStream()
-                        .filter(AssetAttribute::isRuleState)
+                        .filter(Attribute::isRuleState)
                         .forEach(attribute -> {
                             AssetState assetState = new AssetState(asset, attribute, Source.INTERNAL);
                             LOG.fine("Asset was persisted (" + persistenceEvent.getCause() + "), retracting fact: " + assetState);
@@ -815,7 +815,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
         return rulesEngines;
     }
 
-    protected Stream<Pair<Asset, Stream<AssetAttribute>>> findRuleStateAttributes() {
+    protected Stream<Pair<Asset, Stream<Attribute>>> findRuleStateAttributes() {
         List<Asset> assets = assetStorageService.findAll(
             new AssetQuery()
                 .attributeMeta(
@@ -826,7 +826,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
         return assets.stream()
             .map((Asset asset) ->
-                new Pair<>(asset, asset.getAttributesStream().filter(AssetAttribute::isRuleState))
+                new Pair<>(asset, asset.getAttributesStream().filter(Attribute::isRuleState))
             );
     }
 

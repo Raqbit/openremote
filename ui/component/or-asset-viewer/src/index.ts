@@ -22,7 +22,7 @@ import {OrChartConfig, OrChartEvent} from "@openremote/or-chart";
 import {HistoryConfig, OrAttributeHistory, OrAttributeHistoryEvent} from "@openremote/or-attribute-history";
 import {
     Asset,
-    AssetAttribute,
+    Attribute,
     AssetEvent,
     AssetType,
     Attribute,
@@ -381,10 +381,10 @@ export function getPanelContent(panelName: string, asset: Asset, attributes: Att
 
                 if (attributeHistory) {
 
-                    let attribute: AssetAttribute | undefined;
+                    let attribute: Attribute | undefined;
 
                     if (attributeName) {
-                        attribute = Util.getAssetAttribute(asset, attributeName);
+                        attribute = Util.getAttribute(asset, attributeName);
                     }
 
                     attributeHistory.attribute = attribute;
@@ -446,7 +446,7 @@ export function getPanelContent(panelName: string, asset: Asset, attributes: Att
         }
 
         // Get child asset type attribute value
-        const childAssetTypeAttribute = Util.getAssetAttribute(asset, "childAssetType");
+        const childAssetTypeAttribute = Util.getAttribute(asset, "childAssetType");
         const groupConfig = panelConfig as GroupPanelConfig;
 
         if (!childAssetTypeAttribute || typeof childAssetTypeAttribute.value !== "string") {
@@ -569,7 +569,7 @@ export function getPanelContent(panelName: string, asset: Asset, attributes: Att
     return undefined;
 }
 
-export function getAttributeTemplate(asset: Asset, attribute: AssetAttribute, hostElement: LitElement, viewerConfig: AssetViewerConfig, panelConfig: PanelConfig, itemConfig: InfoPanelItemConfig) {
+export function getAttributeTemplate(asset: Asset, attribute: Attribute, hostElement: LitElement, viewerConfig: AssetViewerConfig, panelConfig: PanelConfig, itemConfig: InfoPanelItemConfig) {
     if (viewerConfig.attributeViewProvider) {
         const result = viewerConfig.attributeViewProvider(asset, attribute, hostElement, viewerConfig, panelConfig);
         if (result) {
@@ -867,7 +867,7 @@ export class OrAssetViewer extends subscribe(manager)(translate(i18next)(LitElem
 
             if (this.asset) {
                 this._viewerConfig = this._getPanelConfig(this.asset);
-                this._attributes = Util.getAssetAttributes(this.asset);
+                this._attributes = Util.getAttributes(this.asset);
                 this._assetModified = !this.asset.id;
             }
         }

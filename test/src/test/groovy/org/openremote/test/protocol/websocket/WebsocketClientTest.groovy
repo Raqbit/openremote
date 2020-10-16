@@ -21,8 +21,7 @@ package org.openremote.test.protocol.websocket
 
 import io.netty.channel.ChannelHandler
 import org.apache.http.client.utils.URIBuilder
-import org.openremote.container.timer.TimerService
-import org.openremote.container.web.OAuthPasswordGrant
+import org.openremote.model.auth.OAuthPasswordGrant
 import org.openremote.agent.protocol.io.AbstractNettyIoClient
 import org.openremote.agent.protocol.websocket.WebsocketIoClient
 import org.openremote.container.Container

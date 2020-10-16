@@ -17,16 +17,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.container.web;
+package org.openremote.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.openremote.container.Container;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -102,15 +99,5 @@ public abstract class OAuthGrant {
     public OAuthGrant setBasicAuthHeader(boolean basicAuthHeader) {
         this.basicAuthHeader = basicAuthHeader;
         return this;
-    }
-
-    public ObjectValue toObjectValue() {
-        try {
-            return Values.<ObjectValue>parse(Container.JSON.writeValueAsString(this)).orElse(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

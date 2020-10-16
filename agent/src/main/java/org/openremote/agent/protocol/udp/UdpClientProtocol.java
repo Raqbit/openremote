@@ -20,10 +20,11 @@
 package org.openremote.agent.protocol.udp;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
 import org.openremote.model.syslog.SyslogCategory;
@@ -102,11 +103,6 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
-
-    @Override
     protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
         return PROTOCOL_META_ITEM_DESCRIPTORS;
     }
@@ -117,7 +113,7 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_PROTOCOL_HOST, null),
@@ -126,17 +122,17 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         synchronized (protocolMessageConsumers) {
             protocolMessageConsumers.remove(protocolConfiguration.getReferenceOrThrow());
         }
-        super.doUnlinkProtocolConfiguration(agent, protocolConfiguration);
+        super.doDisconnect();
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
-        Consumer<String> messageConsumer = Protocol.createGenericAttributeMessageConsumer(attribute, assetService, this::updateLinkedAttribute);
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        AttributeRef protocolRef = agent.getReferenceOrThrow();
+        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(attribute, assetService, this::updateLinkedAttribute);
 
         if (messageConsumer != null) {
             synchronized (protocolMessageConsumers) {
@@ -155,10 +151,10 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         synchronized (protocolMessageConsumers) {
-            protocolMessageConsumers.compute(protocolConfiguration.getReferenceOrThrow(), (ref, consumers) -> {
+            protocolMessageConsumers.compute(agent.getReferenceOrThrow(), (ref, consumers) -> {
                 if (consumers != null) {
                     consumers.removeIf((attrRefConsumer) -> attrRefConsumer.key.equals(attributeRef));
                 }
@@ -168,7 +164,7 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(UdpIoClient<String> client, AssetAttribute protocolConfiguration) {
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(UdpIoClient<String> client, Attribute protocolConfiguration) {
         return getGenericStringEncodersAndDecoders(client, protocolConfiguration);
     }
 
@@ -190,7 +186,7 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String> {
     }
 
     @Override
-    protected String createWriteMessage(AssetAttribute protocolConfiguration, AssetAttribute attribute, AttributeEvent event, Value processedValue) {
+    protected String createWriteMessage(Attribute protocolConfiguration, Attribute attribute, AttributeEvent event, Value processedValue) {
         if (attribute.isReadOnly()) {
             LOG.fine("Attempt to write to an attribute that doesn't support writes: " + event.getAttributeRef());
             return null;

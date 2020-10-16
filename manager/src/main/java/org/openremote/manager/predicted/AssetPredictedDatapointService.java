@@ -23,7 +23,7 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolPredictedAssetService;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
@@ -62,7 +62,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         persistenceService = container.getService(PersistenceService.class);
         assetStorageService = container.getService(AssetStorageService.class);
 
@@ -77,12 +77,12 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 
@@ -111,24 +111,24 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
         });
     }
 
-    public ValueDatapoint[] getValueDatapoints(AttributeRef attributeRef,
+    public ValueDatapoint[] getValueDatapoints(String assetId, String attributeName,
                                                DatapointInterval datapointInterval,
                                                long fromTimestamp,
                                                long toTimestamp) {
 
-        Asset asset = assetStorageService.find(attributeRef.getEntityId());
+        Asset asset = assetStorageService.find(assetId);
         if (asset == null) {
-            throw new IllegalStateException("Asset not found: " + attributeRef.getEntityId());
+            throw new IllegalStateException("Asset not found: " + assetId);
         }
-        ValueType attributeValueType = asset.getAttribute(attributeRef.getAttributeName())
-            .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeRef.getAttributeName()))
+        ValueType attributeValueType = asset.getAttribute(attributeName)
+            .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeName))
             .getTypeOrThrow()
             .getValueType();
 
-        LOG.fine("Getting predicted datapoints for: " + attributeRef);
+        LOG.fine("Getting predicted datapoints for: " + attributeName);
 
         return persistenceService.doReturningTransaction(entityManager ->
-            entityManager.unwrap(Session.class).doReturningWork(new AbstractReturningWork<ValueDatapoint[]>() {
+            entityManager.unwrap(Session.class).doReturningWork(new AbstractReturningWork<ValueDatapoint<?>[]>() {
                 @Override
                 public ValueDatapoint[] execute(Connection connection) throws SQLException {
 
@@ -220,13 +220,13 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                             st.setString(5, truncateX);
                             st.setLong(6, fromTimestampSeconds);
                             st.setLong(7, toTimestampSeconds);
-                            st.setString(8, attributeRef.getEntityId());
-                            st.setString(9, attributeRef.getAttributeName());
+                            st.setString(8, assetId);
+                            st.setString(9, attributeName);
                         } else {
                             st.setLong(1, fromTimestampSeconds);
                             st.setLong(2, toTimestampSeconds);
-                            st.setString(3, attributeRef.getEntityId());
-                            st.setString(4, attributeRef.getAttributeName());
+                            st.setString(3, assetId);
+                            st.setString(4, attributeName);
                         }
 
                         try (ResultSet rs = st.executeQuery()) {

@@ -89,7 +89,7 @@ public class ManagerWebService extends WebService {
         return PRIORITY;
     }
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
 
         IdentityService identityService = container.getService(IdentityService.class);

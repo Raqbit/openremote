@@ -24,11 +24,11 @@ import com.github.nmorel.gwtjackson.client.annotation.JsonMixIns;
 import org.openremote.app.client.interop.jackson.DefaultJsonMixin;
 import org.openremote.app.client.rest.EntityReader;
 import org.openremote.app.client.rest.EntityWriter;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 
-@JsonMixIns({@JsonMixIns.JsonMixIn(target = AssetAttribute.class, mixIn = DefaultJsonMixin.class)})
-public interface AssetAttributeMapper
-    extends ObjectMapper<AssetAttribute>,
-    EntityReader<AssetAttribute>,
-    EntityWriter<AssetAttribute> {
+@JsonMixIns({@JsonMixIns.JsonMixIn(target = Attribute.class, mixIn = DefaultJsonMixin.class)})
+public interface AttributeMapper
+    extends ObjectMapper<Attribute>,
+    EntityReader<Attribute>,
+    EntityWriter<Attribute> {
 }

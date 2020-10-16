@@ -26,10 +26,9 @@ import org.apache.camel.spi.*;
 import org.apache.camel.util.StringHelper;
 import org.apache.camel.util.concurrent.CamelThreadFactory;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.concurrent.ContainerExecutor;
 import org.openremote.container.concurrent.ContainerScheduledExecutor;
-import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.security.IdentityService;
 import org.openremote.container.web.DefaultWebsocketComponent;
 import org.openremote.container.web.WebService;
@@ -59,7 +58,7 @@ public class MessageBrokerService implements ContainerService {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
 
         context = new MessageBrokerContext();
 
@@ -143,14 +142,14 @@ public class MessageBrokerService implements ContainerService {
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
         producerTemplate = context.createProducerTemplate();
         LOG.info("Starting Camel message broker");
         context.start();
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
         if (context != null) {
             context.stop();
         }

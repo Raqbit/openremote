@@ -19,14 +19,14 @@
  */
 package org.openremote.test.protocol
 
+
 import org.openremote.agent.protocol.AbstractProtocol
-import org.openremote.agent.protocol.Protocol
+import org.openremote.model.asset.agent.Protocol
 import org.openremote.container.util.Util
 import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.asset.agent.ProtocolConfiguration
@@ -60,8 +60,8 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         protocolExpectedLinkedAttributeCount['mockConfig2'] = 2
         protocolExpectedLinkedAttributeCount['mockConfig3'] = 2
         protocolExpectedLinkedAttributeCount['mockConfig4'] = 2
-        List<AssetAttribute> protocolLinkedConfigurations = []
-        Map<String, List<AssetAttribute>> protocolLinkedAttributes = [:]
+        List<Attribute> protocolLinkedConfigurations = []
+        Map<String, List<Attribute>> protocolLinkedAttributes = [:]
         protocolLinkedAttributes['mockConfig1'] = []
         protocolLinkedAttributes['mockConfig2'] = []
         protocolLinkedAttributes['mockConfig3'] = []
@@ -93,7 +93,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             }
 
             @Override
-            protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+            protected void doConnect() {
                 protocolMethodCalls.add("LINK_PROTOCOL")
                 protocolLinkedConfigurations.add(protocolConfiguration)
                 if (!protocolConfiguration.getMetaItem("MOCK_REQUIRED_META").isPresent()) {
@@ -106,23 +106,23 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             }
 
             @Override
-            protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+            protected void doDisconnect() {
                 protocolMethodCalls.add("UNLINK_PROTOCOL")
                 protocolLinkedConfigurations.removeAll { (it.getReferenceOrThrow() == protocolConfiguration.getReferenceOrThrow())
                 }
             }
 
             @Override
-            protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+            protected void doLinkAttribute(Asset asset, Attribute attribute) {
                 protocolMethodCalls.add("LINK_ATTRIBUTE")
 
                 if (!attribute.getMetaItem("MOCK_ATTRIBUTE_REQUIRED_META").isPresent()) {
                     // This tests exception handling during linking of attributes
                     throw new IllegalStateException("Attribute is not valid")
                 }
-                protocolLinkedAttributes[protocolConfiguration.getName().orElse("")] << attribute
+                protocolLinkedAttributes[agent.getName().orElse("")] << attribute
 
-                def deploymentStatus = getStatus(protocolConfiguration)
+                def deploymentStatus = getStatus(agent)
                 if (deploymentStatus == ConnectionStatus.CONNECTED) {
                     String attributeName = attribute.getName().orElse("")
 
@@ -137,14 +137,14 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             }
 
             @Override
-            protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+            protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
                 protocolMethodCalls.add("UNLINK_ATTRIBUTE")
-                (protocolLinkedAttributes[protocolConfiguration.getName().orElse("")])
+                (protocolLinkedAttributes[agent.getName().orElse("")])
                         .removeAll { (it.getReferenceOrThrow() == attribute.getReferenceOrThrow())}
             }
 
             @Override
-            protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+            protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
                 protocolMethodCalls.add("ATTRIBUTE_WRITE")
                 if (!(protocolLinkedAttributes[protocolConfiguration.getName().orElse("")])
                         .any {(it.getReferenceOrThrow() == event.attributeRef)}) {
@@ -153,10 +153,6 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                 protocolWriteAttributeEvents.add(event)
             }
 
-            @Override
-            String getVersion() {
-                return "1.0"
-            }
 
             @Override
             String getProtocolName() {
@@ -180,16 +176,16 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
         mockAgent.setAttributes(
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("mockConfig1"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig1"), mockProtocolName)
                 .addMeta(
                     new MetaItem("MOCK_REQUIRED_META", Values.create(true))
                 ),
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("mockConfig2"), mockProtocolName),
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("mockConfig3"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig2"), mockProtocolName),
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig3"), mockProtocolName)
                 .addMeta(
                     new MetaItem("MOCK_THROW_EXCEPTION", Values.create(""))
                 ),
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("mockConfig4"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig4"), mockProtocolName)
                 .addMeta(
                     new MetaItem("MOCK_REQUIRED_META", Values.create(true)),
                     new MetaItem(MetaItemType.DISABLED, Values.create(true))
@@ -218,7 +214,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         when: "a mock thing asset is created that links to the mock protocol configurations"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-            new AssetAttribute("lightToggle1", AttributeValueType.BOOLEAN)
+            new Attribute("lightToggle1", AttributeValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                     new MetaItem(
@@ -226,7 +222,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new AssetAttribute("tempTarget1", AttributeValueType.NUMBER)
+            new Attribute("tempTarget1", AttributeValueType.NUMBER)
                 .setMeta(
                     new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                     new MetaItem(
@@ -234,14 +230,14 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new AssetAttribute("invalidToggle1", AttributeValueType.BOOLEAN)
+            new Attribute("invalidToggle1", AttributeValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new AssetAttribute("lightToggle2", AttributeValueType.BOOLEAN)
+            new Attribute("lightToggle2", AttributeValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -249,7 +245,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new AssetAttribute("tempTarget2", AttributeValueType.NUMBER)
+            new Attribute("tempTarget2", AttributeValueType.NUMBER)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -257,7 +253,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new AssetAttribute("lightToggle3", AttributeValueType.BOOLEAN)
+            new Attribute("lightToggle3", AttributeValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -265,7 +261,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new AssetAttribute("tempTarget3", AttributeValueType.NUMBER)
+            new Attribute("tempTarget3", AttributeValueType.NUMBER)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -273,7 +269,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new AssetAttribute("lightToggle4", AttributeValueType.BOOLEAN)
+            new Attribute("lightToggle4", AttributeValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -281,7 +277,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                 )
             ),
-            new AssetAttribute("tempTarget4", AttributeValueType.NUMBER)
+            new Attribute("tempTarget4", AttributeValueType.NUMBER)
                     .setMeta(
                     new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                     new MetaItem(
@@ -289,14 +285,14 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                             new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                     )
             ),
-            new AssetAttribute("invalidToggle5", AttributeValueType.BOOLEAN, Values.create(false))
+            new Attribute("invalidToggle5", AttributeValueType.BOOLEAN, Values.create(false))
                 .setMeta(
                     new MetaItem(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "INVALID CONFIG").toArrayValue()
                     )
                 ),
-            new AssetAttribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
+            new Attribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
                 .setMeta(
                 new MetaItem(
                         MetaItemType.DESCRIPTION,
@@ -304,7 +300,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                 ),
                 new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
             ),
-            new AssetAttribute("filterRegex", AttributeValueType.NUMBER)
+            new Attribute("filterRegex", AttributeValueType.NUMBER)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -316,7 +312,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                     Values.createArray().add(Util.objectToValue(new RegexValueFilter("\\w(\\d+)", 1, 2)).get())
                 )
             ),
-            new AssetAttribute("filterSubstring", AttributeValueType.STRING)
+            new Attribute("filterSubstring", AttributeValueType.STRING)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(
@@ -328,7 +324,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                     Values.createArray().add(Util.objectToValue(new SubStringValueFilter(10, 12)).get())
                 )
             ),
-            new AssetAttribute("filterRegexSubstring", AttributeValueType.NUMBER)
+            new Attribute("filterRegexSubstring", AttributeValueType.NUMBER)
                 .setMeta(
                 new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
                 new MetaItem(

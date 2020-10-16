@@ -44,7 +44,7 @@ public class PredictedFacade<T extends Ruleset> extends PredictedDatapoints {
 
     @Override
     public ValueDatapoint[] getValueDataPoints(AttributeRef attributeRef, DatapointInterval interval, long fromTimestamp, long toTimestamp) {
-        return assetPredictedDatapointService.getValueDatapoints(attributeRef, interval, fromTimestamp, toTimestamp);
+        return assetPredictedDatapointService.getValueDatapoints(, attributeRef, interval, fromTimestamp, toTimestamp);
     }
 
     @Override

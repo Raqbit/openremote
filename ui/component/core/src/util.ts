@@ -10,7 +10,7 @@ import {
     Attribute,
     AttributeEvent,
     MetaItem,
-    AssetAttribute,
+    Attribute,
     AttributeDescriptor,
     MetaItemType,
     MetaItemDescriptor,
@@ -290,16 +290,16 @@ export function getEnumKeyAsString(enm: object, val: string): string {
     return key!;
 }
 
-export function getAssetAttribute(asset: Asset, attributeName: string): AssetAttribute | undefined {
+export function getAttribute(asset: Asset, attributeName: string): Attribute | undefined {
     if (asset && asset.attributes && asset.attributes.hasOwnProperty(attributeName)) {
-        const attr = {...asset.attributes[attributeName], name: attributeName, assetId: asset.id} as AssetAttribute;
+        const attr = {...asset.attributes[attributeName], name: attributeName, assetId: asset.id} as Attribute;
         return attr;
     }
 }
 
-export function getAssetAttributes(asset: Asset, exclude?: string[]): AssetAttribute[] {
+export function getAttributes(asset: Asset, exclude?: string[]): Attribute[] {
     if (asset.attributes) {
-        return Object.entries(asset.attributes as {[s: string]: AssetAttribute}).filter(([name, attr]) => !exclude || exclude.indexOf(name) >= 0).map(([name, attr]) => {
+        return Object.entries(asset.attributes as {[s: string]: Attribute}).filter(([name, attr]) => !exclude || exclude.indexOf(name) >= 0).map(([name, attr]) => {
             attr = {...attr, name: name, assetId: asset.id};
             return attr;
         });
@@ -440,7 +440,7 @@ export function updateAsset(asset: Asset, event: AttributeEvent): Asset {
         if (event.attributeState!.deleted) {
             delete asset.attributes![attributeName];
         } else {
-            const attribute = getAssetAttribute(asset, attributeName);
+            const attribute = getAttribute(asset, attributeName);
             if (attribute) {
                 attribute.value = event.attributeState!.value;
                 attribute.valueTimestamp = event.timestamp;

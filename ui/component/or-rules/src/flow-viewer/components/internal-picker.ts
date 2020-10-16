@@ -1,5 +1,5 @@
 import { LitElement, property, customElement, html, css, TemplateResult } from "lit-element";
-import { Node, PickerType, AssetAttributeInternalValue, AssetState, MetaItemType, Asset, NodeDataType } from "@openremote/model";
+import { Node, PickerType, AttributeInternalValue, AssetState, MetaItemType, Asset, NodeDataType } from "@openremote/model";
 import { nodeConverter } from "../converters/node-converter";
 import { OrInputChangedEvent } from "@openremote/or-input";
 import rest from "@openremote/rest";
@@ -88,7 +88,7 @@ export class InternalPicker extends translate(i18next)(LitElement) {
                 e.detail.allow = false;
                 return;
             }
-            const value: AssetAttributeInternalValue = {
+            const value: AttributeInternalValue = {
                 assetId: e.detail.detail.newNodes[0].asset!.id,
                 attributeName: "nothing yet"
             };
@@ -144,7 +144,7 @@ export class InternalPicker extends translate(i18next)(LitElement) {
         this.assetIntialised = true;
     }
 
-    private async setSocketTypeDynamically(value: AssetAttributeInternalValue) {
+    private async setSocketTypeDynamically(value: AttributeInternalValue) {
         const results = (await rest.api.AssetResource.queryAssets({
             ids: [value.assetId!],
             select: {
@@ -189,7 +189,7 @@ export class InternalPicker extends translate(i18next)(LitElement) {
                     html`<span>${i18next.t("noRuleStateAttributes", "No rule state attributes")}</span>` :
                     html`        
                 <select id="attribute-select" style="margin-top: 10px" @input="${async (e: any) => {
-                            const value: AssetAttributeInternalValue = {
+                            const value: AttributeInternalValue = {
                                 assetId: this.selectedAsset.id,
                                 attributeName: e.target.value
                             };

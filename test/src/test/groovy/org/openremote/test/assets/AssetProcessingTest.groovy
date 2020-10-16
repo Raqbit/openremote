@@ -1,5 +1,6 @@
 package org.openremote.test.assets
 
+
 import org.openremote.agent.protocol.AbstractProtocol
 import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.*
@@ -9,7 +10,7 @@ import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
@@ -54,36 +55,32 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
             }
 
             @Override
-            protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+            protected void doConnect() {
                 LOG.info("Mock Protocol: linkProtocol")
             }
 
             @Override
-            protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+            protected void doDisconnect() {
                 LOG.info("Mock Protocol: unlinkProtocol")
             }
 
             @Override
-            protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+            protected void doLinkAttribute(Asset asset, Attribute attribute) {
                 protocolDeployed = true
                 LOG.info("Mock Protocol: linkAttribute")
             }
 
             @Override
-            protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+            protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
                 LOG.info("Mock Protocol: unlinkAttribute")
             }
 
             @Override
-            protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+            protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
                 LOG.info("Mock Protocol: processLinkedAttributeWrite")
                 sendToActuatorEvents.add(event)
             }
 
-            @Override
-            String getVersion() {
-                return "1.0"
-            }
 
             @Override
             String getProtocolName() {
@@ -105,7 +102,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         AssetUpdateProcessor firstProcessor = new AssetUpdateProcessor() {
             @Override
-            boolean processAssetUpdate(EntityManager em, Asset asset, AssetAttribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
+            boolean processAssetUpdate(EntityManager em, Asset asset, Attribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
                 updatesPassedStartOfProcessingChain.add(attribute)
                 false
             }
@@ -113,7 +110,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         AssetUpdateProcessor afterAgentServiceProcessor = new AssetUpdateProcessor() {
             @Override
-            boolean processAssetUpdate(EntityManager em, Asset asset, AssetAttribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
+            boolean processAssetUpdate(EntityManager em, Asset asset, Attribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
                 updatesPassedAgentService.add(attribute)
                 false
             }
@@ -121,7 +118,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         AssetUpdateProcessor afterRulesServiceProcessor = new AssetUpdateProcessor() {
             @Override
-            boolean processAssetUpdate(EntityManager em, Asset asset, AssetAttribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
+            boolean processAssetUpdate(EntityManager em, Asset asset, Attribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
                 updatesPassedRulesService.add(attribute)
                 false
             }
@@ -129,7 +126,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         AssetUpdateProcessor afterDatapointServiceProcessor = new AssetUpdateProcessor() {
             @Override
-            boolean processAssetUpdate(EntityManager em, Asset asset, AssetAttribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
+            boolean processAssetUpdate(EntityManager em, Asset asset, Attribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
                 updatesPassedDatapointService.add(attribute)
                 false
             }
@@ -137,7 +134,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         AssetUpdateProcessor afterAttributeLinkingServiceProcessor = new AssetUpdateProcessor() {
             @Override
-            boolean processAssetUpdate(EntityManager em, Asset asset, AssetAttribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
+            boolean processAssetUpdate(EntityManager em, Asset asset, Attribute attribute, AttributeEvent.Source source) throws AssetProcessingException {
                 updatesPassedAttributeLinkingService.add(attribute)
                 false
             }
@@ -160,14 +157,14 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         assetProcessingService.processors.add(assetProcessingService.processors.findIndexOf {it instanceof AgentService}+1, afterAgentServiceProcessor)
         assetProcessingService.processors.add(assetProcessingService.processors.findIndexOf {it instanceof RulesService}+1, afterRulesServiceProcessor)
         assetProcessingService.processors.add(assetProcessingService.processors.findIndexOf {it instanceof AssetDatapointService}+1, afterDatapointServiceProcessor)
-        assetProcessingService.processors.add(assetProcessingService.processors.findIndexOf {it instanceof AssetAttributeLinkingService}+1, afterAttributeLinkingServiceProcessor)
+        assetProcessingService.processors.add(assetProcessingService.processors.findIndexOf {it instanceof AttributeLinkingService}+1, afterAttributeLinkingServiceProcessor)
 
         when: "a mock agent that uses the mock protocol is created"
         def mockAgent = new Asset()
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
         mockAgent.setAttributes(
-                ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("mock123"), mockProtocolName)
+                ProtocolConfiguration.initProtocolConfiguration(new Attribute("mock123"), mockProtocolName)
         )
         mockAgent.setRealm(keycloakTestSetup.masterTenant.realm)
         mockAgent = assetStorageService.merge(mockAgent)
@@ -175,7 +172,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         and: "a mock thing asset is created with a valid protocol attribute, an invalid protocol attribute and a plain attribute"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-                new AssetAttribute("light1Toggle", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute("light1Toggle", AttributeValueType.BOOLEAN, Values.create(true))
                         .setMeta(
                         new MetaItem(
                                 MetaItemType.DESCRIPTION,
@@ -186,7 +183,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
                                 new AttributeRef(mockAgent.getId(), "mock123").toArrayValue()
                         )
                 ),
-                new AssetAttribute("light2Toggle", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute("light2Toggle", AttributeValueType.BOOLEAN, Values.create(true))
                         .setMeta(
                         new MetaItem(
                                 MetaItemType.DESCRIPTION,
@@ -197,7 +194,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
                                 new AttributeRef("INVALID AGENT ID", managerTestSetup.agentProtocolConfigName).toArrayValue()
                         )
                 ),
-                new AssetAttribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
+                new Attribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
                         .setMeta(
                         new MetaItem(
                                 MetaItemType.DESCRIPTION,

@@ -42,6 +42,10 @@ public class AttributeState {
     protected AttributeState() {
     }
 
+    public AttributeState(String entityId, Attribute attribute) {
+        this(entityId, attribute.getNameOrThrow(), attribute.getValue().orElse(null));
+    }
+
     public AttributeState(String entityId, String attributeName, Value value) {
         this(new AttributeRef(entityId, attributeName), value);
     }

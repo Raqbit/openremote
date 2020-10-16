@@ -139,7 +139,7 @@ public class ClientEventService implements ProtocolClientEventService {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         timerService = container.getService(TimerService.class);
         messageBrokerService = container.getService(MessageBrokerService.class);
         identityService = container.getService(ManagerIdentityService.class);

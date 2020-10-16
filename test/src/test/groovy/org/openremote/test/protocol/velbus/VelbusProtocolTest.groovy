@@ -10,7 +10,7 @@ import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.AgentLink
@@ -42,12 +42,12 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
     static AbstractVelbusProtocol velbusProtocol = new AbstractVelbusProtocol() {
 
         @Override
-        protected IoClient<VelbusPacket> createIoClient(AssetAttribute protocolConfiguration) throws RuntimeException {
+        protected IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException {
             return messageProcessor
         }
 
         @Override
-        protected String getUniqueNetworkIdentifier(AssetAttribute protocolConfiguration) {
+        protected String getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
             return "MOCK"
         }
 
@@ -101,7 +101,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig"), velbusProtocol.getProtocolName())
+            initProtocolConfiguration(new Attribute("protocolConfig"), velbusProtocol.getProtocolName())
         )
 
         agent = assetStorageService.merge(agent)
@@ -109,7 +109,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         and: "a device asset is created"
         def device = new Asset("VELBUS Demo VMBGPOD", AssetType.THING, agent)
         device.setAttributes(
-            new AssetAttribute("ch1State", AttributeValueType.STRING)
+            new Attribute("ch1State", AttributeValueType.STRING)
                 .setMeta(
                     new MetaItem(
                         AbstractVelbusProtocol.META_VELBUS_DEVICE_ADDRESS,
@@ -163,7 +163,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute("protocolConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(VelbusSerialProtocol.META_VELBUS_SERIAL_PORT, Values.create("COM5"))
                 )

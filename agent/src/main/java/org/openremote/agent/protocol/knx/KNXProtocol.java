@@ -8,7 +8,7 @@ import org.openremote.container.util.CodecUtil;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -142,12 +142,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
-    @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_KNX_IP_CONNECTION_TYPE, Values.create("TUNNELLING")),
@@ -156,7 +151,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             boolean ipFound = false;
@@ -205,7 +200,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         String connectionType = protocolConfiguration.getMetaItem(META_KNX_IP_CONNECTION_TYPE).flatMap(AbstractValueHolder::getValueAsString).orElse("TUNNELLING");
         if (!connectionType.equals("TUNNELLING") && !connectionType.equals("ROUTING")) {
             LOG.severe("KNX connectionType can either be 'TUNNELLING' or 'ROUTING' for protocol configuration: " + protocolConfiguration);
@@ -245,7 +240,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
 
         Consumer<ConnectionStatus> statusConsumer;
         synchronized (statusConsumerMap) {
@@ -266,8 +261,8 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        String gatewayIp = protocolConfiguration.getMetaItem(META_KNX_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        String gatewayIp = agent.getMetaItem(META_KNX_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         // Check there is a META_KNX_DPT
@@ -313,7 +308,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
 
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         // If this attribute is registered for status updates then un-subscribe it
@@ -324,7 +319,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         if (!protocolConfiguration.isEnabled()) {
             LOG.fine("Protocol configuration is disabled so ignoring write request");
             return;
@@ -423,7 +418,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
         ZipInputStream zin = null;
 
         try {
@@ -520,7 +515,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttri
         String attrName = assetName.replaceAll(" ", "");
         AttributeValueType type = TypeMapper.toAttributeType(datapoint);
 
-        AssetAttribute attr = asset.getAttribute(attrName).orElse(new AssetAttribute(attrName, type).setMeta(
+        Attribute attr = asset.getAttribute(attrName).orElse(new Attribute(attrName, type).setMeta(
                         new MetaItem(MetaItemType.LABEL, Values.create(name)),
                         new MetaItem(KNXProtocol.META_KNX_DPT, Values.create(datapoint.getDPT())),
                         agentLink

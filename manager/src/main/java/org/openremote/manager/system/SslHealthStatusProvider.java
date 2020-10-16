@@ -21,7 +21,7 @@ package org.openremote.manager.system;
 
 import org.openremote.container.Container;
 import org.openremote.container.ContainerHealthStatusProvider;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Value;
 import org.openremote.model.value.Values;
@@ -56,14 +56,14 @@ public class SslHealthStatusProvider implements ContainerHealthStatusProvider, X
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         sslEnabled = getBoolean(container.getConfig(), IDENTITY_NETWORK_SECURE, IDENTITY_NETWORK_SECURE_DEFAULT);
         hostname = container.getConfig().getOrDefault(IDENTITY_NETWORK_HOST, IDENTITY_NETWORK_HOST_DEFAULT);
         port = getInteger(container.getConfig(), IDENTITY_NETWORK_WEBSERVER_PORT, IDENTITY_NETWORK_WEBSERVER_PORT_DEFAULT);
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
         if (sslEnabled) {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{this}, null);
@@ -71,7 +71,7 @@ public class SslHealthStatusProvider implements ContainerHealthStatusProvider, X
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 

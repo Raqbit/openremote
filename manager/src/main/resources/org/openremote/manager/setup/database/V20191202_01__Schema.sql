@@ -24,7 +24,7 @@ create table ASSET (
   REALM              varchar(255)             not null,
   ASSET_TYPE         varchar(255)             not null,
   ACCESS_PUBLIC_READ boolean                  not null,
-  OBJ_VERSION        int8                     not null,
+  VERSION            int8                     not null,
   primary key (ID),
   check (ID != PARENT_ID)
 );

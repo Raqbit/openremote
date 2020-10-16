@@ -19,7 +19,6 @@
  */
 package org.openremote.app.client.assets.asset;
 
-import com.google.gwt.typedarrays.client.JsUtils;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.openremote.app.client.Environment;
 import org.openremote.app.client.assets.*;
@@ -32,7 +31,6 @@ import org.openremote.app.client.event.ShowFailureEvent;
 import org.openremote.app.client.event.ShowSuccessEvent;
 import org.openremote.app.client.interop.jackson.FileInfoMapper;
 import org.openremote.app.client.interop.value.ObjectValueMapper;
-import org.openremote.app.client.util.JsUtil;
 import org.openremote.app.client.widget.AttributeLinkEditor;
 import org.openremote.app.client.widget.AttributeRefEditor;
 import org.openremote.app.client.widget.FormButton;
@@ -65,8 +63,8 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.openremote.model.asset.AssetAttribute.attributesFromJson;
-import static org.openremote.model.attribute.Attribute.ATTRIBUTE_NAME_VALIDATOR;
+import static org.openremote.model.attribute.Attribute.attributesFromJson;
+import static org.openremote.model.v2.NameProvider.NAME_VALIDATOR;
 import static org.openremote.model.attribute.Attribute.isAttributeNameEqualTo;
 import static org.openremote.model.attribute.MetaItem.isMetaNameEqualTo;
 import static org.openremote.model.attribute.MetaItemType.LABEL;
@@ -89,13 +87,13 @@ public class AssetEditActivity
     protected final ProtocolDescriptorMapMapper protocolDescriptorMapMapper;
     protected final FileInfoMapper fileInfoMapper;
     protected final AttributeValidationResultMapper attributeValidationResultMapper;
-    protected final AssetAttributeMapper assetAttributeMapper;
+    protected final AttributeMapper assetAttributeMapper;
     protected final AttributeLinkMapper attributeLinkMapper;
     protected final Consumer<ConstraintViolation[]> validationErrorHandler;
     protected List<ProtocolDescriptor> protocolDescriptors = new ArrayList<>();
     protected List<MetaItemDescriptor> metaItemDescriptors = new ArrayList<>(Arrays.asList(MetaItemType.values())); // TODO Get meta item descriptors from server
     protected GeoJSONPoint selectedCoordinates;
-    protected List<AssetAttribute> initialAssetAttributes;
+    protected List<Attribute> initialAttributes;
 
     @Inject
     public AssetEditActivity(Environment environment,
@@ -111,7 +109,7 @@ public class AssetEditActivity
                              ProtocolDescriptorArrayMapper protocolDescriptorArrayMapper,
                              ProtocolDescriptorMapMapper protocolDescriptorMapMapper,
                              AttributeValidationResultMapper attributeValidationResultMapper,
-                             AssetAttributeMapper assetAttributeMapper,
+                             AttributeMapper assetAttributeMapper,
                              FileInfoMapper fileInfoMapper,
                              AttributeLinkMapper attributeLinkMapper,
                              MapResource mapResource,
@@ -169,7 +167,7 @@ public class AssetEditActivity
             asset.setType(AssetType.THING);
         }
 
-        initialAssetAttributes = attributesFromJson(asset.getAttributes(), assetId).collect(Collectors.toList());
+        initialAttributes = new ArrayList<>(asset.getAttributesList());
 
         clearViewMessages();
         writeAssetToView();
@@ -231,11 +229,11 @@ public class AssetEditActivity
             return false;
         }
 
-        if (!ATTRIBUTE_NAME_VALIDATOR.test(name)) {
+        if (!NAME_VALIDATOR.test(name)) {
             showFailureMessage(environment.getMessages().invalidAttributeName());
             return false;
         }
-        AssetAttribute attribute;
+        Attribute attribute;
 
         Optional<ProtocolDescriptor> protocolDescriptor = protocolDescriptors == null ?
             Optional.empty() :
@@ -254,7 +252,7 @@ public class AssetEditActivity
                 return false;
             }
 
-            attribute = new AssetAttribute();
+            attribute = new Attribute();
             attribute.setType(attributeValueType);
             if (attributeValueType.getMetaItemDescriptors() != null) {
                 attribute.addMeta(attributeValueType.getMetaItemDescriptors());
@@ -272,7 +270,7 @@ public class AssetEditActivity
     }
 
     @Override
-    public void removeAttribute(AssetAttribute attribute) {
+    public void removeAttribute(Attribute attribute) {
         // Allow deleting any attributes for now
         asset.getAttributesList().remove(attribute);
         view.getAttributeViews()
@@ -362,7 +360,7 @@ public class AssetEditActivity
     @Override
     public void getLinkableAssetsAndAttributes(ValueHolder valueHolder, Consumer<Map<AttributeRefEditor.AssetInfo, List<AttributeRefEditor.AttributeInfo>>> assetAttributeConsumer) {
         AssetQuery query;
-        Predicate<AssetAttribute> attributeFilter = null;
+        Predicate<Attribute> attributeFilter = null;
 
         // Is it agent or attribute link?
         if ((valueHolder instanceof MetaItem) && AgentLink.isAgentLink((MetaItem) valueHolder)) {
@@ -398,7 +396,7 @@ public class AssetEditActivity
         }
 
         // Do request
-        final Predicate<AssetAttribute> finalAttributeFilter = attributeFilter;
+        final Predicate<Attribute> finalAttributeFilter = attributeFilter;
         environment.getApp().getRequests().sendWithAndReturn(
             assetArrayMapper,
             assetQueryMapper,
@@ -521,7 +519,7 @@ public class AssetEditActivity
     }
 
     @Override
-    protected List<AbstractAttributeViewExtension> createAttributeExtensions(AssetAttribute attribute, AttributeViewImpl view) {
+    protected List<AbstractAttributeViewExtension> createAttributeExtensions(Attribute attribute, AttributeViewImpl view) {
         List<AbstractAttributeViewExtension> extensions = new ArrayList<>();
 
         // if this is a protocol configuration then add a protocol link editor first
@@ -538,7 +536,7 @@ public class AssetEditActivity
 //                        );
 
                         // Only add the import extension if the attribute existed when edit first started
-                        boolean existingAttribute = initialAssetAttributes.stream().anyMatch(initialAttribute -> initialAttribute.getName().equals(attribute.getName()));
+                        boolean existingAttribute = initialAttributes.stream().anyMatch(initialAttribute -> initialAttribute.getName().equals(attribute.getName()));
 
                         if (existingAttribute && (protocolDescriptor.isDeviceDiscovery() || protocolDescriptor.isDeviceImport())) {
                             extensions.add(
@@ -562,7 +560,7 @@ public class AssetEditActivity
     }
 
     @Override
-    protected List<FormButton> createAttributeActions(AssetAttribute attribute, AttributeViewImpl view) {
+    protected List<FormButton> createAttributeActions(Attribute attribute, AttributeViewImpl view) {
         FormButton deleteButton = new FormButton();
         deleteButton.setText(environment.getMessages().deleteAttribute());
         deleteButton.setIcon("remove");
@@ -579,7 +577,7 @@ public class AssetEditActivity
 
     // TODO: Create a richer client side validation mechanism
     @Override
-    protected void onAttributeModified(AssetAttribute attribute) {
+    protected void onAttributeModified(Attribute attribute) {
         // Called when a view has modified the attribute so we need to do validation this is called a lot by value
         // editors (every key stroke) so use basic client side validation - use full validation before submitting
         // the asset to the server
@@ -587,7 +585,7 @@ public class AssetEditActivity
     }
 
     @Override
-    protected void validateAttribute(boolean clientSideOnly, AssetAttribute attribute, Consumer<AttributeValidationResult> resultConsumer) {
+    protected void validateAttribute(boolean clientSideOnly, Attribute attribute, Consumer<AttributeValidationResult> resultConsumer) {
         super.validateAttribute(clientSideOnly, attribute, validationResult -> {
 
             if (!clientSideOnly && validationResult.isValid() && ProtocolConfiguration.isProtocolConfiguration(attribute)) {

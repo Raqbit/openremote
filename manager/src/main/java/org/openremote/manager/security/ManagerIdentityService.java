@@ -37,7 +37,7 @@ public class ManagerIdentityService extends IdentityService {
     protected PersistenceService persistenceService;
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         persistenceService = container.getService(PersistenceService.class);
 

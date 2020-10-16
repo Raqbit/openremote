@@ -26,12 +26,9 @@ import org.openremote.container.Container;
 import org.openremote.container.web.ConnectionConstants;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.AttributeEvent;
-import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.AttributeState;
-import org.openremote.model.attribute.MetaItemDescriptor;
+import org.openremote.model.attribute.*;
 import org.openremote.model.security.ClientRole;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.value.StringValue;
@@ -77,10 +74,10 @@ public class ClientEventProtocol extends AbstractProtocol {
             false,
             null);
 
-    protected Map<String, AssetAttribute> clientIdProtocolConfigMap = new HashMap<>();
+    protected Map<String, Attribute> clientIdProtocolConfigMap = new HashMap<>();
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         protocolClientEventService.addExchangeInterceptor(this::onMessageIntercept);
     }
@@ -104,7 +101,7 @@ public class ClientEventProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
 
         LOG.info("Creating client credentials for: " + protocolConfiguration);
         AttributeRef attributeRef = protocolConfiguration.getReferenceOrThrow();
@@ -139,7 +136,7 @@ public class ClientEventProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         LOG.info("Removing client credentials for: " + protocolConfiguration);
         clientIdProtocolConfigMap.values().remove(protocolConfiguration);
         AttributeRef attributeRef = protocolConfiguration.getReferenceOrThrow();
@@ -147,17 +144,17 @@ public class ClientEventProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) throws Exception {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) throws Exception {
         // Nothing to do here
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         // Nothing to do here
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         // We'll get here when an attribute event is pushed through the processing chain as with all protocols it won't
         // make it to the end of the processing chain, and won't reach the client so we write it through immediately
         // so it will be sent to the client
@@ -174,11 +171,6 @@ public class ClientEventProtocol extends AbstractProtocol {
         return PROTOCOL_DISPLAY_NAME;
     }
 
-    @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
-
     protected void onMessageIntercept(Exchange exchange) {
         String clientId = getClientId(exchange);
 
@@ -186,7 +178,7 @@ public class ClientEventProtocol extends AbstractProtocol {
             return;
         }
 
-        AssetAttribute protocolConfiguration = clientIdProtocolConfigMap.get(clientId);
+        Attribute protocolConfiguration = clientIdProtocolConfigMap.get(clientId);
 
         if (protocolConfiguration == null) {
             LOG.info("Message received from a client for an unlinked protocol configuration, requesting disconnect");
@@ -210,7 +202,7 @@ public class ClientEventProtocol extends AbstractProtocol {
                 // Inbound attribute event is essentially a protocol sensor update
 
                 AttributeEvent attributeEvent = exchange.getIn().getBody(AttributeEvent.class);
-                AssetAttribute linkedAttribute = getLinkedAttribute(attributeEvent.getAttributeRef());
+                Attribute linkedAttribute = getLinkedAttribute(attributeEvent.getAttributeRef());
 
                 if (linkedAttribute == null) {
                     LOG.info("Message received from a client for an unlinked attribute, so ignoring");

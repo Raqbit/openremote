@@ -20,7 +20,9 @@
 package org.openremote.test.protocol.http;
 
 import org.openremote.agent.protocol.http.AbstractHttpServerProtocol;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.asset.Asset;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.value.Value;
@@ -36,7 +38,7 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
     public TestResourceImpl resource1 = new TestResourceImpl();
 
     @Override
-    protected Set<Object> getApiSingletons(AssetAttribute protocolConfiguration) {
+    protected Set<Object> getApiSingletons(Attribute protocolConfiguration) {
         return new HashSet<>(Collections.singletonList(resource1));
     }
 
@@ -51,15 +53,15 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
     }
 
     @Override
@@ -72,8 +74,4 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
         return "HTTP Server Test Protocol";
     }
 
-    @Override
-    public String getVersion() {
-        return "1.0";
-    }
 }

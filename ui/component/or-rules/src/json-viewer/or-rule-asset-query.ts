@@ -148,8 +148,8 @@ export class OrRuleAssetQuery extends translate(i18next)(LitElement) {
         let attributes: [string, string][];
 
         if (asset) {
-            attribute = attributeName ? Util.getAssetAttribute(asset, attributeName) : undefined;
-            attributes = Util.getAssetAttributes(asset)
+            attribute = attributeName ? Util.getAttribute(asset, attributeName) : undefined;
+            attributes = Util.getAttributes(asset)
                 .filter((attr) => Util.hasMetaItem(attr, MetaItemType.RULE_STATE.urn!))
                 .map((attr) => {
                     const descriptors = AssetModelUtil.getAttributeAndValueDescriptors(asset.type, attr);
@@ -187,7 +187,7 @@ export class OrRuleAssetQuery extends translate(i18next)(LitElement) {
 
         const attributeName = this.getAttributeName(attributePredicate);
         const assetType = getAssetTypeFromQuery(this.query);
-        const attribute = asset && attributeName ? Util.getAssetAttribute(asset, attributeName) : undefined;
+        const attribute = asset && attributeName ? Util.getAttribute(asset, attributeName) : undefined;
         const attributeDescriptor = AssetModelUtil.getAttributeDescriptor(attributeName, assetDescriptor);
         // TODO: Fix once asset model working correctly
         const attributeValueDescriptor = attributeDescriptor && attributeDescriptor.valueDescriptor ? typeof attributeDescriptor.valueDescriptor === "string" ? AssetModelUtil.getAttributeValueDescriptor(attributeDescriptor.valueDescriptor as string) : attributeDescriptor.valueDescriptor : attribute ? AssetModelUtil.getAttributeValueDescriptor(attribute.type as string) : undefined;

@@ -25,7 +25,7 @@ import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetResource;
 import org.openremote.model.asset.UserAsset;
 import org.openremote.model.attribute.*;
@@ -273,7 +273,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 }
 
                 // Merge updated with existing attributes
-                for (AssetAttribute updatedAttribute : asset.getAttributesList()) {
+                for (Attribute updatedAttribute : asset.getAttributesList()) {
 
                     // Proper validation happens on merge(), here we only need the name to continue
                     String updatedAttributeName = updatedAttribute.getNameOrThrow();
@@ -282,9 +282,9 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                     checkForWellKnownAttributes(asset);
 
                     // Check if attribute is present on the asset in storage
-                    Optional<AssetAttribute> serverAttribute = resultAsset.getAttribute(updatedAttributeName);
+                    Optional<Attribute> serverAttribute = resultAsset.getAttribute(updatedAttributeName);
                     if (serverAttribute.isPresent()) {
-                        AssetAttribute existingAttribute = serverAttribute.get();
+                        Attribute existingAttribute = serverAttribute.get();
 
                         // If the existing attribute is not writable by restricted client, ignore it
                         if (!existingAttribute.isAccessRestrictedWrite()) {
@@ -489,7 +489,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 if (assetDescriptor.getAttributeDescriptors() != null) {
                     newAsset.addAttributes(
                             Arrays.stream(assetDescriptor.getAttributeDescriptors()).filter(attributeDescriptor ->
-                                    !newAsset.hasAttribute(attributeDescriptor.getAttributeName())).map(AssetAttribute::new).toArray(AssetAttribute[]::new)
+                                    !newAsset.hasAttribute(attributeDescriptor.getAttributeName())).map(Attribute::new).toArray(Attribute[]::new)
                     );
                 }
             });

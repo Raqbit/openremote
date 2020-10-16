@@ -25,7 +25,7 @@ import org.openremote.container.Container;
 import org.openremote.manager.setup.AbstractManagerSetup;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.security.Tenant;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.Values;
 
@@ -82,7 +82,7 @@ public class ManagerTestAgentSetup extends AbstractManagerSetup {
         if (knx) {
             LOG.info("Enable KNX demo protocol configuration, gateway/local IP: " + knxGatewayIp + "/" + knxLocalIp);
             agent.addAttributes(
-                    initProtocolConfiguration(new AssetAttribute("knxConfig"), KNXProtocol.PROTOCOL_NAME)
+                    initProtocolConfiguration(new Attribute("knxConfig"), KNXProtocol.PROTOCOL_NAME)
                             .addMeta(
                                     new MetaItem(KNXProtocol.META_KNX_GATEWAY_HOST, Values.create(knxGatewayIp)),
                                     new MetaItem(KNXProtocol.META_KNX_LOCAL_HOST, Values.create(knxLocalIp))
@@ -95,7 +95,7 @@ public class ManagerTestAgentSetup extends AbstractManagerSetup {
         if (velbus) {
             LOG.info("Enable Velbus demo protocol configuration, COM port: " + velbusComPort);
             agent.addAttributes(
-                    initProtocolConfiguration(new AssetAttribute("velbusConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
+                    initProtocolConfiguration(new Attribute("velbusConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
                             .addMeta(
                                     new MetaItem(VelbusSerialProtocol.META_VELBUS_SERIAL_PORT, Values.create(velbusComPort))
                             )

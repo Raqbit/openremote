@@ -30,8 +30,10 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.openremote.container.concurrent.ContainerThreads;
-import org.openremote.model.ModelModule;
+import org.openremote.container.json.ORModelModule;
 import org.openremote.container.util.LogUtil;
+import org.openremote.model.ContainerProvider;
+import org.openremote.model.ContainerService;
 
 import java.util.*;
 import java.util.logging.Handler;
@@ -54,7 +56,7 @@ import static org.openremote.container.util.MapAccess.getBoolean;
  * <p>
  * Read and write JSON with a sensible mapper configuration using {@link #JSON}.
  */
-public class Container {
+public class Container implements ContainerProvider {
 
     public static final Logger LOG;
 
@@ -72,11 +74,12 @@ public class Container {
         .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false)
         .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
         .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
         .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
         .setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
-        .registerModule(new ModelModule())
+        .registerModule(new ORModelModule())
         .registerModule(new Jdk8Module())
         .registerModule(new JavaTimeModule())
         .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
@@ -131,6 +134,7 @@ public class Container {
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
+    @Override
     public Map<String, String> getConfig() {
         return config;
     }
@@ -195,12 +199,14 @@ public class Container {
         waitingThread = ContainerThreads.startWaitingThread();
     }
 
+    @Override
     public ContainerService[] getServices() {
         synchronized (services) {
             return services.values().toArray(new ContainerService[services.size()]);
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends ContainerService> Collection<T> getServices(Class<T> type) {
         synchronized (services) {
@@ -214,6 +220,7 @@ public class Container {
         }
     }
 
+    @Override
     public <T extends ContainerService> boolean hasService(Class<T> type) {
         return getServices(type).size() > 0;
     }
@@ -222,8 +229,9 @@ public class Container {
      * Get a service instance matching the specified type exactly, or if that yields
      * no result, try to get the first service instance that has a matching interface.
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public <T extends ContainerService> T getService(Class<T> type) {
+    public <T extends ContainerService> T getService(Class<T> type) throws IllegalStateException {
         synchronized (services) {
             T service = (T) services.get(type);
             if (service == null) {
@@ -239,5 +247,4 @@ public class Container {
             return service;
         }
     }
-
 }

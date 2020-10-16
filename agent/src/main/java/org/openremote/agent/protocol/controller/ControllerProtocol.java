@@ -31,7 +31,7 @@ import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.container.Container;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.syslog.SyslogCategory;
@@ -188,7 +188,7 @@ public class ControllerProtocol extends AbstractProtocol {
     private Map<AttributeRef, Boolean> initStatusDone = new HashMap<>();
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         client = createClient(executorService, CONNECTION_POOL_SIZE, 70000, null);
     }
@@ -204,7 +204,7 @@ public class ControllerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         LOG.fine("### Adding new protocol " + protocolConfiguration.getReferenceOrThrow() + " (" + protocolConfiguration.getNameOrThrow() + ")");
 
         String baseURL = protocolConfiguration.getMetaItem(META_PROTOCOL_BASE_URI).flatMap(AbstractValueHolder::getValueAsString)
@@ -236,7 +236,7 @@ public class ControllerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         controllersMap.remove(protocolConfiguration.getReferenceOrThrow());
         controllersTargetMap.remove(protocolConfiguration.getReferenceOrThrow());
         controllerHeartbeat.remove(protocolConfiguration.getReferenceOrThrow());
@@ -249,7 +249,7 @@ public class ControllerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
         String deviceName = Values.getMetaItemValueOrThrow(attribute, META_ATTRIBUTE_DEVICE_NAME, StringValue.class, true, true)
                 .map(StringValue::getString).orElse(null);
 
@@ -270,11 +270,11 @@ public class ControllerProtocol extends AbstractProtocol {
          * Build Sensor Status info for polling request
          */
         if (sensorName != null) {
-            LOG.fine("### Adding new sensor [" + deviceName + "," + sensorName + "] linked to " + protocolConfiguration.getReferenceOrThrow() + " (" + protocolConfiguration.getNameOrThrow() + ")");
-            controllersMap.get(protocolConfiguration.getReferenceOrThrow()).addSensor(attribute.getReferenceOrThrow(), new ControllerSensor(deviceName, sensorName));
+            LOG.fine("### Adding new sensor [" + deviceName + "," + sensorName + "] linked to " + agent.getReferenceOrThrow() + " (" + agent.getNameOrThrow() + ")");
+            controllersMap.get(agent.getReferenceOrThrow()).addSensor(attribute.getReferenceOrThrow(), new ControllerSensor(deviceName, sensorName));
 
             //Properly stop previously existing polling on device name --> use of false parameter
-            PollingKey pollingKey = new PollingKey(deviceName, protocolConfiguration.getReferenceOrThrow());
+            PollingKey pollingKey = new PollingKey(deviceName, agent.getReferenceOrThrow());
 
             if (pollingSensorList.containsKey(pollingKey)) {
                 pollingSensorList.get(pollingKey).cancel(true);
@@ -283,7 +283,7 @@ public class ControllerProtocol extends AbstractProtocol {
             this.initStatusDone.put(attribute.getReferenceOrThrow(), false);
 
             //Get initial status of sensor
-            this.collectInitialStatus(attribute.getReferenceOrThrow(), deviceName, sensorName, protocolConfiguration.getReferenceOrThrow());
+            this.collectInitialStatus(attribute.getReferenceOrThrow(), deviceName, sensorName, agent.getReferenceOrThrow());
 
             //Put new polling on a new device name or update previous
             this.schedulePollingTask(pollingKey);
@@ -300,10 +300,10 @@ public class ControllerProtocol extends AbstractProtocol {
             }
 
             if (commandName != null) {
-                controllersMap.get(protocolConfiguration.getReferenceOrThrow()).addCommand(attribute.getReferenceOrThrow(), new ControllerCommandBasic(commandDeviceName, commandName));
+                controllersMap.get(agent.getReferenceOrThrow()).addCommand(attribute.getReferenceOrThrow(), new ControllerCommandBasic(commandDeviceName, commandName));
             } else {
                 assert commandsMap.size() > 0;
-                controllersMap.get(protocolConfiguration.getReferenceOrThrow()).addCommand(attribute.getReferenceOrThrow(), new ControllerCommandMapped(commandDeviceName, computeCommandsMapFromMultiValue(commandsMap)));
+                controllersMap.get(agent.getReferenceOrThrow()).addCommand(attribute.getReferenceOrThrow(), new ControllerCommandMapped(commandDeviceName, computeCommandsMapFromMultiValue(commandsMap)));
             }
         }
     }
@@ -311,13 +311,12 @@ public class ControllerProtocol extends AbstractProtocol {
     /**
      * Clearing elements if an attribute is unlinked from Controller Agent
      * We don't have to clear {@link #pollingSensorList} as a check is done before scheduling task {@link #schedulePollingTask}
-     *
+     *  @param asset
      * @param attribute
-     * @param protocolConfiguration
      */
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        controllersMap.get(protocolConfiguration.getReferenceOrThrow()).removeAttributeRef(attribute.getReferenceOrThrow());
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+        controllersMap.get(agent.getReferenceOrThrow()).removeAttributeRef(attribute.getReferenceOrThrow());
     }
 
     /**
@@ -328,7 +327,7 @@ public class ControllerProtocol extends AbstractProtocol {
      * @param protocolConfiguration
      */
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         LOG.fine("### Process Linked Attribute Write");
 
         AttributeRef attributeRef = event.getAttributeRef();
@@ -715,8 +714,4 @@ public class ControllerProtocol extends AbstractProtocol {
         return PROTOCOL_DISPLAY_NAME;
     }
 
-    @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
 }

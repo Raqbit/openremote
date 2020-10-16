@@ -22,9 +22,9 @@ package org.openremote.manager.asset;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.security.AuthContext;
@@ -107,7 +107,7 @@ import static org.openremote.model.attribute.AttributeEvent.Source.*;
  * 'things' it communicates with and the transport layer it uses etc.
  * <h2>Rules Service processing logic</h2>
  * <p>
- * Checks if attribute is {@link AssetAttribute#isRuleState} and/or {@link AssetAttribute#isRuleEvent}, and if
+ * Checks if attribute is {@link Attribute#isRuleState} and/or {@link Attribute#isRuleEvent}, and if
  * so the message is passed through the rule engines that are in scope for the asset.
  * <p>
  * <h2>Asset Storage Service processing logic</h2>
@@ -116,7 +116,7 @@ import static org.openremote.model.attribute.AttributeEvent.Source.*;
  * successful.
  * <h2>Asset Datapoint Service processing logic</h2>
  * <p>
- * Checks if attribute is {@link AssetAttribute#isStoreDatapoints()}, and if so the {@link AttributeEvent} is stored
+ * Checks if attribute is {@link Attribute#isStoreDatapoints()}, and if so the {@link AttributeEvent} is stored
  * is stored in a time series of historical data. Then allows the message to continue if the commit was successful.
  */
 public class AssetProcessingService extends RouteBuilder implements ContainerService {
@@ -136,7 +136,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
     protected GatewayService gatewayService;
     protected AssetStorageService assetStorageService;
     protected AssetDatapointService assetDatapointService;
-    protected AssetAttributeLinkingService assetAttributeLinkingService;
+    protected AttributeLinkingService assetAttributeLinkingService;
     protected MessageBrokerService messageBrokerService;
     protected ClientEventService clientEventService;
     // Used in testing to detect if initial/startup processing has completed
@@ -150,7 +150,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         timerService = container.getService(TimerService.class);
         identityService = container.getService(ManagerIdentityService.class);
         persistenceService = container.getService(PersistenceService.class);
@@ -159,7 +159,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         gatewayService = container.getService(GatewayService.class);
         assetStorageService = container.getService(AssetStorageService.class);
         assetDatapointService = container.getService(AssetDatapointService.class);
-        assetAttributeLinkingService = container.getService(AssetAttributeLinkingService.class);
+        assetAttributeLinkingService = container.getService(AttributeLinkingService.class);
         messageBrokerService = container.getService(MessageBrokerService.class);
         clientEventService = container.getService(ClientEventService.class);
         EventSubscriptionAuthorizer assetEventAuthorizer = AssetStorageService.assetInfoAuthorizer(identityService, assetStorageService);
@@ -181,12 +181,12 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
 
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 
@@ -245,7 +245,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                         throw new AssetProcessingException(ASSET_NOT_FOUND);
 
 
-                    AssetAttribute oldAttribute = asset.getAttribute(event.getAttributeName()).orElse(null);
+                    Attribute oldAttribute = asset.getAttribute(event.getAttributeName()).orElse(null);
                     if (oldAttribute == null)
                         throw new AssetProcessingException(ATTRIBUTE_NOT_FOUND);
 
@@ -296,7 +296,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                             break;
 
                         case SENSOR:
-                            Optional<AssetAttribute> protocolConfiguration =
+                            Optional<Attribute> protocolConfiguration =
                                 getAgentLink(oldAttribute).flatMap(agentService::getProtocolConfiguration);
 
                             // Sensor event must be for an attribute linked to a protocol configuration
@@ -362,7 +362,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                     );
 
                     // Create a copy of the attribute and set the new value and timestamp
-                    AssetAttribute updatedAttribute = oldAttribute.deepCopy();
+                    Attribute updatedAttribute = oldAttribute.deepCopy();
                     updatedAttribute.setValue(event.getValue().orElse(null), eventTime);
 
                     // Validate constraints of attribute
@@ -401,14 +401,14 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
     }
 
     /**
-     * This deals with single {@link AssetAttribute} updates and pushes them through the chain where each
+     * This deals with single {@link Attribute} updates and pushes them through the chain where each
      * processor is given the opportunity to completely consume the update or allow its progress to the next
      * processor, see {@link AssetUpdateProcessor#processAssetUpdate}. If no processor completely consumed the
      * update, the attribute will be stored in the database.
      */
     protected boolean processAssetUpdate(EntityManager em,
                                          Asset asset,
-                                         AssetAttribute attribute,
+                                         Attribute attribute,
                                          Source source) throws AssetProcessingException {
 
         String attributeStr = attribute.toString();
@@ -484,7 +484,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         };
     }
 
-    protected void storeAttributeValue(EntityManager em, Asset asset, AssetAttribute attribute) throws AssetProcessingException {
+    protected void storeAttributeValue(EntityManager em, Asset asset, Attribute attribute) throws AssetProcessingException {
         String attributeName = attribute.getName()
             .orElseThrow(() -> new AssetProcessingException(
                 STATE_STORAGE_FAILED,
@@ -505,7 +505,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         }
     }
 
-    protected void publishClientEvent(Asset asset, AssetAttribute attribute) {
+    protected void publishClientEvent(Asset asset, Attribute attribute) {
         // TODO Catch "queue full" exception (e.g. when producing thousands of INFO messages in rules)?
         clientEventService.publishEvent(
             attribute.isAccessRestrictedRead(),

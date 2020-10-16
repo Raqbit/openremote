@@ -20,7 +20,7 @@
 package org.openremote.manager.system;
 
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.system.StatusResource;
@@ -42,7 +42,7 @@ public class HealthStatusService implements ContainerService {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
 
         ServiceLoader.load(HealthStatusProvider.class).forEach(healthStatusProviderList::add);
 
@@ -58,7 +58,7 @@ public class HealthStatusService implements ContainerService {
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
         for (HealthStatusProvider healthStatusProvider : healthStatusProviderList) {
             if (healthStatusProvider instanceof ContainerService) {
                 ((ContainerService) healthStatusProvider).start(container);
@@ -67,7 +67,7 @@ public class HealthStatusService implements ContainerService {
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
         for (HealthStatusProvider healthStatusProvider : healthStatusProviderList) {
             if (healthStatusProvider instanceof ContainerService) {
                 ((ContainerService) healthStatusProvider).stop(container);

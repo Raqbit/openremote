@@ -22,22 +22,22 @@ package org.openremote.app.client.assets.attributes;
 import org.openremote.app.client.Environment;
 import org.openremote.app.client.widget.FormSection;
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.interop.Consumer;
 
 public abstract class AbstractAttributeViewExtension extends FormSection implements AttributeView {
 
     protected Environment environment;
-    protected AssetAttribute attribute;
-    protected Consumer<AssetAttribute> attributeModifiedCallback;
+    protected Attribute attribute;
+    protected Consumer<Attribute> attributeModifiedCallback;
     protected ValueEditorSupplier valueEditorSupplier;
     protected boolean editMode;
     protected AttributeView.Style style;
     protected AttributeView parentView;
     protected ValidationErrorConsumer validationErrorConsumer;
 
-    public AbstractAttributeViewExtension(Environment environment, AttributeView.Style style, AttributeView parentView, AssetAttribute attribute, String label) {
+    public AbstractAttributeViewExtension(Environment environment, AttributeView.Style style, AttributeView parentView, Attribute attribute, String label) {
         super(label);
         this.environment = environment;
         this.style = style;
@@ -46,12 +46,12 @@ public abstract class AbstractAttributeViewExtension extends FormSection impleme
     }
 
     @Override
-    public AssetAttribute getAttribute() {
+    public Attribute getAttribute() {
         return attribute;
     }
 
     @Override
-    public void setAttributeModifiedCallback(Consumer<AssetAttribute> attributeModifiedCallback) {
+    public void setAttributeModifiedCallback(Consumer<Attribute> attributeModifiedCallback) {
         this.attributeModifiedCallback = attributeModifiedCallback;
     }
 

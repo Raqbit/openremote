@@ -25,7 +25,7 @@ import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.io.IoClient;
 import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemDescriptor;
@@ -67,7 +67,7 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             VelbusConfiguration.validateSerialConfiguration(protocolConfiguration, result);
@@ -76,13 +76,13 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(new MetaItem(META_VELBUS_SERIAL_PORT, null));
     }
 
     @Override
-    protected IoClient<VelbusPacket> createIoClient(AssetAttribute protocolConfiguration) throws RuntimeException {
+    protected IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException {
 
         // Extract port and baud rate
         String port = protocolConfiguration.getMetaItem(META_VELBUS_SERIAL_PORT).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
@@ -102,7 +102,7 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    protected String getUniqueNetworkIdentifier(AssetAttribute protocolConfiguration) {
+    protected String getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
         return protocolConfiguration
             .getMetaItem(META_VELBUS_SERIAL_PORT)
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -110,10 +110,10 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    public AssetAttribute[] discoverProtocolConfigurations() {
+    public Attribute[] discoverProtocolConfigurations() {
         // TODO: Search for VELBUS USB devices
-        return new AssetAttribute[]{
-            initProtocolConfiguration(new AssetAttribute(), PROTOCOL_NAME)
+        return new Attribute[]{
+            initProtocolConfiguration(new Attribute(), PROTOCOL_NAME)
                 .addMeta(
                 new MetaItem(META_VELBUS_SERIAL_PORT, Values.create("COM6"))
             )

@@ -19,10 +19,10 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.value.Value;
@@ -110,7 +110,7 @@ public interface ProtocolAssetService extends ContainerService {
      * Protocols can update their own protocol configuration, for example, to store configuration
      * details such as temporary access (e.g. OAuth offline) tokens.
      */
-    void updateProtocolConfiguration(AssetAttribute protocolConfiguration);
+    void updateProtocolConfiguration(Attribute protocolConfiguration);
 
     /**
      * Protocols may store assets in the context or update existing assets. A unique identifier
@@ -156,7 +156,7 @@ public interface ProtocolAssetService extends ContainerService {
      * Gets the Agent {@link Asset} that the specified {@link org.openremote.model.asset.agent.ProtocolConfiguration}
      * belongs to.
      */
-    Asset getAgent(AssetAttribute protocolConfiguration);
+    Asset getAgent(Attribute protocolConfiguration);
 
     /**
      * Apply the specified set of {@link ValueFilter}s to the specified {@link Value}

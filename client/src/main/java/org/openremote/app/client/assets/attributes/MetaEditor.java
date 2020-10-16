@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import org.openremote.app.client.widget.*;
 import org.openremote.app.client.Environment;
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ProtocolDescriptor;
@@ -261,7 +261,7 @@ public class MetaEditor extends AbstractAttributeViewExtension {
     }
 
     protected static final List<ValueType> valueTypes = Arrays.asList(ValueType.values());
-    protected final AssetAttribute attribute;
+    protected final Attribute attribute;
     final protected FlowPanel itemListPanel = new FlowPanel();
     final protected FlowPanel itemEditorPanel = new FlowPanel();
     final protected FormSectionLabel itemEditorSectionLabel;
@@ -270,7 +270,7 @@ public class MetaEditor extends AbstractAttributeViewExtension {
     protected AttributeValidationResult lastValidationResult;
     protected Supplier<List<ProtocolDescriptor>> protocolDescriptorSupplier;
 
-    public MetaEditor(Environment environment, AttributeView.Style style, String existingItemsHeader, String newItemsHeader, AttributeView parentView, AssetAttribute attribute, Supplier<List<ProtocolDescriptor>> protocolDescriptorSupplier) {
+    public MetaEditor(Environment environment, AttributeView.Style style, String existingItemsHeader, String newItemsHeader, AttributeView parentView, Attribute attribute, Supplier<List<ProtocolDescriptor>> protocolDescriptorSupplier) {
         super(environment, style, parentView, attribute, existingItemsHeader);
         setLabelVisible(false);
         this.attribute = attribute;
@@ -357,7 +357,7 @@ public class MetaEditor extends AbstractAttributeViewExtension {
     }
 
     protected String getCustomNameWatermark() {
-        return environment.getMessages().enterCustomAssetAttributeMetaName();
+        return environment.getMessages().enterCustomAttributeMetaName();
     }
 
     protected String getTypeWatermark() {

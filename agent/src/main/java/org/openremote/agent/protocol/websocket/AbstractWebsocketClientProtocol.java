@@ -24,15 +24,15 @@ import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.BasicAuthHelper;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
 import org.openremote.agent.protocol.http.HttpClientProtocol;
-import org.openremote.container.web.OAuthGrant;
+import org.openremote.model.auth.OAuthGrant;
 import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.container.Container;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
@@ -139,14 +139,14 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     protected Map<AttributeRef, MultivaluedMap<String, String>> clientHeaders = new HashMap<>();
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         client = createClient(executorService);
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
-        super.doUnlinkProtocolConfiguration(agent, protocolConfiguration);
+    protected void doDisconnect() {
+        super.doDisconnect();
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         clientHeaders.remove(protocolRef);
         synchronized (protocolConnectedTasks) {
@@ -158,7 +158,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected WebsocketIoClient<T> createIoClient(AssetAttribute protocolConfiguration) throws Exception {
+    protected WebsocketIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         String uriStr = protocolConfiguration.getMetaItem(META_PROTOCOL_CONNECT_URI)
@@ -169,7 +169,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
 
         /* We're going to fail hard and fast if optional meta items are incorrectly configured */
 
-        Optional<OAuthGrant> oAuthGrant = Protocol.getOAuthGrant(protocolConfiguration);
+        Optional<OAuthGrant> oAuthGrant = ProtocolUtil.getOAuthGrant(protocolConfiguration);
         Optional<Pair<StringValue, StringValue>> usernameAndPassword = getUsernameAndPassword(protocolConfiguration);
 
         MultivaluedMap<String, String> headers = Values.getMetaItemValueOrThrow(
@@ -214,8 +214,8 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        AttributeRef protocolRef = agent.getReferenceOrThrow();
         ProtocolIoClient<T, WebsocketIoClient<T>> protocolClient = protocolIoClientMap.get(protocolRef);
         WebsocketIoClient<T> client = protocolClient.client;
         Optional<WebsocketSubscription<T>[]> subscriptions = getSubscriptions(attribute);
@@ -231,8 +231,8 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+        AttributeRef protocolRef = agent.getReferenceOrThrow();
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         synchronized (attributeConnectedTasks) {

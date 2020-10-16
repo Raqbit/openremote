@@ -4,7 +4,7 @@ import "@openremote/or-translate";
 import {translate} from "@openremote/or-translate";
 import "@openremote/or-panel";
 import {OrChartConfig, OrChartEvent} from "@openremote/or-chart";
-import {Asset, AssetAttribute, Attribute} from "@openremote/model";
+import {Asset, Attribute, Attribute} from "@openremote/model";
 import {style} from "./style";
 import i18next from "i18next";
 import {styleMap} from "lit-html/directives/style-map";
@@ -35,7 +35,7 @@ export interface DataViewerConfig {
     viewerStyles?: { [style: string]: string };
     propertyViewProvider?: (property: string, value: any, viewerConfig: DataViewerConfig, panelConfig: PanelConfig) => TemplateResult | undefined;
     attributeViewProvider?: (attribute: Attribute, viewerConfig: DataViewerConfig, panelConfig: PanelConfig) => TemplateResult | undefined;
-    panelViewProvider?: (attributes: AssetAttribute[], panelName: string, viewerConfig: DataViewerConfig, panelConfig: PanelConfig) => TemplateResult | undefined;
+    panelViewProvider?: (attributes: Attribute[], panelName: string, viewerConfig: DataViewerConfig, panelConfig: PanelConfig) => TemplateResult | undefined;
     chartConfig?: OrChartConfig;
 }
 

@@ -33,7 +33,7 @@ import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 
 import org.openremote.model.Constants
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
@@ -91,13 +91,13 @@ class KNXProtocolTest extends Specification implements ManagerContainerTrait {
         knxAgent.setName("KNX Agent")
         knxAgent.setType(AssetType.AGENT)
         knxAgent.setAttributes(
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("knxConfig"), KNXProtocol.PROTOCOL_NAME)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("knxConfig"), KNXProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(KNXProtocol.META_KNX_GATEWAY_HOST, Values.create("127.0.0.1")),
                     new MetaItem(KNXProtocol.META_KNX_LOCAL_HOST, Values.create("127.0.0.1"))
                 ),
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("knxConfigError1"), KNXProtocol.PROTOCOL_NAME),
-            ProtocolConfiguration.initProtocolConfiguration(new AssetAttribute("knxConfigError2"), KNXProtocol.PROTOCOL_NAME)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("knxConfigError1"), KNXProtocol.PROTOCOL_NAME),
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute("knxConfigError2"), KNXProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(KNXProtocol.META_KNX_IP_CONNECTION_TYPE, Values.create("dummy"))
                 )
@@ -120,7 +120,7 @@ class KNXProtocolTest extends Specification implements ManagerContainerTrait {
         when: "a thing asset is created that links it's attributes to the knx protocol configuration"
         def knxThing = new Asset("Living Room Assset", AssetType.THING, knxAgent)
         knxThing.setAttributes(
-                new AssetAttribute("light1ToggleOnOff", AttributeValueType.BOOLEAN)
+                new Attribute("light1ToggleOnOff", AttributeValueType.BOOLEAN)
                     .setMeta(
                         new MetaItem(LABEL, Values.create("Light 1 Toggle On/Off")),
                         new MetaItem(DESCRIPTION, Values.create("Light 1 for living room")),

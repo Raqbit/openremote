@@ -23,7 +23,7 @@ import org.openremote.app.client.assets.browser.BrowserTreeNode;
 import org.openremote.app.client.widget.AttributeRefEditor;
 import org.openremote.app.client.widget.FormView;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.interop.Consumer;
 import org.openremote.model.util.Pair;
@@ -45,7 +45,7 @@ public interface AssetEdit extends FormView, AssetBaseView<AssetEdit.Presenter> 
 
         boolean addAttribute(String name, String type);
 
-        void removeAttribute(AssetAttribute attribute);
+        void removeAttribute(Attribute attribute);
 
         void update();
 

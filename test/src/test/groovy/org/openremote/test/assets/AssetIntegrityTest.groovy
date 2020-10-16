@@ -5,7 +5,7 @@ import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.AssetResource
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.value.Values
@@ -54,7 +54,7 @@ class AssetIntegrityTest extends Specification implements ManagerContainerTrait 
         when: "an asset is stored with an illegal attribute name"
         testAsset = assetResource.get(null, testAsset.getId())
         testAsset.setAttributes(
-            new AssetAttribute(testAsset.id, "illegal- Attribute:name&&&", AttributeValueType.STRING)
+            new Attribute(testAsset.id, "illegal- Attribute:name&&&", AttributeValueType.STRING)
         )
 
         assetResource.update(null, testAsset.getId(), testAsset)
@@ -66,7 +66,7 @@ class AssetIntegrityTest extends Specification implements ManagerContainerTrait 
         when: "an asset is stored with a non-empty attribute value"
         testAsset = assetResource.get(null, testAsset.getId())
         testAsset.setAttributes(
-                new AssetAttribute("foo", AttributeValueType.STRING, Values.create("bar"), getClockTimeOf(container))
+                new Attribute("foo", AttributeValueType.STRING, Values.create("bar"), getClockTimeOf(container))
         )
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, testAsset.getId())

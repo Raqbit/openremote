@@ -23,7 +23,7 @@ import org.openremote.agent.protocol.simulator.SimulatorProtocol
 import org.openremote.container.Container
 import org.openremote.model.ValidationFailure
 import org.openremote.model.ValueHolder
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.AttributeValidationResult
@@ -33,9 +33,9 @@ import spock.lang.Specification
 
 class SerialisationTest extends Specification {
 
-    def "Serialize/Deserialize AssetAttribute"() {
+    def "Serialize/Deserialize Attribute"() {
         given:
-        AssetAttribute attribute = new AssetAttribute("testAttribute")
+        Attribute attribute = new Attribute("testAttribute")
         ProtocolConfiguration.initProtocolConfiguration(attribute, SimulatorProtocol.PROTOCOL_NAME)
         attribute.addMeta(
             new MetaItem(MetaItemType.READ_ONLY, Values.create(true)),
@@ -43,7 +43,7 @@ class SerialisationTest extends Specification {
         )
 
         String str = Container.JSON.writeValueAsString(attribute)
-        attribute = Container.JSON.readValue(str, AssetAttribute.class)
+        attribute = Container.JSON.readValue(str, Attribute.class)
 
         expect:
         attribute.getName().isPresent()

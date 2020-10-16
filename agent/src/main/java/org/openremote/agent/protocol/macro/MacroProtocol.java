@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.macro;
 
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.syslog.SyslogCategory;
@@ -46,7 +46,7 @@ import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE
  * It expects a {@link AttributeExecuteStatus} as the attribute event value on the {@link #processLinkedAttributeWrite}.
  * The protocol will then try to perform the request on the linked macro protocol configuration.
  * <p>
- * {@link AssetAttribute}s can also read/write the macro configuration's {@link MacroAction} values by using the
+ * {@link Attribute}s can also read/write the macro configuration's {@link MacroAction} values by using the
  * {@link #META_MACRO_ACTION_INDEX} Meta Item with the index of the {@link MacroAction} to link to.
  */
 public class MacroProtocol extends AbstractProtocol {
@@ -149,18 +149,13 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
-    @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(new MetaItem(META_MACRO_ACTION, EMPTY_ACTION.toObjectValue()));
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             MacroConfiguration.validateMacroConfiguration(protocolConfiguration, result);
@@ -179,7 +174,7 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         // Protocol configuration is actually a Macro Configuration
         AttributeRef macroRef = protocolConfiguration.getReferenceOrThrow();
 
@@ -197,14 +192,14 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef macroRef = protocolConfiguration.getReferenceOrThrow();
         macroMap.remove(macroRef);
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-        AttributeRef macroRef = protocolConfiguration.getReferenceOrThrow();
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+        AttributeRef macroRef = agent.getReferenceOrThrow();
 
         // Check for executable meta item
         if (attribute.isExecutable()) {
@@ -213,7 +208,7 @@ public class MacroProtocol extends AbstractProtocol {
             updateLinkedAttribute(
                 new AttributeState(
                     attribute.getReferenceOrThrow(),
-                    protocolConfiguration.isEnabled()
+                    agent.isEnabled()
                         ? AttributeExecuteStatus.READY.asValue()
                         : AttributeExecuteStatus.DISABLED.asValue()
                 )
@@ -254,13 +249,13 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
 
-        AssetAttribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (attribute.isExecutable()) {
             // This is a macro execution related write operation

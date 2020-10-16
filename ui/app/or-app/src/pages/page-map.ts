@@ -264,7 +264,7 @@ export class PageMap<S extends MapStateKeyed> extends Page<S> {
             <or-map id="map" class="or-map">
                 ${
                     this._assets.filter((asset) => {
-                        const attr = Util.getAssetAttribute(asset, AttributeType.LOCATION.attributeName!);
+                        const attr = Util.getAttribute(asset, AttributeType.LOCATION.attributeName!);
                         const showOnMapMeta = Util.getFirstMetaItem(attr, MetaItemType.SHOW_ON_DASHBOARD.urn!);
                         return showOnMapMeta && showOnMapMeta.value;
                     }).map((asset) => {

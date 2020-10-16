@@ -32,7 +32,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Optional;
 
-import static org.openremote.model.Constants.PERSISTENCE_JSON_OBJECT_TYPE;
+import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_SEQUENCE_ID_GENERATOR;
 
 /**
@@ -190,7 +190,7 @@ public abstract class Ruleset {
     protected Lang lang = Lang.GROOVY;
 
     @Column(name = "META", columnDefinition = "jsonb")
-    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_OBJECT_TYPE)
+    @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
     protected ObjectValue meta;
 
     @Transient

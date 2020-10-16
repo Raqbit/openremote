@@ -26,17 +26,18 @@ import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.Protocol;
+import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.container.Container;
 import org.openremote.container.web.HeaderInjectorFilter;
-import org.openremote.container.web.OAuthGrant;
+import org.openremote.model.auth.OAuthGrant;
 import org.openremote.container.web.QueryParameterInjectorFilter;
 import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
@@ -567,7 +568,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     protected final Map<AttributeRef, Set<AttributeRef>> pollingLinkedAttributeMap = new HashMap<>();
     protected ResteasyClient client;
 
-    public static Optional<Pair<StringValue, StringValue>> getUsernameAndPassword(AssetAttribute attribute) throws IllegalArgumentException {
+    public static Optional<Pair<StringValue, StringValue>> getUsernameAndPassword(Attribute attribute) throws IllegalArgumentException {
         Optional<StringValue> username = Values.getMetaItemValueOrThrow(
                 attribute,
                 META_PROTOCOL_USERNAME,
@@ -587,7 +588,7 @@ public class HttpClientProtocol extends AbstractProtocol {
         return username.map(stringValue -> new Pair<>(stringValue, password.get()));
     }
 
-    public static Integer getPingMillis(AssetAttribute attribute) throws IllegalArgumentException {
+    public static Integer getPingMillis(Attribute attribute) throws IllegalArgumentException {
         return Values.getMetaItemValueOrThrow(
                 attribute,
                 META_PROTOCOL_PING_MILLIS,
@@ -641,7 +642,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         client = createClient();
     }
@@ -659,7 +660,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         String baseUri = protocolConfiguration.getMetaItem(META_PROTOCOL_BASE_URI)
@@ -680,7 +681,7 @@ public class HttpClientProtocol extends AbstractProtocol {
 
         /* We're going to fail hard and fast if optional meta items are incorrectly configured */
 
-        Optional<OAuthGrant> oAuthGrant = Protocol.getOAuthGrant(protocolConfiguration);
+        Optional<OAuthGrant> oAuthGrant = ProtocolUtil.getOAuthGrant(protocolConfiguration);
         Optional<Pair<StringValue, StringValue>> usernameAndPassword = getUsernameAndPassword(protocolConfiguration);
 
         boolean followRedirects = Values.getMetaItemValueOrThrow(
@@ -828,7 +829,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef protocolConfigurationRef = protocolConfiguration.getReferenceOrThrow();
         clientMap.remove(protocolConfigurationRef);
         requestMap.remove(protocolConfigurationRef);
@@ -836,7 +837,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         String method = Values.getMetaItemValueOrThrow(
@@ -934,7 +935,7 @@ public class HttpClientProtocol extends AbstractProtocol {
             }
         }
 
-        addHttpClientRequest(protocolConfiguration,
+        addHttpClientRequest(agent,
                 attribute,
                 path,
                 method,
@@ -946,8 +947,8 @@ public class HttpClientProtocol extends AbstractProtocol {
                 pollingMillis.orElse(null));
     }
 
-    protected void addHttpClientRequest(AssetAttribute protocolConfiguration,
-                                        AssetAttribute attribute,
+    protected void addHttpClientRequest(Attribute protocolConfiguration,
+                                        Attribute attribute,
                                         String path,
                                         String method,
                                         MultivaluedMap<String, String> headers,
@@ -1012,7 +1013,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         requestMap.remove(attributeRef);
         cancelPolling(attributeRef);
@@ -1034,7 +1035,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         HttpClientRequest request = requestMap.get(event.getAttributeRef());
         Pair<ResteasyWebTarget, List<Integer>> clientAndFailureCodes = clientMap.get(protocolRef);
@@ -1067,11 +1068,6 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public String getVersion() {
-        return PROTOCOL_VERSION;
-    }
-
-    @Override
     protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
         return new ArrayList<>(PROTOCOL_META_ITEM_DESCRIPTORS);
     }
@@ -1082,7 +1078,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
                         new MetaItem(META_PROTOCOL_BASE_URI, null)
@@ -1090,11 +1086,11 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             try {
-                Protocol.getOAuthGrant(protocolConfiguration);
+                ProtocolUtil.getOAuthGrant(protocolConfiguration);
                 getUsernameAndPassword(protocolConfiguration);
                 getPingMillis(protocolConfiguration);
             } catch (IllegalArgumentException e) {

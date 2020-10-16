@@ -33,7 +33,7 @@ import org.openremote.app.client.interop.chartjs.Chart;
 import org.openremote.app.client.interop.chartjs.ChartUtil;
 import org.openremote.app.client.widget.*;
 import org.openremote.model.Constants;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.AttributeValueDescriptor;
 import org.openremote.model.datapoint.DatapointInterval;
@@ -62,7 +62,7 @@ public abstract class DatapointBrowser extends AbstractAttributeViewExtension {
     FormOutputText timeOutput;
     FormButton nextButton;
 
-    public DatapointBrowser(Environment environment, AttributeView.Style style, AttributeViewImpl parentView, AssetAttribute attribute, int width, int height, DatapointInterval interval, long fromTimestamp, long toTimestamp) {
+    public DatapointBrowser(Environment environment, AttributeView.Style style, AttributeViewImpl parentView, Attribute attribute, int width, int height, DatapointInterval interval, long fromTimestamp, long toTimestamp) {
         super(environment, style, parentView, attribute, environment.getMessages().historicalData());
         this.environment = environment;
         this.width = width;

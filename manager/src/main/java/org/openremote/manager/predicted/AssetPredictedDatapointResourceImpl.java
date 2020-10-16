@@ -24,7 +24,7 @@ import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
 import org.openremote.model.http.RequestParams;
@@ -75,16 +75,15 @@ public class AssetPredictedDatapointResourceImpl extends ManagerWebResource impl
                 throw new WebApplicationException(Response.Status.FORBIDDEN);
             }
 
-            AssetAttribute attribute = asset.getAttribute(attributeName).orElseThrow(() ->
+            Attribute attribute = asset.getAttribute(attributeName).orElseThrow(() ->
                 new WebApplicationException(Response.Status.NOT_FOUND)
             );
 
-            return assetPredictedDatapointService.getValueDatapoints(
+            return assetPredictedDatapointService.getValueDatapoints(,
                 attribute.getReferenceOrThrow(),
                 datapointInterval,
                 fromTimestamp,
-                toTimestamp
-            );
+                toTimestamp);
         } catch (IllegalStateException ex) {
             throw new WebApplicationException(ex, Response.Status.BAD_REQUEST);
         }

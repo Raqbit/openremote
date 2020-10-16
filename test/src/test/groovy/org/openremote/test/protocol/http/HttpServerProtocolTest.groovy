@@ -22,15 +22,15 @@ package org.openremote.test.protocol.http
 import org.jboss.resteasy.spi.ResteasyUriInfo
 import org.jboss.resteasy.util.BasicAuthHelper
 import org.openremote.agent.protocol.http.*
-import org.openremote.container.web.OAuthGrant
-import org.openremote.container.web.OAuthPasswordGrant
-import org.openremote.container.web.OAuthRefreshTokenGrant
+import org.openremote.model.auth.OAuthGrant
+import org.openremote.model.auth.OAuthPasswordGrant
+import org.openremote.model.auth.OAuthRefreshTokenGrant
 import org.openremote.container.web.OAuthServerResponse
 import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetAttribute
+import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.MetaItem
@@ -305,7 +305,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig"), TestHttpServerProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute("protocolConfig"), TestHttpServerProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(
                         AbstractHttpServerProtocol.META_PROTOCOL_DEPLOYMENT_PATH,
@@ -330,7 +330,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         def testAsset = new Asset("Test Asset", AssetType.THING)
         testAsset.setId("12345")
         testAsset.setAttributes(
-            new AssetAttribute("attribute1", AttributeValueType.STRING, Values.create("Test"))
+            new Attribute("attribute1", AttributeValueType.STRING, Values.create("Test"))
         )
         testAsset.setCoordinates(new GeoJSONPoint(1d, 2d))
         authenticatedTestResource.postAsset(testAsset)
@@ -362,7 +362,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
 
         when: "an additional instance of the Test HTTP Server protocol is deployed without security enabled"
         agent.addAttributes(
-            initProtocolConfiguration(new AssetAttribute("protocolConfig2"), TestHttpServerProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute("protocolConfig2"), TestHttpServerProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem(
                         AbstractHttpServerProtocol.META_PROTOCOL_DEPLOYMENT_PATH,
@@ -388,7 +388,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         testAsset = new Asset("Test Asset 2", AssetType.THING)
         testAsset.setId("67890")
         testAsset.setAttributes(
-            new AssetAttribute("attribute2", AttributeValueType.STRING, Values.create("Test"))
+            new Attribute("attribute2", AttributeValueType.STRING, Values.create("Test"))
         )
         testAsset.setCoordinates(new GeoJSONPoint(3d, 4d))
         authenticatedTestResource.postAsset(testAsset)

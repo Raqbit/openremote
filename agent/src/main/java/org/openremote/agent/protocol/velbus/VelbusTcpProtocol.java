@@ -24,7 +24,7 @@ import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.io.IoClient;
 import org.openremote.agent.protocol.tcp.TcpIoClient;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemDescriptor;
@@ -85,7 +85,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             VelbusConfiguration.validateSocketConfiguration(protocolConfiguration, result);
@@ -94,7 +94,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_VELBUS_HOST, null),
@@ -103,7 +103,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    protected IoClient<VelbusPacket> createIoClient(AssetAttribute protocolConfiguration) throws RuntimeException {
+    protected IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException {
 
         // Extract IP and Host
         String host = protocolConfiguration.getMetaItem(META_VELBUS_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
@@ -123,7 +123,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    protected String getUniqueNetworkIdentifier(AssetAttribute protocolConfiguration) {
+    protected String getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
         String host = protocolConfiguration.getMetaItem(META_VELBUS_HOST)
             .flatMap(AbstractValueHolder::getValueAsString)
             .orElse("");

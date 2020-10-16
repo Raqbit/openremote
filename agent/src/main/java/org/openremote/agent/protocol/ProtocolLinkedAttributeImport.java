@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol;
 
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.file.FileInfo;
 
@@ -29,8 +29,8 @@ import org.openremote.model.file.FileInfo;
  * <p>
  * The import process should return an array of {@link Asset}s that represent the physical devices
  * connected to a particular {@link org.openremote.model.asset.agent.ProtocolConfiguration}. The device
- * assets should contain all the appropriate {@link AssetAttribute}s needed for interacting with the
- * device. Each {@link AssetAttribute} should be of the correct type and have any required
+ * assets should contain all the appropriate {@link Attribute}s needed for interacting with the
+ * device. Each {@link Attribute} should be of the correct type and have any required
  * {@link org.openremote.model.attribute.MetaItem}s already set.
  * <p>
  * <b>
@@ -46,5 +46,5 @@ public interface ProtocolLinkedAttributeImport {
      * using the supplied {@link FileInfo}.
      * @throws IllegalStateException when there is an issue processing the provided {@link FileInfo}
      */
-    AssetTreeNode[] discoverLinkedAssetAttributes(AssetAttribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException;
+    AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException;
 }

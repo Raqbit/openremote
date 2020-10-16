@@ -28,7 +28,7 @@ import org.openremote.app.client.assets.attributes.AttributeView;
 import org.openremote.app.client.assets.attributes.AttributeViewImpl;
 import org.openremote.app.client.event.ShowSuccessEvent;
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.event.bus.EventRegistration;
@@ -52,7 +52,7 @@ public class Simulator extends AbstractAttributeViewExtension {
     protected Map<AttributeRef, FormGroup> formGroups = new HashMap<>();
     final protected AttributeView.Style style;
 
-    public Simulator(Environment environment, AttributeView.Style style, AttributeViewImpl parentView, AssetAttribute attribute, AttributeRef protocolConfiguration, Runnable onCreate, Runnable onClose) {
+    public Simulator(Environment environment, AttributeView.Style style, AttributeViewImpl parentView, Attribute attribute, AttributeRef protocolConfiguration, Runnable onCreate, Runnable onClose) {
         super(environment, style, parentView, attribute, environment.getMessages().simulator());
         this.environment = environment;
         this.style = style;

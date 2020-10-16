@@ -11,7 +11,7 @@ import {
 } from "lit-element";
 import i18next from "i18next";
 import {translate} from "@openremote/or-translate";
-import {Asset, AssetAttribute, AttributeRef, DatapointInterval, MetaItemType, Attribute, ReadAssetEvent, AssetEvent} from "@openremote/model";
+import {Asset, Attribute, AttributeRef, DatapointInterval, MetaItemType, Attribute, ReadAssetEvent, AssetEvent} from "@openremote/model";
 import manager, {
     AssetModelUtil,
     DefaultColor2,
@@ -330,7 +330,7 @@ export class OrChart extends translate(i18next)(LitElement) {
     private activeAsset?: Asset;
 
     @property({type: Object})
-    public assetAttributes: AssetAttribute[] = [];
+    public assetAttributes: Attribute[] = [];
 
     @property({type: Object})
     public attributeRef?: AttributeRef;
@@ -715,7 +715,7 @@ export class OrChart extends translate(i18next)(LitElement) {
             const assets = response.data;
             if(assets.length > 0) {
                 this.assets = view.assetIds.map((assetId: string)  => assets.find(x => x.id === assetId));
-                this.assetAttributes = view.attributes.map((attr: string, index: number)  => Util.getAssetAttribute(this.assets[index], attr));
+                this.assetAttributes = view.attributes.map((attr: string, index: number)  => Util.getAttribute(this.assets[index], attr));
                 this.period = view.period;
                 this._loading = false;
             }
@@ -775,7 +775,7 @@ export class OrChart extends translate(i18next)(LitElement) {
         if(this.shadowRoot && this.shadowRoot.getElementById('chart-attribute-picker')){
             const elm = this.shadowRoot.getElementById('chart-attribute-picker') as HTMLInputElement;
             if(this.activeAsset){
-                const attr = Util.getAssetAttribute(this.activeAsset, elm.value);
+                const attr = Util.getAttribute(this.activeAsset, elm.value);
                 if(attr){
                     this.setAttrColor(attr);
                     this.assetAttributes = [...this.assetAttributes, attr];
@@ -831,12 +831,12 @@ export class OrChart extends translate(i18next)(LitElement) {
             elm.value = '';
         }
 
-        let attributes = [...Util.getAssetAttributes(this.activeAsset)];
+        let attributes = [...Util.getAttributes(this.activeAsset)];
         if(attributes && attributes.length > 0) {
             attributes = attributes
-                .filter((attr: AssetAttribute) => Util.getFirstMetaItem(attr, MetaItemType.STORE_DATA_POINTS.urn!))
-                .filter((attr: AssetAttribute) => (this.assetAttributes && !this.assetAttributes.some(assetAttr => (assetAttr.name === attr.name) && (assetAttr.assetId === attr.assetId))));
-            const options = attributes.map((attr: AssetAttribute) => {
+                .filter((attr: Attribute) => Util.getFirstMetaItem(attr, MetaItemType.STORE_DATA_POINTS.urn!))
+                .filter((attr: Attribute) => (this.assetAttributes && !this.assetAttributes.some(assetAttr => (assetAttr.name === attr.name) && (assetAttr.assetId === attr.assetId))));
+            const options = attributes.map((attr: Attribute) => {
                 const descriptors = AssetModelUtil.getAttributeAndValueDescriptors(this.activeAsset!.type, attr);
                 const label = Util.getAttributeLabel(attr, descriptors[0], descriptors[1], false);
                 return [attr.name, label];
@@ -994,7 +994,7 @@ export class OrChart extends translate(i18next)(LitElement) {
         return newMoment.format();
     }
     
-    protected async _loadAttributeData(attribute:AssetAttribute, timestamp: Date | undefined) {
+    protected async _loadAttributeData(attribute:Attribute, timestamp: Date | undefined) {
         if (!attribute) {
             return [];
         }
@@ -1041,7 +1041,7 @@ export class OrChart extends translate(i18next)(LitElement) {
         }
     }
 
-    protected async _loadPredictedAttributeData(attribute:AssetAttribute, timestamp: Date | undefined) {
+    protected async _loadPredictedAttributeData(attribute:Attribute, timestamp: Date | undefined) {
         if (!attribute) {
             return [];
         }

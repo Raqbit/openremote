@@ -48,6 +48,7 @@ import org.openremote.model.event.shared.TenantFilter;
 import org.openremote.model.interop.Consumer;
 import org.openremote.model.map.MapResource;
 import org.openremote.model.simulator.SimulatorState;
+import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.Values;
 
 import javax.inject.Inject;
@@ -216,17 +217,16 @@ public class AssetViewActivity
     }
 
     @Override
-    protected void onAttributeModified(AssetAttribute attribute) {
+    protected void onAttributeModified(Attribute attribute) {
         // Called when a view has modified the attribute so we need to do validation
         validateAttribute(true, attribute, result -> processValidationResults(Collections.singletonList(result)));
     }
 
     protected void onAttributeEvent(AttributeEvent attributeEvent) {
         for (AttributeView attributeView : attributeViews) {
-            AssetAttribute assetAttribute = attributeView.getAttribute();
-            Optional<AttributeRef> assetAttributeRef = assetAttribute.getReference();
+            Attribute assetAttribute = attributeView.getAttribute();
 
-            if (assetAttributeRef.map(ref -> ref.equals(attributeEvent.getAttributeRef())).orElse(false)) {
+            if (assetId.equals(attributeEvent.getEntityId()) && attributeEvent.getAttributeName().equals(attributeView.getAttribute().getNameOrThrow())) {
                 assetAttribute.setValue(attributeEvent.getValue().orElse(null), attributeEvent.getTimestamp());
                 attributeView.onAttributeChanged(attributeEvent.getTimestamp());
                 break;
@@ -236,7 +236,7 @@ public class AssetViewActivity
 
     protected void onAssetEvent(AssetEvent assetEvent) {
         for (AttributeView attributeView : attributeViews) {
-            attributeView.getAttribute().getReference().map(AttributeRef::getAttributeName)
+            attributeView.getAttribute().getName()
                 .flatMap(attributeName -> assetEvent.getAsset().getAttribute(attributeName))
                 .ifPresent(assetAttribute ->
                     attributeView.getAttribute().setValue(
@@ -247,11 +247,11 @@ public class AssetViewActivity
 
     protected void onAgentStatusEvent(AgentStatusEvent event) {
         for (AttributeView attributeView : attributeViews) {
-            AssetAttribute assetAttribute = attributeView.getAttribute();
-            Optional<AttributeRef> assetAttributeRef = assetAttribute.getReference();
+            Attribute assetAttribute = attributeView.getAttribute();
 
             if (asset.getWellKnownType() == AssetType.AGENT) {
-                if (assetAttributeRef.map(ref -> ref.equals(event.getProtocolConfiguration())).orElse(false)) {
+                if (event.getProtocolConfiguration().getAttributeName().equals(attributeView.getAttribute().getNameOrThrow())
+                    && event.getProtocolConfiguration().getEntityId().equals(assetId)) {
                     attributeView.setStatus(event.getConnectionStatus());
                 }
             } else {
@@ -293,7 +293,7 @@ public class AssetViewActivity
         );
     }
 
-    protected List<FormButton> createAttributeActions(AssetAttribute attribute, AttributeViewImpl view) {
+    protected List<FormButton> createAttributeActions(Attribute attribute, AttributeViewImpl view) {
         List<FormButton> actionButtons = new ArrayList<>();
 
         if (attribute.isExecutable()) {
@@ -361,7 +361,7 @@ public class AssetViewActivity
         return actionButtons;
     }
 
-    protected List<AbstractAttributeViewExtension> createAttributeExtensions(AssetAttribute attribute, AttributeViewImpl view) {
+    protected List<AbstractAttributeViewExtension> createAttributeExtensions(Attribute attribute, AttributeViewImpl view) {
         List<AbstractAttributeViewExtension> viewExtensions = new ArrayList<>();
 
         if (attribute.isStoreDatapoints()) {
@@ -389,19 +389,19 @@ public class AssetViewActivity
         );
     }
 
-    protected void readAttributeValue(AssetAttribute attribute) {
-        attribute.getReference().ifPresent(attributeRef ->
-            environment.getEventService().dispatch(
-                new ReadAssetAttributeEvent(attributeRef)
-            )
-        );
+    protected void readAttributeValue(Attribute attribute) {
+        if (!TextUtil.isNullOrEmpty(assetId)) {
+             environment.getEventService().dispatch(
+                 new ReadAttributeEvent(new AttributeRef(assetId, attribute.getNameOrThrow()))
+             );
+        }
     }
 
     /*###########################################################################################*/
     /*####                             EXTENSIONS BELOW                                      ####*/
     /*###########################################################################################*/
 
-    protected DatapointBrowser createDatapointBrowser(AssetAttribute attribute, AttributeViewImpl view) {
+    protected DatapointBrowser createDatapointBrowser(Attribute attribute, AttributeViewImpl view) {
         return new DatapointBrowser(environment,
             this.view.getStyle(),
             view,
@@ -437,8 +437,8 @@ public class AssetViewActivity
         }
     }
 
-    protected Simulator createSimulator(AssetAttribute attribute, AttributeViewImpl view) {
-        AttributeRef protocolConfigurationRef = attribute.getReferenceOrThrow();
+    protected Simulator createSimulator(Attribute attribute, AttributeViewImpl view) {
+        AttributeRef protocolConfigurationRef = new AttributeRef(assetId, attribute.getNameOrThrow());
 
         return new Simulator(
             environment,

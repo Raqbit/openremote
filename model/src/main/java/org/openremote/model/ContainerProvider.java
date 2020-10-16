@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -19,11 +19,18 @@
  */
 package org.openremote.model;
 
-/**
- * This is an interface for indicating that a type provides a URN string.
- */
-public interface HasUniqueResourceName {
+import java.util.Collection;
+import java.util.Map;
 
-    String getUrn();
+public interface ContainerProvider {
 
+    Map<String, String> getConfig();
+
+    ContainerService[] getServices();
+
+    <T extends ContainerService> Collection<T> getServices(Class<T> type);
+
+    <T extends ContainerService> T getService(Class<T> type) throws IllegalStateException;
+
+    <T extends ContainerService> boolean hasService(Class<T> type);
 }

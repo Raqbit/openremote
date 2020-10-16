@@ -22,7 +22,7 @@ package org.openremote.app.client.assets.attributes;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Label;
 import org.openremote.app.client.Environment;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolDescriptor;
 import org.openremote.model.attribute.AttributeValidationResult;
 
@@ -36,7 +36,7 @@ public class ProtocolLinksEditor extends AbstractAttributeViewExtension {
         Environment environment,
         Style style,
         AttributeViewImpl parentView,
-        AssetAttribute attribute,
+        Attribute attribute,
         ProtocolDescriptor protocolDescriptor,
         boolean discovery) {
 

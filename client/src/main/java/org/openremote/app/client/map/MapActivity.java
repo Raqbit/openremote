@@ -63,7 +63,7 @@ public class MapActivity extends AssetBrowsingActivity<MapPlace> implements MapV
     String assetId;
     String realm;
     Asset asset;
-    List<AssetAttribute> dashboardAttributes = new ArrayList<>();
+    List<Attribute> dashboardAttributes = new ArrayList<>();
 
     @Inject
     public MapActivity(Environment environment,
@@ -167,7 +167,7 @@ public class MapActivity extends AssetBrowsingActivity<MapPlace> implements MapV
             assetBrowserPresenter.loadAsset(assetId, loadedAsset -> {
                 this.asset = loadedAsset;
                 this.dashboardAttributes = asset.getAttributesStream()
-                    .filter(AssetAttribute::isShowOnDashboard)
+                    .filter(Attribute::isShowOnDashboard)
                     .collect(Collectors.toList());
                 assetBrowserPresenter.selectAsset(asset);
                 view.setAssetViewHistoryToken(environment.getPlaceHistoryMapper().getToken(

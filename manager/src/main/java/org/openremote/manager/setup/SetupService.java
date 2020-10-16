@@ -20,10 +20,8 @@
 package org.openremote.manager.setup;
 
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
-import org.openremote.container.security.IdentityService;
-import org.openremote.container.timer.TimerService;
 import org.openremote.manager.setup.builtin.BuiltinSetupTasks;
 
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class SetupService implements ContainerService {
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
 
         boolean isClean = container.getService(PersistenceService.class).isSetupWipeCleanInstall();
 

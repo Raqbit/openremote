@@ -24,7 +24,7 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolClientEventService;
 import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;
@@ -42,6 +42,7 @@ import org.openremote.model.Constants;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.*;
 import org.openremote.model.attribute.AttributeEvent;
+import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.calendar.CalendarEvent;
@@ -80,7 +81,7 @@ import static org.openremote.container.persistence.PersistenceEvent.PERSISTENCE_
 import static org.openremote.container.persistence.PersistenceEvent.isPersistenceEventForEntityType;
 import static org.openremote.manager.event.ClientEventService.*;
 import static org.openremote.manager.rules.AssetQueryPredicate.asPredicate;
-import static org.openremote.model.asset.AssetAttribute.*;
+import static org.openremote.model.attribute.Attribute.*;
 import static org.openremote.model.attribute.MetaItemType.ACCESS_RESTRICTED_READ;
 import static org.openremote.model.query.AssetQuery.*;
 import static org.openremote.model.query.AssetQuery.Access.PRIVATE;
@@ -222,13 +223,13 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 if (attributePredicate.value instanceof CalendarEventPredicate) {
                     Predicate<String> namePredicate = StringPredicate.asPredicate(attributePredicate.name);
                     Predicate<CalendarEvent> valuePredicate = asPredicate((CalendarEventPredicate)attributePredicate.value);
-                    List<AssetAttribute> matchedAttributes = asset.getAttributesStream()
+                    List<Attribute> matchedAttributes = asset.getAttributesStream()
                         .filter(attr -> namePredicate.test(attr.name)).collect(Collectors.toList());
 
                     matches = true;
 
                     if (!matchedAttributes.isEmpty()) {
-                        for (AssetAttribute attribute : matchedAttributes) {
+                        for (Attribute attribute : matchedAttributes) {
                             matches = valuePredicate.test(attribute.getValue().flatMap(CalendarEvent::fromValue).orElse(null));
                             if (isOr && matches) {
                                 break;
@@ -278,7 +279,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     }
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         timerService = container.getService(TimerService.class);
         persistenceService = container.getService(PersistenceService.class);
         identityService = container.getService(ManagerIdentityService.class);
@@ -329,7 +330,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     }
 
     @Override
-    public void start(Container container) throws Exception {
+    public void start(ContainerProvider container) throws Exception {
         META_ITEM_RESTRICTED_READ_SQL_FRAGMENT =
             " ('" + Arrays.stream(AssetModelUtil.getMetaItemDescriptors()).filter(i -> i.getAccess().restrictedRead).map(MetaItemDescriptor::getUrn).collect(joining("','")) + "')";
 
@@ -338,7 +339,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     }
 
     @Override
-    public void stop(Container container) throws Exception {
+    public void stop(ContainerProvider container) throws Exception {
 
     }
 
@@ -355,7 +356,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         from(CLIENT_EVENT_TOPIC)
             .routeId("FromClientReadRequests")
             .filter(
-                or(body().isInstanceOf(ReadAssetsEvent.class), body().isInstanceOf(ReadAssetEvent.class), body().isInstanceOf(ReadAssetAttributeEvent.class)))
+                or(body().isInstanceOf(ReadAssetsEvent.class), body().isInstanceOf(ReadAssetEvent.class), body().isInstanceOf(ReadAttributeEvent.class)))
             .choice()
                 .when(body().isInstanceOf(ReadAssetEvent.class))
                     .process(exchange -> {
@@ -367,7 +368,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                         if (exchange.getIn().getBody() instanceof ReadAssetEvent) {
                             assetId = exchange.getIn().getBody(ReadAssetEvent.class).getAssetId();
                         } else {
-                            ReadAssetAttributeEvent assetAttributeEvent = exchange.getIn().getBody(ReadAssetAttributeEvent.class);
+                            ReadAttributeEvent assetAttributeEvent = exchange.getIn().getBody(ReadAttributeEvent.class);
                             assetId = assetAttributeEvent.getAttributeRef().getEntityId();
                             attribute = assetAttributeEvent.getAttributeRef().getAttributeName();
                         }
@@ -398,7 +399,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                             Object response = null;
 
                             if (isAttributeRead) {
-                                AssetAttribute assetAttribute = asset.getAttribute(attribute).orElse(null);
+                                Attribute assetAttribute = asset.getAttribute(attribute).orElse(null);
                                 if (assetAttribute != null) {
                                     response = new AttributeEvent(assetId, attribute, assetAttribute.getValue().orElse(null), assetAttribute.getValueTimestamp().orElse(0L));
                                 }
@@ -657,7 +658,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
 
             // Validate attributes
             int invalid = 0;
-            for (AssetAttribute attribute : asset.getAttributesList()) {
+            for (Attribute attribute : asset.getAttributesList()) {
                 List<ValidationFailure> validationFailures = attribute.getValidationFailures();
                 if (!validationFailures.isEmpty()) {
                     LOG.warning("Validation failure(s) " + validationFailures + ", can't store: " + attribute);
@@ -673,7 +674,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             // Validate group child asset type attribute
             if (asset.getWellKnownType() == AssetType.GROUP) {
                 String childAssetType = asset.getAttribute("childAssetType")
-                    .flatMap(AssetAttribute::getValueAsString)
+                    .flatMap(Attribute::getValueAsString)
                     .map(childAssetTypeString -> TextUtil.isNullOrEmpty(childAssetTypeString) ? null : childAssetTypeString)
                     .orElseThrow(() -> {
                         String msg = "Asset of type GROUP childAssetType attribute must be a valid string: asset=" + asset;
@@ -683,7 +684,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
 
                 String existingChildAssetType = existing != null ? existing
                     .getAttribute("childAssetType")
-                    .flatMap(AssetAttribute::getValueAsString)
+                    .flatMap(Attribute::getValueAsString)
                     .orElseThrow(() -> {
                         String msg = "Asset of type GROUP childAssetType attribute must be a valid string: asset=" + asset;
                         LOG.info(msg);
@@ -1942,9 +1943,9 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             try (PreparedStatement statement = connection.prepareStatement(update)) {
 
                 // Bind the value (and check we don't have a SQL injection hole in attribute name!)
-                if (!AssetAttribute.ATTRIBUTE_NAME_VALIDATOR.test(attributeName)) {
+                if (!Attribute.ATTRIBUTE_NAME_VALIDATOR.test(attributeName)) {
                     LOG.fine(
-                        "Invalid attribute name (must match '" + AssetAttribute.ATTRIBUTE_NAME_PATTERN + "'): " + attributeName
+                        "Invalid attribute name (must match '" + Attribute.ATTRIBUTE_NAME_PATTERN + "'): " + attributeName
                     );
                     return false;
                 }
@@ -2079,9 +2080,9 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 }
 
                 // Did any attributes change if so raise attribute events on the event bus
-                List<AssetAttribute> oldAttributes = attributesFromJson(persistenceEvent.getPreviousState("attributes"),
+                List<Attribute> oldAttributes = attributesFromJson(persistenceEvent.getPreviousState("attributes"),
                     asset.getId()).collect(Collectors.toList());
-                List<AssetAttribute> newAttributes = attributesFromJson(persistenceEvent.getCurrentState(
+                List<Attribute> newAttributes = attributesFromJson(persistenceEvent.getCurrentState(
                     "attributes"), asset.getId()).collect(Collectors.toList());
 
                 // Get removed attributes and raise an attribute event with deleted flag in attribute state
@@ -2131,9 +2132,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         // Client may want to read a subset or all attributes of the asset
         List<AttributeEvent> events = asset.getAttributesStream()
             .filter(attribute -> names.isEmpty() || attribute.getName().filter(names::contains).isPresent())
-            .map(AssetAttribute::getStateEvent)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .map(attribute -> new AttributeEvent(new AttributeState(asset.getId(), attribute)))
             .collect(Collectors.toList());
         TriggeredEventSubscription<?> triggeredEventSubscription = new TriggeredEventSubscription<>(events, subscriptionId);
         clientEventService.sendToSession(sessionKey, triggeredEventSubscription);

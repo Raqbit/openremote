@@ -20,6 +20,8 @@
 package org.openremote.container.web;
 
 import org.jboss.resteasy.util.BasicAuthHelper;
+import org.openremote.model.auth.OAuthGrant;
+import org.openremote.model.auth.OAuthRefreshTokenGrant;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
 

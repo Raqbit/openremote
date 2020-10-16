@@ -114,10 +114,11 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         conditions.eventually {
             def thing = assetStorageService.find(managerTestSetup.thingId, true)
             def aggregatedDatapoints = assetDatapointService.getValueDatapoints(
-                    thing.getAttribute("light1PowerConsumption").orElseThrow({ new RuntimeException("Missing attribute")}),
-                    DatapointInterval.MINUTE,
-                    getClockTimeOf(container),
-                    getClockTimeOf(container) + 3600000
+                thing.getId(),
+                thing.getAttribute("light1PowerConsumption").orElseThrow({ new RuntimeException("Missing attribute") }),
+                DatapointInterval.MINUTE,
+                getClockTimeOf(container),
+                getClockTimeOf(container) + 3600000
             )
             assert aggregatedDatapoints.size() == 61
         }
@@ -178,10 +179,11 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         conditions.eventually {
             def thing = assetStorageService.find(managerTestSetup.thingId, true)
             def aggregatedDatapoints = assetDatapointService.getValueDatapoints(
-                    thing.getAttribute(thingLightToggleAttributeName).orElseThrow({ new RuntimeException("Missing attribute")}),
-                    DatapointInterval.MINUTE,
-                    getClockTimeOf(container),
-                    getClockTimeOf(container) + 3600000
+                thing.getId(),
+                thing.getAttribute(thingLightToggleAttributeName).orElseThrow({ new RuntimeException("Missing attribute") }),
+                DatapointInterval.MINUTE,
+                getClockTimeOf(container),
+                getClockTimeOf(container) + 3600000
             )
             assert aggregatedDatapoints.size() == 61
         }

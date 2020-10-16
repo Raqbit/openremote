@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.zwave;
 import org.openremote.agent.protocol.io.IoClient;
 import org.openremote.controller.exception.ConfigurationException;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.AgentLink;
@@ -176,7 +176,7 @@ public class ZWNetwork {
         }
     }
 
-    public synchronized AssetTreeNode[] discoverDevices(AssetAttribute protocolConfiguration) {
+    public synchronized AssetTreeNode[] discoverDevices(Attribute protocolConfiguration) {
         if (controller == null) {
             return new AssetTreeNode[0];
         }
@@ -220,8 +220,8 @@ public class ZWNetwork {
                 // Device Info
 
                 Asset deviceInfoAsset = new Asset("Info", AssetType.THING);
-                List<AssetAttribute> infoAttributes = createNodeInfoAttributes(node, agentLink);
-                deviceInfoAsset.addAttributes(infoAttributes.toArray(new AssetAttribute[infoAttributes.size()]));
+                List<Attribute> infoAttributes = createNodeInfoAttributes(node, agentLink);
+                deviceInfoAsset.addAttributes(infoAttributes.toArray(new Attribute[infoAttributes.size()]));
                 deviceNode.addChild(new AssetTreeNode(deviceInfoAsset));
 
                 // Sub device
@@ -254,10 +254,10 @@ public class ZWNetwork {
                             Asset parameterAsset = new Asset(parameterLabel, AssetType.THING);
                             AssetTreeNode parameterNode = new AssetTreeNode(parameterAsset);
 
-                            List<AssetAttribute> attributes = parameter.getChannels()
+                            List<Attribute> attributes = parameter.getChannels()
                                 .stream()
                                 .map(channel -> {
-                                    AssetAttribute attribute = new AssetAttribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
+                                    Attribute attribute = new Attribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
                                         .setMeta(
                                             agentLink,
                                             new MetaItem(MetaItemType.LABEL, Values.create(channel.getDisplayName()))
@@ -268,7 +268,7 @@ public class ZWNetwork {
                                 })
                                 .collect(toList());
                             if (description != null && description.length() > 0) {
-                                AssetAttribute descriptionAttribute = new AssetAttribute(
+                                Attribute descriptionAttribute = new Attribute(
                                     "description", AttributeValueType.STRING, Values.create("-")
                                 ).setMeta(
                                     new MetaItem(MetaItemType.LABEL, Values.create("Description")),
@@ -277,7 +277,7 @@ public class ZWNetwork {
                                 );
                                 attributes.add(descriptionAttribute);
                             }
-                            parameterAsset.addAttributes(attributes.toArray(new AssetAttribute[attributes.size()]));
+                            parameterAsset.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
                             return parameterNode;
                         })
                         .collect(toList());
@@ -292,12 +292,12 @@ public class ZWNetwork {
         // Z-Wave Controller
 
         Asset networkManagementAsset = new Asset("Z-Wave Controller", AssetType.THING);
-        List<AssetAttribute> attributes = controller.getSystemCommandManager().getChannels()
+        List<Attribute> attributes = controller.getSystemCommandManager().getChannels()
             .stream()
             .filter(channel ->
                 consumerLinkMap.values().stream().noneMatch(link -> link.getChannel() == channel))
             .map(channel -> {
-                AssetAttribute attribute = new AssetAttribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
+                Attribute attribute = new Attribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
                     .setMeta(
                         agentLink,
                         new MetaItem(MetaItemType.LABEL, Values.create(channel.getDisplayName()))
@@ -307,7 +307,7 @@ public class ZWNetwork {
             })
             .collect(toList());
         if (attributes.size() > 0) {
-            networkManagementAsset.addAttributes(attributes.toArray(new AssetAttribute[attributes.size()]));
+            networkManagementAsset.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
             assetNodes.add(new AssetTreeNode(networkManagementAsset));
         }
 
@@ -396,7 +396,7 @@ public class ZWNetwork {
 
         Asset device = new Asset(name, AssetType.THING);
 
-        List<AssetAttribute> attributes = cmdClasses
+        List<Attribute> attributes = cmdClasses
             .stream()
             .filter(commandClass -> commandClass.getID().toRaw() != ZWCommandClassID.COMMAND_CLASS_CONFIGURATION.toRaw() &&
                                     commandClass.getID().toRaw() != ZWCommandClassID.COMMAND_CLASS_ZWAVEPLUS_INFO.toRaw() &&
@@ -408,7 +408,7 @@ public class ZWNetwork {
                 int endpoint = channel.getCommandClass().getContext().getDestEndPoint();
                 String attributeName = channel.getName() + (endpoint == 0 ? "" : "_" + endpoint);
                 String displayName = channel.getDisplayName() + (endpoint == 0 ? "" : " - " + endpoint);
-                AssetAttribute attribute = new AssetAttribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
+                Attribute attribute = new Attribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
                     .setMeta(
                         agentLink,
                         new MetaItem(MetaItemType.LABEL, Values.create(displayName))
@@ -418,15 +418,15 @@ public class ZWNetwork {
             })
             .collect(toList());
 
-        device.addAttributes(attributes.toArray(new AssetAttribute[attributes.size()]));
+        device.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
 
         return new AssetTreeNode(device);
     }
     
-    private List<AssetAttribute> createNodeInfoAttributes(ZWaveNode node, MetaItem agentLink) {
-        List<AssetAttribute> attributes = new ArrayList<>();
+    private List<Attribute> createNodeInfoAttributes(ZWaveNode node, MetaItem agentLink) {
+        List<Attribute> attributes = new ArrayList<>();
 
-        AssetAttribute nodeIdAttrib = new AssetAttribute(
+        Attribute nodeIdAttrib = new Attribute(
             "nodeId", AttributeValueType.NUMBER, Values.create(node.getNodeID()))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Node ID")),
@@ -434,7 +434,7 @@ public class ZWNetwork {
             );
         attributes.add(nodeIdAttrib);
 
-        AssetAttribute manufacturerIdAttrib = new AssetAttribute(
+        Attribute manufacturerIdAttrib = new Attribute(
             "manufacturerId", AttributeValueType.STRING, Values.create(String.format("0x%04X",node.getManufacturerId())))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Manufacturer ID")),
@@ -442,7 +442,7 @@ public class ZWNetwork {
             );
         attributes.add(manufacturerIdAttrib);
 
-        AssetAttribute manufacturerAttrib = new AssetAttribute(
+        Attribute manufacturerAttrib = new Attribute(
             "manufacturerName", AttributeValueType.STRING, Values.create(ZWManufacturerID.fromRaw(node.getManufacturerId()).getName()))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Manufacturer")),
@@ -450,7 +450,7 @@ public class ZWNetwork {
             );
         attributes.add(manufacturerAttrib);
 
-        AssetAttribute flirsAttrib = new AssetAttribute(
+        Attribute flirsAttrib = new Attribute(
             "isFlirs", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isFLIRS()))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("FLIRS")),
@@ -458,7 +458,7 @@ public class ZWNetwork {
             );
         attributes.add(flirsAttrib);
 
-        AssetAttribute routingAttrib = new AssetAttribute(
+        Attribute routingAttrib = new Attribute(
             "isRouting", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isRouting()))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Routing")),
@@ -466,7 +466,7 @@ public class ZWNetwork {
             );
         attributes.add(routingAttrib);
 
-        AssetAttribute listeningAttrib = new AssetAttribute(
+        Attribute listeningAttrib = new Attribute(
             "isListening", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isListening()))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Listening")),
@@ -474,7 +474,7 @@ public class ZWNetwork {
             );
         attributes.add(listeningAttrib);
 
-        AssetAttribute productTypeIdAttrib = new AssetAttribute(
+        Attribute productTypeIdAttrib = new Attribute(
             "productTypeId", AttributeValueType.STRING, Values.create(String.format("0x%04X", node.getProductTypeID())))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Product Type ID")),
@@ -482,7 +482,7 @@ public class ZWNetwork {
             );
         attributes.add(productTypeIdAttrib);
 
-        AssetAttribute productIdAttrib = new AssetAttribute(
+        Attribute productIdAttrib = new Attribute(
             "productId", AttributeValueType.STRING, Values.create(String.format("0x%04X", node.getProductID())))
             .setMeta(
                 new MetaItem(MetaItemType.LABEL, Values.create("Product ID")),
@@ -492,7 +492,7 @@ public class ZWNetwork {
 
         String modelName = node.getModelName();
         if (modelName != null) {
-            AssetAttribute modelNameAttrib = new AssetAttribute(
+            Attribute modelNameAttrib = new Attribute(
                 "modelName", AttributeValueType.STRING, Values.create(modelName))
                 .setMeta(
                     new MetaItem(MetaItemType.LABEL, Values.create("Model")),
@@ -503,7 +503,7 @@ public class ZWNetwork {
 
         // Z-Wave Plus Info
 
-        List<AssetAttribute> zwPlusAttributes = node.getSupportedCommandClasses()
+        List<Attribute> zwPlusAttributes = node.getSupportedCommandClasses()
             .stream()
             .filter(commandClass -> commandClass.getID().toRaw() == ZWCommandClassID.COMMAND_CLASS_ZWAVEPLUS_INFO.toRaw())
             .map(ZWCommandClass::getChannels)
@@ -511,7 +511,7 @@ public class ZWNetwork {
             .map(channel -> {
                 String attributeName = channel.getName();
                 String displayName = channel.getDisplayName();
-                AssetAttribute attribute = new AssetAttribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
+                Attribute attribute = new Attribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
                     .setMeta(
                         agentLink,
                         new MetaItem(MetaItemType.LABEL, Values.create(displayName))
@@ -526,7 +526,7 @@ public class ZWNetwork {
         return attributes;
     }
 
-    private void addValidRangeMeta(AssetAttribute attribute, ZWParameterItem parameter) {
+    private void addValidRangeMeta(Attribute attribute, ZWParameterItem parameter) {
         Long min = null;
         Long max = null;
         if (parameter instanceof ZWParameterByte) {

@@ -22,7 +22,7 @@ public enum NodeModel {
                     new NodeSocket("value", NodeDataType.ANY)
             }),
             info -> {
-                AssetAttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AssetAttributeInternalValue.class);
+                AttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
                 String assetId = assetAttributePair.getAssetId();
                 String attributeName = assetAttributePair.getAttributeName();
                 Optional<AssetState> readValue = info.getFacts().matchFirstAssetState(new AssetQuery().ids(assetId).attributeName(attributeName));
@@ -30,7 +30,7 @@ public enum NodeModel {
                 return readValue.get().getValue().orElse(null);
             },
             params -> {
-                AssetAttributeInternalValue internal = Container.JSON.convertValue(params.getNode().getInternals()[0].getValue(), AssetAttributeInternalValue.class);
+                AttributeInternalValue internal = Container.JSON.convertValue(params.getNode().getInternals()[0].getValue(), AttributeInternalValue.class);
                 String assetId = internal.getAssetId();
                 String attributeName = internal.getAttributeName();
                 List<AssetState> allAssets = params.getFacts().matchAssetState(new AssetQuery().ids(assetId).attributeName(attributeName)
@@ -57,7 +57,7 @@ public enum NodeModel {
                     RulesEngine.LOG.warning("Flow rule error: node " + info.getNode().getName() + " receives invalid value");
                     return;
                 }
-                AssetAttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AssetAttributeInternalValue.class);
+                AttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
                 Optional<AssetState> existingValue = info.getFacts().matchFirstAssetState(new AssetQuery().ids(assetAttributePair.getAssetId()).attributeName(assetAttributePair.getAttributeName()));
 
                 if (existingValue.isPresent())

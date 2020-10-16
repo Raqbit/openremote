@@ -11,7 +11,7 @@ import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
@@ -114,20 +114,11 @@ public class TradfriProtocol extends AbstractProtocol {
     }
 
     /**
-     * Gets the current version number of the protocol.
-     * @return the current version number of the protocol.
-     */
-    @Override
-    public String getVersion() {
-        return VERSION;
-    }
-
-    /**
      * Gets the protocol configuration template.
      * @return the configuration template of the protocol.
      */
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
                         new MetaItem(META_TRADFRI_GATEWAY_HOST, null),
@@ -159,7 +150,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @return the attribute validation result.
      */
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration){
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration){
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             boolean ipFound = false;
@@ -189,10 +180,9 @@ public class TradfriProtocol extends AbstractProtocol {
      * Manages the configuration of the protocol.
      * Checks if assets are not duplicated, makes the connection to the gateway,
      * retrieves the devices, and adds a event handler for the gateway.
-     * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         Optional<String> gatewayIpParam = protocolConfiguration.getMetaItem(META_TRADFRI_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString);
         if (!gatewayIpParam.isPresent()) {
             LOG.severe("No Tradfri gateway IP address provided for protocol configuration: " + protocolConfiguration);
@@ -251,10 +241,9 @@ public class TradfriProtocol extends AbstractProtocol {
 
     /**
      * Handles the disconnections of the protocol.
-     * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         Consumer<ConnectionStatus> statusConsumer;
         synchronized (statusConsumerMap) {
             statusConsumer = statusConsumerMap.get(protocolConfiguration.getReferenceOrThrow());
@@ -278,12 +267,12 @@ public class TradfriProtocol extends AbstractProtocol {
 
     /**
      * Links the attribute.
+     * @param asset
      * @param attribute the attribute of the asset.
-     * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
-       String gatewayIp = protocolConfiguration.getMetaItem(META_TRADFRI_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+       String gatewayIp = agent.getMetaItem(META_TRADFRI_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
        final AttributeRef attributeRef = attribute.getReferenceOrThrow();
        TradfriConnection tradfriConnection = getConnection(gatewayIp);
        if (tradfriConnection == null) return;
@@ -295,11 +284,11 @@ public class TradfriProtocol extends AbstractProtocol {
 
     /**
      * Unlinks the attribute.
+     * @param asset
      * @param attribute the attribute of the asset.
-     * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
         removeDevice(attributeRef);
     }
@@ -311,7 +300,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
         if (!protocolConfiguration.isEnabled()) {
             LOG.fine("Protocol configuration is disabled so ignoring write request");
             return;
@@ -374,7 +363,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @param agentLink the agent link.
      * @param protocolConfiguration the protocol configuration.
      */
-    private void addDevices(Device[] devices, MetaItem agentLink, AssetAttribute protocolConfiguration){
+    private void addDevices(Device[] devices, MetaItem agentLink, Attribute protocolConfiguration){
         String parentId = null;
         Optional<String> assetId = protocolConfiguration.getAssetId();
         if(assetId.isPresent()) parentId = assetId.get();

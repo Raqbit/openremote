@@ -14,7 +14,7 @@ import {
 } from "lit-element";
 import i18next from "i18next";
 import {translate} from "@openremote/or-translate";
-import {AssetAttribute, AttributeRef, DatapointInterval, ValueDatapoint, ValueType} from "@openremote/model";
+import {Attribute, AttributeRef, DatapointInterval, ValueDatapoint, ValueType} from "@openremote/model";
 import manager, {
     AssetModelUtil,
     DefaultColor2,
@@ -229,7 +229,7 @@ export class OrAttributeHistory extends translate(i18next)(LitElement) {
     public assetType?: string;
 
     @property({type: Object})
-    public attribute?: AssetAttribute;
+    public attribute?: Attribute;
 
     @property({type: Object})
     public attributeRef?: AttributeRef;
@@ -675,7 +675,7 @@ export class OrAttributeHistory extends translate(i18next)(LitElement) {
                     }
                 });
                 if (response.status === 200 && response.data.length > 0) {
-                    attr = Util.getAssetAttribute(response.data[0], attributeName);
+                    attr = Util.getAttribute(response.data[0], attributeName);
                 }
             }
 

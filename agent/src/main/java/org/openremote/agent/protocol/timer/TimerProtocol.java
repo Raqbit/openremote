@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.timer;
 
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
@@ -54,7 +54,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <li>{@link #META_TIMER_ACTION}: The {@link AttributeState} that should be sent when the timer is triggered</li>
  * </ul>
  * <p>
- * {@link AssetAttribute}s can be linked to time triggers to read/write the trigger time and/or enable/disable the
+ * {@link Attribute}s can be linked to time triggers to read/write the trigger time and/or enable/disable the
  * trigger. A linked attribute must have a valid {@link MetaItemType#AGENT_LINK} Meta Item and
  * also a {@link #META_TIMER_VALUE_LINK} Meta Item to indicate what value of timer to link to {@link TimerValue}
  */
@@ -135,7 +135,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    public AssetAttribute getProtocolConfigurationTemplate() {
+    public Attribute getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
                 new MetaItem(META_TIMER_CRON_EXPRESSION, null),
@@ -144,7 +144,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             TimerConfiguration.validateTimerConfiguration(protocolConfiguration, result);
@@ -163,7 +163,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         // Verify that this is a valid Timer Configuration
@@ -208,7 +208,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         AttributeRef protocolConfigRef = protocolConfiguration.getReferenceOrThrow();
 
         if (cronExpressionMap.remove(protocolConfigRef) != null) {
@@ -217,8 +217,8 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
-        AssetAttribute attribute = getLinkedAttribute(event.getAttributeRef());
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
 
         TimerValue timerValue = TimerConfiguration.getValue(attribute).orElse(null);
 
@@ -299,7 +299,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doLinkAttribute(Asset asset, Attribute attribute) {
         TimerValue timerValue = TimerConfiguration.getValue(attribute).orElse(null);
 
         if (timerValue == null) {
@@ -311,11 +311,11 @@ public class TimerProtocol extends AbstractProtocol {
 
         switch (timerValue) {
             case ENABLED:
-                updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), Values.create(!isTimerDisabled(protocolConfiguration))));
+                updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), Values.create(!isTimerDisabled(agent))));
                 break;
             case CRON_EXPRESSION:
             case TIME:
-                CronExpressionParser parser = cronExpressionMap.get(protocolConfiguration.getReferenceOrThrow());
+                CronExpressionParser parser = cronExpressionMap.get(agent.getReferenceOrThrow());
                 if (parser == null) {
                     LOG.info("Attribute is linked to an invalid timer so it will be ignored");
                     return;
@@ -331,14 +331,14 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(AssetAttribute attribute, AssetAttribute protocolConfiguration) {
+    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
         // Nothing to do here
     }
 
     /**
      * Sends the trigger's attribute state into the processing chain
      */
-    protected void doTriggerAction(AssetAttribute triggerConfiguration) {
+    protected void doTriggerAction(Attribute triggerConfiguration) {
         if (triggerConfiguration == null) {
             LOG.fine("Cannot execute timer action as timer configuration cannot be found");
             return;
@@ -374,11 +374,6 @@ public class TimerProtocol extends AbstractProtocol {
         }
 
         return cronScheduler;
-    }
-
-    @Override
-    public String getVersion() {
-        return VERSION;
     }
 
     protected static String getTimerId(AttributeRef timerRef) {

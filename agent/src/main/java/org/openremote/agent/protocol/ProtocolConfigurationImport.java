@@ -19,7 +19,7 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.file.FileInfo;
 
 /**
@@ -31,5 +31,5 @@ public interface ProtocolConfigurationImport {
     /**
      * Import available {@link org.openremote.model.asset.agent.ProtocolConfiguration}s from the supplied file(s).
      */
-    AssetAttribute getProtocolConfigurationsByImport(FileInfo[] files);
+    Attribute getProtocolConfigurationsByImport(FileInfo[] files);
 }

@@ -39,7 +39,7 @@ import org.openremote.container.web.*;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
@@ -141,7 +141,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     protected WebService webService;
 
     @Override
-    public void init(Container container) throws Exception {
+    public void init(ContainerProvider container) throws Exception {
         super.init(container);
         this.container = container;
         this.devMode = container.isDevMode();
@@ -165,7 +165,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doConnect() {
         Application application = createApplication(protocolConfiguration);
         ResteasyDeployment deployment = createDeployment(application, protocolConfiguration);
         DeploymentInfo deploymentInfo = createDeploymentInfo(deployment, protocolConfiguration);
@@ -174,18 +174,18 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
+    protected void doDisconnect() {
         undeploy(protocolConfiguration);
     }
 
-    protected Application createApplication(AssetAttribute protocolConfiguration) {
+    protected Application createApplication(Attribute protocolConfiguration) {
         List<Object> providers = getStandardProviders(protocolConfiguration);
         providers = providers == null ? new ArrayList<>() : providers;
         providers.addAll(getApiSingletons(protocolConfiguration));
         return new WebApplication(container, null, providers);
     }
 
-    protected ResteasyDeployment createDeployment(Application application, AssetAttribute protocolConfiguration) {
+    protected ResteasyDeployment createDeployment(Application application, Attribute protocolConfiguration) {
         ResteasyDeployment resteasyDeployment = new ResteasyDeployment();
         resteasyDeployment.setApplication(application);
 
@@ -232,7 +232,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
         return resteasyDeployment;
     }
 
-    protected DeploymentInfo createDeploymentInfo(ResteasyDeployment resteasyDeployment, AssetAttribute protocolConfiguration) {
+    protected DeploymentInfo createDeploymentInfo(ResteasyDeployment resteasyDeployment, Attribute protocolConfiguration) {
         String deploymentPath = getDeploymentPath(protocolConfiguration);
         String deploymentName = getDeploymentName(protocolConfiguration);
 
@@ -270,7 +270,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     /**
      * Should return instances of all JAX-RS interface implementations that make up this protocol's deployment.
      */
-    abstract protected Set<Object> getApiSingletons(AssetAttribute protocolConfiguration);
+    abstract protected Set<Object> getApiSingletons(Attribute protocolConfiguration);
 
     /**
      * Get the path prefix to use for this protocol instance; should use {@value #DEFAULT_DEPLOYMENT_PATH_PREFIX} unless there
@@ -293,7 +293,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
      * If the {@link #META_PROTOCOL_DEPLOYMENT_PATH} is missing or not a {@link StringValue} or the generated path does
      * not match the {@link #PATH_REGEX} regex then an {@link IllegalArgumentException} will is thrown.
      */
-    protected String getDeploymentPath(AssetAttribute protocolConfiguration) throws IllegalArgumentException {
+    protected String getDeploymentPath(Attribute protocolConfiguration) throws IllegalArgumentException {
         String path = protocolConfiguration.getMetaItem(META_PROTOCOL_DEPLOYMENT_PATH)
                 .flatMap(ValueHolder::getValueAsString)
                 .map(String::toLowerCase)
@@ -314,7 +314,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     /**
      * Get standard JAX-RS providers that are used in all deployments.
      */
-    protected List<Object> getStandardProviders(AssetAttribute protocolConfiguration) {
+    protected List<Object> getStandardProviders(Attribute protocolConfiguration) {
         return Lists.newArrayList(
                 defaultResteasyExceptionMapper,
                 forbiddenResteasyExceptionMapper,
@@ -333,12 +333,12 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     /**
      * Get a unique deployment name for the supplied {@link ProtocolConfiguration}.
      */
-    protected String getDeploymentName(AssetAttribute protocolConfiguration) {
+    protected String getDeploymentName(Attribute protocolConfiguration) {
         deploymentCounter++;
         return String.format(DEFAULT_DEPLOYMENT_NAME_FORMAT, getProtocolDisplayName(), deploymentCounter);
     }
 
-    protected void deploy(DeploymentInfo deploymentInfo, AssetAttribute protocolConfiguration) {
+    protected void deploy(DeploymentInfo deploymentInfo, Attribute protocolConfiguration) {
         LOG.info("Deploying JAX-RS deployment for: " + protocolConfiguration.getReferenceOrThrow());
         DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
         manager.deploy();
@@ -375,7 +375,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
         }
     }
 
-    protected void undeploy(AssetAttribute protocolConfiguration) {
+    protected void undeploy(Attribute protocolConfiguration) {
 
         DeploymentInstance instance = deployments.get(protocolConfiguration.getReferenceOrThrow());
 

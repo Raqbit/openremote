@@ -21,7 +21,7 @@ package org.openremote.model.asset.agent;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openremote.model.asset.AssetAttribute;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemDescriptor;
 
@@ -38,7 +38,7 @@ public class ProtocolDescriptor {
     protected boolean configurationImport;
     protected boolean deviceDiscovery;
     protected boolean deviceImport;
-    protected AssetAttribute configurationTemplate;
+    protected Attribute configurationTemplate;
     protected List<MetaItemDescriptor> protocolConfigurationMetaItems;
     protected List<MetaItemDescriptor> linkedAttributeMetaItems;
 
@@ -50,7 +50,7 @@ public class ProtocolDescriptor {
                               @JsonProperty("configurationImport") boolean configurationImport,
                               @JsonProperty("protocolLinkDiscovery") boolean deviceDiscovery,
                               @JsonProperty("deviceImport") boolean deviceImport,
-                              @JsonProperty("configurationTemplate") AssetAttribute configurationTemplate,
+                              @JsonProperty("configurationTemplate") Attribute configurationTemplate,
                               @JsonProperty("protocolConfigurationMetaItems") List<MetaItemDescriptor> protocolConfigurationMetaItems,
                               @JsonProperty("linkedAttributeMetaItems") List<MetaItemDescriptor> linkedAttributeMetaItems) {
         this.name = name;
@@ -112,7 +112,7 @@ public class ProtocolDescriptor {
         return deviceImport;
     }
 
-    public AssetAttribute getConfigurationTemplate() {
+    public Attribute getConfigurationTemplate() {
         return configurationTemplate;
     }
 
@@ -125,7 +125,7 @@ public class ProtocolDescriptor {
     }
 
     /**
-     * Get the {@link MetaItemDescriptor}s that describe {@link MetaItem}s that can be used on {@link AssetAttribute}s
+     * Get the {@link MetaItemDescriptor}s that describe {@link MetaItem}s that can be used on {@link Attribute}s
      * linked to this protocol (for UI purposes)
      */
     public List<MetaItemDescriptor> getLinkedAttributeMetaItems() {
