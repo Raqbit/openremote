@@ -23,7 +23,6 @@ import org.openremote.model.v2.AbstractNameValueProviderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaDescriptor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -83,12 +82,6 @@ public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
             setMeta((MetaItemList)null);
             this.meta.addAll(meta);
         }
-        return this;
-    }
-
-    public Attribute<T> setMeta(Iterable<MetaItem<?>> meta) {
-        setMeta((MetaItemList)null);
-        this.meta.forEach(this.meta::add);
         return this;
     }
 
