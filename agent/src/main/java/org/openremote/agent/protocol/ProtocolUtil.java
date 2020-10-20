@@ -214,7 +214,7 @@ public final class ProtocolUtil {
         }
 
         // built in value conversion
-        Optional<ValueType> attributeValueType = attribute.getType().map(AttributeValueDescriptor::getValueType);
+        Optional<ValueType> attributeValueType = attribute.getValueType().map(AttributeValueDescriptor::getValueType);
 
         if (value != null && attributeValueType.isPresent()) {
             if (attributeValueType.get() != value.getType()) {

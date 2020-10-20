@@ -22,7 +22,7 @@ create table ASSET (
   NAME               varchar(1023)            not null,
   PARENT_ID          varchar(36),
   REALM              varchar(255)             not null,
-  ASSET_TYPE         varchar(255)             not null,
+  TYPE               varchar(255)             not null,
   ACCESS_PUBLIC_READ boolean                  not null,
   VERSION            int8                     not null,
   primary key (ID),

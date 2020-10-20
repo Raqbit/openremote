@@ -57,13 +57,13 @@ public class ArtnetLightState {
         if (lampId != this.getLightId()) return;
 
         //DIM ATTRIBUTE
-        if(attr.getType().get().getValueType() == ValueType.NUMBER)
+        if(attr.getValueType().get().getValueType() == ValueType.NUMBER)
             if(attr.getName().get().equalsIgnoreCase("Dim")) {
                 String val = event.getAttributeState().getValue().get().toString();
                 this.dim = Math.floor((double)Double.parseDouble(val));
             }
         //VALUES ATTRIBUTE
-        if(attr.getType().get().getValueType() == ValueType.OBJECT)
+        if(attr.getValueType().get().getValueType() == ValueType.OBJECT)
             if(attr.getName().get().equalsIgnoreCase("Values")) {
                 Value brouh = event.getAttributeState().getValue().orElse(null);
                 ObjectMapper mapper = new ObjectMapper();
@@ -77,7 +77,7 @@ public class ArtnetLightState {
                 }
             }
         //SWITCH ATTRIBUTE
-        if(attr.getType().get().getValueType() == ValueType.BOOLEAN)
+        if(attr.getValueType().get().getValueType() == ValueType.BOOLEAN)
             if(attr.getName().get().equalsIgnoreCase("Switch")) {
                 String val = event.getAttributeState().getValue().get().toString();
                 boolean switchState = (boolean) Boolean.parseBoolean(val);

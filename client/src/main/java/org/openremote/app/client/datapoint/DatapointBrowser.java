@@ -124,7 +124,7 @@ public abstract class DatapointBrowser extends AbstractAttributeViewExtension {
             DateTimeFormat.getFormat(Constants.DEFAULT_DATETIME_FORMAT).format(new Date(fromTimestamp))
         );
 
-        ValueType valueType = attribute.getType().map(AttributeValueDescriptor::getValueType).orElse(null);
+        ValueType valueType = attribute.getValueType().map(AttributeValueDescriptor::getValueType).orElse(null);
 
         if (valueType == ValueType.NUMBER || valueType == ValueType.BOOLEAN) {
             queryDatapoints(interval, fromTimestamp, toTimestamp,  datapoints -> ChartUtil.update(

@@ -23,7 +23,7 @@ import org.openremote.model.v2.NameValueDescriptorProvider;
 
 import java.util.Optional;
 
-public class AttributeList extends NamedList<MetaItem<?>> {
+public class AttributeList extends NamedList<Attribute<?>> {
 
     // This works around the crappy type system
     public <S, U extends Attribute<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {

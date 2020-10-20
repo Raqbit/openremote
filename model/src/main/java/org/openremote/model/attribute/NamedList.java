@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.openremote.model.v2.NameProvider;
 import org.openremote.model.v2.NameValueDescriptorProvider;
@@ -38,6 +38,7 @@ import org.openremote.model.v2.ValueProvider;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
@@ -66,20 +67,49 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
         }
     }
 
-    public static class NamedListDeserializer extends StdDeserializer<NamedList<?>> {
+    /**
+     * Expects an {@link ObjectNode}; for each key-value entry the value is checked to make sure it is also an
+     * {@link ObjectNode} if it isn't then an {@link ObjectNode} is constructed and the value entry is assigned to the
+     * value field. The key of the entry is then assigned to the name field and then this {@link ObjectNode} is
+     * deserialized as an instance of {@link #innerClass} using the same deserialization context.
+     */
+    public static class NamedListDeserializer<T extends NameProvider & ValueProvider<?>> extends StdDeserializer<NamedList<T>> {
 
-        public NamedListDeserializer(Class<?> vc) {
+        protected Class<T> innerClass;
+
+        public NamedListDeserializer(Class<NamedList<T>> vc, Class<T> innerClass) {
             super(vc);
+            this.innerClass = innerClass;
         }
 
         @Override
-        public NamedList<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        public NamedList<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
             JsonNode node = jp.getCodec().readTree(jp);
 
             if (node.getNodeType() != JsonNodeType.OBJECT) {
                 throw new InvalidFormatException(jp, "Expected an object but got type: " + node.getNodeType(), node, NamedList.class);
             }
-            return null;
+
+            NamedList<T> list = new NamedList<>();
+            ObjectNode namedListObj = (ObjectNode) node;
+            for (Iterator<Map.Entry<String, JsonNode>> it = namedListObj.fields(); it.hasNext(); ) {
+                Map.Entry<String, JsonNode> item = it.next();
+
+                String name = item.getKey();
+                JsonNode itemNode = item.getValue();
+
+                if (itemNode.getNodeType() != JsonNodeType.OBJECT) {
+                    ObjectNode newItemNode = namedListObj.objectNode();
+                    newItemNode.set("value", itemNode);
+                    item.setValue(newItemNode);
+                    itemNode = newItemNode;
+                }
+
+                ((ObjectNode)itemNode).put("name", name);
+                T itemObj = ctxt.readValue(itemNode.traverse(), innerClass);
+                list.add(itemObj);
+            }
+            return list;
         }
     }
 
@@ -145,10 +175,10 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
         return this.stream().filter(item -> item.getName().equals(name)).findFirst();
     }
 
-    public <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    protected  <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
         Optional<T> valueProvider = get(nameValueDescriptorProvider);
         return valueProvider.map(item -> {
-            Class<?> itemType = item.getType();
+            Class<?> itemType = item.getValueType();
             Class<S> expectedType = nameValueDescriptorProvider.getValueDescriptor().getType();
             if (itemType == expectedType) {
                 return (U)item;

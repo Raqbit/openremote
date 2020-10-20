@@ -169,7 +169,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
         Optional<Attribute> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
         if (attribute.isPresent()) {
             // Do built in value conversion
-            Optional<ValueType> attributeValueType = attribute.get().getType().map(AttributeValueDescriptor::getValueType);
+            Optional<ValueType> attributeValueType = attribute.get().getValueType().map(AttributeValueDescriptor::getValueType);
 
             if (value != null && attributeValueType.isPresent()) {
                 if (attributeValueType.get() != value.getType()) {

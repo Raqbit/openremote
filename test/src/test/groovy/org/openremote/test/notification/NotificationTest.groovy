@@ -61,7 +61,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
         mockPushNotificationHandler.sendMessage(_ as Long, _ as Notification.Source, _ as String, _ as Notification.Target, _ as AbstractNotificationMessage) >> {
                 id, source, sourceId, target, message ->
                     notificationIds << id
-                    notificationTargetTypes << target.type
+                    notificationTargetTypes << target.getValueType
                     notificationTargetIds << target.id
                     notificationMessages << message
                     callRealMethod()

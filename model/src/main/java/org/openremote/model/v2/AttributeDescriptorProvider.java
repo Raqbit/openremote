@@ -19,16 +19,9 @@
  */
 package org.openremote.model.v2;
 
-import java.util.Optional;
+public interface AttributeDescriptorProvider {
 
-/**
- * Indicates that the implementing class provides a value of &lt;T&gt; the value should be immutable.
- */
-public interface ValueProvider<T> {
+    AttributeDescriptor<?>[] EMPTY_ATTRIBUTES = new AttributeDescriptor<?>[0];
 
-    Class<T> getValueType();
-
-    Optional<T> getValue();
-
-    void setValue(T value);
+    AttributeDescriptor<?>[] getAttributeDescriptors();
 }

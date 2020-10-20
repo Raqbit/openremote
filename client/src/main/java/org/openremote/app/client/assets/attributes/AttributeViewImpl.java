@@ -202,7 +202,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
 
     protected IsWidget createAttributeValueEditor() {
         return valueEditorSupplier.createValueEditor(attribute,
-            attribute.getType().map(AttributeValueDescriptor::getValueType).orElse(null),
+            attribute.getValueType().map(AttributeValueDescriptor::getValueType).orElse(null),
             style,
             null,
             this::notifyAttributeModified);
@@ -257,7 +257,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
         } else if (attribute.isProtocolConfiguration()) {
             formLabel.setIcon("cogs");
         } else {
-            formLabel.setIcon(attribute.getType().map(AttributeValueDescriptor::getIcon).orElse(AttributeValueType.DEFAULT_ICON));
+            formLabel.setIcon(attribute.getValueType().map(AttributeValueDescriptor::getIcon).orElse(AttributeValueType.DEFAULT_ICON));
         }
 
         getFormLabel().setText(getAttributeLabel());
@@ -271,7 +271,7 @@ public class AttributeViewImpl extends FormGroup implements AttributeView {
             } else {
                 infoText.append(connectionStatus != null ? connectionStatus.toString() : environment.getMessages().waitingForStatus());
             }
-        } else if (attribute.getType().isPresent()) {
+        } else if (attribute.getValueType().isPresent()) {
             infoText.append(environment.getMessages().attributeValueType(attribute.getTypeOrThrow().getName()));
         }
         getAttributeDescription()

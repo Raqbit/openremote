@@ -19,43 +19,24 @@
  */
 package org.openremote.model.asset;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Formula;
-import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.Constants;
 import org.openremote.model.IdentifiableEntity;
-import org.openremote.model.ValidationFailure;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.AttributeDescriptor;
 import org.openremote.model.attribute.AttributeList;
-import org.openremote.model.attribute.NamedList;
-import org.openremote.model.geo.GeoJSON;
-import org.openremote.model.geo.GeoJSONFeature;
-import org.openremote.model.geo.GeoJSONFeatureCollection;
-import org.openremote.model.geo.GeoJSONPoint;
-import org.openremote.model.util.ObservableList;
-import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
-import static org.openremote.model.attribute.Attribute.isAttributeNameEqualTo;
-import static org.openremote.model.attribute.AttributeType.LOCATION;
 
 // @formatter:off
 
@@ -224,16 +205,13 @@ import static org.openremote.model.attribute.AttributeType.LOCATION;
 @Entity
 @Table(name = "ASSET")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "ASSET_TYPE")
+@DiscriminatorColumn(name = "TYPE")
 @DiscriminatorValue("non null")
 @Check(constraints = "ID != PARENT_ID")
-@JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, use = JsonTypeInfo.Id.CLASS, defaultImpl = Asset.class)
+@JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, use = JsonTypeInfo.Id.CUSTOM, defaultImpl = Asset.class)
 public class Asset implements IdentifiableEntity {
 
-    public enum AssetTypeFailureReason implements ValidationFailure.Reason {
-        ASSET_TYPE_MISMATCH,
-        ASSET_TYPE_NOT_SUPPORTED
-    }
+    public static final AssetDescriptor<Asset> DESCRIPTOR = new AssetDescriptor<>("Thing", "cube-outline", null, Asset.class);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")
@@ -256,7 +234,7 @@ public class Asset implements IdentifiableEntity {
 
     @NotNull(message = "{Asset.type.NotNull}")
     @Size(min = 3, max = 255, message = "{Asset.type.Size}")
-    @Column(name = "ASSET_TYPE", nullable = false, updatable = false)
+    @Column(name = "TYPE", nullable = false, updatable = false)
     protected String type;
 
     @Column(name = "ACCESS_PUBLIC_READ", nullable = false)
@@ -284,106 +262,15 @@ public class Asset implements IdentifiableEntity {
     @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
     protected AttributeList attributes;
 
-    public Asset() {
-    }
-
-    public Asset(String name, AssetDescriptor type) {
-        this(name, type, null, null);
-    }
-
-    public Asset(String name, String type) {
-        this(name, type, false, null, null);
-    }
-
-    public Asset(@NotNull String name, @NotNull AssetDescriptor type, Asset parent) {
-        this(name, type, parent, null);
-    }
-
-    public Asset(@NotNull String name, @NotNull String type, Asset parent) {
-        this(name, type, false, parent, null);
-    }
-
-    public Asset(@NotNull String name, @NotNull AssetDescriptor type, Asset parent, String realm) {
-        this(name, type.getType(), false, parent, realm);
-        if (type.getAttributeDescriptors() != null) {
-            addAttributes(Arrays.stream(type.getAttributeDescriptors()).map(Attribute::new).toArray(Attribute[]::new));
-        }
-    }
-
-    public Asset(@NotNull String name, @NotNull String type, boolean accessPublicRead, Asset parent, String realm) {
-        setRealm(realm);
-        setName(name);
-        setType(type);
-        setParent(parent);
-        setAccessPublicRead(accessPublicRead);
-
-        // Initialise realm from parent
-        // TODO: Need to look at this - can child have a different realm to the parent?
-        if (parent != null) {
-            this.realm = parent.getRealm();
-        }
-    }
-
-    @JsonCreator
-    protected Asset(@JsonProperty("id") String id,
-                    @JsonProperty("version") long version,
-                    @JsonProperty("createdOn") Date createdOn,
-                    @JsonProperty("name") String name,
-                    @JsonProperty("type") String type,
-                    @JsonProperty("accessPublicRead") boolean accessPublicRead,
-                    @JsonProperty("parentId") String parentId,
-                    @JsonProperty("parentName") String parentName,
-                    @JsonProperty("parentType") String parentType,
-                    @JsonProperty("realm") String realm,
-                    @JsonProperty("path") String[] path,
-                    @JsonProperty("attributes") NamedList attributes) {
-        this(name, type, accessPublicRead, null, realm);
-        this.id = id;
-        this.version = version;
-        this.createdOn = createdOn;
-        this.parentId = parentId;
-        this.parentName = parentName;
-        this.parentType = parentType;
-        this.path = path;
-        this.attributes = attributes;
-    }
-
-    public Asset addAttributes(Attribute... attributes) throws IllegalArgumentException {
-        Arrays.asList(attributes).forEach(
-            attribute -> {
-                if (getAttributesStream().anyMatch(attr -> isAttributeNameEqualTo(attr, attribute.getName().orElse(null)))) {
-                    throw new IllegalArgumentException("Attribute by this name already exists: " + attribute.getName().orElse(""));
-                }
-
-                replaceAttribute(attribute);
-            }
-        );
-        return this;
-    }
-
     /**
-     * Replaces existing or adds the attribute if it does not exist.
+     * For use by hydrators (i.e. JPA/Jackson)
      */
-    public Asset replaceAttribute(Attribute attribute) throws IllegalArgumentException {
-        if (attribute == null || !attribute.getName().isPresent() || !attribute.getType().isPresent())
-            throw new IllegalArgumentException("Attribute cannot be null and must have a name and type");
-
-        attribute.assetId = getId();
-        List<Attribute> attributeList = getAttributesList();
-        attributeList.removeIf(attr -> attr.getName().orElse("").equals(attribute.getName().orElse("")));
-        attributeList.add(attribute);
-
-        return this;
+    Asset() {
     }
 
-    public Asset removeAttribute(String name) {
-        List<Attribute> attributeList = getAttributesList();
-        attributeList.removeIf(attr -> attr.getName().orElse("").equals(name));
-        return this;
-    }
-
-    public Asset removeAttribute(AttributeDescriptor attributeDescriptor) {
-        return removeAttribute(attributeDescriptor.getAttributeName());
+    public <T extends Asset> Asset(String name, AssetDescriptor<T> descriptor) {
+        setName(name);
+        this.type = descriptor.getName();
     }
 
     public String getId() {
@@ -468,15 +355,6 @@ public class Asset implements IdentifiableEntity {
         return parentType;
     }
 
-    public void setParentType(String parentType) {
-        this.parentType = parentType;
-    }
-
-    public AssetType getParentWellKnownType() {
-        //TODO replace with AssetModel getValues, through a http request
-        return AssetType.getByValue(getParentType()).orElse(null);
-    }
-
     public String getRealm() {
         return realm;
     }
@@ -523,49 +401,33 @@ public class Asset implements IdentifiableEntity {
     }
 
     public AttributeList getAttributes() {
+        if (attributes == null) {
+            attributes = new AttributeList();
+        }
         return attributes;
     }
 
-    public Stream<Attribute> getAttributesStream() {
-        return getAttributesList().stream();
-    }
-
-    public List<Attribute> getAttributesList() {
-        if (attributeList == null) {
-            attributeList = new ObservableList<>(attributesFromJson(attributes, id).collect(Collectors.toList()),
-                    () -> this.attributes = attributesToJson(attributeList).orElse(Values.createObject()));
+    public Asset setAttributes(AttributeList attributes) {
+        if (attributes == null) {
+            attributes = new AttributeList();
         }
-        return attributeList;
-    }
-
-    public boolean hasAttribute(String name) {
-        return attributes != null && attributes.hasKey(name);
-    }
-
-    public Optional<Attribute> getAttribute(AttributeDescriptor descriptor) {
-        return getAttribute(descriptor.getAttributeName());
-    }
-
-    public Optional<Attribute> getAttribute(String name) {
-        return attributes == null ? Optional.empty() : attributes.getObject(name)
-            .flatMap(objectValue -> Attribute.attributeFromJson(objectValue, id, name));
-    }
-
-    public Asset setAttributes(ObjectValue attributes) {
-        setAttributes(attributesFromJson(attributes, id).collect(Collectors.toList()));
+        this.attributes = attributes;
         return this;
     }
 
-    public Asset setAttributes(List<Attribute> attributes) {
-        ((ObservableList) getAttributesList()).clear(false);
-        getAttributesList().addAll(attributes);
-        return this;
-    }
-
-    public Asset setAttributes(Attribute... attributes) {
+    public Asset setAttributes(Attribute<?>...attributes) {
         return setAttributes(Arrays.asList(attributes));
     }
 
+    public Asset setAttributes(Collection<Attribute<?>> attributes) {
+        if (attributes instanceof AttributeList) {
+            setAttributes((AttributeList) attributes);
+        } else {
+            setAttributes((AttributeList) null);
+            this.attributes.addAll(attributes);
+        }
+        return this;
+    }
 
     @Override
     public String toString() {
@@ -597,98 +459,98 @@ public class Asset implements IdentifiableEntity {
 //    ---------------------------------------------------
 //    FUNCTIONAL METHODS BELOW
 //    ---------------------------------------------------
-
-    /**
-     * Complies to the GeoJSON specification RFC 7946
-     */
-    public GeoJSONPoint getCoordinates() {
-        return getAttributesStream()
-            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
-            .findFirst()
-            .flatMap(AbstractValueHolder::getValue)
-            .flatMap(GeoJSONPoint::fromValue)
-            .orElse(null);
-    }
-
-    /**
-     * Complies to the GeoJSON specification RFC 7946
-     */
-    public void setCoordinates(GeoJSONPoint coordinates) {
-        Attribute locationAttribute = getAttributesStream()
-            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
-            .findFirst().orElse(new Attribute(LOCATION));
-
-        locationAttribute.setValue(coordinates == null ? null : coordinates.toValue());
-        replaceAttribute(locationAttribute);
-    }
-
-
-
-    public boolean hasGeoFeature() {
-        return getCoordinates() != null;
-    }
-
-    public GeoJSON getGeoFeature(int maxNameLength) {
-        if (!hasGeoFeature())
-            return GeoJSONFeatureCollection.EMPTY;
-
-        return new GeoJSONFeatureCollection(
-            new GeoJSONFeature(getCoordinates())
-                .setProperty("id", getId())
-                .setProperty("title", TextUtil.ellipsize(getName(), maxNameLength))
-        );
-    }
-
-    public static boolean isAssetNameEqualTo(Asset asset, String name) {
-        return asset != null && asset.getName().equals(name);
-    }
-
-    public static boolean isAssetTypeEqualTo(Asset asset, String assetType) {
-        return asset != null
-            && asset.getType() != null
-            && asset.getType().equals(assetType);
-    }
-
-    public static boolean isAssetTypeEqualTo(Asset asset, AssetType assetType) {
-        return asset != null && asset.getWellKnownType() == assetType;
-    }
-
-    public static void removeAttributes(Asset asset, Predicate<Attribute> filter) {
-        if (asset == null)
-            return;
-
-        asset.getAttributesList().removeIf(filter);
-    }
-
-    public static Asset map(Asset assetToMap, Asset asset) {
-        return map(assetToMap, asset, null, null, null, null, null, null);
-    }
-
-    public static Asset map(Asset assetToMap, Asset asset,
-                            String overrideName,
-                            String overrideRealm,
-                            String overrideParentId,
-                            String overrideType,
-                            Boolean overrideAccessPublicRead,
-                            ObjectValue overrideAttributes) {
-        asset.setVersion(assetToMap.getVersion());
-        asset.setName(overrideName != null ? overrideName : assetToMap.getName());
-        if (overrideType != null) {
-            asset.setType(overrideType);
-        } else {
-            asset.setType(assetToMap.getType());
-        }
-
-        asset.setAccessPublicRead(overrideAccessPublicRead != null ? overrideAccessPublicRead : assetToMap.isAccessPublicRead());
-
-        asset.setParentId(overrideParentId != null ? overrideParentId : assetToMap.getParentId());
-        asset.setParentName(null);
-        asset.setParentType(null);
-
-        asset.setRealm(overrideRealm != null ? overrideRealm : assetToMap.getRealm());
-
-        asset.setAttributes(overrideAttributes != null ? overrideAttributes : assetToMap.getAttributes());
-
-        return asset;
-    }
+//
+//    /**
+//     * Complies to the GeoJSON specification RFC 7946
+//     */
+//    public GeoJSONPoint getCoordinates() {
+//        return getAttributesStream()
+//            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
+//            .findFirst()
+//            .flatMap(AbstractValueHolder::getValue)
+//            .flatMap(GeoJSONPoint::fromValue)
+//            .orElse(null);
+//    }
+//
+//    /**
+//     * Complies to the GeoJSON specification RFC 7946
+//     */
+//    public void setCoordinates(GeoJSONPoint coordinates) {
+//        Attribute locationAttribute = getAttributesStream()
+//            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
+//            .findFirst().orElse(new Attribute(LOCATION));
+//
+//        locationAttribute.setValue(coordinates == null ? null : coordinates.toValue());
+//        replaceAttribute(locationAttribute);
+//    }
+//
+//
+//
+//    public boolean hasGeoFeature() {
+//        return getCoordinates() != null;
+//    }
+//
+//    public GeoJSON getGeoFeature(int maxNameLength) {
+//        if (!hasGeoFeature())
+//            return GeoJSONFeatureCollection.EMPTY;
+//
+//        return new GeoJSONFeatureCollection(
+//            new GeoJSONFeature(getCoordinates())
+//                .setProperty("id", getId())
+//                .setProperty("title", TextUtil.ellipsize(getName(), maxNameLength))
+//        );
+//    }
+//
+//    public static boolean isAssetNameEqualTo(Asset asset, String name) {
+//        return asset != null && asset.getName().equals(name);
+//    }
+//
+//    public static boolean isAssetTypeEqualTo(Asset asset, String assetType) {
+//        return asset != null
+//            && asset.getType() != null
+//            && asset.getType().equals(assetType);
+//    }
+//
+//    public static boolean isAssetTypeEqualTo(Asset asset, AssetType assetType) {
+//        return asset != null && asset.getWellKnownType() == assetType;
+//    }
+//
+//    public static void removeAttributes(Asset asset, Predicate<Attribute> filter) {
+//        if (asset == null)
+//            return;
+//
+//        asset.getAttributesList().removeIf(filter);
+//    }
+//
+//    public static Asset map(Asset assetToMap, Asset asset) {
+//        return map(assetToMap, asset, null, null, null, null, null, null);
+//    }
+//
+//    public static Asset map(Asset assetToMap, Asset asset,
+//                            String overrideName,
+//                            String overrideRealm,
+//                            String overrideParentId,
+//                            String overrideType,
+//                            Boolean overrideAccessPublicRead,
+//                            ObjectValue overrideAttributes) {
+//        asset.setVersion(assetToMap.getVersion());
+//        asset.setName(overrideName != null ? overrideName : assetToMap.getName());
+//        if (overrideType != null) {
+//            asset.setType(overrideType);
+//        } else {
+//            asset.setType(assetToMap.getType());
+//        }
+//
+//        asset.setAccessPublicRead(overrideAccessPublicRead != null ? overrideAccessPublicRead : assetToMap.isAccessPublicRead());
+//
+//        asset.setParentId(overrideParentId != null ? overrideParentId : assetToMap.getParentId());
+//        asset.setParentName(null);
+//        asset.setParentType(null);
+//
+//        asset.setRealm(overrideRealm != null ? overrideRealm : assetToMap.getRealm());
+//
+//        asset.setAttributes(overrideAttributes != null ? overrideAttributes : assetToMap.getAttributes());
+//
+//        return asset;
+//    }
 }

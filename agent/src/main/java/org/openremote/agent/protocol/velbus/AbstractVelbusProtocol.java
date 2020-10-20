@@ -197,7 +197,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
         String property = getVelbusDevicePropertyLink(attribute);
 
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
-        ValueType valueType = attribute.getType().orElse(AttributeValueType.STRING).getValueType();
+        ValueType valueType = attribute.getValueType().orElse(AttributeValueType.STRING).getValueType();
         LOG.fine("Linking attribute to device '" +deviceAddress + "' and property '" + property + "': " + attributeRef);
 
         Consumer<DevicePropertyValue<?>> propertyValueConsumer = propertyValue ->

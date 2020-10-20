@@ -21,17 +21,25 @@ package org.openremote.model.v2;
 
 public class AttributeDescriptor<T> implements MetaDescriptorProvider, NameValueDescriptorProvider<T> {
     protected String name;
+    protected boolean optional;
     protected ValueDescriptor<T> valueDescriptor;
+    protected T defaultValue;
     protected MetaDescriptor<?>[] meta;
 
-    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
-        this(name, valueDescriptor, EMPTY_META);
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue) {
+        this(name, optional, valueDescriptor, defaultValue, EMPTY_META);
     }
 
-    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor, MetaDescriptor<?>[] meta) {
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaDescriptor<?>[] meta) {
         this.name = name;
+        this.optional = optional;
         this.valueDescriptor = valueDescriptor;
+        this.defaultValue = defaultValue;
         this.meta = meta;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 
     public String getName() {
@@ -40,6 +48,10 @@ public class AttributeDescriptor<T> implements MetaDescriptorProvider, NameValue
 
     public ValueDescriptor<T> getValueDescriptor() {
         return valueDescriptor;
+    }
+
+    public T getDefaultValue() {
+        return defaultValue;
     }
 
     @Override

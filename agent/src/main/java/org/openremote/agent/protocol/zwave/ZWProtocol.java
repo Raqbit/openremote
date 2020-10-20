@@ -263,7 +263,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttrib
         String linkName = getZWLinkName(attribute);
 
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
-        ValueType valueType = attribute.getType().orElse(AttributeValueType.STRING).getValueType();
+        ValueType valueType = attribute.getValueType().orElse(AttributeValueType.STRING).getValueType();
         LOG.fine("Linking attribute to device endpoint '" + getEndpointIdAsString(attribute) + "' and channel '" + linkName + "': " + attributeRef);
 
         Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> sensorValueConsumer = value ->

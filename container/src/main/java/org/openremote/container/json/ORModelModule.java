@@ -35,6 +35,9 @@ import org.openremote.model.value.*;
 import java.io.IOException;
 import java.util.function.Function;
 
+/**
+ * Registers serializers/deserializers for OpenRemote model types that need special handling
+ */
 public class ORModelModule extends SimpleModule {
 
     public static class DescriptorDeserializer<T, U extends T> extends JsonDeserializer<T> {

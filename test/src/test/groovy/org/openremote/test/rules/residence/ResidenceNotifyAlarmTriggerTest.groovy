@@ -66,7 +66,7 @@ class ResidenceNotifyAlarmTriggerTest extends Specification implements ManagerCo
         mockPushNotificationHandler.sendMessage(_ as Long, _ as Notification.Source, _ as String, _ as Notification.Target, _ as AbstractNotificationMessage) >> {
             id, source, sourceId, target, message ->
                 notificationIds << id
-                targetTypes << target.type
+                targetTypes << target.getValueType
                 targetIds << target.id
                 messages << message
                 callRealMethod()

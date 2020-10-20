@@ -36,6 +36,10 @@ public abstract class Agent extends Asset {
         MetaTypes.READ_ONLY
     });
 
+    protected Agent(String name, String type) {
+        super(name, type);
+    }
+
     public static <T> void sendEvent(String attributeName, ValueDescriptor<T> valueDescriptor, T value) {
 
     }
@@ -50,10 +54,11 @@ public abstract class Agent extends Asset {
     public abstract Protocol<?> getProtocolInstance();
 
     public boolean isDisabled() {
-        return getAttribute(AttributeType.DISABLED).flatMap(AbstractValueHolder::getValueAsBoolean).orElse(false);
+        return getAttributes().get(DISABLED).flatMap(Attribute::getValue).orElse(false);
     }
 
-    public void setDisabled(boolean disabled) {
-        replaceAttribute(new Attribute(AttributeType.DISABLED, Values.create(disabled)));
+    public Agent setDisabled(boolean disabled) {
+        getAttributes().set(new Attribute<>(DISABLED, disabled));
+        return this;
     }
 }

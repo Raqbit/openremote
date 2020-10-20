@@ -19,18 +19,36 @@
  */
 package org.openremote.model.attribute;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.openremote.model.v2.AbstractNameValueProviderImpl;
 import org.openremote.model.v2.MetaDescriptor;
 import org.openremote.model.value.Value;
 
+import java.io.IOException;
 import java.util.Objects;
 
 /**
- * A named arbitrary {@link Value}. A meta item must have a value to be stored.
- * <p>
- * Name should be a URI, thus avoiding collisions and representing "ownership" of the meta item.
+ * A named value whose name must match the name of a {@link MetaDescriptor} and whose value must match the value type of
+ * the {@link MetaDescriptor}.
  */
 public class MetaItem<T> extends AbstractNameValueProviderImpl<T> {
+
+    public static class MetaItemSerializer extends StdSerializer<MetaItem<?>> {
+
+        public MetaItemSerializer(Class<MetaItem<?>> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(MetaItem<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            gen.writeObject(value.value);
+        }
+    }
+
+
+
 
     protected MetaItem() {
     }
