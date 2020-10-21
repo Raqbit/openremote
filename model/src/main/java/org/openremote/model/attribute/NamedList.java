@@ -113,6 +113,15 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
         }
     }
 
+    public NamedList() {
+    }
+
+    public NamedList(Collection<? extends T> c) {
+        super();
+        // Use addAll to do duplicate checking
+        addAll(c);
+    }
+
     protected static void throwIfHas(NamedList<?> list, String name) {
         if (list.has(name)) {
             throw new IllegalStateException("List already contains an item with this name: " + name);
@@ -175,7 +184,7 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
         return this.stream().filter(item -> item.getName().equals(name)).findFirst();
     }
 
-    protected  <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    protected <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
         Optional<T> valueProvider = get(nameValueDescriptorProvider);
         return valueProvider.map(item -> {
             Class<?> itemType = item.getValueType();

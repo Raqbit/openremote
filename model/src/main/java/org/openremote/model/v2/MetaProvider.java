@@ -19,9 +19,11 @@
  */
 package org.openremote.model.v2;
 
-public interface MetaDescriptorProvider {
+import org.openremote.model.attribute.MetaItem;
 
-    MetaDescriptor<?>[] EMPTY_META = new MetaDescriptor<?>[0];
+import java.util.Collection;
 
-    MetaDescriptor<?>[] getMetaDescriptors();
+public interface MetaProvider {
+
+    Collection<MetaItem<?>> getMetaDescriptors();
 }

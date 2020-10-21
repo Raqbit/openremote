@@ -19,12 +19,17 @@
  */
 package org.openremote.model.asset;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.AttributeDescriptorProvider;
 import org.openremote.model.v2.NameProvider;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -88,27 +93,55 @@ public class AssetDescriptor<T extends Asset> implements NameProvider, Attribute
         return colour;
     }
 
-    public static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) {
-        Map<String, AttributeDescriptor<?>> descriptors = Arrays.stream(type.getDeclaredFields())
-            .filter(field ->
-                field.getType() == AttributeDescriptor.class && isStatic(field.getModifiers()) && isPublic(field.getModifiers()))
-            .map(descriptorField -> {
-                try {
-                    return (AttributeDescriptor<?>)descriptorField.get(null);
-                } catch (IllegalAccessException e) {
-                   throw new IllegalArgumentException("Failed to extract attribute descriptors from asset class: " + type.getName(), e);
-                }
-            }).collect(Collectors.toMap(AttributeDescriptor::getName, Function.identity()));
+    public static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
+        Map<String, AttributeDescriptor<?>> descriptors = new HashMap<>();
+        Class<?> currentType = type;
+        Consumer<AttributeDescriptor<?>> descriptorConsumer = attributeDescriptor -> {
+            if (descriptors.containsKey(attributeDescriptor.getName())) {
+                throw new IllegalArgumentException("Duplicate attribute descriptor name '" + attributeDescriptor.getName() + "' for asset type hierarchy: " + type.getName());
+            }
+            descriptors.put(attributeDescriptor.getName(), attributeDescriptor);
+        };
+
+        while (currentType != Object.class) {
+            Arrays.stream(type.getDeclaredFields())
+                .filter(field ->
+                    field.getType() == AttributeDescriptor.class && isStatic(field.getModifiers()) && isPublic(field.getModifiers()))
+                .map(descriptorField -> {
+                    try {
+                        AttributeDescriptor<?> descriptor = (AttributeDescriptor<?>)descriptorField.get(null);
+                        // Check for corresponding getter
+                        String pascalCaseName = StringUtils.capitalize(descriptor.getName());
+                        Map<String, Method> getterMap = Arrays.stream(type.getDeclaredMethods()).filter(AssetDescriptor::isGetter).collect(Collectors.toMap(Method::getName, Function.identity()));
+                        Method method = getterMap.containsKey("get" + pascalCaseName) ? getterMap.get("get" + pascalCaseName) : getterMap.get("is" + pascalCaseName);
+                        if (method == null || method.getReturnType() != descriptor.getValueDescriptor().getType()) {
+                            throw new IllegalArgumentException("Attribute descriptor '" + descriptor.getName() + "' doesn't have a corresponding getter in asset class: " + type.getName());
+                        }
+                        return descriptor;
+                    } catch (IllegalAccessException e) {
+                        throw new IllegalArgumentException("Failed to extract attribute descriptors from asset class: " + type.getName(), e);
+                    }
+                }).forEach(descriptorConsumer);
+            currentType = currentType.getSuperclass();
+        }
 
         if (additionalAttributeDescriptors != null) {
-            Arrays.stream(additionalAttributeDescriptors).forEach(additionalDescriptor -> {
-                if (descriptors.containsKey(additionalDescriptor.getName())) {
-                    throw new IllegalArgumentException("Additional attribute descriptor conflicts with attribute descriptor extract from asset type hierarchy: " + additionalDescriptor.getName());
-                }
-                descriptors.put(additionalDescriptor.getName(), additionalDescriptor);
-            });
+            Arrays.stream(additionalAttributeDescriptors).forEach(descriptorConsumer);
         }
 
         return descriptors.values().toArray(new AttributeDescriptor[0]);
+    }
+
+    protected static boolean isGetter(Method method) {
+        if (Modifier.isPublic(method.getModifiers()) &&
+            method.getParameterTypes().length == 0) {
+            if (method.getName().matches("^get[A-Z].*") &&
+                !method.getReturnType().equals(void.class))
+                return true;
+            if (method.getName().matches("^is[A-Z].*") &&
+                method.getReturnType().equals(boolean.class))
+                return true;
+        }
+        return false;
     }
 }

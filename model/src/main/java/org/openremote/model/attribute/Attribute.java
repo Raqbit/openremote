@@ -79,8 +79,7 @@ public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
         if (meta instanceof MetaItemList) {
             setMeta((MetaItemList)meta);
         } else {
-            setMeta((MetaItemList)null);
-            this.meta.addAll(meta);
+            this.meta = new MetaItemList(meta);
         }
         return this;
     }

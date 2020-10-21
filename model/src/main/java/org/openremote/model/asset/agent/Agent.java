@@ -19,12 +19,11 @@
  */
 package org.openremote.model.asset.agent;
 
-import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.AttributeType;
+import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.*;
-import org.openremote.model.value.Values;
 
 /**
  * An agent is a special sub type of {@link Asset} that is associated with a {@link Protocol} and is responsible
@@ -32,20 +31,14 @@ import org.openremote.model.value.Values;
  */
 public abstract class Agent extends Asset {
 
-    public static AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", ValueTypes.BOOLEAN, new MetaDescriptor[] {
-        MetaTypes.READ_ONLY
-    });
+    public static AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", true, ValueTypes.BOOLEAN, null);
 
-    protected Agent(String name, String type) {
-        super(name, type);
-    }
+    public static AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueTypes.CONNECTION_STATUS, null,
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
 
-    public static <T> void sendEvent(String attributeName, ValueDescriptor<T> valueDescriptor, T value) {
-
-    }
-
-    public static <T> void sendEvent(AttributeDescriptor<T> attributeDescriptor, T value) {
-
+    protected <T extends Agent> Agent(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
     }
 
     /**

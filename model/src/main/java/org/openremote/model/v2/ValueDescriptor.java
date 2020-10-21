@@ -19,17 +19,33 @@
  */
 package org.openremote.model.v2;
 
-public class ValueDescriptor<T> implements MetaDescriptorProvider {
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.attribute.MetaItemList;
 
-    public String name;
-    public Class<T> type;
-    protected MetaDescriptor<?>[] meta;
+import java.util.Arrays;
+import java.util.Collection;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, defaultImpl = ValueDescriptor.class)
+public class ValueDescriptor<T> implements MetaProvider {
+
+    protected String name;
+    protected Class<T> type;
+    protected MetaItemList meta;
 
     public ValueDescriptor(String name, Class<T> type) {
-        this(name, type, null);
+        this(name, type, (MetaItemList)null);
     }
 
-    public ValueDescriptor(String name, Class<T> type, MetaDescriptor<?>[] meta) {
+    public ValueDescriptor(String name, Class<T> type, MetaItem<?>...meta) {
+        this(name, type, new MetaItemList(Arrays.asList(meta)));
+    }
+
+    public ValueDescriptor(String name, Class<T> type, Collection<MetaItem<?>> meta) {
+        this(name, type, meta instanceof MetaItemList ? (MetaItemList)meta : new MetaItemList(meta));
+    }
+
+    public ValueDescriptor(String name, Class<T> type, MetaItemList meta) {
         this.name = name;
         this.type = type;
         this.meta = meta;
@@ -44,7 +60,7 @@ public class ValueDescriptor<T> implements MetaDescriptorProvider {
     }
 
     @Override
-    public MetaDescriptor<?>[] getMetaDescriptors() {
-        return meta == null ? EMPTY_META : meta;
+    public Collection<MetaItem<?>> getMetaDescriptors() {
+        return meta;
     }
 }

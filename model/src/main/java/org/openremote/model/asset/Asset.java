@@ -26,6 +26,9 @@ import org.openremote.model.Constants;
 import org.openremote.model.IdentifiableEntity;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeList;
+import org.openremote.model.geo.GeoJSONPoint;
+import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.ValueTypes;
 import org.openremote.model.value.ObjectValue;
 
 import javax.persistence.*;
@@ -211,7 +214,21 @@ import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
 @JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, use = JsonTypeInfo.Id.CUSTOM, defaultImpl = Asset.class)
 public class Asset implements IdentifiableEntity {
 
+    /**
+     * Generic asset descriptor called "Thing"
+     */
     public static final AssetDescriptor<Asset> DESCRIPTOR = new AssetDescriptor<>("Thing", "cube-outline", null, Asset.class);
+
+    /*
+     * ATTRIBUTE DESCRIPTORS DESCRIBING FIXED NAME ATTRIBUTES AND THEIR VALUE TYPE - ALL SUB TYPES OF THIS ASSET TYPE
+     * WILL INHERIT THESE DESCRIPTORS ALSO; IT IS REQUIRED THAT EACH DESCRIPTOR HAS CORRESPONDING GETTER WITH OPTIONAL
+     * SETTER, THIS ENSURES BASIC COMPILE TIME CHECKING OF CONFLICTS BUT JUST MAKES GOOD SENSE FOR CONSUMERS
+    */
+    public static AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueTypes.GEO_JSON_POINT, null);
+
+    public static AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueTypes.EMAIL, null);
+
+    public static AttributeDescriptor<ValueTypes.StringList> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.LIST_STRING, null);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")

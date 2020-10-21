@@ -19,18 +19,32 @@
  */
 package org.openremote.model.v2;
 
-public class AttributeDescriptor<T> implements MetaDescriptorProvider, NameValueDescriptorProvider<T> {
+import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.attribute.MetaItemList;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptorProvider<T> {
     protected String name;
     protected boolean optional;
     protected ValueDescriptor<T> valueDescriptor;
     protected T defaultValue;
-    protected MetaDescriptor<?>[] meta;
+    protected MetaItemList meta;
 
     public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue) {
-        this(name, optional, valueDescriptor, defaultValue, EMPTY_META);
+        this(name, optional, valueDescriptor, defaultValue, (MetaItemList)null);
     }
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaDescriptor<?>[] meta) {
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaItem<?>...meta) {
+        this(name, optional, valueDescriptor, defaultValue, Arrays.asList(meta));
+    }
+
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, Collection<MetaItem<?>> meta) {
+        this(name, optional, valueDescriptor, defaultValue, meta instanceof MetaItemList ? (MetaItemList)meta : new MetaItemList(meta));
+    }
+
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaItemList meta) {
         this.name = name;
         this.optional = optional;
         this.valueDescriptor = valueDescriptor;
@@ -55,7 +69,7 @@ public class AttributeDescriptor<T> implements MetaDescriptorProvider, NameValue
     }
 
     @Override
-    public MetaDescriptor<?>[] getMetaDescriptors() {
+    public Collection<MetaItem<?>> getMetaDescriptors() {
         return meta;
     }
 }

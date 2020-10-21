@@ -36,8 +36,9 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
 @GwtIncompatible
 public class TimeUtil {
 
+    public static final String DURATION_REGEXP = "([+-])?((\\d+)[Dd])?\\s*((\\d+)[Hh])?\\s*((\\d+)[Mm]$)?\\s*((\\d+)[Ss])?\\s*((\\d+)([Mm][Ss]$))?\\s*((\\d+)[Ww])?\\s*((\\d+)[Mm][Nn])?\\s*((\\d+)[Yy])?";
     // Simple syntax
-    public static final Pattern SIMPLE = Pattern.compile("([+-])?((\\d+)[Dd])?\\s*((\\d+)[Hh])?\\s*((\\d+)[Mm]$)?\\s*((\\d+)[Ss])?\\s*((\\d+)([Mm][Ss]$))?\\s*((\\d+)[Ww])?\\s*((\\d+)[Mm][Nn])?\\s*((\\d+)[Yy])?");
+    protected static final Pattern SIMPLE = Pattern.compile(DURATION_REGEXP);
 
     private static final int SIM_SGN = 1;
     private static final int SIM_DAY = 3;

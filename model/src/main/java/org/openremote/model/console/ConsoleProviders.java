@@ -17,24 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.attribute;
+package org.openremote.model.console;
 
-import org.openremote.model.v2.NameValueDescriptorProvider;
+import java.util.HashMap;
 
-import java.util.Collection;
-import java.util.Optional;
-
-public class MetaItemList extends NamedList<MetaItem<?>> {
-
-    public MetaItemList() {
-    }
-
-    public MetaItemList(Collection<MetaItem<?>> meta) {
-        super(meta);
-    }
-
-    // This works around the crappy type system
-    public <S, U extends MetaItem<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
-        return super.getInternal(nameValueDescriptorProvider);
-    }
+public class ConsoleProviders extends HashMap<String, ConsoleProvider> {
 }
