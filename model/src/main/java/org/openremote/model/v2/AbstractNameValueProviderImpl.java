@@ -19,7 +19,6 @@
  */
 package org.openremote.model.v2;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.util.TextUtil;
 
@@ -29,8 +28,7 @@ import java.util.Optional;
 
 public abstract class AbstractNameValueProviderImpl<T> implements ValueProvider<T>, NameProvider {
 
-    @JsonIgnore
-    protected Class<T> valueType;
+    protected ValueDescriptor<T> type;
     protected T value;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     protected String name;
@@ -38,18 +36,21 @@ public abstract class AbstractNameValueProviderImpl<T> implements ValueProvider<
     protected AbstractNameValueProviderImpl() {
     }
 
-    public AbstractNameValueProviderImpl(@NotNull String name, T value, Class<T> valueType) {
+    public AbstractNameValueProviderImpl(@NotNull String name, @NotNull ValueDescriptor<T> type, T value) {
         if (TextUtil.isNullOrEmpty(name)) {
             throw new IllegalArgumentException("name cannot be null or empty");
         }
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
         this.name = name;
+        this.type = type;
         this.value = value;
-        this.valueType = valueType;
     }
 
     @Override
-    public Class<T> getValueType() {
-        return valueType;
+    public ValueDescriptor<T> getValueType() {
+        return type;
     }
 
     @Override

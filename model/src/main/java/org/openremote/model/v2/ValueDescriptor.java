@@ -20,6 +20,7 @@
 package org.openremote.model.v2;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaItemList;
 
@@ -28,6 +29,14 @@ import java.util.Collection;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE, defaultImpl = ValueDescriptor.class)
 public class ValueDescriptor<T> implements MetaProvider {
+
+    public static class ValueProviderStringConverter extends StdConverter<ValueDescriptor<?>, String> {
+
+        @Override
+        public String convert(ValueDescriptor<?> value) {
+            return value.getName();
+        }
+    }
 
     protected String name;
     protected Class<T> type;
@@ -42,7 +51,7 @@ public class ValueDescriptor<T> implements MetaProvider {
     }
 
     public ValueDescriptor(String name, Class<T> type, Collection<MetaItem<?>> meta) {
-        this(name, type, meta instanceof MetaItemList ? (MetaItemList)meta : new MetaItemList(meta));
+        this(name, type, new MetaItemList(meta));
     }
 
     public ValueDescriptor(String name, Class<T> type, MetaItemList meta) {
@@ -60,7 +69,7 @@ public class ValueDescriptor<T> implements MetaProvider {
     }
 
     @Override
-    public Collection<MetaItem<?>> getMetaDescriptors() {
+    public Collection<MetaItem<?>> getMeta() {
         return meta;
     }
 }

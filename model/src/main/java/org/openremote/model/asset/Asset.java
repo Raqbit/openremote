@@ -224,11 +224,13 @@ public class Asset implements IdentifiableEntity {
      * WILL INHERIT THESE DESCRIPTORS ALSO; IT IS REQUIRED THAT EACH DESCRIPTOR HAS CORRESPONDING GETTER WITH OPTIONAL
      * SETTER, THIS ENSURES BASIC COMPILE TIME CHECKING OF CONFLICTS BUT JUST MAKES GOOD SENSE FOR CONSUMERS
     */
-    public static AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueTypes.GEO_JSON_POINT, null);
+    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueTypes.GEO_JSON_POINT, null);
 
-    public static AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueTypes.EMAIL, null);
+    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueTypes.EMAIL, null);
 
-    public static AttributeDescriptor<ValueTypes.StringList> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.LIST_STRING, null);
+    public static final AttributeDescriptor<ValueTypes.StringList> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.LIST_STRING, null);
+
+    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueTypes.STRING, null);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")
@@ -437,12 +439,43 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Asset setAttributes(Collection<Attribute<?>> attributes) {
-        if (attributes instanceof AttributeList) {
-            setAttributes((AttributeList) attributes);
-        } else {
-            setAttributes((AttributeList) null);
-            this.attributes.addAll(attributes);
-        }
+        this.attributes = new AttributeList(attributes);
+        return this;
+    }
+
+    public GeoJSONPoint getLocation() {
+        return getAttributes().get(LOCATION).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Asset setLocation(GeoJSONPoint location) {
+        getAttributes().addOrReplace(new Attribute<>(LOCATION, location));
+        return this;
+    }
+
+    public ValueTypes.StringList getTags() {
+        return getAttributes().get(TAGS).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Asset setTags(ValueTypes.StringList tags) {
+        getAttributes().addOrReplace(new Attribute<>(TAGS, tags));
+        return this;
+    }
+
+    public String getEmail() {
+        return getAttributes().get(EMAIL).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Asset setEmail(String email) {
+        getAttributes().addOrReplace(new Attribute<>(EMAIL, email));
+        return this;
+    }
+
+    public String getNotes() {
+        return getAttributes().get(NOTES).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Asset setNotes(String notes) {
+        getAttributes().addOrReplace(new Attribute<>(NOTES, notes));
         return this;
     }
 

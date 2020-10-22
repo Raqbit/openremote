@@ -17,13 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.asset.impl;
 
-import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.ValueTypes;
 
-import java.util.Collection;
+public class Group extends Asset {
 
-public interface MetaProvider {
+    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", false, ValueTypes.STRING, null);
 
-    Collection<MetaItem<?>> getMeta();
+    public static final AssetDescriptor<Group> DESCRIPTOR = new AssetDescriptor<>("Group", "folder", "B3B3B3", Group.class);
+
+    public Group(String name) {
+        super(name, DESCRIPTOR);
+    }
+
+    public String getChildAssetType() {
+        return getAttributes().get(CHILD_ASSET_TYPE).flatMap(Attribute::getValue).orElse(null);
+    }
 }

@@ -31,9 +31,9 @@ import org.openremote.model.v2.*;
  */
 public abstract class Agent extends Asset {
 
-    public static AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", true, ValueTypes.BOOLEAN, null);
+    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", true, ValueTypes.BOOLEAN, null);
 
-    public static AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueTypes.CONNECTION_STATUS, null,
+    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueTypes.CONNECTION_STATUS, null,
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
 
@@ -51,7 +51,11 @@ public abstract class Agent extends Asset {
     }
 
     public Agent setDisabled(boolean disabled) {
-        getAttributes().set(new Attribute<>(DISABLED, disabled));
+        getAttributes().addOrReplace(new Attribute<>(DISABLED, disabled));
         return this;
+    }
+
+    public ConnectionStatus getAgentStatus() {
+        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
     }
 }

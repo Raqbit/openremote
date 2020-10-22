@@ -38,7 +38,6 @@ import org.openremote.model.v2.ValueProvider;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
@@ -138,22 +137,20 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
 
     @Override
     public T set(int index, T element) {
-        T result = super.set(index, element);
-        throwIfHas(this, element.getName());
-        return result;
+        throw new IllegalStateException("set by index not supported for named lists");
     }
 
     @Override
     public boolean add(T t) {
-        boolean result = super.add(t);
         throwIfHas(this, t.getName());
+        boolean result = super.add(t);
         return result;
     }
 
     @Override
     public void add(int index, T element) {
-        super.add(index, element);
         throwIfHas(this, element.getName());
+        super.add(index, element);
     }
 
     @Override
@@ -184,10 +181,11 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
         return this.stream().filter(item -> item.getName().equals(name)).findFirst();
     }
 
+    @SuppressWarnings("unchecked")
     protected <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
         Optional<T> valueProvider = get(nameValueDescriptorProvider);
         return valueProvider.map(item -> {
-            Class<?> itemType = item.getValueType();
+            Class<?> itemType = item.getValueType().getType();
             Class<S> expectedType = nameValueDescriptorProvider.getValueDescriptor().getType();
             if (itemType == expectedType) {
                 return (U)item;
@@ -204,10 +202,10 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
     /**
      * Add or replace the specified items by name
      */
-    public final void set(T...items) {
-        set(Arrays.asList(items));
+    public final void addOrReplace(T...items) {
+        addOrReplace(Arrays.asList(items));
     }
-    public final void set(Collection<T> items) {
+    public final void addOrReplace(Collection<T> items) {
         items.forEach(item -> this.removeIf(i -> i.getName().equals(item.getName())));
         addAll(items);
     }

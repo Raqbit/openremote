@@ -21,9 +21,17 @@ package org.openremote.model.attribute;
 
 import org.openremote.model.v2.NameValueDescriptorProvider;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public class AttributeList extends NamedList<Attribute<?>> {
+
+    public AttributeList() {
+    }
+
+    public AttributeList(Collection<? extends Attribute<?>> c) {
+        super(c);
+    }
 
     // This works around the crappy type system
     public <S, U extends Attribute<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {

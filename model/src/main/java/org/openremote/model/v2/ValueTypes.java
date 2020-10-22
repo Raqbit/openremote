@@ -94,7 +94,7 @@ public final class ValueTypes {
         new MetaItem<>(MetaTypes.SECRET, true)
     );
 
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     public static final ValueDescriptor<IntegerList> COLOUR_RGB = new ValueDescriptor<>("Colour RGB", IntegerList.class);
 
     @Size(min = 4, max = 4)
@@ -114,6 +114,9 @@ public final class ValueTypes {
     @Pattern(regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
     public static final ValueDescriptor<String> EMAIL = new ValueDescriptor<>("Email", String.class);
 
+    @Pattern(regexp = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}")
+    public static final ValueDescriptor<String> UUID = new ValueDescriptor<>("UUID", String.class);
+
     @Size(min = 22, max = 22)
     public static final ValueDescriptor<String> ASSET_ID = new ValueDescriptor<>("AssetId", String.class);
 
@@ -129,6 +132,9 @@ public final class ValueTypes {
 
     public static final ValueDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new ValueDescriptor<>("Console Providers", ConsoleProviders.class);
 
+    @Min(0)
+    @Max(359)
+    public static final ValueDescriptor<Integer> DIRECTION = new ValueDescriptor<>("Direction", Integer.class);
 
     protected ValueTypes() {
     }

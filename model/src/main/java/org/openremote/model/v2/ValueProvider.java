@@ -19,6 +19,8 @@
  */
 package org.openremote.model.v2;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.Optional;
 
 /**
@@ -26,7 +28,8 @@ import java.util.Optional;
  */
 public interface ValueProvider<T> {
 
-    Class<T> getValueType();
+    @JsonSerialize(converter = ValueDescriptor.ValueProviderStringConverter.class)
+    ValueDescriptor<T> getValueType();
 
     Optional<T> getValue();
 

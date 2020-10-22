@@ -17,13 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.asset.impl;
 
-import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.AssetDescriptor;
 
-import java.util.Collection;
+public class Room extends Asset {
 
-public interface MetaProvider {
+    public static final AssetDescriptor<Room> DESCRIPTOR = new AssetDescriptor<>("Room", "door", "2eaaa2", Room.class);
 
-    Collection<MetaItem<?>> getMeta();
+    public Room(String name) {
+        super(name, DESCRIPTOR);
+    }
 }

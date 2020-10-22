@@ -69,7 +69,7 @@ public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptor
     }
 
     @Override
-    public Collection<MetaItem<?>> getMetaDescriptors() {
+    public Collection<MetaItem<?>> getMeta() {
         return meta;
     }
 }

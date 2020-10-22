@@ -19,14 +19,11 @@
  */
 package org.openremote.model.attribute;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openremote.model.v2.AbstractNameValueProviderImpl;
 import org.openremote.model.v2.MetaDescriptor;
-import org.openremote.model.value.Value;
+import org.openremote.model.v2.ValueDescriptor;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -35,26 +32,7 @@ import java.util.Objects;
  */
 public class MetaItem<T> extends AbstractNameValueProviderImpl<T> {
 
-    public static class MetaItemSerializer extends StdSerializer<MetaItem<?>> {
-
-        public MetaItemSerializer(Class<MetaItem<?>> t) {
-            super(t);
-        }
-
-        @Override
-        public void serialize(MetaItem<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            gen.writeObject(value.value);
-        }
-    }
-
-
-
-
     protected MetaItem() {
-    }
-
-    public MetaItem(String name, T value, Class<T> type) {
-        super(name, value, type);
     }
 
     public MetaItem(MetaDescriptor<T> metaDescriptor) {
@@ -62,7 +40,14 @@ public class MetaItem<T> extends AbstractNameValueProviderImpl<T> {
     }
 
     public MetaItem(MetaDescriptor<T> metaDescriptor, T value) {
-        super(metaDescriptor.getName(), value, metaDescriptor.getValueDescriptor().getType());
+        super(metaDescriptor.getName(), metaDescriptor.getValueDescriptor(), value);
+    }
+
+    // Don't serialise type info for meta items as the name is the meta descriptor name
+    @JsonIgnore
+    @Override
+    public ValueDescriptor<T> getValueType() {
+        return super.getValueType();
     }
 
     @Override
@@ -77,7 +62,7 @@ public class MetaItem<T> extends AbstractNameValueProviderImpl<T> {
             return false;
         }
 
-        MetaItem metaItem = (MetaItem) o;
+        MetaItem<?> metaItem = (MetaItem<?>) o;
         return Objects.equals(getName(), metaItem.getName())
             && Objects.equals(getValue(), metaItem.getValue());
     }

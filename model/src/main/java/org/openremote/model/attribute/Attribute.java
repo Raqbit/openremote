@@ -21,12 +21,12 @@ package org.openremote.model.attribute;
 
 import org.openremote.model.v2.AbstractNameValueProviderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.ValueDescriptor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
@@ -38,20 +38,20 @@ public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
     }
 
     public Attribute(AttributeDescriptor<T> attributeDescriptor, T value) {
-        super(attributeDescriptor.getName(), value, attributeDescriptor.getValueDescriptor().getType());
-        MetaDescriptor<?>[] metaDescriptors = attributeDescriptor.getValueDescriptor().getMetaDescriptors();
-        if (metaDescriptors != null) {
-            getMeta().addAll(
-                Arrays.stream(metaDescriptors)
-                    .map((Function<MetaDescriptor<?>, MetaItem<?>>) MetaItem::new)
-                    .collect(Collectors.toList()));
+        this(attributeDescriptor.getName(), attributeDescriptor.getValueDescriptor(), value);
+
+        // Auto merge meta from attribute descriptor
+        if (attributeDescriptor.getMeta() != null) {
+            getMeta().addAll(attributeDescriptor.getMeta());
         }
-        metaDescriptors = attributeDescriptor.getMetaDescriptors();
-        if (metaDescriptors != null) {
-            getMeta().set(
-                Arrays.stream(metaDescriptors)
-                    .map((Function<MetaDescriptor<?>, MetaItem<?>>) MetaItem::new)
-                    .collect(Collectors.toList()));
+    }
+
+    public Attribute(String name, ValueDescriptor<T> valueDescriptor, T value) {
+        super(name, valueDescriptor, value);
+
+        // Auto add meta from value descriptor
+        if (valueDescriptor.getMeta() != null) {
+            getMeta().addAll(valueDescriptor.getMeta());
         }
     }
 
@@ -63,24 +63,17 @@ public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
         return meta;
     }
 
-    public Attribute<T> setMeta(MetaItemList meta) {
-        if (meta == null) {
-            meta = new MetaItemList();
-        }
-        this.meta = meta;
+    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaItemList meta) {
+        getMeta().addAll(meta);
         return this;
     }
 
-    public Attribute<T> setMeta(MetaItem<?>...meta) {
-        return setMeta(Arrays.asList(meta));
+    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaItem<?>...meta) {
+        return addOrReplaceMetaItems(Arrays.asList(meta));
     }
 
-    public Attribute<T> setMeta(Collection<MetaItem<?>> meta) {
-        if (meta instanceof MetaItemList) {
-            setMeta((MetaItemList)meta);
-        } else {
-            this.meta = new MetaItemList(meta);
-        }
+    public Attribute<T> addOrReplaceMetaItems(@NotNull Collection<MetaItem<?>> meta) {
+        getMeta().addAll(meta);
         return this;
     }
 

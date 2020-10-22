@@ -17,22 +17,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.asset;
+package org.openremote.model.asset.impl;
 
-import org.openremote.model.console.ConsoleProviders;
+import org.openremote.model.Constants;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
-public class Console extends Asset {
+public class Microphone extends Device {
 
-    public static AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", false, ValueTypes.STRING, null);
-    public static AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", false, ValueTypes.STRING, null);
-    public static AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", false, ValueTypes.STRING, null);
-    public static AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", false, ValueTypes.CONSOLE_PROVIDERS, null);
+    public static final AttributeDescriptor<Double> SOUND_LEVEL = new AttributeDescriptor<>("soundLevel", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_SOUND_DECIBELS)
+    );
 
-    protected <T extends Console> Console(String name, AssetDescriptor<T> descriptor) {
-        super(name, descriptor);
+    public static final AssetDescriptor<Microphone> DESCRIPTOR = new AssetDescriptor<>("Microphone", "microphone", "47A5FF", Microphone.class);
+
+    public Microphone(String name) {
+        super(name, DESCRIPTOR);
     }
 
-
+    public Double getSoundLevel() {
+        return getAttributes().get(SOUND_LEVEL).flatMap(Attribute::getValue).orElse(null);
+    }
 }
