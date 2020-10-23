@@ -25,6 +25,7 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.AttributeExecuteStatus;
 import org.openremote.model.attribute.AttributeLink;
+import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.console.ConsoleProvider;
@@ -54,23 +55,23 @@ public final class ValueTypes {
 
     public static final ValueDescriptor<ObjectNode> OBJECT = new ValueDescriptor<>("Object", ObjectNode.class);
 
-    public static final ValueDescriptor<StringList> LIST_STRING = new ValueDescriptor<>("ListString", StringList.class);
+    public static final ValueDescriptor<StringList> LIST_STRING = new ValueDescriptor<>("List of strings", StringList.class);
 
-    public static final ValueDescriptor<IntegerList> LIST_INTEGER = new ValueDescriptor<>("ListString", IntegerList.class);
+    public static final ValueDescriptor<IntegerList> LIST_INTEGER = new ValueDescriptor<>("List of integers", IntegerList.class);
 
-    public static final ValueDescriptor<DoubleList> LIST_DOUBLE = new ValueDescriptor<>("ListDouble", DoubleList.class);
+    public static final ValueDescriptor<DoubleList> LIST_DOUBLE = new ValueDescriptor<>("List of numbers", DoubleList.class);
 
-    public static final ValueDescriptor<BooleanList> LIST_BOOLEAN = new ValueDescriptor<>("ListBoolean", BooleanList.class);
+    public static final ValueDescriptor<BooleanList> LIST_BOOLEAN = new ValueDescriptor<>("List of booleans", BooleanList.class);
 
     @Min(0)
-    public static final ValueDescriptor<Integer> POSITIVE_INTEGER = new ValueDescriptor<>("PositiveInteger", Integer.class);
+    public static final ValueDescriptor<Integer> POSITIVE_INTEGER = new ValueDescriptor<>("Positive integer", Integer.class);
 
     @DecimalMin("0.0")
-    public static final ValueDescriptor<Double> POSITIVE_NUMBER = new ValueDescriptor<>("PositiveInteger", Double.class);
+    public static final ValueDescriptor<Double> POSITIVE_NUMBER = new ValueDescriptor<>("Positive number", Double.class);
 
     @Min(0)
     @Max(100)
-    public static final ValueDescriptor<Integer> PERCENTAGE_INTEGER_0_100 = new ValueDescriptor<>("PositiveInteger", Integer.class,
+    public static final ValueDescriptor<Integer> PERCENTAGE_INTEGER_0_100 = new ValueDescriptor<>("Positive integer 0-100", Integer.class,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_PERCENTAGE)
     );
 
@@ -88,7 +89,7 @@ public final class ValueTypes {
     );
 
     @Pattern(regexp = TimeUtil.DURATION_REGEXP)
-    public static final ValueDescriptor<String> DURATION_STRING = new ValueDescriptor<>("Duration String", String.class);
+    public static final ValueDescriptor<String> DURATION_STRING = new ValueDescriptor<>("Duration string", String.class);
 
     public static final ValueDescriptor<String> PASSWORD = new ValueDescriptor<>("Password", String.class,
         new MetaItem<>(MetaTypes.SECRET, true)
@@ -118,19 +119,21 @@ public final class ValueTypes {
     public static final ValueDescriptor<String> UUID = new ValueDescriptor<>("UUID", String.class);
 
     @Size(min = 22, max = 22)
-    public static final ValueDescriptor<String> ASSET_ID = new ValueDescriptor<>("AssetId", String.class);
+    public static final ValueDescriptor<String> ASSET_ID = new ValueDescriptor<>("Asset ID", String.class);
 
-    public static final ValueDescriptor<AttributeLink> ATTRIBUTE_LINK = new ValueDescriptor<>("AttributeLink", AttributeLink.class);
+    public static final ValueDescriptor<AttributeLink> ATTRIBUTE_LINK = new ValueDescriptor<>("Attribute link", AttributeLink.class);
 
-    public static final ValueDescriptor<GeoJSONPoint> GEO_JSON_POINT = new ValueDescriptor<>("GeoJSON Point", GeoJSONPoint.class);
+    public static final ValueDescriptor<AttributeRef> ATTRIBUTE_REF = new ValueDescriptor<>("Attribute reference", AttributeRef.class);
 
-    public static final ValueDescriptor<CalendarEvent> CALENDAR_EVENT = new ValueDescriptor<>("CalendarEvent", CalendarEvent.class);
+    public static final ValueDescriptor<GeoJSONPoint> GEO_JSON_POINT = new ValueDescriptor<>("GeoJSON point", GeoJSONPoint.class);
 
-    public static final ValueDescriptor<AttributeExecuteStatus> EXECUTION_STATUS = new ValueDescriptor<>("Execution Status", AttributeExecuteStatus.class);
+    public static final ValueDescriptor<CalendarEvent> CALENDAR_EVENT = new ValueDescriptor<>("Calendar event", CalendarEvent.class);
 
-    public static final ValueDescriptor<ConnectionStatus> CONNECTION_STATUS = new ValueDescriptor<>("Connection Status", ConnectionStatus.class);
+    public static final ValueDescriptor<AttributeExecuteStatus> EXECUTION_STATUS = new ValueDescriptor<>("Execution status", AttributeExecuteStatus.class);
 
-    public static final ValueDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new ValueDescriptor<>("Console Providers", ConsoleProviders.class);
+    public static final ValueDescriptor<ConnectionStatus> CONNECTION_STATUS = new ValueDescriptor<>("Connection status", ConnectionStatus.class);
+
+    public static final ValueDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new ValueDescriptor<>("Console providers", ConsoleProviders.class);
 
     @Min(0)
     @Max(359)

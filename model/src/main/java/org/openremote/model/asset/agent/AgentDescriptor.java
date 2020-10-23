@@ -23,22 +23,49 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.v2.AttributeDescriptor;
 
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link org.openremote.model.asset.Asset}
  */
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonDeserialize(as = AgentDescriptorImpl.class)
-public interface AgentDescriptor extends AssetDescriptor {
-    @JsonProperty
-    boolean hasInstanceDiscovery();
+public class AgentDescriptor<T extends Agent> extends AssetDescriptor<T> {
 
-    @JsonProperty
-    boolean hasAssetDiscovery();
+    protected boolean instanceDiscovery;
+    protected boolean instanceImport;
+    protected boolean assetDiscovery;
+    protected boolean assetImport;
 
-    @JsonProperty
-    boolean hasInstanceImport();
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport) {
+        super(name, icon, colour, type, additionalAttributeDescriptors);
+        this.instanceDiscovery = instanceDiscovery;
+        this.instanceImport = instanceImport;
+        this.assetDiscovery = assetDiscovery;
+        this.assetImport = assetImport;
+    }
 
-    @JsonProperty
-    boolean hasAssetImport();
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport) {
+        super(name, icon, colour, type);
+        this.instanceDiscovery = instanceDiscovery;
+        this.instanceImport = instanceImport;
+        this.assetDiscovery = assetDiscovery;
+        this.assetImport = assetImport;
+    }
+
+    public boolean isInstanceDiscovery() {
+        return instanceDiscovery;
+    }
+
+    public boolean isInstanceImport() {
+        return instanceImport;
+    }
+
+    public boolean isAssetDiscovery() {
+        return assetDiscovery;
+    }
+
+    public boolean isAssetImport() {
+        return assetImport;
+    }
 }

@@ -22,10 +22,10 @@ package org.openremote.model.asset;
 import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.query.AssetQuery;
+import org.openremote.model.v2.MetaTypes;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
@@ -201,7 +201,7 @@ public interface AssetResource {
      * <p>
      * If the asset or attribute doesn't exist then a 404 status is returned.
      * <p>
-     * If an attribute is marked as {@link MetaItemType#ACCESS_PUBLIC_WRITE} then the attribute can be written publicly
+     * If an attribute is marked as {@link MetaTypes#ACCESS_PUBLIC_WRITE} then the attribute can be written publicly
      * <p>
      * This operation is ultimately asynchronous, any call will return before the actual attribute value is changed in
      * any storage or downstream processors. Thus any constraint violation or processing error will not be returned from

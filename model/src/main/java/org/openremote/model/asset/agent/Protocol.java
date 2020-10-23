@@ -23,7 +23,6 @@ import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.*;
 import org.openremote.model.auth.OAuthGrant;
 import org.openremote.model.query.AssetQuery;
@@ -36,8 +35,6 @@ import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
-import static org.openremote.model.attribute.MetaItemDescriptor.Access.ACCESS_PRIVATE;
-import static org.openremote.model.attribute.MetaItemDescriptorImpl.*;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_STRING_NON_EMPTY;
 

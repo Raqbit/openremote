@@ -21,7 +21,6 @@ package org.openremote.manager.asset;
 
 import org.openremote.model.ContainerProvider;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.container.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
@@ -69,7 +68,7 @@ public class AssetModelService implements ContainerService, AssetModelProvider {
         }
 
         @Override
-        public MetaItemDescriptor[] getMetaItemDescriptors() {
+        public MetaItemDescriptor[] getMetaDescriptors() {
             return new MetaItemDescriptor[0];
         }
 
@@ -117,7 +116,7 @@ public class AssetModelService implements ContainerService, AssetModelProvider {
         }
 
         @Override
-        public AttributeValueDescriptor[] getAttributeValueDescriptors() {
+        public AttributeValueDescriptor[] getValueDescriptors() {
             return new AttributeValueDescriptor[0];
         }
     }
@@ -171,12 +170,12 @@ public class AssetModelService implements ContainerService, AssetModelProvider {
         agentDescriptors.addAll(Arrays.asList(assetModelProvider.getAgentDescriptors()));
         assetDescriptors.addAll(Arrays.asList(assetModelProvider.getAssetDescriptors()));
         attributeDescriptors.addAll(Arrays.asList(assetModelProvider.getAttributeDescriptors()));
-        attributeValueDescriptors.addAll(Arrays.asList(assetModelProvider.getAttributeValueDescriptors()));
-        metaItemDescriptors.addAll(Arrays.asList(assetModelProvider.getMetaItemDescriptors()));
+        attributeValueDescriptors.addAll(Arrays.asList(assetModelProvider.getValueDescriptors()));
+        metaItemDescriptors.addAll(Arrays.asList(assetModelProvider.getMetaDescriptors()));
     }
 
     @Override
-    public MetaItemDescriptor[] getMetaItemDescriptors() {
+    public MetaItemDescriptor[] getMetaDescriptors() {
         return metaItemDescriptors.toArray(new MetaItemDescriptor[0]);
     }
 
@@ -196,7 +195,7 @@ public class AssetModelService implements ContainerService, AssetModelProvider {
     }
 
     @Override
-    public AttributeValueDescriptor[] getAttributeValueDescriptors() {
+    public AttributeValueDescriptor[] getValueDescriptors() {
         return attributeValueDescriptors.toArray(new AttributeValueDescriptor[0]);
     }
 

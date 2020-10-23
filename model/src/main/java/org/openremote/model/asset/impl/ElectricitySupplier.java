@@ -35,9 +35,42 @@ public class ElectricitySupplier extends Device {
     public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
-
-    
-    public static final AttributeDescriptor<Integer> EFFICIENCY = new AttributeDescriptor<>("efficiency", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
+    public static final AttributeDescriptor<Double> POWER_EDR_SETPOINT = new AttributeDescriptor<>("powerEDRSetpoint", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
+    );
+    public static final AttributeDescriptor<Double> POWER_EDR_RESERVE = new AttributeDescriptor<>("powerEDRReserve", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
+    );
+    public static final AttributeDescriptor<Integer> POWER_EDR_MIN_PERIOD = new AttributeDescriptor<>("powerEDRMinPeriod", true, ValueTypes.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_TIME_SECONDS)
+    );
+    public static final AttributeDescriptor<Double> TARIFF_IMPORT = new AttributeDescriptor<>("energyTariffImport", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
+    );
+    public static final AttributeDescriptor<Double> TARIFF_EXPORT = new AttributeDescriptor<>("energyTariffExport", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
+    );
+    public static final AttributeDescriptor<Double> ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION = new AttributeDescriptor<>("energyTariffImportForecastDeviation", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
+    public static final AttributeDescriptor<Double> ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION = new AttributeDescriptor<>("energyTariffExportForecastDeviation", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
+    public static final AttributeDescriptor<Double> ENERGY_TAX = new AttributeDescriptor<>("energyTax", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
+    );
+    public static final AttributeDescriptor<Double> GRID_COST = new AttributeDescriptor<>("gridCost", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
+    );
+    public static final AttributeDescriptor<Double> GRID_CONNECTION_COST = new AttributeDescriptor<>("gridConnectionCost", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
+    );
+    public static final AttributeDescriptor<Double> CARBON_IMPORT = new AttributeDescriptor<>("carbonImport", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_KILOGRAM_CARBON_PER_KILOWATT_HOUR)
+    );
+    public static final AttributeDescriptor<Double> CARBON_EXPORT = new AttributeDescriptor<>("carbonExport", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_KILOGRAM_CARBON_PER_KILOWATT_HOUR)
+    );
     public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
@@ -46,11 +79,26 @@ public class ElectricitySupplier extends Device {
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Double> ENERGY_TOTAL = new AttributeDescriptor<>("energyTotal", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_IMPORT = new AttributeDescriptor<>("energyTotalImport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Integer> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", true, ValueTypes.DIRECTION, null);
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_EXPORT = new AttributeDescriptor<>("energyTotalExport", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_IMPORT_COST = new AttributeDescriptor<>("energyTotalImportCost", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR),
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_EXPORT_INCOME = new AttributeDescriptor<>("energyTotalExportIncome", true, ValueTypes.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR),
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
+    public static final AttributeDescriptor<Integer> CARBON_TOTAL = new AttributeDescriptor<>("carbonTotal", true, ValueTypes.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_MASS_KILOGRAM),
+        new MetaItem<>(MetaTypes.READ_ONLY, true)
+    );
 
     public static final AssetDescriptor<ElectricitySupplier> DESCRIPTOR = new AssetDescriptor<>("Electricity supplier", "upload-network", "9257A9", ElectricitySupplier.class);
 
@@ -62,6 +110,58 @@ public class ElectricitySupplier extends Device {
         return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
     }
 
+    public Double getPowerCapacity() {
+        return getAttributes().get(POWER_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getPowerEDRSetpoint() {
+        return getAttributes().get(POWER_EDR_SETPOINT).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getPowerEDRReserve() {
+        return getAttributes().get(POWER_EDR_RESERVE).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Integer getPowerEDRMinPeriod() {
+        return getAttributes().get(POWER_EDR_MIN_PERIOD).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getTariffImport() {
+        return getAttributes().get(TARIFF_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getTariffExport() {
+        return getAttributes().get(TARIFF_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getEnergyTariffImportForecastDeviation() {
+        return getAttributes().get(ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getEnergyTariffExportForecastDeviation() {
+        return getAttributes().get(ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getEnergyTax() {
+        return getAttributes().get(ENERGY_TAX).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getGridCost() {
+        return getAttributes().get(GRID_COST).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getGridConnectionCost() {
+        return getAttributes().get(GRID_CONNECTION_COST).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getCarbonImport() {
+        return getAttributes().get(CARBON_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Double getCarbonExport() {
+        return getAttributes().get(CARBON_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    }
+
     public Double getPowerTotal() {
         return getAttributes().get(POWER_TOTAL).flatMap(Attribute::getValue).orElse(null);
     }
@@ -70,19 +170,23 @@ public class ElectricitySupplier extends Device {
         return getAttributes().get(POWER_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getPowerCapacity() {
-        return getAttributes().get(POWER_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalImport() {
+        return getAttributes().get(ENERGY_TOTAL_IMPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Integer getEfficiency() {
-        return getAttributes().get(EFFICIENCY).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalExport() {
+        return getAttributes().get(ENERGY_TOTAL_EXPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getEnergyTotal() {
-        return getAttributes().get(ENERGY_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalImportCost() {
+        return getAttributes().get(ENERGY_TOTAL_IMPORT_COST).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Integer getPanelOrientation() {
-        return getAttributes().get(PANEL_ORIENTATION).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalExportIncome() {
+        return getAttributes().get(ENERGY_TOTAL_EXPORT_INCOME).flatMap(Attribute::getValue).orElse(null);
+    }
+
+    public Integer getCarbonTotal() {
+        return getAttributes().get(CARBON_TOTAL).flatMap(Attribute::getValue).orElse(null);
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.openremote.model.asset.agent;
 
-import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.attribute.MetaItem;
 
 /**
@@ -53,12 +52,6 @@ public enum ConnectionStatus {
      */
     CONNECTED,
 
-    /**
-     * Disabled.
-     * <p>
-     * For protocol configurations this generally means that it is disabled (i.e. it has a
-     * {@link MetaItemType#DISABLED} {@link MetaItem} with a value of <code>true</code>).
-     */
     DISABLED,
 
     /**

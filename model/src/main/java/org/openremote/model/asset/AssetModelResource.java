@@ -20,14 +20,15 @@
 package org.openremote.model.asset;
 
 import jsinterop.annotations.JsType;
-import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.attribute.AttributeDescriptor;
-import org.openremote.model.attribute.AttributeValueDescriptor;
-import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
+import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.ValueDescriptor;
 
-import javax.ws.rs.*;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -46,26 +47,8 @@ public interface AssetModelResource {
     @SuppressWarnings("unusable-by-js")
     AssetDescriptor[] getAssetDescriptors(@BeanParam RequestParams requestParams);
 
-    @GET
-    @Path("agent/descriptors")
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
-    AgentDescriptor[] getAgentDescriptors(@BeanParam RequestParams requestParams);
-
     /**
-     * Retrieve attribute type descriptors {@link AttributeDescriptor} present.
-     * <p>
-     */
-    @GET
-    @Path("attribute/typeDescriptors")
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
-    AttributeDescriptor[] getAttributeDescriptors(@BeanParam RequestParams requestParams);
-
-    /**
-     * Retrieve attribute type descriptors {@link AttributeValueDescriptor} present.
+     * Retrieve value descriptors {@link ValueDescriptor}.
      * <p>
      */
     @GET
@@ -73,10 +56,10 @@ public interface AssetModelResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @SuppressWarnings("unusable-by-js")
-    AttributeValueDescriptor[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
+    ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
 
     /**
-     * Retrieve meta type descriptors {@link MetaItemDescriptor} present.
+     * Retrieve meta descriptors {@link MetaDescriptor} present.
      * <p>
      */
     @GET
@@ -84,5 +67,5 @@ public interface AssetModelResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @SuppressWarnings("unusable-by-js")
-    MetaItemDescriptor[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
+    MetaDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
 }

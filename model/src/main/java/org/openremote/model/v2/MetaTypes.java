@@ -68,7 +68,7 @@ public final class MetaTypes {
      * Marks the attribute as writable by restricted clients and therefore users who are linked to the asset, see {@link
      * UserAsset}.
      */
-    public static final MetaDescriptor<Boolean> ACCESS_PROTECTED_WRITE = new MetaDescriptor<>("accessRestrictedWrite", BOOLEAN);
+    public static final MetaDescriptor<Boolean> ACCESS_RESTRICTED_WRITE = new MetaDescriptor<>("accessRestrictedWrite", BOOLEAN);
 
     /**
      * Marks the attribute as read-only for non-superuser clients. South-bound {@link AttributeEvent}s by regular or

@@ -19,7 +19,7 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.attribute.MetaItemDescriptor;
+import org.openremote.model.v2.MetaDescriptor;
 
 public class MetaPredicate {
 
@@ -33,8 +33,8 @@ public class MetaPredicate {
         this.itemNamePredicate = itemNamePredicate;
     }
 
-    public MetaPredicate(MetaItemDescriptor metaItemDescriptor) {
-        this.itemNamePredicate = new StringPredicate(metaItemDescriptor.getUrn());
+    public MetaPredicate(MetaDescriptor<?> metaDescriptor) {
+        this.itemNamePredicate = new StringPredicate(metaDescriptor.getName());
     }
 
     public MetaPredicate(ValuePredicate itemValuePredicate) {
@@ -46,8 +46,8 @@ public class MetaPredicate {
         this.itemValuePredicate = itemValuePredicate;
     }
 
-    public MetaPredicate(MetaItemDescriptor metaItemDescriptor, ValuePredicate itemValuePredicate) {
-        this(new StringPredicate(metaItemDescriptor.getUrn()), itemValuePredicate);
+    public MetaPredicate(MetaDescriptor<?> metaItemDescriptor, ValuePredicate itemValuePredicate) {
+        this(new StringPredicate(metaItemDescriptor.getName()), itemValuePredicate);
     }
 
     public MetaPredicate itemName(StringPredicate itemNamePredicate) {
@@ -55,8 +55,8 @@ public class MetaPredicate {
         return this;
     }
 
-    public MetaPredicate itemName(MetaItemDescriptor metaItemDescriptor) {
-        return itemName(new StringPredicate(metaItemDescriptor.getUrn()));
+    public MetaPredicate itemName(MetaDescriptor<?> metaItemDescriptor) {
+        return itemName(new StringPredicate(metaItemDescriptor.getName()));
     }
 
     public MetaPredicate itemValue(ValuePredicate itemValuePredicate) {

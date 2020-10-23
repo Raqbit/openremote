@@ -19,23 +19,17 @@
  */
 package org.openremote.model.asset;
 
-import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.attribute.AttributeDescriptor;
-import org.openremote.model.attribute.AttributeValueDescriptor;
-import org.openremote.model.attribute.MetaItemDescriptor;
+import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.ValueDescriptor;
 
 /**
  * Extend the asset model in custom projects.
  */
 public interface AssetModelProvider {
 
-    MetaItemDescriptor[] getMetaItemDescriptors();
+    MetaDescriptor<?>[] getMetaDescriptors();
 
-    AssetDescriptor[] getAssetDescriptors();
+    AssetDescriptor<?>[] getAssetDescriptors();
 
-    AgentDescriptor[] getAgentDescriptors();
-
-    AttributeDescriptor[] getAttributeDescriptors();
-
-    AttributeValueDescriptor[] getAttributeValueDescriptors();
+    ValueDescriptor<?>[] getValueDescriptors();
 }

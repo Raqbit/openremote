@@ -19,7 +19,7 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.asset.AssetType;
+import org.openremote.model.asset.AssetDescriptor;
 
 public class ParentPredicate {
 
@@ -49,8 +49,8 @@ public class ParentPredicate {
         return this;
     }
 
-    public ParentPredicate type(AssetType type) {
-        return type(type.getType());
+    public ParentPredicate type(AssetDescriptor<?> type) {
+        return type(type.getName());
     }
 
     public ParentPredicate name(String name) {

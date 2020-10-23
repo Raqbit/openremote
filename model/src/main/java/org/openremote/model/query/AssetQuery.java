@@ -20,9 +20,9 @@
 package org.openremote.model.query;
 
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.asset.AssetType;
-import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.query.filter.*;
+import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.NameProvider;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -83,13 +83,13 @@ public class AssetQuery {
             return this;
         }
 
-        public Select meta(MetaItemDescriptor... meta) {
+        public Select meta(MetaDescriptor<?>... meta) {
             if (meta == null) {
                 this.meta = null;
                 return this;
             }
 
-            return meta(Arrays.stream(meta).map(MetaItemDescriptor::getUrn).toArray(String[]::new));
+            return meta(Arrays.stream(meta).map(NameProvider::getName).toArray(String[]::new));
         }
 
         public Select excludeAttributes(boolean exclude) {
@@ -301,7 +301,7 @@ public class AssetQuery {
         return this;
     }
 
-    public AssetQuery parents(AssetType... assetTypes) {
+    public AssetQuery parents(AssetDescriptor<?>... assetTypes) {
         if (assetTypes == null || assetTypes.length == 0) {
             this.names = null;
             return this;
@@ -345,13 +345,13 @@ public class AssetQuery {
         return this;
     }
 
-    public AssetQuery types(AssetDescriptor... types) {
+    public AssetQuery types(AssetDescriptor<?>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;
         }
 
-        this.types = Arrays.stream(types).map(at -> new StringPredicate(at.getType())).toArray(StringPredicate[]::new);
+        this.types = Arrays.stream(types).map(at -> new StringPredicate(at.getName())).toArray(StringPredicate[]::new);
         return this;
     }
 
@@ -427,12 +427,12 @@ public class AssetQuery {
         return getClass().getSimpleName() + "{" +
                 "select=" + select +
                 ", ids=" + (ids != null ? Arrays.toString(ids) : "null") +
-                ", name=" + names +
-                ", parent=" + parents +
-                ", path=" + paths +
+                ", name=" + Arrays.toString(names) +
+                ", parent=" + Arrays.toString(parents) +
+                ", path=" + Arrays.toString(paths) +
                 ", tenant=" + tenant +
-                ", userId='" + userIds + '\'' +
-                ", type=" + types +
+                ", userId='" + Arrays.toString(userIds) + '\'' +
+                ", type=" + Arrays.toString(types) +
                 ", attribute=" + (attributes != null ? attributes.toString() : "null") +
                 ", attributeMeta=" + Arrays.toString(attributeMeta) +
                 ", orderBy=" + orderBy +

@@ -39,8 +39,8 @@ public class ElectricityStorage extends Device {
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Integer> ENERGY_IN_PERCENTAGE = new AttributeDescriptor<>("energyInPercentage", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
-    public static final AttributeDescriptor<Double> ENERGY_IN = new AttributeDescriptor<>("energyIn", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Integer> ENERGY_AVAILABLE_PERCENTAGE = new AttributeDescriptor<>("energyAvailablePercentage", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
+    public static final AttributeDescriptor<Double> ENERGY_AVAILABLE = new AttributeDescriptor<>("energyAvailable", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
@@ -48,18 +48,18 @@ public class ElectricityStorage extends Device {
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Double> ENERGY_IN_TOTAL = new AttributeDescriptor<>("energyInTotal", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_IMPORT = new AttributeDescriptor<>("energyTotalImport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Double> ENERGY_OUT_TOTAL = new AttributeDescriptor<>("energyOutTotal", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL_EXPORT = new AttributeDescriptor<>("energyTotalExport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
         new MetaItem<>(MetaTypes.READ_ONLY, true)
     );
-    public static final AttributeDescriptor<Double> POWER_CAPACITY_IN = new AttributeDescriptor<>("powerCapacityIn", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> POWER_CAPACITY_IMPORT = new AttributeDescriptor<>("powerCapacityImport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
-    public static final AttributeDescriptor<Double> POWER_CAPACITY_OUT = new AttributeDescriptor<>("powerCapacityOut", true, ValueTypes.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> POWER_CAPACITY_EXPORT = new AttributeDescriptor<>("powerCapacityExport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
     public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
@@ -98,32 +98,32 @@ public class ElectricityStorage extends Device {
         return getAttributes().get(ENERGY_CAPACITY).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Integer getEnergyInPercentage() {
-        return getAttributes().get(ENERGY_IN_PERCENTAGE).flatMap(Attribute::getValue).orElse(null);
+    public Integer getEnergyAvailablePercentage() {
+        return getAttributes().get(ENERGY_AVAILABLE_PERCENTAGE).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getEnergyIn() {
-        return getAttributes().get(ENERGY_IN).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyAvailable() {
+        return getAttributes().get(ENERGY_AVAILABLE).flatMap(Attribute::getValue).orElse(null);
     }
 
     public Double getEnergyCapacityRemaining() {
         return getAttributes().get(ENERGY_CAPACITY_REMAINING).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getEnergyInTotal() {
-        return getAttributes().get(ENERGY_IN_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalImport() {
+        return getAttributes().get(ENERGY_TOTAL_IMPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getEnergyOutTotal() {
-        return getAttributes().get(ENERGY_OUT_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Double getEnergyTotalExport() {
+        return getAttributes().get(ENERGY_TOTAL_EXPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getPowerCapacityIn() {
-        return getAttributes().get(POWER_CAPACITY_IN).flatMap(Attribute::getValue).orElse(null);
+    public Double getPowerCapacityImport() {
+        return getAttributes().get(POWER_CAPACITY_IMPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
-    public Double getPowerCapacityOut() {
-        return getAttributes().get(POWER_CAPACITY_OUT).flatMap(Attribute::getValue).orElse(null);
+    public Double getPowerCapacityExport() {
+        return getAttributes().get(POWER_CAPACITY_EXPORT).flatMap(Attribute::getValue).orElse(null);
     }
 
     public Double getPowerTotal() {
