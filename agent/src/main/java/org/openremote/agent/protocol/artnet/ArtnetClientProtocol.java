@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.openremote.container.util.Util.joinCollections;
+import static org.openremote.model.value.Values.joinCollections;
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.asset.AssetType.THING;
 import static org.openremote.model.attribute.AttributeValueType.*;
@@ -278,7 +278,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                                 Map<String, Integer> valuesToUpdate = new LinkedHashMap<>();
                                 for(String requiredKey : updatedLight.getRequiredValues()) {
                                     try {
-                                        JsonNode node = Container.JSON.readTree(processedValue.toJson());
+                                        JsonNode node = Values.JSON.readTree(processedValue.toJson());
                                         JsonNode requiredKeyValue = node.get(requiredKey);
                                         if(requiredKeyValue == null)
                                             throw new NullPointerException("Could not find key: " + requiredKey + " in the json-file.");
@@ -292,7 +292,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                             //UPDATE DIM
                             else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Dim")) {
                                 try {
-                                    JsonNode node = Container.JSON.readTree(processedValue.toJson());
+                                    JsonNode node = Values.JSON.readTree(processedValue.toJson());
                                     int dimValue = node.asInt();
                                     updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), dimValue, oldLightState.isEnabled()));
                                 } catch (JsonProcessingException e) {
@@ -302,7 +302,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                             //UPDATE ENABLED/DISABLED
                             else if(event.getAttributeRef().getAttributeName().equalsIgnoreCase("Switch")) {
                                 try{
-                                    JsonNode node = Container.JSON.readTree(processedValue.toJson());
+                                    JsonNode node = Values.JSON.readTree(processedValue.toJson());
                                     boolean enabled = node.asBoolean();
                                     updateLightStateInMemory(lightId, new ArtnetLightState(lightId, oldLightState.getReceivedValues(), oldLightState.getDim(), enabled));
                                 } catch (JsonProcessingException e) {
@@ -436,7 +436,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                                         new Attribute("Universe", NUMBER, Values.create(updatedLight.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                                         new Attribute("AmountOfLeds", NUMBER, Values.create(updatedLight.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                                         new Attribute("RequiredValues", STRING, Values.create(String.join(",", updatedLight.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                                        new Attribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
+                                        new Attribute("Values", OBJECT, Values.parseOrNull(Values.JSON.writeValueAsString(values))).addMeta(
                                                 new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                                         ),
                                         new Attribute("Switch", BOOLEAN, Values.create(true)).addMeta(
@@ -504,7 +504,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                 new Attribute("Universe", NUMBER, Values.create(light.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                 new Attribute("AmountOfLeds", NUMBER, Values.create(light.getAmountOfLeds())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                 new Attribute("RequiredValues", STRING, Values.create(String.join(",", light.getRequiredValues()))).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
-                new Attribute("Values", OBJECT, Values.parseOrNull(Container.JSON.writeValueAsString(values))).addMeta(
+                new Attribute("Values", OBJECT, Values.parseOrNull(Values.JSON.writeValueAsString(values))).addMeta(
                         new MetaItem(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                 ),
                 new Attribute("Switch", BOOLEAN, Values.create(true)).addMeta(

@@ -19,14 +19,12 @@
  */
 package org.openremote.model.http;
 
-import com.google.gwt.http.client.Response;
-import jsinterop.annotations.JsType;
+import javax.ws.rs.core.Response;
 
-@JsType
 public class ConflictRequestError extends RequestError {
 
     public ConflictRequestError() {
-        super(Response.SC_CONFLICT, "Conflicting resource state (concurrent updates?)");
+        super(Response.Status.CONFLICT.getStatusCode(), "Conflicting resource state (concurrent updates?)");
     }
 
 }

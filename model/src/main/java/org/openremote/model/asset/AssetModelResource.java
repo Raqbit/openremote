@@ -19,7 +19,6 @@
  */
 package org.openremote.model.asset;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.v2.MetaDescriptor;
@@ -33,7 +32,6 @@ import javax.ws.rs.Produces;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("model")
-@JsType(isNative = true)
 public interface AssetModelResource {
 
     /**

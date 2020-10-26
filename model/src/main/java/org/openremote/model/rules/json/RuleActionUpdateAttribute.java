@@ -19,8 +19,6 @@
  */
 package org.openremote.model.rules.json;
 
-import org.openremote.model.value.Value;
-
 public class RuleActionUpdateAttribute extends RuleAction {
     public enum UpdateAction {
         ADD,

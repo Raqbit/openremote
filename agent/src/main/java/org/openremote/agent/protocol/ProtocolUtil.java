@@ -88,7 +88,7 @@ public final class ProtocolUtil {
 
         try {
             String json = arrayValueOptional.get().toJson();
-            return Optional.of(Container.JSON.readValue(json, ValueFilter[].class));
+            return Optional.of(Values.JSON.readValue(json, ValueFilter[].class));
         } catch (Exception e) {
             Protocol.LOG.log(Level.WARNING, e.getMessage(), e);
         }
@@ -104,7 +104,7 @@ public final class ProtocolUtil {
             .map(objValue -> {
                 String json = objValue.toJson();
                 try {
-                    return Container.JSON.readValue(json, OAuthGrant.class);
+                    return Values.JSON.readValue(json, OAuthGrant.class);
                 } catch (IOException e) {
                     throw new IllegalArgumentException("OAuth Grant meta item is not valid", e);
                 }
@@ -234,7 +234,7 @@ public final class ProtocolUtil {
         return new Pair<>(false, value);
     }
 
-    public static Pair<Boolean, Value> applyValueConverter(Value value, ObjectValue converter) {
+    public static Pair<Boolean, Object> applyValueConverter(Value value, ObjectValue converter) {
 
         if (converter == null) {
             return new Pair<>(false, value);
@@ -269,7 +269,7 @@ public final class ProtocolUtil {
             .map(Value::toJson)
             .map(json -> {
                 try {
-                    return Container.JSON.readValue(json, ValueFilter[].class);
+                    return Values.JSON.readValue(json, ValueFilter[].class);
                 } catch (IOException e) {
                     Protocol.LOG.log(Level.WARNING, "Failed to deserialize ValueFilter[]", e);
                     return null;
@@ -284,7 +284,7 @@ public final class ProtocolUtil {
             .map(Value::toJson)
             .map(s -> {
                 try {
-                    return Container.JSON.readValue(s, StringPredicate.class);
+                    return Values.JSON.readValue(s, StringPredicate.class);
                 } catch (IOException e) {
                     Protocol.LOG.log(Level.WARNING, "Failed to deserialise StringPredicate", e);
                     return null;

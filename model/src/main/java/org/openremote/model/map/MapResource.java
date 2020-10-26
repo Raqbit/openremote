@@ -19,17 +19,14 @@
  */
 package org.openremote.model.map;
 
-import jsinterop.annotations.JsType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
-import org.openremote.model.value.ObjectValue;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("map")
-@JsType(isNative = true)
 public interface MapResource {
 
     /**
@@ -39,7 +36,7 @@ public interface MapResource {
     @Produces(MediaType.APPLICATION_JSON)
     @SuccessStatusCode(200)
     @SuppressWarnings("unusable-by-js")
-    ObjectValue getSettings(@BeanParam RequestParams requestParams);
+    ObjectNode getSettings(@BeanParam RequestParams requestParams);
 
     /**
      * Returns tileJSON object used to initialise Mapbox JS
@@ -49,7 +46,7 @@ public interface MapResource {
     @Produces(MediaType.APPLICATION_JSON)
     @SuccessStatusCode(200)
     @SuppressWarnings("unusable-by-js")
-    ObjectValue getSettingsJs(@BeanParam RequestParams requestParams);
+    ObjectNode getSettingsJs(@BeanParam RequestParams requestParams);
 
     /**
      * Gets vector tile data for Mapbox GL

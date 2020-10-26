@@ -19,19 +19,11 @@
  */
 package org.openremote.model.rules;
 
-import javaemul.internal.annotations.GwtIncompatible;
-import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.AbstractValueTimestampHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.asset.AssetType;
 import org.openremote.model.attribute.AttributeEvent;
-import org.openremote.model.attribute.AttributeValueDescriptor;
-import org.openremote.model.attribute.Meta;
-import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
+import org.openremote.model.attribute.MetaList;
+import org.openremote.model.v2.ValueDescriptor;
 
 import java.util.Date;
 import java.util.Objects;
@@ -44,20 +36,19 @@ import java.util.Optional;
  * are equal if they have the same asset ID and attribute name (the same attribute
  * reference).
  */
-@GwtIncompatible
 public class AssetState implements Comparable<AssetState> {
 
     final protected String attributeName;
 
-    final protected AttributeValueDescriptor attributeValueType;
+    final protected ValueDescriptor<?> attributeValueType;
 
-    final protected Value value;
+    final protected Object value;
 
     final protected long timestamp;
 
     final protected AttributeEvent.Source source;
 
-    final protected Value oldValue;
+    final protected Object oldValue;
 
     final protected long oldValueTimestamp;
 
@@ -65,9 +56,7 @@ public class AssetState implements Comparable<AssetState> {
 
     final protected String name;
 
-    final protected String typeString;
-
-    final protected AssetType type;
+    final protected String type;
 
     final protected Date createdOn;
 
@@ -77,54 +66,28 @@ public class AssetState implements Comparable<AssetState> {
 
     final protected String parentName;
 
-    final protected String parentTypeString;
-
-    final protected AssetType parentType;
+    final protected String parentType;
 
     final protected String realm;
 
-    final protected Meta meta;
+    final protected MetaList meta;
 
-    public AssetState(AssetState that) {
-        this.attributeName = that.attributeName;
-        this.attributeValueType = that.attributeValueType;
-        this.value = that.value;
-        this.timestamp = that.timestamp;
-        this.source = that.source;
-        this.oldValue = that.oldValue;
-        this.oldValueTimestamp = that.oldValueTimestamp;
-        this.id = that.id;
-        this.name = that.name;
-        this.typeString = that.typeString;
-        this.type = that.type;
-        this.createdOn = that.createdOn;
-        this.path = that.path;
-        this.parentId = that.parentId;
-        this.parentName = that.parentName;
-        this.parentTypeString = that.parentTypeString;
-        this.parentType = that.parentType;
-        this.realm = that.realm;
-        this.meta = that.meta;
-    }
-
-    public AssetState(Asset asset, Attribute attribute, AttributeEvent.Source source) {
-        this.attributeName = attribute.getNameOrThrow();
-        this.attributeValueType = attribute.getTypeOrThrow();
+    public AssetState(Asset asset, Attribute<?> attribute, AttributeEvent.Source source) {
+        this.attributeName = attribute.getName();
+        this.attributeValueType = attribute.getValueType();
         this.value = attribute.getValue().orElse(null);
-        this.timestamp = attribute.getValueTimestamp().orElse(-1L);
+        this.timestamp = attribute.getTimestamp();
         this.source = source;
-        this.oldValue = asset.getAttribute(attributeName).flatMap(AbstractValueHolder::getValue).orElse(null);
-        this.oldValueTimestamp = asset.getAttribute(attributeName).flatMap(AbstractValueTimestampHolder::getValueTimestamp).orElse(-1L);
+        this.oldValue = asset.getAttributes().get(attributeName).flatMap(Attribute::getValue).orElse(null);
+        this.oldValueTimestamp = asset.getAttributes().get(attributeName).map(Attribute::getTimestamp).orElse(-1L);
         this.id = asset.getId();
         this.name = asset.getName();
-        this.typeString = asset.getType();
-        this.type = asset.getWellKnownType();
+        this.type = asset.getType();
         this.createdOn = asset.getCreatedOn();
         this.path = asset.getPath();
         this.parentId = asset.getParentId();
         this.parentName = asset.getParentName();
-        this.parentTypeString = asset.getParentType();
-        this.parentType = asset.getParentWellKnownType();
+        this.parentType = asset.getParentType();
         this.realm = asset.getRealm();
         this.meta = attribute.getMeta();
     }
@@ -133,11 +96,11 @@ public class AssetState implements Comparable<AssetState> {
         return attributeName;
     }
 
-    public AttributeValueDescriptor getAttributeValueType() {
+    public ValueDescriptor<?> getAttributeValueType() {
         return attributeValueType;
     }
 
-    public Optional<Value> getValue() {
+    public Optional<Object> getValue() {
         return Optional.ofNullable(value);
     }
 
@@ -149,7 +112,7 @@ public class AssetState implements Comparable<AssetState> {
         return source;
     }
 
-    public Optional<Value> getOldValue() {
+    public Optional<Object> getOldValue() {
         return Optional.ofNullable(oldValue);
     }
 
@@ -169,11 +132,7 @@ public class AssetState implements Comparable<AssetState> {
         return name;
     }
 
-    public String getTypeString() {
-        return typeString;
-    }
-
-    public AssetType getType() {
+    public String getType() {
         return type;
     }
 
@@ -189,11 +148,7 @@ public class AssetState implements Comparable<AssetState> {
         return parentName;
     }
 
-    public String getParentTypeString() {
-        return parentTypeString;
-    }
-
-    public AssetType getParentType() {
+    public String getParentType() {
         return parentType;
     }
 
@@ -201,76 +156,8 @@ public class AssetState implements Comparable<AssetState> {
         return realm;
     }
 
-    public Meta getMeta() {
+    public MetaList getMeta() {
         return meta;
-    }
-
-    public boolean isValueChanged() {
-        return !getValue().equals(Optional.ofNullable(oldValue));
-    }
-
-    public Optional<Boolean> getValueAsBoolean() {
-        return getValue().flatMap(Values::getBoolean);
-    }
-
-    public Optional<Double> getValueAsNumber() {
-        return getValue().flatMap(Values::getNumber);
-    }
-
-    public Optional<String> getValueAsString() {
-        return getValue().flatMap(Values::getString);
-    }
-
-    public Optional<ObjectValue> getValueAsObject() {
-        return getValue().flatMap(Values::getObject);
-    }
-
-    public Optional<ArrayValue> getValueAsArray() {
-        return getValue().flatMap(Values::getArray);
-    }
-
-    /**
-     * <code>true</code> if this value is not empty and that value is null or this value is greater than that value.
-     */
-    public boolean isValueGreaterThan(Number that) {
-        Optional<Double> number = getValueAsNumber();
-        return (number.isPresent() && that == null) || (number.isPresent() && number.get() > that.doubleValue());
-    }
-
-    /**
-     * <code>true</code> if this value is not empty and the old value is null or this value is greater than old value.
-     */
-    public boolean isValueGreaterThanOldValue() {
-        return isValueGreaterThan(Values.getNumber(getOldValue().orElse(null)).orElse(null));
-    }
-
-    /**
-     * <code>true</code> if this value is empty and that value is not null or this value is less than that value.
-     */
-    public boolean isValueLessThan(Number that) {
-        Optional<Double> number = getValueAsNumber();
-        return (!number.isPresent() && that != null) || (number.isPresent() && number.get() < that.doubleValue());
-    }
-
-    /**
-     * <code>true</code> if this value is empty and the old value is not null or this value is less than old value.
-     */
-    public boolean isValueLessThanOldValue() {
-        return isValueLessThan(Values.getNumber(getOldValue().orElse(null)).orElse(null));
-    }
-
-    /**
-     * Value is empty or {@link org.openremote.model.value.BooleanValue} <code>false</code>.
-     */
-    public boolean isValueFalse() {
-        return !getValueAsBoolean().isPresent() || !getValueAsBoolean().get();
-    }
-
-    /**
-     * Value is not empty and {@link org.openremote.model.value.BooleanValue} <code>true</code>.
-     */
-    public boolean isValueTrue() {
-        return getValueAsBoolean().isPresent() && getValueAsBoolean().get();
     }
 
     /**
@@ -321,12 +208,12 @@ public class AssetState implements Comparable<AssetState> {
             "id='" + getId() + '\'' +
             ", name='" + getName() + '\'' +
             ", parentName='" + getParentName() + '\'' +
-            ", type='" + getTypeString() + '\'' +
+            ", type='" + getType() + '\'' +
             ", attributeName='" + getAttributeName() + '\'' +
             ", attributeValueDescriptor=" + getAttributeValueType() +
-            ", value=" + (getValue().isPresent() ? getValue().get().toJson() : "null") + // TODO Performance?
+            ", value=" + getValue() +
             ", timestamp=" + getTimestamp() +
-            ", oldValue=" + (getOldValue().isPresent() ? getOldValue().get().toJson() : "null") +
+            ", oldValue=" + getOldValue() +
             ", oldValueTimestamp=" + getOldValueTimestamp() +
             ", source=" + getSource() +
             '}';

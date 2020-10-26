@@ -19,9 +19,6 @@
  */
 package org.openremote.model.http;
 
-import jsinterop.annotations.JsType;
-
-@JsType
 public class EntityMarshallingRequestError extends RequestError {
 
     public EntityMarshallingRequestError(int statusCode, Throwable cause) {

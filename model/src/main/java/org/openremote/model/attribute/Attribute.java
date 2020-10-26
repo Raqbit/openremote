@@ -19,7 +19,7 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.v2.AbstractNameValueProviderImpl;
+import org.openremote.model.v2.AbstractNameValueHolderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
@@ -29,9 +29,9 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
+public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 
-    protected MetaItemList meta;
+    protected MetaList meta;
     protected long timestamp;
 
     protected Attribute() {
@@ -55,15 +55,15 @@ public class Attribute<T> extends AbstractNameValueProviderImpl<T> {
         }
     }
 
-    public MetaItemList getMeta() {
+    public MetaList getMeta() {
         if (meta == null) {
-            meta = new MetaItemList();
+            meta = new MetaList();
         }
 
         return meta;
     }
 
-    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaItemList meta) {
+    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaList meta) {
         getMeta().addAll(meta);
         return this;
     }

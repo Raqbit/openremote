@@ -24,10 +24,8 @@ import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
-import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
 import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_ENDPOINT;

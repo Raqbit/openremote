@@ -26,7 +26,7 @@ import org.openremote.model.value.ValueType;
  * Simple interface for converting device property values into attribute values
  */
 public interface DevicePropertyValue<T> {
-    Value toValue(ValueType valueType);
+    <U> U toValue(ValueType valueType);
 
     T getPropertyValue();
 }

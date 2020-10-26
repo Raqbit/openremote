@@ -19,10 +19,6 @@
  */
 package org.openremote.model.http;
 
-import jsinterop.annotations.JsProperty;
-import jsinterop.annotations.JsType;
-
-@JsType
 public class RequestError {
 
     protected double statusCode;
@@ -33,12 +29,10 @@ public class RequestError {
         this.message = message;
     }
 
-    @JsProperty
     public double getStatusCode() {
         return statusCode;
     }
 
-    @JsProperty
     public String getMessage() {
         return message;
     }

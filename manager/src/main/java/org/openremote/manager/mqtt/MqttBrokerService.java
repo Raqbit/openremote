@@ -152,7 +152,7 @@ public class MqttBrokerService implements ContainerService {
 
     public void sendAttributeEvent(String clientId, AttributeEvent attributeEvent) {
         try {
-            ByteBuf payload = Unpooled.copiedBuffer(Container.JSON.writeValueAsString(attributeEvent), Charset.defaultCharset());
+            ByteBuf payload = Unpooled.copiedBuffer(Values.JSON.writeValueAsString(attributeEvent), Charset.defaultCharset());
 
             MqttPublishMessage publishMessage = MqttMessageBuilders.publish()
                     .qos(MqttQoS.AT_MOST_ONCE)

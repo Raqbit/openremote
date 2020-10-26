@@ -20,8 +20,6 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
 
 public class NumberPredicate implements ValuePredicate {
 
@@ -96,16 +94,6 @@ public class NumberPredicate implements ValuePredicate {
     public NumberPredicate negate(boolean negate) {
         this.negate = negate;
         return this;
-    }
-
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("predicateType", name);
-        objectValue.put("value", Values.create(value));
-        objectValue.put("rangeValue", Values.create(rangeValue));
-        objectValue.put("negate", Values.create(negate));
-        objectValue.put("operator", Values.create(operator.toString()));
-        return objectValue;
     }
 
     @Override

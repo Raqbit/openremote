@@ -24,18 +24,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.openremote.model.ValidationFailure;
-import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.AttributeValueDescriptor;
-import org.openremote.model.simulator.element.ColorSimulatorElement;
-import org.openremote.model.simulator.element.ReplaySimulatorElement;
-import org.openremote.model.simulator.element.NumberSimulatorElement;
-import org.openremote.model.simulator.element.SwitchSimulatorElement;
-import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
+import org.openremote.model.v2.ValueDescriptor;
 import org.openremote.model.value.Values;
 
+import org.openremote.model.simulator.element.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +47,7 @@ import java.util.Optional;
 public abstract class SimulatorElement implements ValueHolder {
 
     public AttributeRef attributeRef;
-    public AttributeValueDescriptor expectedType;
+    public ValueDescriptor<?> expectedType;
     @JsonIgnore
     public Value elementValue = null;
 

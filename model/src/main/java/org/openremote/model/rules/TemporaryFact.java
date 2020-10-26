@@ -19,7 +19,6 @@
  */
 package org.openremote.model.rules;
 
-import javaemul.internal.annotations.GwtIncompatible;
 import org.openremote.model.event.Event;
 
 import java.time.Instant;
@@ -30,7 +29,6 @@ import java.time.temporal.ChronoUnit;
 /**
  * A rule fact that has a timestamp, it expires after a certain time.
  */
-@GwtIncompatible
 public class TemporaryFact<T> extends Event {
 
     /**

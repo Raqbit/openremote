@@ -23,7 +23,6 @@ import org.openremote.model.flow.Node;
 import org.openremote.model.flow.NodeColor;
 import org.openremote.model.flow.catalog.CatalogCategory;
 import org.openremote.model.flow.catalog.WidgetNodeDescriptor;
-import org.openremote.model.value.ObjectValue;
 
 import java.util.function.Supplier;
 

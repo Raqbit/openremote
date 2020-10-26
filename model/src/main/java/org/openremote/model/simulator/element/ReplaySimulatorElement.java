@@ -21,11 +21,8 @@ package org.openremote.model.simulator.element;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openremote.model.ModelModule;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.value.Value;
 
 import java.util.Arrays;
 

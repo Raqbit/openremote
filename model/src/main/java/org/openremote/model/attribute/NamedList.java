@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.openremote.model.v2.NameProvider;
 import org.openremote.model.v2.NameValueDescriptorProvider;
-import org.openremote.model.v2.ValueProvider;
+import org.openremote.model.v2.ValueHolder;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,7 +46,7 @@ import java.util.function.UnaryOperator;
  */
 @JsonSerialize(using = NamedList.NamedListSerializer.class)
 @JsonDeserialize(using = NamedList.NamedListDeserializer.class)
-public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayList<T> {
+public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayList<T> {
 
     public static class NamedListSerializer extends StdSerializer<NamedList<?>> {
 
@@ -72,7 +72,7 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
      * value field. The key of the entry is then assigned to the name field and then this {@link ObjectNode} is
      * deserialized as an instance of {@link #innerClass} using the same deserialization context.
      */
-    public static class NamedListDeserializer<T extends NameProvider & ValueProvider<?>> extends StdDeserializer<NamedList<T>> {
+    public static class NamedListDeserializer<T extends NameProvider & ValueHolder<?>> extends StdDeserializer<NamedList<T>> {
 
         protected Class<T> innerClass;
 
@@ -182,7 +182,7 @@ public class NamedList<T extends NameProvider & ValueProvider<?>> extends ArrayL
     }
 
     @SuppressWarnings("unchecked")
-    protected <S, U extends ValueProvider<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    protected <S, U extends ValueHolder<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
         Optional<T> valueProvider = get(nameValueDescriptorProvider);
         return valueProvider.map(item -> {
             Class<?> itemType = item.getValueType().getType();

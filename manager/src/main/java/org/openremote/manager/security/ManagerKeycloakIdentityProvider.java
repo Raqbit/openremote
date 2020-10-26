@@ -52,7 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.openremote.container.util.JsonUtil.convert;
+import static org.openremote.model.value.Values.convert;
 import static org.openremote.container.util.MapAccess.getBoolean;
 import static org.openremote.container.util.MapAccess.getString;
 import static org.openremote.container.web.WebService.WEBSERVER_ALLOWED_ORIGINS;
@@ -160,7 +160,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
     public User createUser(String realm, User user, String password) {
         RealmResource realmResource = getRealms().realm(realm);
         Response response = realmResource.users().create(
-                convert(Container.JSON, UserRepresentation.class, user)
+                convert(UserRepresentation.class, user)
             );
         response.close();
         if (!response.getStatusInfo().equals(Response.Status.CREATED)) {
@@ -203,7 +203,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
     public void resetPassword(String realm, String userId, Credential credential) {
         getRealms()
             .realm(realm).users().get(userId).resetPassword(
-            convert(Container.JSON, CredentialRepresentation.class, credential)
+            convert(CredentialRepresentation.class, credential)
         );
     }
 
@@ -297,7 +297,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
     @Override
     public Tenant getTenant(String realm) {
         RealmRepresentation realmRepresentation = getRealms().realm(realm).toRepresentation();
-        return convert(Container.JSON, Tenant.class, realmRepresentation);
+        return convert(Tenant.class, realmRepresentation);
     }
 
     @Override
@@ -335,7 +335,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
     public Tenant createTenant(Tenant tenant) {
         LOG.fine("Create tenant: " + tenant);
         RealmsResource realmsResource = getRealms();
-        RealmRepresentation realmRepresentation = convert(Container.JSON, RealmRepresentation.class, tenant);
+        RealmRepresentation realmRepresentation = convert(RealmRepresentation.class, tenant);
         realmsResource.create(realmRepresentation);
         RealmResource realmResource = realmsResource.realm(tenant.getRealm());
 
@@ -345,7 +345,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
         realmResource.update(realmRepresentation);
         createOpenRemoteClientApplication(realmRepresentation.getRealm());
         publishModification(PersistenceEvent.Cause.CREATE, tenant);
-        return convert(Container.JSON, Tenant.class, realmRepresentation);
+        return convert(Tenant.class, realmRepresentation);
     }
 
     @Override
@@ -416,7 +416,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
             return null;
         }
         UserRepresentation user = getRealms().realm(realm).clients().get(client.getId()).getServiceAccountUser();
-        return user != null ? convert(Container.JSON, User.class, user) : null;
+        return user != null ? convert(User.class, user) : null;
     }
 
     /**
@@ -613,7 +613,7 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
     }
 
     public static User convertUser(String realm, UserRepresentation userRepresentation) {
-        User user = convert(Container.JSON, User.class, userRepresentation);
+        User user = convert(User.class, userRepresentation);
         user.setRealm(realm);
         return user;
     }

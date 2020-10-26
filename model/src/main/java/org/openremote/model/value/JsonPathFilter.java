@@ -25,8 +25,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import static org.openremote.model.value.RegexValueFilter.NAME;
 
+/**
+ * This filter works on any type of data; when applying the filter the data should be converted to JSON representation
+ * using a tool like Jackson and then the JSON path expression should be applied to this JSON string.
+ */
 @JsonTypeName(NAME)
-public class JsonPathFilter extends ValueFilter<Value> {
+public class JsonPathFilter extends ValueFilter<Object> {
 
     public static final String NAME = "jsonPath";
 
@@ -49,7 +53,7 @@ public class JsonPathFilter extends ValueFilter<Value> {
     }
 
     @Override
-    public Class<Value> getValueType() {
-        return Value.class;
+    public Class<Object> getValueType() {
+        return Object.class;
     }
 }

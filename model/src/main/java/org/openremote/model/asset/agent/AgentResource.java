@@ -19,7 +19,6 @@
  */
 package org.openremote.model.asset.agent;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -45,7 +44,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  *
  */
 @Path("agent")
-@JsType(isNative = true)
 public interface AgentResource {
 
     /**

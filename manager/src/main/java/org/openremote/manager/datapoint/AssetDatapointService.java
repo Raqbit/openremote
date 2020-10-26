@@ -23,8 +23,6 @@ import org.openremote.model.datapoint.ValueDatapoint;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.query.filter.MetaPredicate;
 import org.openremote.model.util.Pair;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 import org.postgresql.util.PGInterval;
 import org.postgresql.util.PGobject;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,31 +17,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.query.filter;
+package org.openremote.model.attribute;
 
-import java.util.Arrays;
+import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.NameValueDescriptorProvider;
 
-public class StringArrayPredicate implements ValuePredicate {
+import java.util.Collection;
+import java.util.Optional;
 
-    public static final String name = "string-array";
-    public StringPredicate[] predicates = new StringPredicate[0];
+public class MetaList extends NamedList<MetaItem<?>> {
 
-    public StringArrayPredicate() {
+    public MetaList() {
     }
 
-    public StringArrayPredicate(StringPredicate... predicates) {
-        this.predicates = predicates;
+    public MetaList(Collection<MetaItem<?>> meta) {
+        super(meta);
     }
 
-    public StringArrayPredicate predicates(StringPredicate... predicates) {
-        this.predicates = predicates;
-        return this;
+    // This works around the crappy type system
+    public <S, U extends MetaItem<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+        return super.getInternal(nameValueDescriptorProvider);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "predicates=" + Arrays.toString(predicates) +
-            '}';
+    public <T> void set(MetaDescriptor<T> descriptor, T value) {
+        MetaItem<T> metaItem = get(descriptor).orElse(new MetaItem<>(descriptor, null));
+        metaItem.setValue(value);
     }
 }

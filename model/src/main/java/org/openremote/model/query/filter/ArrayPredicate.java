@@ -21,10 +21,6 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
-
 /**
  * Determines if the value is an array and meets the following:
  * <ul>
@@ -92,24 +88,4 @@ public class ArrayPredicate implements ValuePredicate {
         return this;
     }
 
-    @Override
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("predicateType", name);
-        objectValue.put("negated", Values.create(negated));
-        objectValue.put("value", value);
-        if (index != null) {
-            objectValue.put("index", Values.create(index));
-        }
-        if (lengthEquals != null) {
-            objectValue.put("lengthEquals", Values.create(lengthEquals));
-        }
-        if (lengthGreaterThan != null) {
-            objectValue.put("lengthGreaterThan", Values.create(lengthGreaterThan));
-        }
-        if (lengthLessThan != null) {
-            objectValue.put("lengthLessTHan", Values.create(lengthLessThan));
-        }
-        return objectValue;
-    }
 }

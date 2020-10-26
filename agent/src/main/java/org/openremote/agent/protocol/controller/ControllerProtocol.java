@@ -28,8 +28,6 @@ import org.openremote.agent.protocol.controller.command.ControllerCommandBasic;
 import org.openremote.agent.protocol.controller.command.ControllerCommandMapped;
 import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.container.web.WebTargetBuilder;
-import org.openremote.container.Container;
-import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;

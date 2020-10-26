@@ -19,11 +19,6 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.util.Pair;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,34 +28,27 @@ import java.util.Optional;
  * <code>null</code> is a valid {@link #value}.
  * </p>
  */
-public class AttributeState {
+public class AttributeState<T> {
 
     protected AttributeRef attributeRef;
-    protected Value value;
+    protected T value;
     protected boolean deleted;
 
     protected AttributeState() {
     }
 
-    public AttributeState(String entityId, Attribute attribute) {
-        this(entityId, attribute.getNameOrThrow(), attribute.getValue().orElse(null));
+    public AttributeState(String entityId, Attribute<T> attribute) {
+        this(entityId, attribute.getName(), attribute.getValue().orElse(null));
     }
 
-    public AttributeState(String entityId, String attributeName, Value value) {
+    public AttributeState(String entityId, String attributeName, T value) {
         this(new AttributeRef(entityId, attributeName), value);
-    }
-
-    /**
-     * Sets the {@link #value} to <code>null</code>.
-     */
-    public AttributeState(String entityId, String attributeName) {
-        this(new AttributeRef(entityId, attributeName), null);
     }
 
     /**
      * @param value can be <code>null</code> if the attribute has no value.
      */
-    public AttributeState(AttributeRef attributeRef, Value value) {
+    public AttributeState(AttributeRef attributeRef, T value) {
         this.attributeRef = Objects.requireNonNull(attributeRef);
         this.value = value;
     }
@@ -76,26 +64,16 @@ public class AttributeState {
         return attributeRef;
     }
 
-    public Optional<Value> getValue() {
+    public Optional<T> getValue() {
         return Optional.ofNullable(value);
     }
 
-    public void setValue(Value value) {
+    public void setValue(T value) {
         this.value = value;
     }
 
     public boolean isDeleted() {
         return deleted;
-    }
-
-    public ObjectValue toObjectValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("attributeRef", getAttributeRef().toArrayValue());
-        getValue().ifPresent(v -> objectValue.put("value", value));
-        if (deleted) {
-            objectValue.put("deleted", Values.create(true));
-        }
-        return objectValue;
     }
 
     @Override
@@ -105,24 +83,5 @@ public class AttributeState {
             ", value=" + value +
             ", deleted=" + deleted +
             '}';
-    }
-
-    public static boolean isAttributeState(Value value) {
-        return Values.getObject(value)
-            .flatMap(objectValue -> objectValue.get("attributeRef"))
-            .filter(AttributeRef::isAttributeRef)
-            .isPresent();
-    }
-
-    public static Optional<AttributeState> fromValue(Value value) {
-        return Values.getObject(value)
-            .filter(AttributeState::isAttributeState)
-            .map(objectValue -> new Pair<>(
-                    AttributeRef.fromValue(objectValue.get("attributeRef").get()),
-                    objectValue.get("value")
-                )
-            )
-            .filter(pair -> pair.key.isPresent())
-            .map(pair -> new AttributeState(pair.key.get(), pair.value.orElse(null)));
     }
 }

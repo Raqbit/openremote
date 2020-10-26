@@ -19,7 +19,6 @@
  */
 package org.openremote.model.notification;
 
-import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
 import javax.persistence.*;

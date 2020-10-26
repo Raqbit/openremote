@@ -4,13 +4,11 @@ compileJava.options.compilerArgs.add '-parameters'
 compileTestJava.options.compilerArgs.add '-parameters'
 
 dependencies {
-    compile("com.google.gwt.inject:gin:$ginVersion")
-
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-    compile("com.google.gwt:gwt-user:$gwtVersion") {
-        exclude group: "javax.servlet"
-        exclude group: "org.sonatype.sisu.inject"
-    }
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion"
+
     compile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:$javaxPersistenceVersion"
     compile "org.hibernate:hibernate-core:$hibernateVersion"
     compile "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
@@ -19,7 +17,6 @@ dependencies {
 
     compile "org.jboss.spec.javax.annotation:jboss-annotations-api_1.2_spec:$javaxAnnotationsVersion"
     compile "org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.0_spec:$jaxrsSpecVersion"
-    compile "com.google.jsinterop:base:$jsinteropBaseVersion"
 
     compile "org.keycloak:keycloak-core:$keycloakVersion"
     compile "org.keycloak:keycloak-core:$keycloakVersion:sources"

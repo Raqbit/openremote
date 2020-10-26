@@ -19,7 +19,6 @@
  */
 package org.openremote.model.datapoint;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
@@ -30,7 +29,6 @@ import javax.ws.rs.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("asset/datapoint")
-@JsType(isNative = true)
 public interface AssetDatapointResource {
 
     /**

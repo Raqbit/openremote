@@ -22,7 +22,6 @@ package org.openremote.model.datapoint;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeState;
-import org.openremote.model.value.Value;
 
 import javax.persistence.*;
 import java.io.Serializable;

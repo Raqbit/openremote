@@ -20,7 +20,7 @@
 package org.openremote.model.v2;
 
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.attribute.MetaItemList;
+import org.openremote.model.attribute.MetaList;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,10 +30,10 @@ public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptor
     protected boolean optional;
     protected ValueDescriptor<T> valueDescriptor;
     protected T defaultValue;
-    protected MetaItemList meta;
+    protected MetaList meta;
 
     public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue) {
-        this(name, optional, valueDescriptor, defaultValue, (MetaItemList)null);
+        this(name, optional, valueDescriptor, defaultValue, (MetaList)null);
     }
 
     public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaItem<?>...meta) {
@@ -41,10 +41,10 @@ public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptor
     }
 
     public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, Collection<MetaItem<?>> meta) {
-        this(name, optional, valueDescriptor, defaultValue, meta instanceof MetaItemList ? (MetaItemList)meta : new MetaItemList(meta));
+        this(name, optional, valueDescriptor, defaultValue, meta instanceof MetaList ? (MetaList)meta : new MetaList(meta));
     }
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaItemList meta) {
+    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaList meta) {
         this.name = name;
         this.optional = optional;
         this.valueDescriptor = valueDescriptor;

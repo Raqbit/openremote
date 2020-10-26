@@ -19,14 +19,12 @@
  */
 package org.openremote.model.http;
 
-import com.google.gwt.http.client.Response;
-import jsinterop.annotations.JsType;
+import javax.ws.rs.core.Response;
 
-@JsType
 public class UnauthorizedRequestError extends RequestError {
 
     public UnauthorizedRequestError() {
-        super(Response.SC_UNAUTHORIZED, "Unauthorized request, invalid credentials or access token");
+        super(Response.Status.UNAUTHORIZED.getStatusCode(), "Unauthorized request, invalid credentials or access token");
     }
 
 }

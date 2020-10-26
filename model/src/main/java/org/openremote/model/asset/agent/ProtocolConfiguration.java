@@ -21,8 +21,6 @@ package org.openremote.model.asset.agent;
 
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.MetaItemType;
-import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.Values;

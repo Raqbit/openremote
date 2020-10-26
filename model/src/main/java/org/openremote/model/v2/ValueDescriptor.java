@@ -22,7 +22,7 @@ package org.openremote.model.v2;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.attribute.MetaItemList;
+import org.openremote.model.attribute.MetaList;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +30,7 @@ import java.util.Collection;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE, defaultImpl = ValueDescriptor.class)
 public class ValueDescriptor<T> implements MetaProvider {
 
-    public static class ValueProviderStringConverter extends StdConverter<ValueDescriptor<?>, String> {
+    public static class ValueDescriptorStringConverter extends StdConverter<ValueDescriptor<?>, String> {
 
         @Override
         public String convert(ValueDescriptor<?> value) {
@@ -40,21 +40,21 @@ public class ValueDescriptor<T> implements MetaProvider {
 
     protected String name;
     protected Class<T> type;
-    protected MetaItemList meta;
+    protected MetaList meta;
 
     public ValueDescriptor(String name, Class<T> type) {
-        this(name, type, (MetaItemList)null);
+        this(name, type, (MetaList)null);
     }
 
     public ValueDescriptor(String name, Class<T> type, MetaItem<?>...meta) {
-        this(name, type, new MetaItemList(Arrays.asList(meta)));
+        this(name, type, new MetaList(Arrays.asList(meta)));
     }
 
     public ValueDescriptor(String name, Class<T> type, Collection<MetaItem<?>> meta) {
-        this(name, type, new MetaItemList(meta));
+        this(name, type, new MetaList(meta));
     }
 
-    public ValueDescriptor(String name, Class<T> type, MetaItemList meta) {
+    public ValueDescriptor(String name, Class<T> type, MetaList meta) {
         this.name = name;
         this.type = type;
         this.meta = meta;

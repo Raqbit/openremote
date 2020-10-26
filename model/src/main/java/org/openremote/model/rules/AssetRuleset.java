@@ -19,11 +19,8 @@
  */
 package org.openremote.model.rules;
 
-import com.google.gwt.core.shared.GwtIncompatible;
 import org.hibernate.annotations.Formula;
 import org.openremote.model.calendar.CalendarEvent;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -167,7 +164,6 @@ public class AssetRuleset extends Ruleset {
         return this;
     }
 
-    @GwtIncompatible
     @Override
     public AssetRuleset setValidity(CalendarEvent calendarEvent) {
         super.setValidity(calendarEvent);

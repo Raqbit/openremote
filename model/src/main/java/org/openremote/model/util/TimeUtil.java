@@ -16,8 +16,6 @@
 
 package org.openremote.model.util;
 
-import javaemul.internal.annotations.GwtIncompatible;
-
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -32,8 +30,6 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
  * A helper class with utility methods for
  * time related operations.
  */
-@SuppressWarnings("NonJREEmulationClassesInClientCode")
-@GwtIncompatible
 public class TimeUtil {
 
     public static final String DURATION_REGEXP = "([+-])?((\\d+)[Dd])?\\s*((\\d+)[Hh])?\\s*((\\d+)[Mm]$)?\\s*((\\d+)[Ss])?\\s*((\\d+)([Mm][Ss]$))?\\s*((\\d+)[Ww])?\\s*((\\d+)[Mm][Nn])?\\s*((\\d+)[Yy])?";

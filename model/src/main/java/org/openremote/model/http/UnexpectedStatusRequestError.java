@@ -19,11 +19,8 @@
  */
 package org.openremote.model.http;
 
-import jsinterop.annotations.JsType;
-
 import java.util.Arrays;
 
-@JsType
 public class UnexpectedStatusRequestError extends RequestError {
 
     protected double[] expectedStatusCodes;

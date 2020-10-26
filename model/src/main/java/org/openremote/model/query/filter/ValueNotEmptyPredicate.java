@@ -19,17 +19,8 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
-
 public class ValueNotEmptyPredicate implements ValuePredicate {
 
     public static final String name = "value-not-empty";
 
-    @Override
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("predicateType", "ValueNotEmptyPredicate");
-        return objectValue;
-    }
 }

@@ -19,20 +19,16 @@
  */
 package org.openremote.model.notification;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
-import org.openremote.model.value.Value;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("notification")
-@JsType(isNative = true)
 public interface NotificationResource {
 
     /**
@@ -152,5 +148,5 @@ public interface NotificationResource {
     void notificationAcknowledged(@BeanParam RequestParams requestParams,
                                   @QueryParam("targetId") String targetId,
                                   @PathParam("notificationId") Long notificationId,
-                                  Value acknowledgement);
+                                  Object acknowledgement);
 }

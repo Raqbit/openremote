@@ -49,7 +49,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static org.openremote.container.Container.JSON;
+import static org.openremote.container.Values.JSON;
 import static org.openremote.model.attribute.AttributeEvent.Source.CLIENT;
 import static org.openremote.model.attribute.MetaItemType.ACCESS_RESTRICTED_READ;
 import static org.openremote.model.query.AssetQuery.Access;

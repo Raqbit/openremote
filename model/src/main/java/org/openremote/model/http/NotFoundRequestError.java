@@ -19,14 +19,12 @@
  */
 package org.openremote.model.http;
 
-import com.google.gwt.http.client.Response;
-import jsinterop.annotations.JsType;
+import javax.ws.rs.core.Response;
 
-@JsType
 public class NotFoundRequestError extends RequestError {
 
     public NotFoundRequestError() {
-        super(Response.SC_NOT_FOUND, "Resource not found");
+        super(Response.Status.NOT_FOUND.getStatusCode(), "Resource not found");
     }
 
 }

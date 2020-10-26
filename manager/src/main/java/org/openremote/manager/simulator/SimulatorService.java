@@ -21,7 +21,6 @@ package org.openremote.manager.simulator;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.agent.protocol.simulator.SimulatorProtocol;
-import org.openremote.container.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.security.AuthContext;

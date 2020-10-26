@@ -21,7 +21,6 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.openremote.model.value.ObjectValue;
 
 @JsonSubTypes({
     @JsonSubTypes.Type(value = StringPredicate.class, name = StringPredicate.name),
@@ -42,6 +41,4 @@ import org.openremote.model.value.ObjectValue;
     property = "predicateType"
 )
 public interface ValuePredicate {
-
-    ObjectValue toModelValue();
 }

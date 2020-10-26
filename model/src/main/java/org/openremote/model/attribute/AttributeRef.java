@@ -19,13 +19,6 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
-
-import java.util.Optional;
-
 import static org.openremote.model.util.TextUtil.requireNonNullAndNonEmpty;
 
 /**
@@ -81,43 +74,5 @@ public class AttributeRef {
             "entityId='" + entityId + '\'' +
             ", attributeName='" + attributeName + '\'' +
             '}';
-    }
-
-    public ArrayValue toArrayValue() {
-        ArrayValue arrayValue = Values.createArray();
-        arrayValue.set(0, Values.create(getEntityId()));
-        arrayValue.set(1, Values.create(getAttributeName()));
-        return arrayValue;
-    }
-
-    public static boolean isAttributeRef(AbstractValueHolder valueHolder) {
-        return valueHolder != null
-            && valueHolder.getValueAsArray().filter(AttributeRef::isAttributeRef).isPresent();
-    }
-
-    public static boolean isAttributeRef(Value value) {
-        boolean result = Values.getArray(value)
-            .map(arrayValue ->
-                arrayValue.length() == 2
-                    && arrayValue.getString(0).filter(s -> !s.isEmpty()).isPresent()
-                    && arrayValue.getString(1).filter(s -> !s.isEmpty()).isPresent()
-            )
-            .orElse(
-                Values.getObject(value)
-                    .map(objectValue ->
-                        objectValue.getString("entityId").isPresent() && objectValue.getString("attributeName").isPresent()
-                    ).orElse(false)
-            );
-
-        return result;
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public static Optional<AttributeRef> fromValue(Value value) {
-        return Values.getArray(value)
-            .filter(AttributeRef::isAttributeRef)
-            .map(arrayValue ->
-                new AttributeRef(arrayValue.getString(0).get(), arrayValue.getString(1).get())
-            );
     }
 }

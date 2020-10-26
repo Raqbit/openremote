@@ -30,7 +30,6 @@ import org.openremote.model.notification.Notification;
 import org.openremote.model.notification.NotificationResource;
 import org.openremote.model.notification.SentNotification;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.value.Value;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.Collections;

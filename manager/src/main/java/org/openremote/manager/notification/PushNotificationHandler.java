@@ -409,13 +409,13 @@ public class PushNotificationHandler extends RouteBuilder implements Notificatio
 
         try {
             if (pushMessage.getAction() != null) {
-                builder.putData("action", Container.JSON.writeValueAsString(pushMessage.getAction()));
+                builder.putData("action", Values.JSON.writeValueAsString(pushMessage.getAction()));
                 // Add so tapping the notification will cause an action
                 builder.putData("click_action", "FLUTTER_NOTIFICATION_CLICK");
             }
 
             if (pushMessage.getButtons() != null) {
-                builder.putData("buttons", Container.JSON.writeValueAsString(pushMessage.getButtons()));
+                builder.putData("buttons", Values.JSON.writeValueAsString(pushMessage.getButtons()));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();

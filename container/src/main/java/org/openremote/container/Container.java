@@ -19,21 +19,12 @@
  */
 package org.openremote.container;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.openremote.container.concurrent.ContainerThreads;
-import org.openremote.container.json.ORModelModule;
 import org.openremote.container.util.LogUtil;
 import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
+import org.openremote.model.value.Values;
 
 import java.util.*;
 import java.util.logging.Handler;
@@ -53,8 +44,6 @@ import static org.openremote.container.util.MapAccess.getBoolean;
  * Access environment configuration through {@link #getConfig()} and the helper methods
  * in {@link org.openremote.container.util.MapAccess}. Consider using {@link #DEV_MODE}
  * to distinguish between development and production environments.
- * <p>
- * Read and write JSON with a sensible mapper configuration using {@link #JSON}.
  */
 public class Container implements ContainerProvider {
 
@@ -67,23 +56,6 @@ public class Container implements ContainerProvider {
 
     public static final String DEV_MODE = "DEV_MODE";
     public static final boolean DEV_MODE_DEFAULT = true;
-
-    @SuppressWarnings("deprecation")
-    public static final ObjectMapper JSON = new ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false)
-        .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
-        .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-        .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
-        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-        .setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
-        .registerModule(new ORModelModule())
-        .registerModule(new Jdk8Module())
-        .registerModule(new JavaTimeModule())
-        .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
-
     protected final Map<String, String> config = new HashMap<>();
     protected final boolean devMode;
 
@@ -116,7 +88,7 @@ public class Container implements ContainerProvider {
         this.devMode = getBoolean(this.config, DEV_MODE, DEV_MODE_DEFAULT);
 
         if (this.devMode) {
-            JSON.enable(SerializationFeature.INDENT_OUTPUT);
+            Values.JSON.enable(SerializationFeature.INDENT_OUTPUT);
         }
 
         // Any log handlers of the root logger that are container services must be registered

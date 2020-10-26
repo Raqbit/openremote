@@ -19,7 +19,6 @@
  */
 package org.openremote.model.gateway;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.http.RequestParams;
@@ -37,7 +36,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  * Resource for managing the connection to a central manager
  */
 @Path("gateway")
-@JsType(isNative = true)
 public interface GatewayClientResource {
 
     /**

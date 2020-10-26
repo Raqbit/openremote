@@ -22,7 +22,6 @@ package org.openremote.model.rules;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
-import org.openremote.model.value.Value;
 
 public abstract class PredictedDatapoints {
 

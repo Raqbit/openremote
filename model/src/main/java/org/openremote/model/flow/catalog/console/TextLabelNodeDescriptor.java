@@ -22,7 +22,6 @@ package org.openremote.model.flow.catalog.console;
 
 import org.openremote.model.flow.Slot;
 import org.openremote.model.flow.catalog.WidgetNodeDescriptor;
-import org.openremote.model.value.ObjectValue;
 
 import java.util.List;
 import java.util.function.Supplier;

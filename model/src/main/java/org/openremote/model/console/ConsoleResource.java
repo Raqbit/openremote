@@ -19,7 +19,6 @@
  */
 package org.openremote.model.console;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.http.RequestParams;
@@ -30,7 +29,6 @@ import javax.ws.rs.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("console")
-@JsType(isNative = true)
 public interface ConsoleResource {
 
     /**

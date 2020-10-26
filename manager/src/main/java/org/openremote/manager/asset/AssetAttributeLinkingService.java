@@ -142,7 +142,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
         AttributeLink attributeLink = null;
 
         try {
-            attributeLink = Container.JSON.readValue(metaItem.getValue().map(Value::toJson).orElse(""), AttributeLink.class);
+            attributeLink = Values.JSON.readValue(metaItem.getValue().map(Value::toJson).orElse(""), AttributeLink.class);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "Failed to deserialize AttributeLink", e);
         }

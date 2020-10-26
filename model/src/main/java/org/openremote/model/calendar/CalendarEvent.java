@@ -22,16 +22,10 @@ package org.openremote.model.calendar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gwt.core.shared.GwtIncompatible;
 import net.fortuna.ical4j.model.Recur;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
-import org.openremote.model.value.Values;
 
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * Represents an event that occurs at a point in time with a {@link #start}, {#link #end} and optional
@@ -109,49 +103,7 @@ public class CalendarEvent {
         return end;
     }
 
-    @JsonIgnore
     public Recur getRecurrence() {
         return recurrence;
-    }
-
-    // TODO: Remove once GWT removed
-    @JsonProperty("recurrence")
-    protected String getRecurrenceInternal() {
-        return recurrence != null ? recurrence.toString() : null;
-    }
-
-    @GwtIncompatible
-    public static Optional<CalendarEvent> fromValue(Value value) {
-        if (value == null || value.getType() != ValueType.OBJECT) {
-            return Optional.empty();
-        }
-
-        ObjectValue objectValue = (ObjectValue) value;
-        Optional<Long> start = objectValue.get("start").flatMap(Values::getLongCoerced);
-        Optional<Long> end = objectValue.get("end").flatMap(Values::getLongCoerced);
-        Optional<Recur> recurrence = objectValue.get("recurrence").flatMap(Values::getString).map(str -> {
-            try {
-                return new Recur(str);
-            } catch (Exception e) {
-                return null;
-            }
-        });
-
-        return start.map(aLong -> new CalendarEvent(new Date(aLong),
-            end.map(Date::new).orElse(null), recurrence.orElse(null)));
-    }
-
-    @GwtIncompatible
-    public Value toValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("start", start.getTime());
-        if (end != null) {
-            objectValue.put("end", end.getTime());
-        }
-        if (recurrence != null) {
-            objectValue.put("recurrence", recurrence.toString());
-        }
-
-        return objectValue;
     }
 }

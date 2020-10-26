@@ -22,9 +22,6 @@ package org.openremote.model.geo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
 
 @JsonSubTypes({
     @JsonSubTypes.Type(value = GeoJSONFeatureCollection.class, name = GeoJSONFeatureCollection.TYPE),
@@ -43,6 +40,4 @@ public abstract class GeoJSON {
     protected GeoJSON(String type) {
         this.type = type;
     }
-
-    public abstract ObjectValue toValue();
 }

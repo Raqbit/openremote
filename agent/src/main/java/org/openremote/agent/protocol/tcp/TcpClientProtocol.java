@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import static org.openremote.container.util.Util.joinCollections;
+import static org.openremote.model.value.Values.joinCollections;
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 

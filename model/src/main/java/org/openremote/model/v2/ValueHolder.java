@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,27 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.system;
+package org.openremote.model.v2;
 
-import org.openremote.model.http.SuccessStatusCode;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import java.util.Optional;
 
-@Path("")
-public interface StatusResource {
+/**
+ * Indicates that the implementing class provides a value of &lt;T&gt; the value should be immutable.
+ */
+public interface ValueHolder<T> {
 
-    @Path("health")
-    @GET
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    ObjectValue getHealthStatus();
+    @JsonSerialize(converter = ValueDescriptor.ValueDescriptorStringConverter.class)
+    ValueDescriptor<T> getValueType();
 
-    @Path("info")
-    @GET
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    ObjectValue getInfo();
+    Optional<T> getValue();
+
+    void setValue(T value);
 }

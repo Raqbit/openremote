@@ -19,7 +19,6 @@
  */
 package org.openremote.model.security;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
@@ -35,7 +34,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  */
 // TODO Relax permissions to allow regular users to maintain their own realm
 @Path("user")
-@JsType(isNative = true)
 public interface UserResource {
 
     @GET

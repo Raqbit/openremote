@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.value.*;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -32,25 +33,26 @@ import static java.util.Objects.requireNonNull;
  * A link from one attribute to another with a definition of how to map the value from the source attribute
  * to the linked attribute.
  */
+// TODO: Somehow combine this with flow rules
 public class AttributeLink {
 
     public enum ConverterType {
 
         /**
          * Toggle the value of the linked attribute; the linked attribute's type must be
-         * {@link AttributeValueType#BOOLEAN}
+         * {@link Boolean}
          */
         TOGGLE("@TOGGLE"),
 
         /**
          * Increment the value of the linked attribute; the linked attribute's type must be
-         * {@link AttributeValueType#NUMBER}
+         * {@link Number}
          */
         INCREMENT("@INCREMENT"),
 
         /**
          * Decrement the value of the linked attribute; the linked attribute's type must be
-         * {@link AttributeValueType#NUMBER}
+         * {@link Number}
          */
         DECREMENT("@DECREMENT");
 
@@ -76,12 +78,12 @@ public class AttributeLink {
     }
 
     protected AttributeRef attributeRef;
-    protected ObjectValue converter;
+    protected Map<String, Object> converter;
     protected ValueFilter[] filters;
 
     @JsonCreator
     public AttributeLink(@JsonProperty("attributeRef") AttributeRef attributeRef,
-                         @JsonProperty("converter") ObjectValue converter,
+                         @JsonProperty("converter") Map<String, Object> converter,
                          @JsonProperty("filters") ValueFilter[] filters) {
         this.attributeRef = requireNonNull(attributeRef);
         this.converter = converter;
@@ -92,11 +94,11 @@ public class AttributeLink {
         return attributeRef;
     }
 
-    public Optional<ObjectValue> getConverter() {
+    public Optional<Map<String, Object>> getConverter() {
         return Optional.ofNullable(converter);
     }
 
-    public void setConverter(ObjectValue converter) {
+    public void setConverter(Map<String, Object> converter) {
         this.converter = converter;
     }
 
@@ -119,15 +121,5 @@ public class AttributeLink {
             ", converter=" + converter +
             ", filters=" + (filters != null ? Arrays.toString(filters) : "null") +
             '}';
-    }
-
-    public static boolean isAttributeLink(Value value) {
-        boolean result = Values.getObject(value)
-            .map(objectValue -> AttributeRef.isAttributeRef(objectValue.get("attributeRef").orElse(null)) &&
-                objectValue.get("converter").map(v -> v.getType() == ValueType.OBJECT).orElse(true) &&
-                objectValue.get("filters").map(v -> v.getType() == ValueType.ARRAY).orElse(true)
-            )
-            .orElse(false);
-        return result;
     }
 }

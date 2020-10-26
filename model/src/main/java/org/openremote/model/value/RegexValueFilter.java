@@ -23,14 +23,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import static org.openremote.model.value.RegexValueFilter.NAME;
 
 @JsonTypeName(NAME)
-public class RegexValueFilter extends ValueFilter<StringValue> {
+public class RegexValueFilter extends ValueFilter<String> {
 
     public static final String NAME = "regex";
 
@@ -56,7 +55,7 @@ public class RegexValueFilter extends ValueFilter<StringValue> {
     }
 
     @Override
-    public Class<StringValue> getValueType() {
-        return StringValue.class;
+    public Class<String> getValueType() {
+        return String.class;
     }
 }

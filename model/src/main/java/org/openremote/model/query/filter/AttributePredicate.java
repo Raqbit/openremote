@@ -19,9 +19,6 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
-
 // TODO: Incorporate meta predicates here
 public class AttributePredicate {
 
@@ -62,13 +59,6 @@ public class AttributePredicate {
     public AttributePredicate doesntExist() {
         this.notExists = true;
         return this;
-    }
-
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("name", name.toModelValue());
-        objectValue.put("value", value.toModelValue());
-        return objectValue;
     }
 
     @Override

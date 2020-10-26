@@ -19,9 +19,6 @@
  */
 package org.openremote.model.security;
 
-import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
 import org.openremote.model.value.Values;
 
 import java.util.Optional;

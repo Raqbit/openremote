@@ -19,17 +19,12 @@
  */
 package org.openremote.model.asset.agent;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.v2.AttributeDescriptor;
 
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link org.openremote.model.asset.Asset}
  */
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonDeserialize(as = AgentDescriptorImpl.class)
 public class AgentDescriptor<T extends Agent> extends AssetDescriptor<T> {
 
     protected boolean instanceDiscovery;

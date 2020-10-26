@@ -20,8 +20,7 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
+import org.openremote.model.v2.NameProvider;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -42,6 +41,10 @@ public class StringPredicate implements ValuePredicate {
         this.value = value;
     }
 
+    public StringPredicate(NameProvider nameProvider) {
+        this.value = nameProvider.getName();
+    }
+
     public StringPredicate(AssetQuery.Match match, String value) {
         this.match = match;
         this.value = value;
@@ -51,23 +54,6 @@ public class StringPredicate implements ValuePredicate {
         this.match = match;
         this.caseSensitive = caseSensitive;
         this.value = value;
-    }
-
-    public static StringPredicate fromObjectValue(ObjectValue objectValue) {
-        StringPredicate stringPredicate = new StringPredicate();
-        objectValue.getString("match").ifPresent(match -> {
-            stringPredicate.match = AssetQuery.Match.valueOf(match);
-        });
-        objectValue.getBoolean("caseSensitive").ifPresent(caseSensitive -> {
-            stringPredicate.caseSensitive = caseSensitive;
-        });
-        objectValue.getBoolean("negate").ifPresent(negate -> {
-            stringPredicate.negate = negate;
-        });
-        objectValue.getString("value").ifPresent(value -> {
-            stringPredicate.value = value;
-        });
-        return stringPredicate;
     }
 
     public static Predicate<String> asPredicate(StringPredicate predicate) {
@@ -119,20 +105,6 @@ public class StringPredicate implements ValuePredicate {
         if (!caseSensitive)
             s = s.toUpperCase(Locale.ROOT);
         return s;
-    }
-
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("predicateType", name);
-        if (match != null) {
-            objectValue.put("match", Values.create(match.toString()));
-        }
-        objectValue.put("caseSensitive", Values.create(caseSensitive));
-        objectValue.put("negate", Values.create(negate));
-        if (value != null) {
-            objectValue.put("value", Values.create(value));
-        }
-        return objectValue;
     }
 
     @Override

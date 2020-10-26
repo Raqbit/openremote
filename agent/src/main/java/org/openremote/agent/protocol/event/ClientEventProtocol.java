@@ -31,8 +31,6 @@ import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.security.ClientRole;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.value.StringValue;
-import org.openremote.model.value.Value;
 import org.openremote.model.value.Values;
 
 import java.util.*;

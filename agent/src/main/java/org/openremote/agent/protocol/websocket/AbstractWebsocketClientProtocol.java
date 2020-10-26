@@ -384,7 +384,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
             .flatMap(Values::getArray)
             .map(arrValue -> {
                 try {
-                    return Container.JSON.readValue(arrValue.toJson(), new TypeReference<WebsocketSubscription<T>[]>() {});
+                    return Values.JSON.readValue(arrValue.toJson(), new TypeReference<WebsocketSubscription<T>[]>() {});
                 } catch (IOException e) {
                     LOG.log(Level.WARNING, "Failed to deserialize WebsocketSubscription[]", e);
                     return null;

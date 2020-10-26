@@ -19,9 +19,6 @@
  */
 package org.openremote.model.http;
 
-import jsinterop.annotations.JsType;
-
-@JsType
 public class NoResponseError extends RequestError {
 
     public NoResponseError(int statusCode) {

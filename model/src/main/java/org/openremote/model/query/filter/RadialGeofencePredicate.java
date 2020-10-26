@@ -21,8 +21,6 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Values;
 
 import java.util.Objects;
 
@@ -89,14 +87,4 @@ public class RadialGeofencePredicate extends GeofencePredicate {
         return new double[]{lng, lat};
     }
 
-    @Override
-    public ObjectValue toModelValue() {
-        ObjectValue objectValue = Values.createObject();
-        objectValue.put("predicateType", name);
-        objectValue.put("radius", radius);
-        objectValue.put("lat", lat);
-        objectValue.put("lng", lng);
-        objectValue.put("negated", negated);
-        return objectValue;
-    }
 }

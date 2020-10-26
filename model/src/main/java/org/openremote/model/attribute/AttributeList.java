@@ -19,6 +19,7 @@
  */
 package org.openremote.model.attribute;
 
+import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.NameValueDescriptorProvider;
 
 import java.util.Collection;
@@ -36,5 +37,10 @@ public class AttributeList extends NamedList<Attribute<?>> {
     // This works around the crappy type system
     public <S, U extends Attribute<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
         return super.getInternal(nameValueDescriptorProvider);
+    }
+
+    public <T> void set(AttributeDescriptor<T> descriptor, T value) {
+        Attribute<T> attribute = get(descriptor).orElse(new Attribute<>(descriptor, null));
+        attribute.setValue(value);
     }
 }

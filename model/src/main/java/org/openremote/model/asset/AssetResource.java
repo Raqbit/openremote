@@ -19,7 +19,6 @@
  */
 package org.openremote.model.asset;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.http.RequestParams;
@@ -62,7 +61,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
  * </ul>
  */
 @Path("asset")
-@JsType(isNative = true)
 public interface AssetResource {
 
     class Util {

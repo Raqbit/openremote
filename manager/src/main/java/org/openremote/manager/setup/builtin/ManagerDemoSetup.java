@@ -44,6 +44,7 @@ import org.openremote.model.value.Values;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Random;
 
 import static java.time.temporal.ChronoField.SECOND_OF_DAY;
@@ -1446,10 +1447,8 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                 null,
                 "#FAFAFA",
                 "#AFAFAF",
-                Values.createArray().addAll(
-                    Values.createObject()
-                        .put("displayText", "Map")
-                        .put("pageLink", "https://demo.openremote.io/mobile/?realm=smartcity&consoleProviders=geofence push storage&consoleAutoEnable=true#!geofences")
+                Arrays.asList(
+                    new ConsoleAppConfig.AppLink("Map", "https://demo.openremote.io/mobile/?realm=smartcity&consoleProviders=geofence push storage&consoleAutoEnable=true#!geofences")
                 )))
         );
     }
@@ -1462,6 +1461,6 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                 new ValueFilter[]{
                         new JsonPathFilter("$." + jsonParentName + "." + jsonName, true, false),
                 }
-        ), Container.JSON.writer()).get();
+        ), Values.JSON.writer()).get();
     }
 }

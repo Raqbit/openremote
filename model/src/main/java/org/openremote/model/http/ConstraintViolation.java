@@ -19,67 +19,50 @@
  */
 package org.openremote.model.http;
 
-import jsinterop.annotations.*;
-
-@JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "Object")
 public class ConstraintViolation {
 
-    @JsType
     public enum Type {CONFLICT, CLASS, FIELD, PROPERTY, PARAMETER, RETURN_VALUE}
 
-    @JsProperty
     protected Type constraintType;
 
-    @JsProperty
     protected String path;
 
-    @JsProperty
     protected String message;
 
-    @JsProperty
     protected String value;
 
-    @JsOverlay
     final public Type getConstraintType() {
         return constraintType;
     }
 
-    @JsOverlay
     final public void setConstraintType(Type constraintType) {
         this.constraintType = constraintType;
     }
 
-    @JsOverlay
     final public String getPath() {
         return path;
     }
 
-    @JsOverlay
     final public void setPath(String path) {
         this.path = path;
     }
 
-    @JsOverlay
     final public String getMessage() {
         return message;
     }
 
-    @JsOverlay
     final public void setMessage(String message) {
         this.message = message;
     }
 
-    @JsOverlay
     final public String getValue() {
         return value;
     }
 
-    @JsOverlay
     final public void setValue(String value) {
         this.value = value;
     }
 
-    @JsOverlay
     @Override
     final public String toString() {
         return getClass().getSimpleName() + "{" +

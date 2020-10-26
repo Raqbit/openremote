@@ -49,9 +49,9 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.openremote.container.Container.JSON;
+import static org.openremote.container.Values.JSON;
 import static org.openremote.container.Container.LOG;
-import static org.openremote.container.util.Util.distinctByKey;
+import static org.openremote.model.value.Values.distinctByKey;
 import static org.openremote.manager.rules.AssetQueryPredicate.groupIsEmpty;
 import static org.openremote.model.query.filter.LocationAttributePredicate.getLocationPredicates;
 

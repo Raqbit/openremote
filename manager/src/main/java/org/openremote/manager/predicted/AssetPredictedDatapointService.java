@@ -33,8 +33,6 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 import org.postgresql.util.PGInterval;
 

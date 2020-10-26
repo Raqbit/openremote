@@ -20,7 +20,7 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.MetaItemDescriptor;
+import org.openremote.model.v2.MetaDescriptor;
 
 public class RefPredicate extends MetaPredicate {
 
@@ -48,8 +48,8 @@ public class RefPredicate extends MetaPredicate {
             ));
     }
 
-    public RefPredicate(MetaItemDescriptor metaItemDescriptor, String entityId, String attributeName) {
-        this(metaItemDescriptor.getUrn(), entityId, attributeName);
+    public RefPredicate(MetaDescriptor<?> descriptor, String entityId, String attributeName) {
+        this(descriptor.getName(), entityId, attributeName);
     }
 
     public RefPredicate(StringPredicate name, AttributeRef attributeRef) {
@@ -61,7 +61,7 @@ public class RefPredicate extends MetaPredicate {
             ));
     }
 
-    public RefPredicate(MetaItemDescriptor metaItemDescriptor, AttributeRef attributeRef) {
-        this(new StringPredicate(metaItemDescriptor.getUrn()), attributeRef);
+    public RefPredicate(MetaDescriptor<?> descriptor, AttributeRef attributeRef) {
+        this(new StringPredicate(descriptor.getName()), attributeRef);
     }
 }

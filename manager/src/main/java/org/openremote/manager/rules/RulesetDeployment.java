@@ -456,7 +456,7 @@ public class RulesetDeployment {
     protected boolean compileRulesFlow(Ruleset ruleset, Assets assetsFacade, Users usersFacade, Notifications notificationsFacade, HistoricDatapoints historicDatapointsFacade, PredictedDatapoints predictedDatapointsFacade) {
         try {
             flowRulesBuilder = new FlowRulesBuilder(timerService, assetStorageService, assetsFacade, usersFacade, notificationsFacade, historicDatapointsFacade, predictedDatapointsFacade);
-            NodeCollection nodeCollection = Container.JSON.readValue(ruleset.getRules(), NodeCollection.class);
+            NodeCollection nodeCollection = Values.JSON.readValue(ruleset.getRules(), NodeCollection.class);
             flowRulesBuilder.add(nodeCollection);
             for (Rule rule : flowRulesBuilder.build()) {
                 RulesEngine.LOG.info("Registering rule: " + rule.getName());

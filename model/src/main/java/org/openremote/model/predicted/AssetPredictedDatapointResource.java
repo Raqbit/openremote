@@ -19,7 +19,6 @@
  */
 package org.openremote.model.predicted;
 
-import jsinterop.annotations.JsType;
 import org.openremote.model.Constants;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
@@ -32,7 +31,6 @@ import javax.ws.rs.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("asset/predicted")
-@JsType(isNative = true)
 public interface AssetPredictedDatapointResource {
     /**
      * Retrieve the predicted datapoints of an asset attribute. Regular users can only access assets in their

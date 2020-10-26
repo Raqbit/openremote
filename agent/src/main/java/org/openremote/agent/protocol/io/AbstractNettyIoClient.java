@@ -23,7 +23,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.openremote.agent.protocol.ProtocolExecutorService;
-import org.openremote.container.util.Util;
+import org.openremote.model.util.Retry;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.syslog.SyslogCategory;
 
@@ -166,7 +166,7 @@ public abstract class AbstractNettyIoClient<T, U extends SocketAddress> implemen
     protected Bootstrap bootstrap;
     protected EventLoopGroup workerGroup;
     protected ProtocolExecutorService executorService;
-    protected Util.Retry connectRetry;
+    protected Retry connectRetry;
     protected boolean permanentError;
     protected Supplier<ChannelHandler[]> encoderDecoderProvider;
 
@@ -210,7 +210,7 @@ public abstract class AbstractNettyIoClient<T, U extends SocketAddress> implemen
     }
 
     protected void scheduleDoConnect() {
-        connectRetry = new Util.Retry("Connect to '" + getClientUri() + "'", executorService, () -> {
+        connectRetry = new Retry("Connect to '" + getClientUri() + "'", executorService, () -> {
             boolean success = false;
             try {
                 success = doConnect().get();

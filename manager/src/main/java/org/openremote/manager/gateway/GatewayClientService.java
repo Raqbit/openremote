@@ -372,7 +372,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     protected <T> T messageFromString(String message, String prefix, Class<T> clazz) {
         try {
             message = message.substring(prefix.length());
-            return Container.JSON.readValue(message, clazz);
+            return Values.JSON.readValue(message, clazz);
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to parse message");
         }
@@ -380,7 +380,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
 
     protected String messageToString(String prefix, Object message) {
         try {
-            String str = Container.JSON.writeValueAsString(message);
+            String str = Values.JSON.writeValueAsString(message);
             return prefix + str;
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to serialise message");

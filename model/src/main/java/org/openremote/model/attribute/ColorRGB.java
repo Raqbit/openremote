@@ -19,7 +19,6 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.value.ArrayValue;
 import org.openremote.model.value.Values;
 
 public class ColorRGB {

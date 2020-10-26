@@ -21,10 +21,8 @@ package org.openremote.model.attribute;
 
 import org.openremote.model.event.shared.AssetInfo;
 import org.openremote.model.event.shared.SharedEvent;
-import org.openremote.model.value.Value;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A timestamped {@link AttributeState}.

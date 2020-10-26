@@ -29,7 +29,6 @@ import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
-import org.openremote.model.value.ObjectValue;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -57,18 +56,19 @@ import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
  * <p>
  * The {@link #createdOn} value is milliseconds since the Unix epoch.
  * <p>
- * The {@link #type} of the asset is an arbitrary string, it should be a URI, thus avoiding
- * collisions and representing "ownership" of asset type. Well-known asset types handled by
- * the core platform are defined in {@link AssetType}, third-party extensions can define
- * their own asset types in their own namespace, e.g. <code>urn:mynamespace:myassettype</code>
+ * The {@link #type} of the asset is an arbitrary string which should correspond with an {@link AssetDescriptor}
+ * registered within the running instance. If the corresponding {@link AssetDescriptor} cannot be found then
+ * the fallback generic {@link Asset#DESCRIPTOR} will be assumed.
  * <p>
  * The {@link #path} is a list of parent asset identifiers, starting with the identifier of
  * this asset, followed by parent asset identifiers, and ending with the identifier of the
  * root asset in the tree. This is a transient property and only resolved and usable when
  * the asset is loaded from storage and as calculating it is costly, might be empty when
  * certain optimized loading operations are used.
- * An asset may have dynamically-typed {@link #attributes} with an underlying
- * {@link ObjectValue} model. Use the {@link Attribute} etc. class to work with this API.
+ * An asset may have 0-N {@link #attributes}; the {@link AssetDescriptor} associated with an
+ * asset type describes the standard {@link Attribute}s that can be found and what the value type of these
+ * {@link Attribute}s should be but additional {@link Attribute}s can also be added but obviously no validation
+ * can be performed on such dynamic {@link Attribute}s. Use the {@link Attribute} etc. class to work with this API.
  * This property can be empty when certain optimized loading operations are used.
  * <p>
  * For more details on restricted access of user-assigned assets, see {@link UserAsset}.

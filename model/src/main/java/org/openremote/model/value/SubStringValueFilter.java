@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import static org.openremote.model.value.SubStringValueFilter.NAME;
 
 @JsonTypeName(NAME)
-public class SubStringValueFilter extends ValueFilter<StringValue> {
+public class SubStringValueFilter extends ValueFilter<String> {
 
     public static final String NAME = "substring";
 
@@ -44,7 +44,7 @@ public class SubStringValueFilter extends ValueFilter<StringValue> {
     }
 
     @Override
-    public Class<StringValue> getValueType() {
-        return StringValue.class;
+    public Class<String> getValueType() {
+        return String.class;
     }
 }

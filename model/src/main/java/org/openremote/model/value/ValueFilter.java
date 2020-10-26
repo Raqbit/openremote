@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * Interface for a filter that can be applied to messages of type &lt;T&gt; the filter can return a different
- * {@link ValueType} to the supplied message (i.e. value conversion as well as filtering). Filters can be chained and
+ * value type to the supplied message (i.e. value conversion as well as filtering). Filters can be chained and
  * filters should be applied using the following logic:
  * <ul>
  * <li>If message is null then do not pass through filter</li>
@@ -34,11 +34,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-    @JsonSubTypes.Type(name = RegexValueFilter.NAME, value = RegexValueFilter.class),
-    @JsonSubTypes.Type(name = SubStringValueFilter.NAME, value = SubStringValueFilter.class),
-    @JsonSubTypes.Type(name = JsonPathFilter.NAME, value = JsonPathFilter.class)
+    @JsonSubTypes.Type(value = RegexValueFilter.class),
+    @JsonSubTypes.Type(value = SubStringValueFilter.class),
+    @JsonSubTypes.Type(value = JsonPathFilter.class)
 })
-public abstract class ValueFilter<T extends Value> {
+public abstract class ValueFilter<T> {
 
     /**
      * Get the value type

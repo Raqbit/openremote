@@ -22,7 +22,7 @@ public enum NodeModel {
                     new NodeSocket("value", NodeDataType.ANY)
             }),
             info -> {
-                AttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
+                AttributeInternalValue assetAttributePair = Values.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
                 String assetId = assetAttributePair.getAssetId();
                 String attributeName = assetAttributePair.getAttributeName();
                 Optional<AssetState> readValue = info.getFacts().matchFirstAssetState(new AssetQuery().ids(assetId).attributeName(attributeName));
@@ -30,7 +30,7 @@ public enum NodeModel {
                 return readValue.get().getValue().orElse(null);
             },
             params -> {
-                AttributeInternalValue internal = Container.JSON.convertValue(params.getNode().getInternals()[0].getValue(), AttributeInternalValue.class);
+                AttributeInternalValue internal = Values.JSON.convertValue(params.getNode().getInternals()[0].getValue(), AttributeInternalValue.class);
                 String assetId = internal.getAssetId();
                 String attributeName = internal.getAttributeName();
                 List<AssetState> allAssets = params.getFacts().matchAssetState(new AssetQuery().ids(assetId).attributeName(attributeName)
@@ -57,7 +57,7 @@ public enum NodeModel {
                     RulesEngine.LOG.warning("Flow rule error: node " + info.getNode().getName() + " receives invalid value");
                     return;
                 }
-                AttributeInternalValue assetAttributePair = Container.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
+                AttributeInternalValue assetAttributePair = Values.JSON.convertValue(info.getInternals()[0].getValue(), AttributeInternalValue.class);
                 Optional<AssetState> existingValue = info.getFacts().matchFirstAssetState(new AssetQuery().ids(assetAttributePair.getAssetId()).attributeName(assetAttributePair.getAttributeName()));
 
                 if (existingValue.isPresent())
@@ -75,7 +75,7 @@ public enum NodeModel {
                         info.getAssets().dispatch(
                                 assetAttributePair.getAssetId(),
                                 assetAttributePair.getAttributeName(),
-                                Values.parseOrNull(Container.JSON.writeValueAsString(value))
+                                Values.parseOrNull(Values.JSON.writeValueAsString(value))
                         );
                     }
                 } catch (JsonProcessingException e) {
@@ -151,7 +151,7 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    return Values.create(Float.parseFloat(Container.JSON.writeValueAsString(info.getInternals()[0].getValue())));
+                    return Values.create(Float.parseFloat(Values.JSON.writeValueAsString(info.getInternals()[0].getValue())));
                 } catch (JsonProcessingException e) {
                     RulesEngine.RULES_LOG.warning("Number node returned invalid value");
                     return Values.create(0f);
