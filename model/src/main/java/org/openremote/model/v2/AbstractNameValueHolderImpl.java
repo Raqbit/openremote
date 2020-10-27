@@ -58,9 +58,21 @@ public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, 
         return Optional.ofNullable(value);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <U> Optional<U> getValueAs(Class<U> valueType) {
+        if (valueType.isAssignableFrom(getValueType().getType())) {
+            return Optional.ofNullable((U)value);
+        }
+
+
+
+        return Optional.empty();
+    }
+
     @Override
     public void setValue(T value) {
-
+        this.value = value;
     }
 
     @Override

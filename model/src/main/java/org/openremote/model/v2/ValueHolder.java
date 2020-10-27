@@ -33,5 +33,10 @@ public interface ValueHolder<T> {
 
     Optional<T> getValue();
 
+    /**
+     * Provides basic type casting/coercion useful for unknown values
+     */
+    <U> Optional<U> getValueAs(Class<U> valueType);
+
     void setValue(T value);
 }

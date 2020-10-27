@@ -19,6 +19,11 @@
  */
 package org.openremote.model.attribute;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import static org.openremote.model.util.TextUtil.requireNonNullAndNonEmpty;
 
 /**
@@ -30,15 +35,15 @@ import static org.openremote.model.util.TextUtil.requireNonNullAndNonEmpty;
  * Two attribute references are {@link #equals} if they reference the same entity
  * and attribute.
  */
+@JsonFormat(shape = JsonFormat.Shape.ARRAY)
+@JsonPropertyOrder({"entityId", "attributeName"})
 public class AttributeRef {
 
     protected String entityId;
     protected String attributeName;
 
-    protected AttributeRef() {
-    }
-
-    public AttributeRef(String entityId, String attributeName) {
+    @JsonCreator
+    public AttributeRef(@JsonProperty("entityId") String entityId, @JsonProperty("attributeName") String attributeName) {
         requireNonNullAndNonEmpty(entityId);
         requireNonNullAndNonEmpty(attributeName);
         this.entityId = entityId;

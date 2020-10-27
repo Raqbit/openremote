@@ -53,7 +53,7 @@ public abstract class Datapoint implements Serializable {
 
     @Column(name = "VALUE", columnDefinition = "jsonb", nullable = false)
     @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
-    protected Value value;
+    protected Object value;
 
     public Datapoint() {
     }
@@ -66,11 +66,11 @@ public abstract class Datapoint implements Serializable {
         this(stateEvent.getAttributeState(), stateEvent.getTimestamp());
     }
 
-    public Datapoint(AttributeRef attributeRef, Value value, long timestamp) {
+    public Datapoint(AttributeRef attributeRef, Object value, long timestamp) {
         this(attributeRef.getEntityId(), attributeRef.getAttributeName(), value, timestamp);
     }
 
-    public Datapoint(String entityId, String attributeName, Value value, long timestamp) {
+    public Datapoint(String entityId, String attributeName, Object value, long timestamp) {
         this.entityId = entityId;
         this.attributeName = attributeName;
         this.timestamp = new Date(timestamp);
@@ -101,11 +101,11 @@ public abstract class Datapoint implements Serializable {
         this.timestamp = new Date(timestamp);
     }
 
-    public Value getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(Value value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -133,7 +133,7 @@ public abstract class Datapoint implements Serializable {
             "entityId='" + entityId + '\'' +
             ", attributeName='" + attributeName + '\'' +
             ", timestamp=" + timestamp +
-            ", value=" + (value != null ? value.toJson() : "null") +
+            ", value=" + (value != null ? value : "null") +
             '}';
     }
 }

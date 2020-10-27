@@ -19,10 +19,13 @@
  */
 package org.openremote.model.attribute;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.event.shared.AssetInfo;
 import org.openremote.model.event.shared.SharedEvent;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A timestamped {@link AttributeState}.
@@ -69,10 +72,7 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
     protected String realm;
     protected String parentId;
 
-    protected AttributeEvent() {
-    }
-
-    public AttributeEvent(String entityId, String attributeName, Value value) {
+    public AttributeEvent(String entityId, String attributeName, Object value) {
         this(new AttributeState(new AttributeRef(entityId, attributeName), value));
     }
 
@@ -85,11 +85,11 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
         attributeState.deleted = deleted;
     }
 
-    public AttributeEvent(String entityId, String attributeName, Value value, long timestamp) {
+    public AttributeEvent(String entityId, String attributeName, Object value, long timestamp) {
         this(new AttributeState(new AttributeRef(entityId, attributeName), value), timestamp);
     }
 
-    public AttributeEvent(AttributeRef attributeRef, Value value) {
+    public AttributeEvent(AttributeRef attributeRef, Object value) {
         this(new AttributeState(attributeRef, value));
     }
 
@@ -97,7 +97,7 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
         this(new AttributeState(attributeRef));
     }
 
-    public AttributeEvent(AttributeRef attributeRef, Value value, long timestamp) {
+    public AttributeEvent(AttributeRef attributeRef, Object value, long timestamp) {
         this(new AttributeState(attributeRef, value), timestamp);
     }
 
@@ -105,7 +105,8 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
         this.attributeState = attributeState;
     }
 
-    public AttributeEvent(AttributeState attributeState, long timestamp) {
+    @JsonCreator
+    public AttributeEvent(@JsonProperty("state") AttributeState attributeState, @JsonProperty("t") long timestamp) {
         super(timestamp);
         Objects.requireNonNull(attributeState);
         this.attributeState = attributeState;
@@ -151,7 +152,7 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
         return getAttributeRef().getAttributeName();
     }
 
-    public Optional<Value> getValue() {
+    public Optional<Object> getValue() {
         return getAttributeState().getValue();
     }
 

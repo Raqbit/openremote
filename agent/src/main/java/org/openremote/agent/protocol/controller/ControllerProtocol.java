@@ -19,6 +19,8 @@
  */
 package org.openremote.agent.protocol.controller;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.HttpHostConnectException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -391,23 +393,17 @@ public class ControllerProtocol extends AbstractProtocol {
     private void onInitialStatusResponse(AttributeRef attributeRef, String deviceName, String sensorName, AttributeRef controllerRef, Response response) {
         if(response != null) {
             if (response.getStatusInfo().equals(Response.Status.OK)) {
-                String responseBodyAsString = response.readEntity(String.class);
-
                 LOG.fine("### New sensor [" + sensorName + "] status received");
-                LOG.finer("### Status request body response : " + responseBodyAsString);
+                ArrayNode arrayValue = response.readEntity(ArrayNode.class);
 
-                Optional<ArrayValue> arrayValue = Values.parse(responseBodyAsString).flatMap(Values::getArray);
-                Optional<List<ObjectValue>> statuses = Values.getArrayElements(arrayValue.orElse(null), ObjectValue.class, false, false);
-
-                if (!statuses.isPresent()) {
-                    LOG.warning("### Status response is not a JSON array or empty: " + responseBodyAsString);
+                if (arrayValue.isEmpty()) {
+                    LOG.warning("### Status response is empty");
                 } else {
-                    statuses.get().forEach(status -> {
-                        String name = status.getString("name").orElse(null);
-                        String value = status.getString("value").orElse(null);
+                    arrayValue.forEach(status -> {
+                        String name = status.get("name").asText();
+                        String value = status.get("value").asText();
 
                         this.updateAttributeValue(attributeRef, value);
-
                         this.initStatusDone.put(attributeRef, true);
                     });
                 }

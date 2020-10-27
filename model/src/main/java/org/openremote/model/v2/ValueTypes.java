@@ -32,6 +32,7 @@ import org.openremote.model.console.ConsoleProvider;
 import org.openremote.model.console.ConsoleProviders;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.util.TimeUtil;
+import org.openremote.model.value.ColorRGB;
 
 import javax.validation.constraints.*;
 import java.util.List;
@@ -46,6 +47,8 @@ public final class ValueTypes {
     public static final ValueDescriptor<Boolean> BOOLEAN = new ValueDescriptor<>("Boolean", Boolean.class);
 
     public static final ValueDescriptor<Integer> INTEGER = new ValueDescriptor<>("Integer", Integer.class);
+
+    public static final ValueDescriptor<Long> LONG = new ValueDescriptor<>("Long", Long.class);
 
     public static final ValueDescriptor<Double> NUMBER = new ValueDescriptor<>("Number", Double.class);
 
@@ -95,14 +98,14 @@ public final class ValueTypes {
         new MetaItem<>(MetaTypes.SECRET, true)
     );
 
-    @Size(min = 3, max = 4)
-    public static final ValueDescriptor<IntegerList> COLOUR_RGB = new ValueDescriptor<>("Colour RGB", IntegerList.class);
+    @Size(min = 3, max = 3)
+    public static final ValueDescriptor<ColorRGB> COLOUR_RGB = new ValueDescriptor<>("Colour RGB", ColorRGB.class);
 
     @Size(min = 4, max = 4)
-    public static final ValueDescriptor<IntegerList> COLOUR_RGBW = new ValueDescriptor<>("Colour RGBW", IntegerList.class);
+    public static final ValueDescriptor<ColorRGB> COLOUR_RGBW = new ValueDescriptor<>("Colour RGBW", ColorRGB.class);
 
     @Size(min = 4, max = 4)
-    public static final ValueDescriptor<IntegerList> COLOUR_ARGB = new ValueDescriptor<>("Colour ARGB", IntegerList.class);
+    public static final ValueDescriptor<ColorRGB> COLOUR_RGBA = new ValueDescriptor<>("Colour RGBA", ColorRGB.class);
 
     @Pattern(regexp = "[a-fA-F0-9]{6}")
     public static final ValueDescriptor<String> COLOUR_HEX = new ValueDescriptor<>("Colour HEX", String.class);

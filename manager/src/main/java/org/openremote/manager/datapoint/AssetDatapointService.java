@@ -201,12 +201,12 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         return getValueDatapoints(asset.getId(), assetAttribute, datapointInterval, fromTimestamp, toTimestamp);
     }
 
-    public ValueDatapoint[] getValueDatapoints(String assetId, Attribute attribute,
+    public ValueDatapoint<?>[] getValueDatapoints(String assetId, Attribute<?> attribute,
                                                DatapointInterval datapointInterval,
                                                long fromTimestamp,
                                                long toTimestamp) {
 
-        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getNameOrThrow());
+        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         ValueType attributeValueType = attribute.getTypeOrThrow().getValueType();
 
         LOG.fine("Getting datapoints for: " + attributeRef);

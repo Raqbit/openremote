@@ -17,15 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.attribute;
+package org.openremote.model.value;
 
-import org.openremote.model.value.Values;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Objects;
+
+@JsonFormat(shape = JsonFormat.Shape.ARRAY)
+@JsonPropertyOrder({"red", "green", "blue", "amberWhite"})
 public class ColorRGB {
 
-    final protected int red;
-    final protected int green;
-    final protected int blue;
+    protected int red;
+    protected int green;
+    protected int blue;
+    protected Integer amberWhite = null;
 
     public ColorRGB(int red, int green, int blue) {
         this.red = red;
@@ -33,16 +39,11 @@ public class ColorRGB {
         this.blue = blue;
     }
 
-    public ColorRGB(double red, double green, double blue) {
-        this((int) red, (int) green, (int) blue);
-    }
-
-    public ColorRGB(ArrayValue arrayValue) {
-        this(
-            arrayValue.getNumber(0).orElseThrow(() -> new IllegalArgumentException("Element 0 must be a number")),
-            arrayValue.getNumber(1).orElseThrow(() -> new IllegalArgumentException("Element 1 must be a number")),
-            arrayValue.getNumber(2).orElseThrow(() -> new IllegalArgumentException("Element 2 must be a number"))
-        );
+    public ColorRGB(int red, int green, int blue, int amberWhite) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.amberWhite = amberWhite;
     }
 
     public int getRed() {
@@ -57,24 +58,8 @@ public class ColorRGB {
         return blue;
     }
 
-    public ArrayValue asArrayValue() {
-        ArrayValue array = Values.createArray();
-        array.set(0, Values.create(getRed()));
-        array.set(1, Values.create(getGreen()));
-        array.set(2, Values.create(getBlue()));
-        return array;
-    }
-
-    public ColorRGB red(int red) {
-        return new ColorRGB(red, getGreen(), getBlue());
-    }
-
-    public ColorRGB green(int green) {
-        return new ColorRGB(getRed(), green, getBlue());
-    }
-
-    public ColorRGB blue(int blue) {
-        return new ColorRGB(getRed(), getGreen(), blue);
+    public Integer getAmberWhite() {
+        return amberWhite;
     }
 
     @Override
@@ -82,19 +67,17 @@ public class ColorRGB {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ColorRGB colorRGB = (ColorRGB) o;
+        ColorRGB other = (ColorRGB) o;
 
-        if (red != colorRGB.red) return false;
-        if (green != colorRGB.green) return false;
-        return blue == colorRGB.blue;
+        if (red != other.red) return false;
+        if (green != other.green) return false;
+        if (blue != other.blue) return false;
+        return Objects.equals(amberWhite, other.amberWhite);
     }
 
     @Override
     public int hashCode() {
-        int result = red;
-        result = 31 * result + green;
-        result = 31 * result + blue;
-        return result;
+        return Objects.hash(red, green, blue, amberWhite);
     }
 
     @Override

@@ -19,6 +19,10 @@
  */
 package org.openremote.model.attribute;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,27 +32,23 @@ import java.util.Optional;
  * <code>null</code> is a valid {@link #value}.
  * </p>
  */
-public class AttributeState<T> {
+public class AttributeState {
 
+    @JsonProperty("ref")
     protected AttributeRef attributeRef;
-    protected T value;
+    protected Object value;
     protected boolean deleted;
 
-    protected AttributeState() {
-    }
-
-    public AttributeState(String entityId, Attribute<T> attribute) {
+    public AttributeState(String entityId, Attribute<?> attribute) {
         this(entityId, attribute.getName(), attribute.getValue().orElse(null));
     }
 
-    public AttributeState(String entityId, String attributeName, T value) {
+    public AttributeState(String entityId, String attributeName, Object value) {
         this(new AttributeRef(entityId, attributeName), value);
     }
 
-    /**
-     * @param value can be <code>null</code> if the attribute has no value.
-     */
-    public AttributeState(AttributeRef attributeRef, T value) {
+    @JsonCreator
+    public AttributeState(AttributeRef attributeRef, Object value) {
         this.attributeRef = Objects.requireNonNull(attributeRef);
         this.value = value;
     }
@@ -64,11 +64,11 @@ public class AttributeState<T> {
         return attributeRef;
     }
 
-    public Optional<T> getValue() {
+    public Optional<Object> getValue() {
         return Optional.ofNullable(value);
     }
 
-    public void setValue(T value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 

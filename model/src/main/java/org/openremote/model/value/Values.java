@@ -19,27 +19,33 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.jackson.ORModelModule;
 
-import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * Utilities for working with values
+ * Utilities for working with values and JSON
  */
+@SuppressWarnings("unchecked")
 public class Values {
 
     public static final ObjectMapper JSON = new ObjectMapper()
@@ -59,301 +65,152 @@ public class Values {
 
     public static final String NULL_LITERAL = "null";
 
-    public static Value parseOrNull(String jsonString) {
+    public static Optional<JsonNode> parse(String jsonString) {
         try {
-            return parse(jsonString).orElse(null);
+            return Optional.of(JSON.readTree(jsonString));
         }
         catch (Exception ignored) {}
-        return null;
+        return Optional.empty();
     }
 
-    public static <T extends Value> Optional<T> parse(String jsonString) throws ValueException {
-        return instance().parse(jsonString);
+    public static <T> Optional<T> parse(String jsonString, Type type) {
+        try {
+            return Optional.of(JSON.readValue(jsonString, JSON.constructType(type)));
+        } catch (Exception ignored) {}
+        return Optional.empty();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Value> Optional<T> cast(Class<T> type, Value value) {
-        return value != null && value.getType().getModelType() == type
-            ? Optional.of((T) value)
-            : Optional.empty();
+    public static <T> Optional<T> parse(String jsonString, TypeReference<T> type) {
+        return parse(jsonString, JSON.getTypeFactory().constructType(type));
     }
 
-    public static Optional<String> getString(Value value) {
-        return cast(StringValue.class, value).map(StringValue::getString);
+    public static <T> Optional<T> parse(String jsonString, Class<T> type) {
+        return parse(jsonString, JSON.constructType(type));
     }
 
-    public static Optional<Double> getNumber(Value value) {
-        return cast(NumberValue.class, value).map(NumberValue::getNumber);
-    }
-
-    public static Optional<Boolean> getBoolean(Value value) {
-        return cast(BooleanValue.class, value).map(BooleanValue::getBoolean);
-    }
-
-    /**
-     * Will attempt to coerce the value into a boolean (where it makes sense)
-     */
-    public static Optional<Boolean> getBooleanCoerced(Value value) {
-
-        return convertToValue(value, BooleanValue.class)
-            .map(BooleanValue::getBoolean);
-    }
-
-    /**
-     * Attempts to coerce the value into an integer (where it makes sense)
-     */
-    public static Optional<Integer> getIntegerCoerced(Value value) {
-
-        return convertToValue(value, NumberValue.class)
-            .map(NumberValue::getNumber)
-            .map(Double::intValue);
-    }
-
-    /**
-     * Attempts to coerce the value into a long (where it makes sense)
-     */
-    public static Optional<Long> getLongCoerced(Value value) {
-
-        return convertToValue(value, NumberValue.class)
-            .map(NumberValue::getNumber)
-            .map(Double::longValue);
-    }
-
-    public static Optional<ObjectValue> getObject(Value value) {
-        return cast(ObjectValue.class, value);
-    }
-
-    public static Optional<ArrayValue> getArray(Value value) {
-        return cast(ArrayValue.class, value);
-    }
-
-    public static <T extends Value> Optional<List<T>> getArrayElements(ArrayValue arrayValue,
-                                                                       Class<T> elementType,
-                                                                       boolean throwOnError,
-                                                                       boolean includeNulls) throws ClassCastException {
-        return getArrayElements(arrayValue, elementType, throwOnError, includeNulls, value -> value);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Value, U> Optional<List<U>> getArrayElements(ArrayValue arrayValue,
-                                                                          Class<T> elementType,
-                                                                          boolean throwOnError,
-                                                                          boolean includeNulls,
-                                                                          Function<T, U> converter)
-        throws ClassCastException, IllegalArgumentException {
-
-        if (arrayValue == null || arrayValue.isEmpty() || elementType == null) {
-            return Optional.empty();
-        }
-
-        if (converter == null) {
-            if (throwOnError) {
-                throw new IllegalArgumentException("Converter cannot be null");
-            }
-            return Optional.empty();
-        }
-
-        Stream<Value> values = arrayValue.stream();
-        if (!throwOnError) {
-            values = values.filter(value -> value != null && value.getType().getModelType() == elementType);
-        }
-
-        Stream<U> stream = values.map(value -> (T)value).map(converter);
-
-        if (!includeNulls) {
-            stream = stream.filter(Objects::nonNull);
-        }
-
-        return Optional.of(stream.collect(Collectors.toList()));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Value> Optional<T> getMetaItemValueOrThrow(Attribute attribute,
-                                                                        MetaItemDescriptor metaItemDescriptor,
-                                                                        boolean throwIfMetaMissing,
-                                                                        boolean throwIfValueMissing)
-        throws IllegalArgumentException {
-        return getMetaItemValueOrThrow(
-                attribute,
-                metaItemDescriptor.getUrn(),
-                metaItemDescriptor.getValueType().getModelType(),
-                throwIfMetaMissing,
-                throwIfValueMissing);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Value> Optional<T> getMetaItemValueOrThrow(Attribute attribute,
-                                                                        String name,
-                                                                        Class<T> valueClazz,
-                                                                        boolean throwIfMetaMissing,
-                                                                        boolean throwIfValueMissing)
-        throws IllegalArgumentException {
-
-        Optional<MetaItem> metaItem = attribute.getMetaItem(name);
-
-        if (!metaItem.isPresent()) {
-            if (throwIfMetaMissing) {
-                throw new IllegalArgumentException("Required meta item is missing: " + name);
-            }
-
-            return Optional.empty();
-        }
-
-        Optional<Value> value = metaItem.get().getValue();
-
-        if (!value.isPresent()) {
-            if (throwIfValueMissing) {
-                throw new IllegalArgumentException("Meta item value is missing: " + name);
-            }
-            return Optional.empty();
-        }
-
-        if (valueClazz != Value.class && value.get().getType().getModelType() != valueClazz) {
-            throw new IllegalArgumentException("Meta item value is of incorrect type: expected="
-                + valueClazz.getName() + "; actual=" + value.get().getType().getModelType().getName());
-        }
-
-        return Optional.of((T)value.get());
-    }
-
-    public static <T extends Value> Optional<T> convertToValue(Value value, Class<T> toType) {
-        return convertToValue(value, ValueType.fromModelType(toType));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Value> Optional<T> convertToValue(Value value, ValueType toType) {
+    protected static <T> Optional<T> getValue(Object value, Class<T> type, boolean coerce) {
         if (value == null) {
             return Optional.empty();
         }
 
-        T outputValue = null;
+        if (type.isAssignableFrom(value.getClass())) {
+            return Optional.of((T)value);
+        }
 
-        if (toType == value.getType()) {
-            outputValue = (T) value;
-        } else if (toType == ValueType.STRING) {
-            outputValue = (T) Values.create(value.toString());
-        } else {
-            switch (value.getType()) {
-
-                case STRING:
-                    switch (toType) {
-
-                        case NUMBER:
-                            try {
-                                double dbl = Double.parseDouble(value.toString());
-                                outputValue = (T) Values.create(dbl);
-                            } catch (NumberFormatException e) {
-                                return Optional.empty();
-                            }
-                            break;
-                        case BOOLEAN:
-                            if ("ON".equalsIgnoreCase(value.toString())) {
-                                outputValue = (T) Values.create(true);
-                            } else if ("OFF".equalsIgnoreCase(value.toString())) {
-                                outputValue = (T) Values.create(false);
-                            } else {
-                                outputValue = (T) Values.create(Boolean.parseBoolean(value.toString()));
-                            }
-                            break;
-                        case ARRAY:
-                        case OBJECT:
-                            try {
-                                outputValue = (T) Values.parse(value.toString()).orElse(null);
-                            } catch (ValueException e) {
-                                return Optional.empty();
-                            }
+        if (value instanceof JsonNode) {
+            JsonNode node = (JsonNode)value;
+            if (Number.class.isAssignableFrom(type)) {
+                if (type == Integer.class && (node.isInt() || coerce)) {
+                    return Optional.of((T)Integer.valueOf(node.asInt()));
+                } else if (type == Double.class && (node.isDouble() || coerce)) {
+                    return Optional.of((T)Double.valueOf(node.asDouble()));
+                } else if (type == Long.class && (node.isLong() || coerce)) {
+                    return Optional.of((T)Long.valueOf(node.asLong()));
+                } else if (type == BigDecimal.class && (node.isBigDecimal() || coerce)) {
+                    return Optional.of((T)node.decimalValue());
+                } else if (type == BigInteger.class && (node.isBigInteger() || coerce)) {
+                    return Optional.of((T)node.bigIntegerValue());
+                } else if (type == Short.class && (node.isShort() || coerce)) {
+                    return Optional.of((T)Short.valueOf(node.shortValue()));
+                }
+            }
+            if (String.class == type && (node.isTextual() || coerce)) {
+                return Optional.of((T)node.asText());
+            }
+            if (Boolean.class == type && (node.isBoolean() || coerce)) {
+                if (!node.isBoolean() && node.isTextual()) {
+                    if ("TRUE".equalsIgnoreCase(node.textValue()) || "1".equalsIgnoreCase(node.textValue()) || "ON".equalsIgnoreCase(node.textValue())) {
+                        return Optional.of((T)Boolean.TRUE);
                     }
-                    break;
-                case NUMBER:
-                    switch (toType) {
-
-                        case BOOLEAN:
-                            outputValue = (T) Values.getNumber(value)
-                                .map(Double::intValue)
-                                .map(i -> i == 0 ? Boolean.FALSE : i == 1 ? Boolean.TRUE : null)
-                                .map(Values::create)
-                                .orElse(null);
-                            break;
-                    }
-                    break;
-                case BOOLEAN:
-
-                    switch (toType) {
-
-                        case NUMBER:
-                            outputValue = (T) Values.create(((BooleanValue)value).getBoolean() ? 1 : 0);
-                            break;
-                    }
-                    break;
-                case ARRAY:
-
-                    // Only works when the array has a single value
-                    ArrayValue arrayValue = (ArrayValue)value;
-                    if (arrayValue.length() == 1) {
-
-                        Value firstValue = arrayValue.get(0).orElse(null);
-
-                        if (firstValue != null) {
-                            return convertToValue(firstValue, toType);
-                        }
-                    }
+                    return Optional.of((T)Boolean.FALSE);
+                }
+                return Optional.of((T)Boolean.valueOf(node.asBoolean()));
+            }
+            if ((type.isArray() && node.isArray()) || (!node.isArray() && node.isObject())) {
+                try {
+                    return Optional.of(((JsonNode) value).traverse().readValueAs(type));
+                } catch (Exception ignored) {}
             }
         }
 
-        return Optional.ofNullable(outputValue);
-    }
-
-    public static <T extends Value> Optional<T> convertToValue(Object object, ObjectWriter writer) {
-        try {
-            return Optional.of(convertToValueOrThrow(object, writer));
-        } catch (Exception ignored) {
+        if (coerce) {
+            try {
+                return Optional.of(JSON.convertValue(value, type));
+            } catch (Exception ignored) {}
         }
 
         return Optional.empty();
     }
 
-    public static <T extends Value> T convertToValueOrThrow(Object object, ObjectWriter writer) throws IOException {
-        if (object == null || writer == null) {
-            throw new IllegalArgumentException("Value and writer must be defined");
-        }
-
-        Value v;
-        v = parse(writer.writeValueAsString(object)).orElse(null);
-        return (T)v;
+    public static <T> Optional<T> getValue(Object value, Class<T> type) {
+        return getValue(value, type, false);
     }
 
-    public static <T> Optional<T> convertFromValue(Value value, Class<T> clazz, ObjectReader reader) {
-        try {
-            return Optional.of(convertFromValueOrThrow(value, clazz, reader));
-        } catch (Exception ignored) {
-        }
-
-        return Optional.empty();
+    /**
+     * Basic type coercion/casting of values; utilises Jackson's underlying type coercion/casting mechanism
+     */
+    public static <T> Optional<T> getValueCoerced(Object value, Class<T> type) {
+        return getValue(value, type, true);
     }
 
-    public static <T> T convertFromValueOrThrow(Value value, Class<T> clazz, ObjectReader reader) throws IOException {
-        if (value == null || clazz == null || reader == null) {
-            throw new IllegalArgumentException("Value, class and reader must be defined");
-        }
+    public static Optional<String> getString(Object value) {
+        return getValue(value, String.class);
+    }
 
-        String str = value.toJson();
-        return reader.forType(clazz).readValue(str);
+    public static Optional<String> getStringCoerced(Object value) {
+        return getValueCoerced(value, String.class);
+    }
+
+    public static Optional<Boolean> getBoolean(Object value) {
+        return getValue(value, Boolean.class);
+    }
+
+    public static Optional<Boolean> getBooleanCoerced(Object value) {
+        return getValueCoerced(value, Boolean.class);
+    }
+
+    public static Optional<Integer> getInteger(Object value) {
+        return getValue(value, Integer.class);
+    }
+
+    public static Optional<Integer> getIntegerCoerced(Object value) {
+        return getValueCoerced(value, Integer.class);
+    }
+
+    public static Optional<Double> getDouble(Object value) {
+        return getValue(value, Double.class);
+    }
+
+    public static Optional<Double> getDoubleCoerced(Object value) {
+        return getValueCoerced(value, Double.class);
+    }
+
+    public static Optional<Long> getLong(Object value) {
+        return getValue(value, Long.class);
+    }
+
+    public static Optional<Long> getLongCoerced(Object value) {
+        return getValueCoerced(value, Long.class);
+    }
+
+    public static Optional<ObjectNode> getObject(Object value) {
+        return getValue(value, ObjectNode.class);
+    }
+
+    public static Optional<ArrayNode> getArray(Object value) {
+        return getValue(value, ArrayNode.class);
     }
 
     public static <T> T[] reverseArray(T[] array, Class<T> clazz) {
         if (array == null) {
             return null;
         }
-        T[] newArray = createArray(array.length, clazz);
-        int j = 0;
-        for (int i=array.length; i>0; i--) {
-            newArray[j] = array[i-1];
-            j++;
-        }
-        return newArray;
+
+        List<T> list = Arrays.asList(array);
+        Collections.reverse(list);
+        return list.toArray(createArray(0, clazz));
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T[] createArray(int size, Class<T> clazz) {
         return (T[]) Array.newInstance(clazz, size);
     }
@@ -426,8 +283,8 @@ public class Values {
     public static String shiftTime(Object o, int minutes) {
         String timestamp = o.toString();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        Date date = null;
-        if (timestamp != null && timestamp.length() >= 1 && timestamp.substring(0, 1).equals("-")) {
+        Date date;
+        if (timestamp != null && timestamp.length() >= 1 && timestamp.startsWith("-")) {
             date = new Date();
             date.setTime(date.getTime() + 60 * 60000);
         } else {
@@ -469,7 +326,6 @@ public class Values {
         return newCollection;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T convert(Class<T> targetType, Object object) {
         Map<String, Object> props = JSON.convertValue(object, Map.class);
         return JSON.convertValue(props, targetType);
