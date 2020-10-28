@@ -21,40 +21,41 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class ElectricityStorage extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> LEVELISED_COST_OF_STORAGE = new AttributeDescriptor<>("levelisedCostOfStorage", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
     public static final AttributeDescriptor<Double> ENERGY_CAPACITY = new AttributeDescriptor<>("energyCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> ENERGY_AVAILABLE_PERCENTAGE = new AttributeDescriptor<>("energyAvailablePercentage", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
     public static final AttributeDescriptor<Double> ENERGY_AVAILABLE = new AttributeDescriptor<>("energyAvailable", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_CAPACITY_REMAINING = new AttributeDescriptor<>("energyCapacityRemaining", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TOTAL_IMPORT = new AttributeDescriptor<>("energyTotalImport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TOTAL_EXPORT = new AttributeDescriptor<>("energyTotalExport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_CAPACITY_IMPORT = new AttributeDescriptor<>("powerCapacityImport", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
@@ -64,20 +65,20 @@ public class ElectricityStorage extends Device {
     );
     public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_SETPOINT = new AttributeDescriptor<>("powerSetpoint", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
     public static final AttributeDescriptor<Integer> CHARGE_CYCLES = new AttributeDescriptor<>("chargeCycles", true, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> FINANCIAL_WALLET = new AttributeDescriptor<>("financialWallet", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
     public static final AttributeDescriptor<Integer> CARBON_WALLET = new AttributeDescriptor<>("carbonWallet", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_MASS_KILOGRAM),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
 
     public static final AssetDescriptor<ElectricityStorage> DESCRIPTOR = new AssetDescriptor<>("Electricity storage", "battery-charging", "1B7C89", ElectricityStorage.class);
@@ -86,63 +87,63 @@ public class ElectricityStorage extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public String getStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public Double getLevelisedCostOfStorage() {
-        return getAttributes().get(LEVELISED_COST_OF_STORAGE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getLevelisedCostOfStorage() {
+        return getAttributes().getValueOrDefault(LEVELISED_COST_OF_STORAGE);
     }
 
-    public Double getEnergyCapacity() {
-        return getAttributes().get(ENERGY_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyCapacity() {
+        return getAttributes().getValueOrDefault(ENERGY_CAPACITY);
     }
 
-    public Integer getEnergyAvailablePercentage() {
-        return getAttributes().get(ENERGY_AVAILABLE_PERCENTAGE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getEnergyAvailablePercentage() {
+        return getAttributes().getValueOrDefault(ENERGY_AVAILABLE_PERCENTAGE);
     }
 
-    public Double getEnergyAvailable() {
-        return getAttributes().get(ENERGY_AVAILABLE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyAvailable() {
+        return getAttributes().getValueOrDefault(ENERGY_AVAILABLE);
     }
 
-    public Double getEnergyCapacityRemaining() {
-        return getAttributes().get(ENERGY_CAPACITY_REMAINING).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyCapacityRemaining() {
+        return getAttributes().getValueOrDefault(ENERGY_CAPACITY_REMAINING);
     }
 
-    public Double getEnergyTotalImport() {
-        return getAttributes().get(ENERGY_TOTAL_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalImport() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT);
     }
 
-    public Double getEnergyTotalExport() {
-        return getAttributes().get(ENERGY_TOTAL_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalExport() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT);
     }
 
-    public Double getPowerCapacityImport() {
-        return getAttributes().get(POWER_CAPACITY_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerCapacityImport() {
+        return getAttributes().getValueOrDefault(POWER_CAPACITY_IMPORT);
     }
 
-    public Double getPowerCapacityExport() {
-        return getAttributes().get(POWER_CAPACITY_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerCapacityExport() {
+        return getAttributes().getValueOrDefault(POWER_CAPACITY_EXPORT);
     }
 
-    public Double getPowerTotal() {
-        return getAttributes().get(POWER_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerTotal() {
+        return getAttributes().getValueOrDefault(POWER_TOTAL);
     }
 
-    public Double getPowerSetpoint() {
-        return getAttributes().get(POWER_SETPOINT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerSetpoint() {
+        return getAttributes().getValueOrDefault(POWER_SETPOINT);
     }
 
-    public Integer getChargeCycles() {
-        return getAttributes().get(CHARGE_CYCLES).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getChargeCycles() {
+        return getAttributes().getValueOrDefault(CHARGE_CYCLES);
     }
 
-    public Double getFinancialWallet() {
-        return getAttributes().get(FINANCIAL_WALLET).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getFinancialWallet() {
+        return getAttributes().getValueOrDefault(FINANCIAL_WALLET);
     }
 
-    public Integer getCarbonWallet() {
-        return getAttributes().get(CARBON_WALLET).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCarbonWallet() {
+        return getAttributes().getValueOrDefault(CARBON_WALLET);
     }
 }

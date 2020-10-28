@@ -21,6 +21,7 @@ package org.openremote.model.asset.agent;
 
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.MetaDescriptor;
 
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link org.openremote.model.asset.Asset}
@@ -31,17 +32,19 @@ public class AgentDescriptor<T extends Agent> extends AssetDescriptor<T> {
     protected boolean instanceImport;
     protected boolean assetDiscovery;
     protected boolean assetImport;
+    protected MetaDescriptor<?>[] linkedAttributeDescriptors;
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport) {
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport, MetaDescriptor<?>...linkedAttributeDescriptors) {
         super(name, icon, colour, type, additionalAttributeDescriptors);
         this.instanceDiscovery = instanceDiscovery;
         this.instanceImport = instanceImport;
         this.assetDiscovery = assetDiscovery;
         this.assetImport = assetImport;
+        this.linkedAttributeDescriptors = linkedAttributeDescriptors;
     }
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport) {
-        super(name, icon, colour, type);
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport, MetaDescriptor<?>...linkedAttributeDescriptors) {
+        this(name, icon, colour, type, null, instanceDiscovery, instanceImport, assetDiscovery, assetImport, linkedAttributeDescriptors);
         this.instanceDiscovery = instanceDiscovery;
         this.instanceImport = instanceImport;
         this.assetDiscovery = assetDiscovery;
@@ -62,5 +65,9 @@ public class AgentDescriptor<T extends Agent> extends AssetDescriptor<T> {
 
     public boolean isAssetImport() {
         return assetImport;
+    }
+
+    public MetaDescriptor<?>[] getLinkedAttributeDescriptors() {
+        return linkedAttributeDescriptors;
     }
 }

@@ -23,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.Values;
 
 import static org.openremote.model.asset.AssetResource.Util.WRITE_ATTRIBUTE_HTTP_METHOD;
 import static org.openremote.model.asset.AssetResource.Util.getWriteAttributeUrl;
@@ -34,7 +32,7 @@ public class PushNotificationAction {
 
     protected String url;
     protected String httpMethod;
-    protected JsonNode data;
+    protected Object data;
     protected boolean silent;
     protected boolean openInBrowser; // For app based consoles (i.e. Android and iOS)
 
@@ -44,7 +42,7 @@ public class PushNotificationAction {
 
     @JsonCreator
     public PushNotificationAction(@JsonProperty("url") String url,
-                                  @JsonProperty("data") JsonNode data,
+                                  @JsonProperty("data") Object data,
                                   @JsonProperty("silent") boolean silent,
                                   @JsonProperty("openInBrowser") boolean openInBrowser,
                                   @JsonProperty("httpMethod") String httpMethod) {
@@ -63,7 +61,7 @@ public class PushNotificationAction {
         this.url = url;
     }
 
-    public JsonNode getData() {
+    public Object getData() {
         return data;
     }
 
@@ -95,38 +93,8 @@ public class PushNotificationAction {
         this.httpMethod = httpMethod;
     }
 
-    public ObjectValue toValue() {
-        ObjectValue val = Values.createObject();
-        if (!TextUtil.isNullOrEmpty(url)) {
-            val.put("url", url);
-        }
-        if (!TextUtil.isNullOrEmpty(httpMethod)) {
-            val.put("httpMethod", httpMethod);
-        }
-        val.put("silent", silent);
-        val.put("openInBrowser", openInBrowser);
-        if (data != null) {
-            val.put("data", data);
-        }
-        return val;
-    }
-
-    public static PushNotificationAction writeAttributeValueAction(AttributeRef attributeRef, Value value) {
+    public static PushNotificationAction writeAttributeValueAction(AttributeRef attributeRef, Object value) {
         String url = getWriteAttributeUrl(attributeRef);
         return new PushNotificationAction(url, value, true, false, WRITE_ATTRIBUTE_HTTP_METHOD);
-    }
-
-    public static PushNotificationAction fromValue(ObjectValue value) {
-        if (value == null) {
-            return null;
-        }
-
-        return new PushNotificationAction(
-            value.getString("url").orElse(null),
-            value.get("data").orElse(null),
-            value.getBoolean("silent").orElse(false),
-            value.getBoolean("openInBrowser").orElse(false),
-            value.getString("httpMethod").orElse(null)
-        );
     }
 }

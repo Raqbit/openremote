@@ -86,5 +86,4 @@ public class RadialGeofencePredicate extends GeofencePredicate {
     public double[] getCentrePoint() {
         return new double[]{lng, lat};
     }
-
 }

@@ -22,7 +22,7 @@ package org.openremote.model.asset;
 import org.apache.commons.lang3.StringUtils;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.AttributeDescriptorProvider;
-import org.openremote.model.v2.NameProvider;
+import org.openremote.model.v2.NameHolder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -43,7 +43,7 @@ import static java.lang.reflect.Modifier.isStatic;
  * A custom project can add its own descriptors through {@link org.openremote.model.asset.AssetModelProvider}.
  * <p>
  */
-public class AssetDescriptor<T extends Asset> implements NameProvider, AttributeDescriptorProvider {
+public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDescriptorProvider {
 
     protected String name;
     protected Class<T> type;

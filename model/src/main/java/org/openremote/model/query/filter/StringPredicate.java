@@ -20,7 +20,7 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.v2.NameProvider;
+import org.openremote.model.v2.NameHolder;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -41,7 +41,7 @@ public class StringPredicate implements ValuePredicate {
         this.value = value;
     }
 
-    public StringPredicate(NameProvider nameProvider) {
+    public StringPredicate(NameHolder nameProvider) {
         this.value = nameProvider.getName();
     }
 

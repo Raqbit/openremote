@@ -19,7 +19,9 @@
  */
 package org.openremote.model.v2;
 
-public interface NameValueDescriptorProvider<T> extends NameProvider {
+public interface NameValueDescriptorProvider<T> extends NameHolder {
 
     ValueDescriptor<T> getValueDescriptor();
+
+    T getDefaultValue();
 }

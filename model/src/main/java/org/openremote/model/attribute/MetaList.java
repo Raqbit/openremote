@@ -20,7 +20,6 @@
 package org.openremote.model.attribute;
 
 import org.openremote.model.v2.MetaDescriptor;
-import org.openremote.model.v2.NameValueDescriptorProvider;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -35,8 +34,14 @@ public class MetaList extends NamedList<MetaItem<?>> {
     }
 
     // This works around the crappy type system
-    public <S, U extends MetaItem<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
-        return super.getInternal(nameValueDescriptorProvider);
+    public <S> Optional<MetaItem<S>> get(MetaDescriptor<S> metaDescriptor) {
+        return super.getInternal(metaDescriptor);
+    }
+
+    public <S> MetaItem<S> getOrCreate(MetaDescriptor<S> metaDescriptor) {
+        MetaItem<S> metaItem = get(metaDescriptor).orElse(new MetaItem<>(metaDescriptor));
+        addOrReplace(metaItem);
+        return metaItem;
     }
 
     public <T> void set(MetaDescriptor<T> descriptor, T value) {

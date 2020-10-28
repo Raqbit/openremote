@@ -48,24 +48,6 @@ public class DateTimePredicate implements ValuePredicate {
         this.rangeValue = rangeEnd;
     }
 
-    public static DateTimePredicate fromObjectValue(ObjectValue objectValue) {
-        DateTimePredicate dateTimePredicate = new DateTimePredicate();
-
-        objectValue.getString("value").ifPresent(value -> {
-            dateTimePredicate.value = value;
-        });
-        objectValue.getString("rangeValue").ifPresent(rangeValue -> {
-            dateTimePredicate.rangeValue = rangeValue;
-        });
-        objectValue.getString("operator").ifPresent(operator -> {
-            dateTimePredicate.operator = AssetQuery.Operator.valueOf(operator);
-        });
-        objectValue.getBoolean("negate").ifPresent(negate -> {
-            dateTimePredicate.negate = negate;
-        });
-        return dateTimePredicate;
-    }
-
     public DateTimePredicate operator(AssetQuery.Operator dateMatch) {
         this.operator = dateMatch;
         return this;

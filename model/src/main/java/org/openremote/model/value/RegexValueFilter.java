@@ -29,7 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import static org.openremote.model.value.RegexValueFilter.NAME;
 
 @JsonTypeName(NAME)
-public class RegexValueFilter extends ValueFilter<String> {
+public class RegexValueFilter extends ValueFilter {
 
     public static final String NAME = "regex";
 

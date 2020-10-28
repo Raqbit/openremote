@@ -22,9 +22,10 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Gateway extends Asset {
 
@@ -39,19 +40,19 @@ public class Gateway extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public String getClientId() {
-        return getAttributes().get(CLIENT_ID).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getClientId() {
+        return getAttributes().getValueOrDefault(CLIENT_ID);
     }
 
-    public String getClientSecret() {
-        return getAttributes().get(CLIENT_SECRET).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getClientSecret() {
+        return getAttributes().getValueOrDefault(CLIENT_SECRET);
     }
 
-    public ConnectionStatus getGatewayStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<ConnectionStatus> getGatewayStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public Boolean getDisabled() {
-        return getAttributes().get(DISABLED).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Boolean> getDisabled() {
+        return getAttributes().getValueOrDefault(DISABLED);
     }
 }

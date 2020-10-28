@@ -23,6 +23,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.simulator.SimulatorElement;
+import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 
@@ -30,15 +32,18 @@ public class ReplaySimulatorElement extends SimulatorElement {
 
     public static final String ELEMENT_NAME = "replay";
 
-    public ReplaySimulatorElement() {
+    protected ReplaySimulatorElement() {
     }
 
     public ReplaySimulatorElement(AttributeRef attributeRef) {
-        super(attributeRef, AttributeValueType.ARRAY);
+        super(attributeRef, ValueTypes.ARRAY);
     }
 
     public ReplaySimulatorDatapoint getNextDatapoint(long seconds) throws JsonProcessingException {
-        ReplaySimulatorDatapoint[] datapoints = new ObjectMapper().registerModule(new ModelModule()).readValue(elementValue.toJson(), ReplaySimulatorDatapoint[].class);
+        ReplaySimulatorDatapoint[] datapoints = getDatapoints();
+        if (datapoints == null) {
+             return null;
+        }
         return Arrays.stream(datapoints)
             .filter(replaySimulatorDatapoint -> replaySimulatorDatapoint.timestamp > seconds)
             .findFirst()
@@ -46,7 +51,7 @@ public class ReplaySimulatorElement extends SimulatorElement {
     }
 
     public ReplaySimulatorDatapoint[] getDatapoints() throws JsonProcessingException {
-        return new ObjectMapper().registerModule(new ModelModule()).readValue(elementValue.toJson(), ReplaySimulatorDatapoint[].class);
+        return Values.convert(ReplaySimulatorDatapoint[].class, elementValue);
     }
 
     public static class ReplaySimulatorDatapoint {
@@ -55,6 +60,6 @@ public class ReplaySimulatorElement extends SimulatorElement {
          * In seconds
          */
         public long timestamp;
-        public Value value;
+        public Object value;
     }
 }

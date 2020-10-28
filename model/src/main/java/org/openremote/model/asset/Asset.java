@@ -36,6 +36,7 @@ import javax.validation.constraints.Size;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
@@ -228,7 +229,7 @@ public class Asset implements IdentifiableEntity {
 
     public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueTypes.EMAIL, null);
 
-    public static final AttributeDescriptor<ValueTypes.StringList> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.LIST_STRING, null);
+    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.STRING.asArray(), null);
 
     public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueTypes.STRING, null);
 
@@ -443,8 +444,8 @@ public class Asset implements IdentifiableEntity {
         return this;
     }
 
-    public GeoJSONPoint getLocation() {
-        return getAttributes().get(LOCATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<GeoJSONPoint> getLocation() {
+        return getAttributes().getValueOrDefault(LOCATION);
     }
 
     public Asset setLocation(GeoJSONPoint location) {
@@ -452,30 +453,30 @@ public class Asset implements IdentifiableEntity {
         return this;
     }
 
-    public ValueTypes.StringList getTags() {
-        return getAttributes().get(TAGS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String[]> getTags() {
+        return getAttributes().getValueOrDefault(TAGS);
     }
 
-    public Asset setTags(ValueTypes.StringList tags) {
-        getAttributes().addOrReplace(new Attribute<>(TAGS, tags));
+    public Asset setTags(String[] tags) {
+        getAttributes().getOrCreate(TAGS).setValue(tags);
         return this;
     }
 
-    public String getEmail() {
-        return getAttributes().get(EMAIL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getEmail() {
+        return getAttributes().getValueOrDefault(EMAIL);
     }
 
     public Asset setEmail(String email) {
-        getAttributes().addOrReplace(new Attribute<>(EMAIL, email));
+        getAttributes().getOrCreate(EMAIL).setValue(email);
         return this;
     }
 
-    public String getNotes() {
-        return getAttributes().get(NOTES).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getNotes() {
+        return getAttributes().getValueOrDefault(NOTES);
     }
 
     public Asset setNotes(String notes) {
-        getAttributes().addOrReplace(new Attribute<>(NOTES, notes));
+        getAttributes().getOrCreate(NOTES).setValue(notes);
         return this;
     }
 

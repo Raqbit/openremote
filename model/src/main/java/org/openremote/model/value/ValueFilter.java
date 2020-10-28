@@ -38,10 +38,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = SubStringValueFilter.class),
     @JsonSubTypes.Type(value = JsonPathFilter.class)
 })
-public abstract class ValueFilter<T> {
+public abstract class ValueFilter {
 
     /**
      * Get the value type
      */
-    public abstract Class<T> getValueType();
+    public abstract Class<?> getValueType();
 }

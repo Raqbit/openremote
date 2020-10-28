@@ -19,16 +19,15 @@
  */
 package org.openremote.manager.rules;
 
-import org.openremote.container.Container;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
-import org.openremote.container.ContainerHealthStatusProvider;
 import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.TenantRuleset;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
+import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
-public class RulesHealthStatusProvider implements ContainerHealthStatusProvider {
+public class RulesHealthStatusProvider implements HealthStatusProvider, ContainerService {
 
     public static final String NAME = "rules";
     public static final String VERSION = "1.0";
@@ -66,7 +65,7 @@ public class RulesHealthStatusProvider implements ContainerHealthStatusProvider 
     }
 
     @Override
-    public Value getHealthStatus() {
+    public Object getHealthStatus() {
         int totalEngines = rulesService.tenantEngines.size() + rulesService.assetEngines.size();
         int stoppedEngines = 0;
         int errorEngines = 0;
@@ -81,7 +80,7 @@ public class RulesHealthStatusProvider implements ContainerHealthStatusProvider 
             }
         }
 
-        ObjectValue tenantEngines = Values.createObject();
+        ObjectNode tenantEngines = Values.JSON.createObjectNode();
 
         for (RulesEngine<TenantRuleset> tenantEngine : rulesService.tenantEngines.values()) {
             if (!tenantEngine.isRunning()) {
@@ -94,7 +93,7 @@ public class RulesHealthStatusProvider implements ContainerHealthStatusProvider 
             tenantEngines.put(tenantEngine.getId().getRealm().orElse(""), getEngineHealthStatus(tenantEngine));
         }
 
-        ObjectValue assetEngines = Values.createObject();
+        ObjectNode assetEngines = Values.JSON.createObjectNode();
 
         for (RulesEngine<AssetRuleset> assetEngine : rulesService.assetEngines.values()) {
             if (!assetEngine.isRunning()) {
@@ -108,7 +107,7 @@ public class RulesHealthStatusProvider implements ContainerHealthStatusProvider 
             assetEngines.put(assetEngine.getId().getAssetId().orElse(""), getEngineHealthStatus(assetEngine));
         }
 
-        ObjectValue objectValue = Values.createObject();
+        ObjectNode objectValue = Values.JSON.createObjectNode();
         objectValue.put("totalEngines", totalEngines);
         objectValue.put("stoppedEngines", stoppedEngines);
         objectValue.put("errorEngines", errorEngines);
@@ -120,23 +119,23 @@ public class RulesHealthStatusProvider implements ContainerHealthStatusProvider 
         return objectValue;
     }
 
-    protected ObjectValue getEngineHealthStatus(RulesEngine rulesEngine) {
+    protected ObjectNode getEngineHealthStatus(RulesEngine<?> rulesEngine) {
         boolean isError = rulesEngine.isError();
         int totalDeployments = rulesEngine.deployments.size();
         int executionErrorDeployments = rulesEngine.getExecutionErrorDeploymentCount();
         int compilationErrorDeployments = rulesEngine.getExecutionErrorDeploymentCount();
-        ObjectValue val = Values.createObject();
+        ObjectNode val = Values.JSON.createObjectNode();
         val.put("isRunning", rulesEngine.isRunning());
         val.put("isError", isError);
         val.put("totalDeployments", totalDeployments);
         val.put("executionErrorDeployments", executionErrorDeployments);
         val.put("compilationErrorDeployments", compilationErrorDeployments);
 
-        ObjectValue deployments = Values.createObject();
+        ObjectNode deployments = Values.JSON.createObjectNode();
 
         for (Object obj : rulesEngine.deployments.values()) {
             RulesetDeployment deployment = (RulesetDeployment)obj;
-            ObjectValue dVal = Values.createObject();
+            ObjectNode dVal = Values.JSON.createObjectNode();
             dVal.put("name", deployment.getName());
             dVal.put("status", deployment.getStatus().name());
             dVal.put("error", deployment.getError() != null ? deployment.getError().getMessage() : null);

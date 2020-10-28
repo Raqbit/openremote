@@ -20,6 +20,7 @@
 package org.openremote.model.rules;
 
 import org.hibernate.annotations.Formula;
+import org.openremote.model.attribute.MetaList;
 import org.openremote.model.calendar.CalendarEvent;
 
 import javax.persistence.Column;
@@ -129,20 +130,8 @@ public class AssetRuleset extends Ruleset {
     }
 
     @Override
-    public AssetRuleset setMeta(ObjectValue meta) {
+    public AssetRuleset setMeta(MetaList meta) {
         super.setMeta(meta);
-        return this;
-    }
-
-    @Override
-    public AssetRuleset addMeta(String key, Value value) {
-        super.addMeta(key, value);
-        return this;
-    }
-
-    @Override
-    public AssetRuleset removeMeta(String key) {
-        super.removeMeta(key);
         return this;
     }
 

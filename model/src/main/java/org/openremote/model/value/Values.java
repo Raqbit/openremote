@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -48,35 +48,43 @@ import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
 public class Values {
 
-    public static final ObjectMapper JSON = new ObjectMapper()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false)
-        .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
-        .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-        .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
-        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-        .setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
-        .registerModule(new ORModelModule())
-        .registerModule(new Jdk8Module())
-        .registerModule(new JavaTimeModule())
-        .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+    public static final ObjectMapper JSON;
+
+    static {
+        //noinspection deprecation
+        JSON = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false) // see https://github.com/FasterXML/jackson-databind/issues/1547
+            .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+            .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+            .setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
+            .registerModule(new ORModelModule())
+            .registerModule(new Jdk8Module())
+            .registerModule(new JavaTimeModule())
+            .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+
+        JSON.configOverride(Map.class)
+            .setInclude(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
+    }
 
     public static final String NULL_LITERAL = "null";
 
     public static Optional<JsonNode> parse(String jsonString) {
         try {
             return Optional.of(JSON.readTree(jsonString));
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         return Optional.empty();
     }
 
     public static <T> Optional<T> parse(String jsonString, Type type) {
         try {
             return Optional.of(JSON.readValue(jsonString, JSON.constructType(type)));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return Optional.empty();
     }
 
@@ -94,49 +102,51 @@ public class Values {
         }
 
         if (type.isAssignableFrom(value.getClass())) {
-            return Optional.of((T)value);
+            return Optional.of((T) value);
         }
 
         if (value instanceof JsonNode) {
-            JsonNode node = (JsonNode)value;
+            JsonNode node = (JsonNode) value;
             if (Number.class.isAssignableFrom(type)) {
                 if (type == Integer.class && (node.isInt() || coerce)) {
-                    return Optional.of((T)Integer.valueOf(node.asInt()));
+                    return Optional.of((T) Integer.valueOf(node.asInt()));
                 } else if (type == Double.class && (node.isDouble() || coerce)) {
-                    return Optional.of((T)Double.valueOf(node.asDouble()));
+                    return Optional.of((T) Double.valueOf(node.asDouble()));
                 } else if (type == Long.class && (node.isLong() || coerce)) {
-                    return Optional.of((T)Long.valueOf(node.asLong()));
+                    return Optional.of((T) Long.valueOf(node.asLong()));
                 } else if (type == BigDecimal.class && (node.isBigDecimal() || coerce)) {
-                    return Optional.of((T)node.decimalValue());
+                    return Optional.of((T) node.decimalValue());
                 } else if (type == BigInteger.class && (node.isBigInteger() || coerce)) {
-                    return Optional.of((T)node.bigIntegerValue());
+                    return Optional.of((T) node.bigIntegerValue());
                 } else if (type == Short.class && (node.isShort() || coerce)) {
-                    return Optional.of((T)Short.valueOf(node.shortValue()));
+                    return Optional.of((T) Short.valueOf(node.shortValue()));
                 }
             }
             if (String.class == type && (node.isTextual() || coerce)) {
-                return Optional.of((T)node.asText());
+                return Optional.of((T) node.asText());
             }
             if (Boolean.class == type && (node.isBoolean() || coerce)) {
                 if (!node.isBoolean() && node.isTextual()) {
                     if ("TRUE".equalsIgnoreCase(node.textValue()) || "1".equalsIgnoreCase(node.textValue()) || "ON".equalsIgnoreCase(node.textValue())) {
-                        return Optional.of((T)Boolean.TRUE);
+                        return Optional.of((T) Boolean.TRUE);
                     }
-                    return Optional.of((T)Boolean.FALSE);
+                    return Optional.of((T) Boolean.FALSE);
                 }
-                return Optional.of((T)Boolean.valueOf(node.asBoolean()));
+                return Optional.of((T) Boolean.valueOf(node.asBoolean()));
             }
             if ((type.isArray() && node.isArray()) || (!node.isArray() && node.isObject())) {
                 try {
                     return Optional.of(((JsonNode) value).traverse().readValueAs(type));
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
         if (coerce) {
             try {
                 return Optional.of(JSON.convertValue(value, type));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return Optional.empty();
@@ -223,7 +233,7 @@ public class Values {
         String timestamp = "";
         try {
             timestamp = o.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             return (0L);
         }
         SimpleDateFormat sdf;
@@ -277,8 +287,8 @@ public class Values {
     /**
      * @param o       A timestamp string as 'HH:mm' or '-'.
      * @param minutes The minutes to increment/decrement from timestamp.
-     * @return Timestamp string as 'HH:mm', modified with the given minutes or the current time + 60 minutes if
-     * the given timestamp was '-' or the given timestamp couldn't be parsed.
+     * @return Timestamp string as 'HH:mm', modified with the given minutes or the current time + 60 minutes if the
+     * given timestamp was '-' or the given timestamp couldn't be parsed.
      */
     public static String shiftTime(Object o, int minutes) {
         String timestamp = o.toString();
@@ -305,7 +315,7 @@ public class Values {
     }
 
     @SafeVarargs
-    public static <T> List<T> joinCollections(Collection<T>...collections) {
+    public static <T> List<T> joinCollections(Collection<T>... collections) {
         if (collections == null || collections.length == 0) {
             return Collections.emptyList();
         }
@@ -329,5 +339,34 @@ public class Values {
     public static <T> T convert(Class<T> targetType, Object object) {
         Map<String, Object> props = JSON.convertValue(object, Map.class);
         return JSON.convertValue(props, targetType);
+    }
+
+    public static Class<?> getArrayClass(Class<?> componentType) throws ClassNotFoundException {
+        ClassLoader classLoader = componentType.getClassLoader();
+        String name;
+        if (componentType.isArray()) {
+            // just add a leading "["
+            name = "[" + componentType.getName();
+        } else if (componentType == boolean.class) {
+            name = "[Z";
+        } else if (componentType == byte.class) {
+            name = "[B";
+        } else if (componentType == char.class) {
+            name = "[C";
+        } else if (componentType == double.class) {
+            name = "[D";
+        } else if (componentType == float.class) {
+            name = "[F";
+        } else if (componentType == int.class) {
+            name = "[I";
+        } else if (componentType == long.class) {
+            name = "[J";
+        } else if (componentType == short.class) {
+            name = "[S";
+        } else {
+            // must be an object non-array class
+            name = "[L" + componentType.getName() + ";";
+        }
+        return classLoader != null ? classLoader.loadClass(name) : Class.forName(name);
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.openremote.model.rules;
 
+import org.openremote.model.attribute.MetaList;
 import org.openremote.model.calendar.CalendarEvent;
 
 import javax.persistence.Entity;
@@ -90,20 +91,8 @@ public class GlobalRuleset extends Ruleset {
     }
 
     @Override
-    public GlobalRuleset setMeta(ObjectValue meta) {
+    public GlobalRuleset setMeta(MetaList meta) {
         super.setMeta(meta);
-        return this;
-    }
-
-    @Override
-    public GlobalRuleset addMeta(String key, Value value) {
-        super.addMeta(key, value);
-        return this;
-    }
-
-    @Override
-    public GlobalRuleset removeMeta(String key) {
-        super.removeMeta(key);
         return this;
     }
 

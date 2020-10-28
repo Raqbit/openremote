@@ -20,6 +20,7 @@
 
 package org.openremote.model.flow.catalog.console;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.flow.Slot;
 import org.openremote.model.flow.catalog.WidgetNodeDescriptor;
 
@@ -33,7 +34,7 @@ public class TextLabelNodeDescriptor extends WidgetNodeDescriptor {
 
     public static final String COMPONENT = "or-console-widget-textlabel";
 
-    public static final ObjectValue TEXT_LABEL_INITIAL_PROPERTIES = WIDGET_INITIAL_PROPERTIES.deepCopy()
+    public static final ObjectNode TEXT_LABEL_INITIAL_PROPERTIES = WIDGET_INITIAL_PROPERTIES.deepCopy()
         .put(PROPERTY_COMPONENT, COMPONENT)
         .put("emptyValue", "(EMPTY LABEL)")
         .put("fontSizePixels", 15)
@@ -65,7 +66,7 @@ public class TextLabelNodeDescriptor extends WidgetNodeDescriptor {
     }
 
     @Override
-    protected ObjectValue getInitialProperties() {
+    protected ObjectNode getInitialProperties() {
         return TEXT_LABEL_INITIAL_PROPERTIES;
     }
 

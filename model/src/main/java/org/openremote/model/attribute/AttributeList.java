@@ -19,7 +19,6 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.v2.AbstractNameValueHolderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.NameValueDescriptorProvider;
 
@@ -36,10 +35,14 @@ public class AttributeList extends NamedList<Attribute<?>> {
     }
 
     // This works around the crappy type system
-    public <S, U extends Attribute<S>> Optional<U> get(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
-        Object val = super.get("test").flatMap(AbstractNameValueHolderImpl::getValue).orElse(null);
+    public <S> Optional<Attribute<S>> get(AttributeDescriptor<S> attributeDescriptor) {
+        return super.getInternal(attributeDescriptor);
+    }
 
-        return super.getInternal(nameValueDescriptorProvider);
+    public <S> Attribute<S> getOrCreate(AttributeDescriptor<S> attributeDescriptor) {
+        Attribute<S> attribute = get(attributeDescriptor).orElse(new Attribute<>(attributeDescriptor));
+        addOrReplace(attribute);
+        return attribute;
     }
 
     public <T> void set(AttributeDescriptor<T> descriptor, T value) {

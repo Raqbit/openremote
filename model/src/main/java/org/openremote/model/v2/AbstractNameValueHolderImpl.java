@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, NameProvider {
+public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, NameHolder {
 
     protected ValueDescriptor<T> type;
     protected T value;

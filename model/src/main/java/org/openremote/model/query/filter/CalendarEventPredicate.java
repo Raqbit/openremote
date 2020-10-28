@@ -21,12 +21,13 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.openremote.model.v2.ValueTypes;
 
 import java.util.Date;
 
 /**
  * Can be applied to {@link org.openremote.model.attribute.Attribute}s of type
- * {@link org.openremote.model.attribute.AttributeValueType#CALENDAR_EVENT}.
+ * {@link ValueTypes#CALENDAR_EVENT}.
  */
 public class CalendarEventPredicate implements ValuePredicate {
 

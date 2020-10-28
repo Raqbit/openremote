@@ -22,7 +22,7 @@ package org.openremote.model.query;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.query.filter.*;
 import org.openremote.model.v2.MetaDescriptor;
-import org.openremote.model.v2.NameProvider;
+import org.openremote.model.v2.NameHolder;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -89,7 +89,7 @@ public class AssetQuery {
                 return this;
             }
 
-            return meta(Arrays.stream(meta).map(NameProvider::getName).toArray(String[]::new));
+            return meta(Arrays.stream(meta).map(NameHolder::getName).toArray(String[]::new));
         }
 
         public Select excludeAttributes(boolean exclude) {

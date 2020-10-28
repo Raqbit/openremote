@@ -19,21 +19,20 @@
  */
 package org.openremote.manager.agent;
 
-import org.openremote.container.Container;
-import org.openremote.container.ContainerHealthStatusProvider;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
-import org.openremote.model.value.ObjectValue;
-import org.openremote.model.value.Value;
+import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AgentHealthStatusProvider implements ContainerHealthStatusProvider {
+public class AgentHealthStatusProvider implements HealthStatusProvider, ContainerService {
 
     public static final String NAME = "agents";
     public static final String VERSION = "1.0";
@@ -70,13 +69,13 @@ public class AgentHealthStatusProvider implements ContainerHealthStatusProvider 
     }
 
     @Override
-    public Value getHealthStatus() {
+    public Object getHealthStatus() {
         AtomicInteger connectedCount = new AtomicInteger(0);
         AtomicInteger disabledCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
         AtomicInteger otherCount = new AtomicInteger(0);
 
-        ObjectValue objectValue = Values.createObject();
+        ObjectNode objectValue = Values.JSON.createObjectNode();
         objectValue.put("agents", agentService.getAgents().size());
         objectValue.put("protocols", agentService.protocols.size());
 
@@ -87,7 +86,7 @@ public class AgentHealthStatusProvider implements ContainerHealthStatusProvider 
             AtomicInteger error = new AtomicInteger(0);
             AtomicInteger other = new AtomicInteger(0);
 
-            ObjectValue agentValue = Values.createObject();
+            ObjectNode agentValue = Values.JSON.createObjectNode();
             agentValue.put("name", agent.getName());
 
             // Get protocol configurations for this agent
@@ -130,7 +129,7 @@ public class AgentHealthStatusProvider implements ContainerHealthStatusProvider 
                         other.incrementAndGet();
                     }
 
-                    ObjectValue protocol = Values.createObject();
+                    ObjectNode protocol = Values.JSON.createObjectNode();
 
                     protocol.put(
                         "protocol",

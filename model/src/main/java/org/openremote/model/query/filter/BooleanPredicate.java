@@ -31,14 +31,6 @@ public class BooleanPredicate implements ValuePredicate {
         this.value = value;
     }
 
-    public static BooleanPredicate fromObjectValue(ObjectValue objectValue) {
-        BooleanPredicate booleanPredicate = new BooleanPredicate();
-        booleanPredicate.value = objectValue
-            .getBoolean("value")
-            .orElseThrow(() -> new IllegalArgumentException("value missing for BooleanPredicate"));
-        return booleanPredicate;
-    }
-
     public BooleanPredicate value(boolean value) {
         this.value = value;
         return this;
@@ -50,5 +42,4 @@ public class BooleanPredicate implements ValuePredicate {
             "predicate=" + value +
             '}';
     }
-
 }

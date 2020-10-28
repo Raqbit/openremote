@@ -21,16 +21,17 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class ElectricityConsumer extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<String> DEMAND_RESPONSE_TYPE = new AttributeDescriptor<>("demandResponseType", true, ValueTypes.STRING, null);
     public static final AttributeDescriptor<Double> TARIFF_IMPORT = new AttributeDescriptor<>("tariffImport", true, ValueTypes.NUMBER, null,
@@ -47,27 +48,27 @@ public class ElectricityConsumer extends Device {
     );
     public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_FORECAST_DEVIATION = new AttributeDescriptor<>("powerForecastDeviation", true, ValueTypes.NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_SETPOINT = new AttributeDescriptor<>("powerSetpoint", true, ValueTypes.NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_AVAILABLE_MAX = new AttributeDescriptor<>("powerAvailableMax", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_AVAILABLE_MIN = new AttributeDescriptor<>("powerAvailableMin", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TOTAL = new AttributeDescriptor<>("energyTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
 
     public static final AssetDescriptor<ElectricityConsumer> DESCRIPTOR = new AssetDescriptor<>("Electricity consumer", "power-plug", "8A293D", ElectricityConsumer.class);
@@ -76,51 +77,51 @@ public class ElectricityConsumer extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public String getStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public String getDemandResponseType() {
-        return getAttributes().get(DEMAND_RESPONSE_TYPE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getDemandResponseType() {
+        return getAttributes().getValueOrDefault(DEMAND_RESPONSE_TYPE);
     }
 
-    public Double getTariffImport() {
-        return getAttributes().get(TARIFF_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffImport() {
+        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
     }
 
-    public Double getTariffExport() {
-        return getAttributes().get(TARIFF_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffExport() {
+        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
     }
 
-    public Integer getCarbonImport() {
-        return getAttributes().get(CARBON_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCarbonImport() {
+        return getAttributes().getValueOrDefault(CARBON_IMPORT);
     }
 
-    public Integer getCarbonExport() {
-        return getAttributes().get(CARBON_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCarbonExport() {
+        return getAttributes().getValueOrDefault(CARBON_EXPORT);
     }
 
-    public Double getPowerTotal() {
-        return getAttributes().get(POWER_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerTotal() {
+        return getAttributes().getValueOrDefault(POWER_TOTAL);
     }
 
-    public Double getPowerForecastDeviation() {
-        return getAttributes().get(POWER_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerForecastDeviation() {
+        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
     }
 
-    public Double getPowerSetpoint() {
-        return getAttributes().get(POWER_SETPOINT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerSetpoint() {
+        return getAttributes().getValueOrDefault(POWER_SETPOINT);
     }
 
-    public Double getPowerAvailableMax() {
-        return getAttributes().get(POWER_AVAILABLE_MAX).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerAvailableMax() {
+        return getAttributes().getValueOrDefault(POWER_AVAILABLE_MAX);
     }
 
-    public Double getPowerAvailableMin() {
-        return getAttributes().get(POWER_AVAILABLE_MIN).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerAvailableMin() {
+        return getAttributes().getValueOrDefault(POWER_AVAILABLE_MIN);
     }
 
-    public Double getEnergyTotal() {
-        return getAttributes().get(ENERGY_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotal() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL);
     }
 }

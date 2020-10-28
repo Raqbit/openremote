@@ -30,7 +30,7 @@ import static org.openremote.model.value.RegexValueFilter.NAME;
  * using a tool like Jackson and then the JSON path expression should be applied to this JSON string.
  */
 @JsonTypeName(NAME)
-public class JsonPathFilter extends ValueFilter<Object> {
+public class JsonPathFilter extends ValueFilter {
 
     public static final String NAME = "jsonPath";
 

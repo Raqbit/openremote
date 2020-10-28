@@ -21,16 +21,17 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class ElectricityCharger extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<String> CHARGER_TYPE = new AttributeDescriptor<>("chargerType", true, ValueTypes.STRING, null);
     public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
@@ -38,7 +39,7 @@ public class ElectricityCharger extends Device {
     );
     public static final AttributeDescriptor<Double> POWER_CONSUMPTION = new AttributeDescriptor<>("powerConsumption", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> TARIFF_IMPORT = new AttributeDescriptor<>("tariffImport", true, ValueTypes.NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
@@ -56,31 +57,31 @@ public class ElectricityCharger extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public String getStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public String getChargerType() {
-        return getAttributes().get(CHARGER_TYPE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getChargerType() {
+        return getAttributes().getValueOrDefault(CHARGER_TYPE);
     }
 
-    public Double getPowerCapacity() {
-        return getAttributes().get(POWER_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerCapacity() {
+        return getAttributes().getValueOrDefault(POWER_CAPACITY);
     }
 
-    public Double getPowerConsumption() {
-        return getAttributes().get(POWER_CONSUMPTION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerConsumption() {
+        return getAttributes().getValueOrDefault(POWER_CONSUMPTION);
     }
 
-    public Double getTariffImport() {
-        return getAttributes().get(TARIFF_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffImport() {
+        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
     }
 
-    public Double getTariffExport() {
-        return getAttributes().get(TARIFF_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffExport() {
+        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
     }
 
-    public Double getTariffStart() {
-        return getAttributes().get(TARIFF_START).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffStart() {
+        return getAttributes().getValueOrDefault(TARIFF_START);
     }
 }

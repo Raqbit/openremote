@@ -19,22 +19,27 @@
  */
 package org.openremote.model.v2;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaList;
+import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NONE, defaultImpl = ValueDescriptor.class)
-public class ValueDescriptor<T> implements MetaProvider {
+public class ValueDescriptor<T> implements MetaHolder {
+
+    protected static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
+        public ValueArrayDescriptor(String name, Class<T> type, MetaList meta) {
+            super(name, type, meta);
+        }
+    }
 
     public static class ValueDescriptorStringConverter extends StdConverter<ValueDescriptor<?>, String> {
 
         @Override
         public String convert(ValueDescriptor<?> value) {
-            return value.getName();
+            return value instanceof ValueArrayDescriptor ? value.getName() + "[]" : value.getName();
         }
     }
 
@@ -71,5 +76,17 @@ public class ValueDescriptor<T> implements MetaProvider {
     @Override
     public Collection<MetaItem<?>> getMeta() {
         return meta;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ValueArrayDescriptor<T[]> asArray() {
+        try {
+            Class<T[]> arrayClass = (Class<T[]>) Values.getArrayClass(type);
+            return new ValueArrayDescriptor<>(name, arrayClass, meta);
+        } catch (ClassNotFoundException ignored) {
+            // Can't happen as we have the source class already
+        }
+
+        return null;
     }
 }

@@ -19,18 +19,15 @@
  */
 package org.openremote.model.simulator;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.openremote.model.ValidationFailure;
 import org.openremote.model.attribute.AttributeRef;
+import org.openremote.model.simulator.element.ColorSimulatorElement;
+import org.openremote.model.simulator.element.NumberSimulatorElement;
+import org.openremote.model.simulator.element.ReplaySimulatorElement;
+import org.openremote.model.simulator.element.SwitchSimulatorElement;
 import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.value.Values;
 
-import org.openremote.model.simulator.element.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @JsonSubTypes({
@@ -44,17 +41,16 @@ import java.util.Optional;
     use = JsonTypeInfo.Id.NAME,
     property = "elementType"
 )
-public abstract class SimulatorElement implements ValueHolder {
+public abstract class SimulatorElement {
 
     public AttributeRef attributeRef;
     public ValueDescriptor<?> expectedType;
-    @JsonIgnore
-    public Value elementValue = null;
+    public Object elementValue = null;
 
     protected SimulatorElement() {
     }
 
-    public SimulatorElement(AttributeRef attributeRef, AttributeValueDescriptor expectedType) {
+    public SimulatorElement(AttributeRef attributeRef, ValueDescriptor<?> expectedType) {
         this.attributeRef = attributeRef;
         this.expectedType = expectedType;
     }
@@ -63,69 +59,16 @@ public abstract class SimulatorElement implements ValueHolder {
         return attributeRef;
     }
 
-    public AttributeValueDescriptor getExpectedType() {
+    public ValueDescriptor<?> getExpectedType() {
         return expectedType;
     }
 
-    @JsonIgnore
-    @Override
-    public Optional<Value> getValue() {
+    public Optional<Object> getValue() {
         return Optional.ofNullable(elementValue);
     }
 
-    @JsonProperty("value")
-    private Value getValueInternal() {
-        return getValue().orElse(null);
-    }
-
-    @JsonProperty("value")
-    @Override
-    public void setValue(Value value) {
+    public void setValue(Object value) {
         this.elementValue = value;
-    }
-
-    @Override
-    public void clearValue() {
-        this.elementValue = null;
-    }
-
-    @Override
-    public Optional<String> getValueAsString() {
-        return Values.getString(elementValue);
-    }
-
-    @Override
-    public Optional<Double> getValueAsNumber() {
-        return Values.getNumber(elementValue);
-    }
-
-    @Override
-    public Optional<Integer> getValueAsInteger() {
-        return Values.getNumber(elementValue).map(Double::intValue);
-    }
-
-    @Override
-    public Optional<Boolean> getValueAsBoolean() {
-        return Values.getBoolean(elementValue);
-    }
-
-    @Override
-    public Optional<ObjectValue> getValueAsObject() {
-        return Values.getObject(elementValue);
-    }
-
-    @Override
-    public Optional<ArrayValue> getValueAsArray() {
-        return Values.getArray(elementValue);
-    }
-
-    @Override
-    public List<ValidationFailure> getValidationFailures() {
-        List<ValidationFailure> failures = new ArrayList<>();
-        if (elementValue != null) {
-            expectedType.getValidator().flatMap(v -> v.apply(elementValue)).ifPresent(failures::add);
-        }
-        return failures;
     }
 
     @Override

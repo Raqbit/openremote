@@ -43,11 +43,11 @@ public class AssetPredictedDatapoint extends Datapoint {
         super(stateEvent);
     }
 
-    public AssetPredictedDatapoint(AttributeRef attributeRef, Value value, long timestamp) {
+    public AssetPredictedDatapoint(AttributeRef attributeRef, Object value, long timestamp) {
         super(attributeRef, value, timestamp);
     }
 
-    public AssetPredictedDatapoint(String entityId, String attributeName, Value value, long timestamp) {
+    public AssetPredictedDatapoint(String entityId, String attributeName, Object value, long timestamp) {
         super(entityId, attributeName, value, timestamp);
     }
 }

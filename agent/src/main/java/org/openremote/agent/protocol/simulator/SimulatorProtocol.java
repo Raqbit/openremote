@@ -545,11 +545,15 @@ public class SimulatorProtocol extends AbstractProtocol {
         }
     }
 
-    protected ScheduledFuture scheduleReplay(AttributeRef attributeRef, ReplaySimulatorElement replaySimulatorElement) {
+    protected ScheduledFuture<?> scheduleReplay(AttributeRef attributeRef, ReplaySimulatorElement replaySimulatorElement) {
         LOG.fine("Scheduling value update");
         try {
             long now = LocalDateTime.now().get(ChronoField.SECOND_OF_DAY);
             ReplaySimulatorElement.ReplaySimulatorDatapoint nextDatapoint = replaySimulatorElement.getNextDatapoint(now);
+            if (nextDatapoint == null) {
+                LOG.info("Next datapoint not found so replay cancelled: " + attributeRef);
+                return null;
+            }
             long nextRun = nextDatapoint.timestamp;
             if (nextRun <= now) { //now is after so nextRun is next day
                 nextRun += 86400; //day in seconds

@@ -21,9 +21,10 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Building extends Asset {
 
@@ -38,19 +39,19 @@ public class Building extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public String getStreet() {
-        return getAttributes().get(STREET).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStreet() {
+        return getAttributes().getValueOrDefault(STREET);
     }
 
-    public String getCity() {
-        return getAttributes().get(CITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getCity() {
+        return getAttributes().getValueOrDefault(CITY);
     }
 
-    public String getCountry() {
-        return getAttributes().get(COUNTRY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getCountry() {
+        return getAttributes().getValueOrDefault(COUNTRY);
     }
 
-    public String getPostalCode() {
-        return getAttributes().get(POSTAL_CODE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getPostalCode() {
+        return getAttributes().getValueOrDefault(POSTAL_CODE);
     }
 }

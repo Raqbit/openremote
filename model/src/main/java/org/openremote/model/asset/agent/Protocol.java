@@ -23,20 +23,17 @@ import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.*;
-import org.openremote.model.auth.OAuthGrant;
-import org.openremote.model.query.AssetQuery;
-import org.openremote.model.query.filter.StringPredicate;
+import org.openremote.model.attribute.AttributeEvent;
+import org.openremote.model.attribute.AttributeValidationResult;
+import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.*;
+import org.openremote.model.v2.MetaTypes;
+import org.openremote.model.value.ValueFilter;
+import org.openremote.model.value.Values;
 
-import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
-import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
-import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_STRING_NON_EMPTY;
 
 /**
  * A protocol instance is responsible for connecting devices and services to the context broker. A protocol instance
@@ -165,231 +162,6 @@ public interface Protocol<T extends Agent> {
     String ACTUATOR_TOPIC_TARGET_PROTOCOL = "Protocol";
     String SENSOR_QUEUE_SOURCE_PROTOCOL = "Protocol";
 
-    /**
-     * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
-     * HEX string representation (e.g. 34FD87)
-     */
-    MetaItemDescriptor META_PROTOCOL_CONVERT_HEX = metaItemFixedBoolean(PROTOCOL_NAMESPACE + ":convertHex", ACCESS_PRIVATE, false);
-
-    /**
-     * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
-     * binary string representation (e.g. 1001010111)
-     */
-    MetaItemDescriptor META_PROTOCOL_CONVERT_BINARY = metaItemFixedBoolean(PROTOCOL_NAMESPACE + ":convertBinary", ACCESS_PRIVATE, false);
-
-    /**
-     * Charset to use when converting byte[] to a string (should default to UTF8 if not specified); values must be
-     * string that matches a charset as defined in {@link java.nio.charset.Charset}
-     */
-    MetaItemDescriptor META_PROTOCOL_CHARSET = metaItemString(
-        PROTOCOL_NAMESPACE + ":charset",
-        ACCESS_PRIVATE,
-        false,
-        Charset.availableCharsets().keySet().toArray(new String[0])
-    );
-
-    /**
-     * Max length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
-     * for {@link String} protocols it could be the number of characters but for {@link Byte} protocols it could be the
-     * number of bytes. This is typically used for I/O based {@link Protocol}s.
-     */
-    MetaItemDescriptor META_PROTOCOL_MAX_LENGTH = metaItemInteger(
-        PROTOCOL_NAMESPACE + ":maxLength",
-        ACCESS_PRIVATE,
-        false,
-        0,
-        Integer.MAX_VALUE
-    );
-
-    /**
-     * Defines a delimiter for messages received by a {@link Protocol}. Multiples of this {@link MetaItem} can be used
-     * to add multiple delimiters (the first matched delimiter should be used to generate the shortest possible match(.
-     * This is typically used for I/O based {@link Protocol}s.
-     */
-    MetaItemDescriptor META_PROTOCOL_DELIMITER = new MetaItemDescriptorImpl(
-        PROTOCOL_NAMESPACE + ":delimiter",
-        ValueType.STRING,
-        ACCESS_PRIVATE,
-        false,
-        null,
-        null,
-        null,
-        null,
-        false,
-        null,
-        null,
-        null,
-        false
-    );
-
-    /**
-     * For protocols that use {@link #META_PROTOCOL_DELIMITER}, this indicates whether or not the matched delimiter
-     * should be stripped from the message.
-     */
-    MetaItemDescriptor META_PROTOCOL_STRIP_DELIMITER = metaItemFixedBoolean(
-        PROTOCOL_NAMESPACE + ":stripDelimiter",
-        ACCESS_PRIVATE,
-        false
-    );
-
-    /**
-     * OAuth grant ({@link OAuthGrant} stored as {@link ObjectValue})
-     */
-    MetaItemDescriptor META_PROTOCOL_OAUTH_GRANT = metaItemObject(
-        PROTOCOL_NAMESPACE + ":oAuthGrant",
-        ACCESS_PRIVATE,
-        false,
-        null);
-
-
-    /**
-     * Basic authentication username (string)
-     */
-    MetaItemDescriptor META_PROTOCOL_USERNAME = metaItemString(
-        PROTOCOL_NAMESPACE + ":username",
-        ACCESS_PRIVATE,
-        false,
-        REGEXP_PATTERN_STRING_NON_EMPTY,
-        PatternFailure.STRING_EMPTY);
-
-    /**
-     * Basic authentication password (string)
-     */
-    MetaItemDescriptor META_PROTOCOL_PASSWORD = metaItemString(
-        PROTOCOL_NAMESPACE + ":password",
-        ACCESS_PRIVATE,
-        false,
-        true,
-        REGEXP_PATTERN_STRING_NON_EMPTY,
-        PatternFailure.STRING_EMPTY);
-
-
-    /**
-     * TCP/IP network host name/IP address
-     */
-    MetaItemDescriptor META_PROTOCOL_HOST = metaItemString(
-        PROTOCOL_NAMESPACE + ":host",
-        ACCESS_PRIVATE,
-        true,
-        TextUtil.REGEXP_PATTERN_STRING_NON_EMPTY_NO_WHITESPACE,
-        PatternFailure.STRING_EMPTY_OR_CONTAINS_WHITESPACE);
-
-    /**
-     * TCP/IP network port number
-     */
-    MetaItemDescriptor META_PROTOCOL_PORT = metaItemInteger(
-        PROTOCOL_NAMESPACE + ":port",
-        ACCESS_PRIVATE,
-        true,
-        1,
-        65536);
-
-    /**
-     * Serial port name/address
-     */
-    MetaItemDescriptor META_PROTOCOL_SERIAL_PORT = metaItemString(
-        PROTOCOL_NAMESPACE + ":serialPort",
-        ACCESS_PRIVATE,
-        true,
-        REGEXP_PATTERN_STRING_NON_EMPTY,
-        PatternFailure.STRING_EMPTY);
-
-    MetaItemDescriptor META_PROTOCOL_SERIAL_BAUDRATE = metaItemInteger(
-        PROTOCOL_NAMESPACE + ":baudrate",
-        ACCESS_PRIVATE,
-        true,
-        1,
-        Integer.MAX_VALUE);
-
-    /**
-     * Defines {@link ValueFilter}s to apply to an incoming value before it is written to a protocol linked attribute;
-     * this is particularly useful for generic protocols. The {@link MetaItem} value should be an {@link ArrayValue} of
-     * {@link ObjectValue}s where each {@link ObjectValue} represents a serialised {@link ValueFilter}. The message
-     * should pass through the filters in array order.
-     */
-    MetaItemDescriptor META_ATTRIBUTE_VALUE_FILTERS = metaItemArray(
-        PROTOCOL_NAMESPACE + ":valueFilters",
-        ACCESS_PRIVATE,
-        false,
-        null);
-
-    /**
-     * Defines a value converter map to allow for basic value type conversion; the incoming value will be converted to
-     * JSON and if this string matches a key in the converter then the value of that key will be pushed through to the
-     * attribute. An example use case is an API that returns "ACTIVE"/"DISABLED" strings but you want to connect this to
-     * a {@link AttributeValueType#BOOLEAN} attribute.
-     */
-    MetaItemDescriptor META_ATTRIBUTE_VALUE_CONVERTER = metaItemObject(
-        PROTOCOL_NAMESPACE + ":valueConverter",
-        ACCESS_PRIVATE,
-        false,
-        null);
-
-    /**
-     * Similar to {@link #META_ATTRIBUTE_VALUE_CONVERTER} but will applied to outgoing values allowing for the opposite
-     * conversion.
-     */
-    MetaItemDescriptor META_ATTRIBUTE_WRITE_VALUE_CONVERTER = metaItemObject(
-        PROTOCOL_NAMESPACE + ":writeValueConverter",
-        ACCESS_PRIVATE,
-        false,
-        null);
-
-    /**
-     * JSON string to be used for attribute writes and can contain {@link #DYNAMIC_VALUE_PLACEHOLDER}s; this allows the
-     * written value to be injected into a bigger JSON payload or to even hardcode the value sent to the protocol (i.e.
-     * ignore the written value). If this {@link MetaItem} is not defined then the written value is passed through to
-     * the protocol as is. The resulting JSON string (after any dynamic value insertion) is then parsed using {@link
-     * Values#parse} so it is important the value of this {@link MetaItem} is a valid JSON string so literal strings
-     * must be quoted (e.g. '"string value"' not 'string value' otherwise parsing will fail).
-     * <p>
-     * A value of 'null' will produce a literal null.
-     */
-    MetaItemDescriptor META_ATTRIBUTE_WRITE_VALUE = metaItemAny(
-        PROTOCOL_NAMESPACE + ":writeValue",
-        ACCESS_PRIVATE,
-        false,
-        null,
-        TextUtil.REGEXP_PATTERN_STRING_NON_EMPTY,
-        PatternFailure.STRING_EMPTY.name());
-
-    /**
-     * Polling frequency in milliseconds for {@link Attribute}s whose value should be polled; can be set on the {@link
-     * ProtocolConfiguration} or the {@link Attribute} (the latter takes precedence).
-     */
-    MetaItemDescriptor META_ATTRIBUTE_POLLING_MILLIS = metaItemInteger(
-        PROTOCOL_NAMESPACE + ":pollingMillis",
-        ACCESS_PRIVATE,
-        false,
-        1000,
-        null);
-
-    /**
-     * The predicate to use on incoming messages to determine if the message is intended for the {@link Attribute} that
-     * has this {@link MetaItem}; it is particularly useful for pub-sub based {@link Protocol}s.
-     */
-    MetaItemDescriptor META_ATTRIBUTE_MATCH_PREDICATE = metaItemObject(
-        PROTOCOL_NAMESPACE + ":matchPredicate",
-        ACCESS_PRIVATE,
-        false,
-        new StringPredicate(AssetQuery.Match.EXACT, false, "").toModelValue());
-
-    /**
-     * {@link ValueFilter}s to apply to incoming messages prior to comparison with the {@link
-     * Protocol#META_ATTRIBUTE_MATCH_PREDICATE}, if the predicate matches then the original un-filtered message is
-     * intended for this linked {@link Attribute} and the message should be written to the {@link Attribute} where the
-     * actual {@link Value} written can be filtered using the {@link Protocol#META_ATTRIBUTE_VALUE_FILTERS}.
-     * <p>
-     * The {@link Value} of this {@link MetaItem} must be an {@link ArrayValue} of {@link ObjectValue}s where each
-     * {@link ObjectValue} represents a serialised {@link ValueFilter}. The message will pass through the filters in
-     * array order and the resulting final {@link Value} should be written to the {@link Attribute}
-     */
-    MetaItemDescriptor META_ATTRIBUTE_MATCH_FILTERS = metaItemArray(
-        PROTOCOL_NAMESPACE + ":matchFilters",
-        ACCESS_PRIVATE,
-        false,
-        null);
-
     // TODO: Some of these options should be configurable depending on expected load etc.
     // Message topic for communicating from asset/thing to protocol layer (asset attribute changed, trigger actuator)
     String ACTUATOR_TOPIC = "seda://ActuatorTopic?multipleConsumers=true&concurrentConsumers=1&waitForTaskToComplete=NEVER&purgeWhenStopping=true&discardIfNoConsumers=true&limitConcurrentConsumers=false&size=1000";
@@ -420,7 +192,7 @@ public interface Protocol<T extends Agent> {
      * <p>
      * If the attribute is not valid for this protocol then it is up to the protocol to log the issue and return false.
      * <p>
-     * Attributes are linked to an agent via an {@link MetaItemType#AGENT_LINK} meta item.
+     * Attributes are linked to an agent via an {@link MetaTypes#AGENT_LINK} meta item.
      * @return True if successful, false otherwise
      */
     boolean linkAttribute(Asset asset, Attribute attribute);
@@ -465,21 +237,4 @@ public interface Protocol<T extends Agent> {
      *  Get the {@link Asset#getName} of the associated {@link Agent}
      */
     String getAgentName();
-
-    /**
-     * Get a {@link ProtocolDescriptor} for this protocol.
-     */
-    ProtocolDescriptor getProtocolDescriptor();
-
-    /**
-     * Create an empty {@link ProtocolConfiguration} attribute that contains the required meta items needed by the
-     * protocol. The purpose of this is to populate the UI when adding a new protocol configuration for this protocol.
-     */
-    Attribute getProtocolConfigurationTemplate();
-
-    /**
-     * Validate the supplied {@link ProtocolConfiguration} attribute against this protocol (should indicate that the
-     * protocol configuration is well formed but not necessarily that it connects to a working system).
-     */
-    AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration);
 }

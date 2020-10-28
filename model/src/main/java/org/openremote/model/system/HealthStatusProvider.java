@@ -28,5 +28,5 @@ public interface HealthStatusProvider {
 
     String getHealthStatusVersion();
 
-    JsonNode getHealthStatus();
+    Object getHealthStatus();
 }

@@ -22,11 +22,12 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Ship extends Asset {
 
@@ -51,27 +52,27 @@ public class Ship extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public Integer getMSSINumber() {
-        return getAttributes().get(MSSI_NUMBER).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getMSSINumber() {
+        return getAttributes().getValueOrDefault(MSSI_NUMBER);
     }
 
-    public Integer getIMONumber() {
-        return getAttributes().get(IMO_NUMBER).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getIMONumber() {
+        return getAttributes().getValueOrDefault(IMO_NUMBER);
     }
 
-    public Integer getDirection() {
-        return getAttributes().get(DIRECTION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getDirection() {
+        return getAttributes().getValueOrDefault(DIRECTION);
     }
 
-    public Integer getLength() {
-        return getAttributes().get(LENGTH).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getLength() {
+        return getAttributes().getValueOrDefault(LENGTH);
     }
 
-    public Double getSpeed() {
-        return getAttributes().get(SPEED).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getSpeed() {
+        return getAttributes().getValueOrDefault(SPEED);
     }
 
-    public String getShipType() {
-        return getAttributes().get(SHIP_TYPE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getShipType() {
+        return getAttributes().getValueOrDefault(SHIP_TYPE);
     }
 }

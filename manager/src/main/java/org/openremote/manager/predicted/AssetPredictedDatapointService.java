@@ -23,6 +23,7 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolPredictedAssetService;
 import org.openremote.container.Container;
+import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
@@ -241,19 +242,19 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
         );
     }
 
-    public void updateValue(AttributeRef attributeRef, Value value, long timestamp) {
+    public void updateValue(AttributeRef attributeRef, Object value, long timestamp) {
         persistenceService.doTransaction(em -> upsertValue(em, attributeRef.getEntityId(), attributeRef.getAttributeName(), value, timestamp));
     }
 
-    public void updateValue(String assetId, String attributeName, Value value, long timestamp) {
+    public void updateValue(String assetId, String attributeName, Object value, long timestamp) {
         updateValue(new AttributeRef(assetId, attributeName), value, timestamp);
     }
 
-    private void upsertValue(EntityManager entityManager, String assetId, String attributeName, Value value, long timestamp) {
+    private void upsertValue(EntityManager entityManager, String assetId, String attributeName, Object value, long timestamp) {
         entityManager.createNativeQuery(String.format("INSERT INTO asset_predicted_datapoint (entity_id, attribute_name, value, timestamp) \n" +
             "VALUES ('%1$s', '%2$s', '%3$s', to_timestamp(%4$d))\n" +
             "ON CONFLICT (entity_id, attribute_name, timestamp) DO UPDATE \n" +
-            "  SET value = excluded.value", assetId, attributeName, value.toJson(), timestamp))
+            "  SET value = excluded.value", assetId, attributeName, value, timestamp))
             .executeUpdate();
     }
 }

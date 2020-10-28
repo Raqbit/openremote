@@ -19,12 +19,9 @@
  */
 package org.openremote.model.simulator.element;
 
-import org.openremote.model.ValidationFailure;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.value.Values;
-
-import java.util.List;
+import org.openremote.model.v2.ValueTypes;
 
 public class NumberSimulatorElement extends SimulatorElement {
 
@@ -42,7 +39,7 @@ public class NumberSimulatorElement extends SimulatorElement {
     }
 
     public NumberSimulatorElement(AttributeRef attributeRef, Integer min, Integer max) {
-        super(attributeRef, AttributeValueType.NUMBER);
+        super(attributeRef, ValueTypes.NUMBER);
         this.min = min;
         this.max = max;
     }
@@ -53,17 +50,5 @@ public class NumberSimulatorElement extends SimulatorElement {
 
     public Integer getMax() {
         return max;
-    }
-
-    @Override
-    public List<ValidationFailure> getValidationFailures() {
-        List<ValidationFailure> failures = super.getValidationFailures();
-        if (elementValue != null) {
-            if ((getMin() != null && Values.getNumber(elementValue).filter(v -> v < getMin()).isPresent())
-                && (getMax() != null && Values.getNumber(elementValue).filter(v -> v > getMax()).isPresent())) {
-                failures.add(new ValidationFailure(ValueFailureReason.VALUE_NUMBER_OUT_OF_RANGE, getMin() + "-" + getMax()));
-            }
-        }
-        return failures;
     }
 }

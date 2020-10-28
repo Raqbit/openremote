@@ -41,6 +41,4 @@ public abstract class AbstractNotificationMessage {
     public String getType() {
         return type;
     }
-
-    public abstract ObjectValue toValue();
 }

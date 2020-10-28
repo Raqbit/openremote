@@ -21,16 +21,17 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class ElectricityProducer extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
@@ -38,15 +39,15 @@ public class ElectricityProducer extends Device {
     public static final AttributeDescriptor<Integer> EFFICIENCY = new AttributeDescriptor<>("efficiency", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
     public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_FORECAST_DEVIATION = new AttributeDescriptor<>("powerForecastDeviation", true, ValueTypes.NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TOTAL = new AttributeDescriptor<>("energyTotal", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", true, ValueTypes.DIRECTION, null);
 
@@ -56,31 +57,31 @@ public class ElectricityProducer extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public String getStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public Double getPowerTotal() {
-        return getAttributes().get(POWER_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerTotal() {
+        return getAttributes().getValueOrDefault(POWER_TOTAL);
     }
 
-    public Double getPowerForecastDeviation() {
-        return getAttributes().get(POWER_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerForecastDeviation() {
+        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
     }
 
-    public Double getPowerCapacity() {
-        return getAttributes().get(POWER_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerCapacity() {
+        return getAttributes().getValueOrDefault(POWER_CAPACITY);
     }
 
-    public Integer getEfficiency() {
-        return getAttributes().get(EFFICIENCY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getEfficiency() {
+        return getAttributes().getValueOrDefault(EFFICIENCY);
     }
 
-    public Double getEnergyTotal() {
-        return getAttributes().get(ENERGY_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotal() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL);
     }
 
-    public Integer getPanelOrientation() {
-        return getAttributes().get(PANEL_ORIENTATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getPanelOrientation() {
+        return getAttributes().getValueOrDefault(PANEL_ORIENTATION);
     }
 }

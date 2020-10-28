@@ -19,6 +19,7 @@
  */
 package org.openremote.model.flow.catalog.virtual;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.flow.Node;
 import org.openremote.model.flow.NodeColor;
 import org.openremote.model.flow.catalog.CatalogCategory;
@@ -58,9 +59,8 @@ public class SubflowNodeDescriptor extends WidgetNodeDescriptor {
     }
 
     @Override
-    protected ObjectValue getInitialProperties() {
+    protected ObjectNode getInitialProperties() {
         return WIDGET_INITIAL_PROPERTIES.deepCopy()
             .put(PROPERTY_COMPONENT, WIDGET_COMPONENT);
     }
-
 }

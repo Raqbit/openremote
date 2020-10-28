@@ -21,9 +21,10 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Group extends Asset {
 
@@ -35,7 +36,7 @@ public class Group extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public String getChildAssetType() {
-        return getAttributes().get(CHILD_ASSET_TYPE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getChildAssetType() {
+        return getAttributes().getValueOrDefault(CHILD_ASSET_TYPE);
     }
 }

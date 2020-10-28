@@ -21,43 +21,44 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class EnvironmentSensor extends Device {
 
     public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueTypes.TEMPERATURE, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> RELATIVE_HUMIDITY = new AttributeDescriptor<>("relativeHumidity", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> NO2 = new AttributeDescriptor<>("nO2Level", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.LABEL, "NO2 level"),
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAMS_CUBIC_M),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> OZONE = new AttributeDescriptor<>("ozoneLevel", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAMS_CUBIC_M),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> PM1 = new AttributeDescriptor<>("particlesPM1", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.LABEL, "Particles PM1"),
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAMS_CUBIC_M),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> PM2_5 = new AttributeDescriptor<>("particlesPM2_5", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.LABEL, "Particles PM2.5"),
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAMS_CUBIC_M),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> PM10 = new AttributeDescriptor<>("particlesPM10", true, ValueTypes.POSITIVE_INTEGER, null,
         new MetaItem<>(MetaTypes.LABEL, "Particles PM10"),
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAMS_CUBIC_M),
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
 
     public static final AssetDescriptor<EnvironmentSensor> DESCRIPTOR = new AssetDescriptor<>("Environment Sensor", "periodic-table-co2", "f18546", EnvironmentSensor.class);
@@ -66,31 +67,31 @@ public class EnvironmentSensor extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public Double getTemperature() {
-        return getAttributes().get(TEMPERATURE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTemperature() {
+        return getAttributes().getValueOrDefault(TEMPERATURE);
     }
 
-    public Double getRelativeHumidity() {
-        return getAttributes().get(RELATIVE_HUMIDITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getRelativeHumidity() {
+        return getAttributes().getValueOrDefault(RELATIVE_HUMIDITY);
     }
 
-    public Integer getOzone() {
-        return getAttributes().get(OZONE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getOzone() {
+        return getAttributes().getValueOrDefault(OZONE);
     }
 
-    public Integer getNO2() {
-        return getAttributes().get(NO2).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getNO2() {
+        return getAttributes().getValueOrDefault(NO2);
     }
 
-    public Integer getParticlesPM1() {
-        return getAttributes().get(PM1).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getParticlesPM1() {
+        return getAttributes().getValueOrDefault(PM1);
     }
 
-    public Integer getParticlesPM2_5() {
-        return getAttributes().get(PM2_5).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getParticlesPM2_5() {
+        return getAttributes().getValueOrDefault(PM2_5);
     }
 
-    public Integer getParticlesPM10() {
-        return getAttributes().get(PM10).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getParticlesPM10() {
+        return getAttributes().getValueOrDefault(PM10);
     }
 }

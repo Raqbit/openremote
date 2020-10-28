@@ -26,11 +26,11 @@ import org.openremote.model.datapoint.ValueDatapoint;
 public abstract class PredictedDatapoints {
 
 
-    public abstract ValueDatapoint[] getValueDataPoints(AttributeRef attributeRef,
+    public abstract ValueDatapoint[] getValueDatapoints(AttributeRef attributeRef,
                                                         DatapointInterval interval,
                                                         long fromTimestamp,
                                                         long toTimestamp);
 
-    public abstract void updateValue(String assetId, String attributeName, Value value, long timestamp);
-    public abstract void updateValue(AttributeRef attributeRef, Value value, long timestamp);
+    public abstract void updateValue(String assetId, String attributeName, Object value, long timestamp);
+    public abstract void updateValue(AttributeRef attributeRef, Object value, long timestamp);
 }

@@ -21,9 +21,10 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Device extends Asset {
 
@@ -40,11 +41,11 @@ public class Device extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public String getManufacturer() {
-        return getAttributes().get(MANUFACTURER).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getManufacturer() {
+        return getAttributes().getValueOrDefault(MANUFACTURER);
     }
 
-    public String getModel() {
-        return getAttributes().get(MODEL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getModel() {
+        return getAttributes().getValueOrDefault(MODEL);
     }
 }

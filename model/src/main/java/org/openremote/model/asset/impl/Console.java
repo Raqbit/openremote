@@ -28,6 +28,8 @@ import org.openremote.model.util.TextUtil;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class Console extends Asset {
 
     public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", false, ValueTypes.STRING, null);
@@ -41,47 +43,47 @@ public class Console extends Asset {
         super(name, DESCRIPTOR);
     }
 
-    public String getConsoleName() {
-        return getAttributes().get(CONSOLE_NAME).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getConsoleName() {
+        return getAttributes().getValueOrDefault(CONSOLE_NAME);
     }
 
     public Console setConsoleName(String name) {
         TextUtil.requireNonNullAndNonEmpty(name);
-        getAttributes().addOrReplace(new Attribute<>(CONSOLE_NAME, name));
+        getAttributes().getOrCreate(CONSOLE_NAME).setValue(name);
         return this;
     }
 
-    public String getConsoleVersion() {
-        return getAttributes().get(CONSOLE_VERSION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getConsoleVersion() {
+        return getAttributes().getValueOrDefault(CONSOLE_VERSION);
     }
 
     public Console setConsoleVersion(String version) {
         TextUtil.requireNonNullAndNonEmpty(version);
-        getAttributes().addOrReplace(new Attribute<>(CONSOLE_VERSION, version));
+        getAttributes().getOrCreate(CONSOLE_VERSION).setValue(version);
         return this;
     }
 
-    public String getConsolePlatform() {
-        return getAttributes().get(CONSOLE_PLATFORM).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getConsolePlatform() {
+        return getAttributes().getValueOrDefault(CONSOLE_PLATFORM);
     }
 
     public Console setConsolePlatform(String platform) {
         TextUtil.requireNonNullAndNonEmpty(platform);
-        getAttributes().addOrReplace(new Attribute<>(CONSOLE_PLATFORM, platform));
+        getAttributes().getOrCreate(CONSOLE_PLATFORM).setValue(platform);
         return this;
     }
 
-    public ConsoleProviders getConsoleProviders() {
-        return getAttributes().get(CONSOLE_PROVIDERS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<ConsoleProviders> getConsoleProviders() {
+        return getAttributes().getValueOrDefault(CONSOLE_PROVIDERS);
     }
 
     public Console setConsoleProviders(ConsoleProviders providers) {
-        getAttributes().set(CONSOLE_PROVIDERS, providers);
+        getAttributes().getOrCreate(CONSOLE_PROVIDERS).setValue(providers);
         return this;
     }
 
     public Console setConsoleProvider(String name, ConsoleProvider consoleProvider) {
-        ConsoleProviders providers = getAttributes().get(CONSOLE_PROVIDERS).orElse(new Attribute<>(CONSOLE_PROVIDERS, null)).getValue().orElse(new ConsoleProviders());
+        ConsoleProviders providers = getAttributes().getValue(CONSOLE_PROVIDERS).orElse(new ConsoleProviders());
         providers.put(name, consoleProvider);
         setConsoleProviders(providers);
         return this;

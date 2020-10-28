@@ -19,6 +19,7 @@
  */
 package org.openremote.model.query.filter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.openremote.model.query.AssetQuery;
 
 public class NumberPredicate implements ValuePredicate {
@@ -30,7 +31,7 @@ public class NumberPredicate implements ValuePredicate {
     public AssetQuery.NumberType numberType = AssetQuery.NumberType.DOUBLE;
     public boolean negate;
 
-    public NumberPredicate() {
+    protected NumberPredicate() {
     }
 
     public NumberPredicate(double value) {
@@ -51,23 +52,6 @@ public class NumberPredicate implements ValuePredicate {
         this.value = value;
         this.operator = operator;
         this.numberType = numberType;
-    }
-
-    public static NumberPredicate fromObjectValue(ObjectValue objectValue) {
-        NumberPredicate numberPredicate = new NumberPredicate();
-        objectValue.getNumber("value").ifPresent(value -> {
-            numberPredicate.value = value;
-        });
-        objectValue.getNumber("rangeValue").ifPresent(rangeValue -> {
-            numberPredicate.rangeValue = rangeValue;
-        });
-        objectValue.getBoolean("negate").ifPresent(negate -> {
-            numberPredicate.negate = negate;
-        });
-        objectValue.getString("operator").ifPresent(operator -> {
-            numberPredicate.operator = AssetQuery.Operator.valueOf(operator);
-        });
-        return numberPredicate;
     }
 
     public NumberPredicate predicate(double predicate) {

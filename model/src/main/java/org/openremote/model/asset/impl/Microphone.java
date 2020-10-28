@@ -21,11 +21,12 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Microphone extends Device {
 
@@ -39,7 +40,7 @@ public class Microphone extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public Double getSoundLevel() {
-        return getAttributes().get(SOUND_LEVEL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getSoundLevel() {
+        return getAttributes().getValueOrDefault(SOUND_LEVEL);
     }
 }

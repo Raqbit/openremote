@@ -36,7 +36,7 @@ public abstract class Assets {
 
     abstract public Assets dispatch(AttributeEvent... event);
 
-    abstract public Assets dispatch(String assetId, String attributeName, Value value);
+    abstract public Assets dispatch(String assetId, String attributeName, Object value);
 
     abstract public Assets dispatch(String assetId, String attributeName, String value);
 

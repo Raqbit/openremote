@@ -19,6 +19,7 @@
  */
 package org.openremote.model.rules;
 
+import org.openremote.model.attribute.MetaList;
 import org.openremote.model.calendar.CalendarEvent;
 
 import javax.persistence.Column;
@@ -116,20 +117,8 @@ public class TenantRuleset extends Ruleset {
     }
 
     @Override
-    public TenantRuleset setMeta(ObjectValue meta) {
+    public TenantRuleset setMeta(MetaList meta) {
         super.setMeta(meta);
-        return this;
-    }
-
-    @Override
-    public TenantRuleset addMeta(String key, Value value) {
-        super.addMeta(key, value);
-        return this;
-    }
-
-    @Override
-    public TenantRuleset removeMeta(String key) {
-        super.removeMeta(key);
         return this;
     }
 

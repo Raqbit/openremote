@@ -20,9 +20,10 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class PeopleCounter extends Device {
 
@@ -39,27 +40,27 @@ public class PeopleCounter extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public Integer getCountIn() {
-        return getAttributes().get(COUNT_IN).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCountIn() {
+        return getAttributes().getValueOrDefault(COUNT_IN);
     }
 
-    public Integer getCountOut() {
-        return getAttributes().get(COUNT_OUT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCountOut() {
+        return getAttributes().getValueOrDefault(COUNT_OUT);
     }
 
-    public Integer getCountInMinute() {
-        return getAttributes().get(COUNT_IN_PER_MINUTE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCountInMinute() {
+        return getAttributes().getValueOrDefault(COUNT_IN_PER_MINUTE);
     }
 
-    public Integer getCountOutMinute() {
-        return getAttributes().get(COUNT_OUT_PER_MINUTE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCountOutMinute() {
+        return getAttributes().getValueOrDefault(COUNT_OUT_PER_MINUTE);
     }
 
-    public Integer getCountTotal() {
-        return getAttributes().get(COUNT_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCountTotal() {
+        return getAttributes().getValueOrDefault(COUNT_TOTAL);
     }
 
-    public Double getCountGrowthMinute() {
-        return getAttributes().get(COUNT_GROWTH_PER_MINUTE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getCountGrowthMinute() {
+        return getAttributes().getValueOrDefault(COUNT_GROWTH_PER_MINUTE);
     }
 }

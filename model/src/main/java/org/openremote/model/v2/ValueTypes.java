@@ -27,22 +27,20 @@ import org.openremote.model.attribute.AttributeExecuteStatus;
 import org.openremote.model.attribute.AttributeLink;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.auth.OAuthGrant;
+import org.openremote.model.auth.UsernamePassword;
 import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.console.ConsoleProvider;
 import org.openremote.model.console.ConsoleProviders;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.util.TimeUtil;
 import org.openremote.model.value.ColorRGB;
+import org.openremote.model.value.ValueFilter;
 
 import javax.validation.constraints.*;
 import java.util.List;
 
 public final class ValueTypes {
-
-    public interface StringList extends List<String> {}
-    public interface IntegerList extends List<Integer> {}
-    public interface DoubleList extends List<Double> {}
-    public interface BooleanList extends List<Boolean> {}
 
     public static final ValueDescriptor<Boolean> BOOLEAN = new ValueDescriptor<>("Boolean", Boolean.class);
 
@@ -52,19 +50,12 @@ public final class ValueTypes {
 
     public static final ValueDescriptor<Double> NUMBER = new ValueDescriptor<>("Number", Double.class);
 
+    @Min(1)
     public static final ValueDescriptor<String> STRING = new ValueDescriptor<>("String", String.class);
 
     public static final ValueDescriptor<ArrayNode> ARRAY = new ValueDescriptor<>("Array", ArrayNode.class);
 
     public static final ValueDescriptor<ObjectNode> OBJECT = new ValueDescriptor<>("Object", ObjectNode.class);
-
-    public static final ValueDescriptor<StringList> LIST_STRING = new ValueDescriptor<>("List of strings", StringList.class);
-
-    public static final ValueDescriptor<IntegerList> LIST_INTEGER = new ValueDescriptor<>("List of integers", IntegerList.class);
-
-    public static final ValueDescriptor<DoubleList> LIST_DOUBLE = new ValueDescriptor<>("List of numbers", DoubleList.class);
-
-    public static final ValueDescriptor<BooleanList> LIST_BOOLEAN = new ValueDescriptor<>("List of booleans", BooleanList.class);
 
     @Min(0)
     public static final ValueDescriptor<Integer> POSITIVE_INTEGER = new ValueDescriptor<>("Positive integer", Integer.class);
@@ -95,17 +86,8 @@ public final class ValueTypes {
     public static final ValueDescriptor<String> DURATION_STRING = new ValueDescriptor<>("Duration string", String.class);
 
     public static final ValueDescriptor<String> PASSWORD = new ValueDescriptor<>("Password", String.class,
-        new MetaItem<>(MetaTypes.SECRET, true)
+        new MetaItem<>(MetaTypes.SECRET)
     );
-
-    @Size(min = 3, max = 3)
-    public static final ValueDescriptor<ColorRGB> COLOUR_RGB = new ValueDescriptor<>("Colour RGB", ColorRGB.class);
-
-    @Size(min = 4, max = 4)
-    public static final ValueDescriptor<ColorRGB> COLOUR_RGBW = new ValueDescriptor<>("Colour RGBW", ColorRGB.class);
-
-    @Size(min = 4, max = 4)
-    public static final ValueDescriptor<ColorRGB> COLOUR_RGBA = new ValueDescriptor<>("Colour RGBA", ColorRGB.class);
 
     @Pattern(regexp = "[a-fA-F0-9]{6}")
     public static final ValueDescriptor<String> COLOUR_HEX = new ValueDescriptor<>("Colour HEX", String.class);
@@ -124,6 +106,17 @@ public final class ValueTypes {
     @Size(min = 22, max = 22)
     public static final ValueDescriptor<String> ASSET_ID = new ValueDescriptor<>("Asset ID", String.class);
 
+    @Min(0)
+    @Max(359)
+    public static final ValueDescriptor<Integer> DIRECTION = new ValueDescriptor<>("Direction", Integer.class);
+
+    @Min(1)
+    @Max(65536)
+    public static final ValueDescriptor<Integer> PORT = new ValueDescriptor<>("Port number", Integer.class);
+
+    @Pattern(regexp = "(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)|(^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)")
+    public static final ValueDescriptor<String> HOSTNAME_OR_IP_ADDRESS = new ValueDescriptor<>("Hostname", String.class);
+
     public static final ValueDescriptor<AttributeLink> ATTRIBUTE_LINK = new ValueDescriptor<>("Attribute link", AttributeLink.class);
 
     public static final ValueDescriptor<AttributeRef> ATTRIBUTE_REF = new ValueDescriptor<>("Attribute reference", AttributeRef.class);
@@ -138,9 +131,11 @@ public final class ValueTypes {
 
     public static final ValueDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new ValueDescriptor<>("Console providers", ConsoleProviders.class);
 
-    @Min(0)
-    @Max(359)
-    public static final ValueDescriptor<Integer> DIRECTION = new ValueDescriptor<>("Direction", Integer.class);
+    public static final ValueDescriptor<ColorRGB> COLOUR_RGB = new ValueDescriptor<>("Colour RGB", ColorRGB.class);
+
+    public static final ValueDescriptor<OAuthGrant> OAUTH_GRANT = new ValueDescriptor<>("OAuth Grant", OAuthGrant.class);
+
+    public static final ValueDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new ValueDescriptor<>("Username and password", UsernamePassword.class);
 
     protected ValueTypes() {
     }

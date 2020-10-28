@@ -25,7 +25,7 @@ import org.openremote.model.attribute.MetaList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptorProvider<T> {
+public class AttributeDescriptor<T> implements MetaHolder, NameValueDescriptorProvider<T> {
     protected String name;
     protected boolean optional;
     protected ValueDescriptor<T> valueDescriptor;
@@ -60,10 +60,12 @@ public class AttributeDescriptor<T> implements MetaProvider, NameValueDescriptor
         return name;
     }
 
+    @Override
     public ValueDescriptor<T> getValueDescriptor() {
         return valueDescriptor;
     }
 
+    @Override
     public T getDefaultValue() {
         return defaultValue;
     }

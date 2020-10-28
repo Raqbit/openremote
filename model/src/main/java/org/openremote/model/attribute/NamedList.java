@@ -21,7 +21,6 @@ package org.openremote.model.attribute;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -32,7 +31,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.openremote.model.v2.NameProvider;
+import org.openremote.model.v2.NameHolder;
 import org.openremote.model.v2.NameValueDescriptorProvider;
 import org.openremote.model.v2.ValueHolder;
 
@@ -41,12 +40,12 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 
 /**
- * Special list for {@link NameProvider} items where items with duplicate names are not allowed; this is serialised as
+ * Special list for {@link NameHolder} items where items with duplicate names are not allowed; this is serialised as
  * a JSON object where the name becomes the key.
  */
 @JsonSerialize(using = NamedList.NamedListSerializer.class)
 @JsonDeserialize(using = NamedList.NamedListDeserializer.class)
-public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayList<T> {
+public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<T> {
 
     public static class NamedListSerializer extends StdSerializer<NamedList<?>> {
 
@@ -58,7 +57,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         public void serialize(NamedList<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
             gen.writeStartObject();
 
-            for (NameProvider model : value) {
+            for (NameHolder model : value) {
                 gen.writeObjectField(model.getName(), model);
             }
 
@@ -72,7 +71,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
      * value field. The key of the entry is then assigned to the name field and then this {@link ObjectNode} is
      * deserialized as an instance of {@link #innerClass} using the same deserialization context.
      */
-    public static class NamedListDeserializer<T extends NameProvider & ValueHolder<?>> extends StdDeserializer<NamedList<T>> {
+    public static class NamedListDeserializer<T extends NameHolder & ValueHolder<?>> extends StdDeserializer<NamedList<T>> {
 
         protected Class<T> innerClass;
 
@@ -82,7 +81,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         }
 
         @Override
-        public NamedList<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        public NamedList<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
             JsonNode node = jp.getCodec().readTree(jp);
 
             if (node.getNodeType() != JsonNodeType.OBJECT) {
@@ -125,10 +124,10 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         if (list.has(name)) {
             throw new IllegalStateException("List already contains an item with this name: " + name);
         }
-    };
+    }
 
-    protected static <T extends NameProvider> void throwIfDuplicates(Collection<T> c) {
-        c.stream().map(NameProvider::getName).filter(name ->
+    protected static <T extends NameHolder> void throwIfDuplicates(Collection<T> c) {
+        c.stream().map(NameHolder::getName).filter(name ->
             Collections.frequency(c, name) > 1
         ).findAny().ifPresent(duplicateName -> {
             throw new IllegalStateException("Detected multiple items with the same name: " + duplicateName);
@@ -143,8 +142,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
     @Override
     public boolean add(T t) {
         throwIfHas(this, t.getName());
-        boolean result = super.add(t);
-        return result;
+        return super.add(t);
     }
 
     @Override
@@ -173,7 +171,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         throwIfDuplicates(this);
     }
 
-    public Optional<T> get(NameProvider nameHolder) {
+    public Optional<T> get(NameHolder nameHolder) {
         return get(nameHolder.getName());
     }
 
@@ -194,6 +192,14 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         });
     }
 
+    public <S> Optional<S> getValue(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+        return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue);
+    }
+
+    public <S> Optional<S> getValueOrDefault(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+        return Optional.ofNullable(getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(nameValueDescriptorProvider.getDefaultValue()));
+    }
+
     @SafeVarargs
     public final void addAll(T... items) {
         this.addAll(Arrays.asList(items));
@@ -202,6 +208,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
     /**
      * Add or replace the specified items by name
      */
+    @SafeVarargs
     public final void addOrReplace(T...items) {
         addOrReplace(Arrays.asList(items));
     }
@@ -210,7 +217,7 @@ public class NamedList<T extends NameProvider & ValueHolder<?>> extends ArrayLis
         addAll(items);
     }
 
-    public boolean has(NameProvider nameHolder) {
+    public boolean has(NameHolder nameHolder) {
         return has(nameHolder.getName());
     }
 

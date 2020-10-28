@@ -21,11 +21,12 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
+
+import java.util.Optional;
 
 public class Parking extends Device {
 
@@ -46,27 +47,27 @@ public class Parking extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public Integer getSpacesTotal() {
-        return getAttributes().get(SPACES_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getSpacesTotal() {
+        return getAttributes().getValueOrDefault(SPACES_TOTAL);
     }
 
-    public Integer getSpacesOccupied() {
-        return getAttributes().get(SPACES_OCCUPIED).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getSpacesOccupied() {
+        return getAttributes().getValueOrDefault(SPACES_OCCUPIED);
     }
 
-    public Integer getSpacesOpen() {
-        return getAttributes().get(SPACES_OPEN).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getSpacesOpen() {
+        return getAttributes().getValueOrDefault(SPACES_OPEN);
     }
 
-    public Integer getSpacesBuffer() {
-        return getAttributes().get(SPACES_BUFFER).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getSpacesBuffer() {
+        return getAttributes().getValueOrDefault(SPACES_BUFFER);
     }
 
-    public Double getPriceHourly() {
-        return getAttributes().get(PRICE_HOURLY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPriceHourly() {
+        return getAttributes().getValueOrDefault(PRICE_HOURLY);
     }
 
-    public Double getPriceDaily() {
-        return getAttributes().get(PRICE_DAILY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPriceDaily() {
+        return getAttributes().getValueOrDefault(PRICE_DAILY);
     }
 }

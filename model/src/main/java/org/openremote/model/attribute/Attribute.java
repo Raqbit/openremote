@@ -37,6 +37,10 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
     protected Attribute() {
     }
 
+    public Attribute(AttributeDescriptor<T> attributeDescriptor) {
+        this(attributeDescriptor, attributeDescriptor.getDefaultValue());
+    }
+
     public Attribute(AttributeDescriptor<T> attributeDescriptor, T value) {
         this(attributeDescriptor.getName(), attributeDescriptor.getValueDescriptor(), value);
 

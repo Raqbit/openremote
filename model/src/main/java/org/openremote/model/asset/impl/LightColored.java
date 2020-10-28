@@ -20,15 +20,15 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.value.ColorRGB;
+
+import java.util.Optional;
 
 public class LightColored extends Light {
 
-    public static final AttributeDescriptor<ValueTypes.IntegerList> COLOR_RGB = new AttributeDescriptor<>("colorRGB", true, ValueTypes.COLOUR_RGB, null);
-    public static final AttributeDescriptor<ValueTypes.IntegerList> COLOR_RGBW = new AttributeDescriptor<>("colorRGBW", true, ValueTypes.COLOUR_RGB, null);
-    public static final AttributeDescriptor<ValueTypes.IntegerList> COLOR_ARGB = new AttributeDescriptor<>("colorARGB", true, ValueTypes.COLOUR_RGB, null);
+    public static final AttributeDescriptor<ColorRGB> COLOR_RGB = new AttributeDescriptor<>("colorRGB", true, ValueTypes.COLOUR_RGB, null);
     // TODO: Re-evaluate the following these seem like protocol related attributes
     public static final AttributeDescriptor<Integer> GROUP_NUMBER = new AttributeDescriptor<>("groupNumber", true, ValueTypes.POSITIVE_INTEGER, null);
     public static final AttributeDescriptor<String> SCENARIO = new AttributeDescriptor<>("scenario", true, ValueTypes.STRING, null);
@@ -39,15 +39,7 @@ public class LightColored extends Light {
         super(name, DESCRIPTOR);
     }
 
-    public ValueTypes.IntegerList getColorRGB() {
-        return getAttributes().get(COLOR_RGB).flatMap(Attribute::getValue).orElse(null);
-    }
-
-    public ValueTypes.IntegerList getColorRGBW() {
-        return getAttributes().get(COLOR_RGBW).flatMap(Attribute::getValue).orElse(null);
-    }
-
-    public ValueTypes.IntegerList getColorARGB() {
-        return getAttributes().get(COLOR_ARGB).flatMap(Attribute::getValue).orElse(null);
+    public Optional<ColorRGB> getColorRGB() {
+        return getAttributes().getValueOrDefault(COLOR_RGB);
     }
 }

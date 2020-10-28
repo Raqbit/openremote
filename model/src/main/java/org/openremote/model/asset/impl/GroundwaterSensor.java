@@ -20,19 +20,20 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class GroundwaterSensor extends Device {
 
     public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueTypes.TEMPERATURE, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", true, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
 
     public static final AssetDescriptor<GroundwaterSensor> DESCRIPTOR = new AssetDescriptor<>("Groundwater Sensor", "water-outline", "95d0df", GroundwaterSensor.class);
@@ -41,11 +42,11 @@ public class GroundwaterSensor extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public Double getTemperature() {
-        return getAttributes().get(TEMPERATURE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTemperature() {
+        return getAttributes().getValueOrDefault(TEMPERATURE);
     }
 
-    public Integer getWaterLevel() {
-        return getAttributes().get(WATER_LEVEL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getWaterLevel() {
+        return getAttributes().getValueOrDefault(WATER_LEVEL);
     }
 }

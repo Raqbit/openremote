@@ -21,16 +21,17 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaTypes;
 import org.openremote.model.v2.ValueTypes;
 
+import java.util.Optional;
+
 public class ElectricitySupplier extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
@@ -51,10 +52,10 @@ public class ElectricitySupplier extends Device {
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
     );
     public static final AttributeDescriptor<Double> ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION = new AttributeDescriptor<>("energyTariffImportForecastDeviation", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION = new AttributeDescriptor<>("energyTariffExportForecastDeviation", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY, true)
+        new MetaItem<>(MetaTypes.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> ENERGY_TAX = new AttributeDescriptor<>("energyTax", true, ValueTypes.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
@@ -106,87 +107,87 @@ public class ElectricitySupplier extends Device {
         super(name, DESCRIPTOR);
     }
 
-    public String getStatus() {
-        return getAttributes().get(STATUS).flatMap(Attribute::getValue).orElse(null);
+    public Optional<String> getStatus() {
+        return getAttributes().getValueOrDefault(STATUS);
     }
 
-    public Double getPowerCapacity() {
-        return getAttributes().get(POWER_CAPACITY).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerCapacity() {
+        return getAttributes().getValueOrDefault(POWER_CAPACITY);
     }
 
-    public Double getPowerEDRSetpoint() {
-        return getAttributes().get(POWER_EDR_SETPOINT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerEDRSetpoint() {
+        return getAttributes().getValueOrDefault(POWER_EDR_SETPOINT);
     }
 
-    public Double getPowerEDRReserve() {
-        return getAttributes().get(POWER_EDR_RESERVE).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerEDRReserve() {
+        return getAttributes().getValueOrDefault(POWER_EDR_RESERVE);
     }
 
-    public Integer getPowerEDRMinPeriod() {
-        return getAttributes().get(POWER_EDR_MIN_PERIOD).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getPowerEDRMinPeriod() {
+        return getAttributes().getValueOrDefault(POWER_EDR_MIN_PERIOD);
     }
 
-    public Double getTariffImport() {
-        return getAttributes().get(TARIFF_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffImport() {
+        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
     }
 
-    public Double getTariffExport() {
-        return getAttributes().get(TARIFF_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getTariffExport() {
+        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
     }
 
-    public Double getEnergyTariffImportForecastDeviation() {
-        return getAttributes().get(ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTariffImportForecastDeviation() {
+        return getAttributes().getValueOrDefault(ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION);
     }
 
-    public Double getEnergyTariffExportForecastDeviation() {
-        return getAttributes().get(ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTariffExportForecastDeviation() {
+        return getAttributes().getValueOrDefault(ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION);
     }
 
-    public Double getEnergyTax() {
-        return getAttributes().get(ENERGY_TAX).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTax() {
+        return getAttributes().getValueOrDefault(ENERGY_TAX);
     }
 
-    public Double getGridCost() {
-        return getAttributes().get(GRID_COST).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getGridCost() {
+        return getAttributes().getValueOrDefault(GRID_COST);
     }
 
-    public Double getGridConnectionCost() {
-        return getAttributes().get(GRID_CONNECTION_COST).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getGridConnectionCost() {
+        return getAttributes().getValueOrDefault(GRID_CONNECTION_COST);
     }
 
-    public Double getCarbonImport() {
-        return getAttributes().get(CARBON_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getCarbonImport() {
+        return getAttributes().getValueOrDefault(CARBON_IMPORT);
     }
 
-    public Double getCarbonExport() {
-        return getAttributes().get(CARBON_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getCarbonExport() {
+        return getAttributes().getValueOrDefault(CARBON_EXPORT);
     }
 
-    public Double getPowerTotal() {
-        return getAttributes().get(POWER_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerTotal() {
+        return getAttributes().getValueOrDefault(POWER_TOTAL);
     }
 
-    public Double getPowerForecastDeviation() {
-        return getAttributes().get(POWER_FORECAST_DEVIATION).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getPowerForecastDeviation() {
+        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
     }
 
-    public Double getEnergyTotalImport() {
-        return getAttributes().get(ENERGY_TOTAL_IMPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalImport() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT);
     }
 
-    public Double getEnergyTotalExport() {
-        return getAttributes().get(ENERGY_TOTAL_EXPORT).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalExport() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT);
     }
 
-    public Double getEnergyTotalImportCost() {
-        return getAttributes().get(ENERGY_TOTAL_IMPORT_COST).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalImportCost() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT_COST);
     }
 
-    public Double getEnergyTotalExportIncome() {
-        return getAttributes().get(ENERGY_TOTAL_EXPORT_INCOME).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Double> getEnergyTotalExportIncome() {
+        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT_INCOME);
     }
 
-    public Integer getCarbonTotal() {
-        return getAttributes().get(CARBON_TOTAL).flatMap(Attribute::getValue).orElse(null);
+    public Optional<Integer> getCarbonTotal() {
+        return getAttributes().getValueOrDefault(CARBON_TOTAL);
     }
 }

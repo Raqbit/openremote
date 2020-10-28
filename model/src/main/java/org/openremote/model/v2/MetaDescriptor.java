@@ -24,20 +24,24 @@ public class MetaDescriptor<T> implements NameValueDescriptorProvider<T> {
     protected ValueDescriptor<T> valueDescriptor;
     protected T defaultValue;
 
-    public MetaDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
+    public MetaDescriptor(String name, ValueDescriptor<T> valueDescriptor, T defaultValue) {
         this.name = name;
         this.valueDescriptor = valueDescriptor;
+        this.defaultValue = defaultValue;
     }
 
     public String getName() {
         return name;
     }
 
+    @Override
     public ValueDescriptor<T> getValueDescriptor() {
         return valueDescriptor;
     }
 
+    @Override
     public T getDefaultValue() {
         return defaultValue;
     }
+
 }

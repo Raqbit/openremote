@@ -37,14 +37,14 @@ public class ArrayPredicate implements ValuePredicate {
 
     public static final String name = "array";
     public boolean negated;
-    public Value value;
+    public Object value;
     public Integer index;
     public Integer lengthEquals;
     public Integer lengthGreaterThan;
     public Integer lengthLessThan;
 
     @JsonCreator
-    public ArrayPredicate(@JsonProperty("value") Value value,
+    public ArrayPredicate(@JsonProperty("value") Object value,
                           @JsonProperty("index") Integer index,
                           @JsonProperty("lengthEquals") Integer lengthEquals,
                           @JsonProperty("lengthGreaterThan") Integer lengthGreaterThan,
@@ -63,7 +63,7 @@ public class ArrayPredicate implements ValuePredicate {
         return this;
     }
 
-    public ArrayPredicate value(Value value) {
+    public ArrayPredicate value(Object value) {
         this.value = value;
         return this;
     }
@@ -87,5 +87,4 @@ public class ArrayPredicate implements ValuePredicate {
         this.lengthLessThan = lengthLessThan;
         return this;
     }
-
 }
