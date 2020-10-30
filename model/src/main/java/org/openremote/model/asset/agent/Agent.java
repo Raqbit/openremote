@@ -49,77 +49,78 @@ public abstract class Agent extends Asset {
      * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
      * HEX string representation (e.g. 34FD87)
      */
-    AttributeDescriptor<Boolean> MESSAGE_CONVERT_HEX = new AttributeDescriptor<>("messageConvertHex", true, ValueTypes.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_HEX = new AttributeDescriptor<>("messageConvertHex", true, ValueTypes.BOOLEAN, true);
 
     /**
      * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
      * binary string representation (e.g. 1001010111)
      */
-    AttributeDescriptor<Boolean> MESSAGE_CONVERT_BINARY = new AttributeDescriptor<>("messageConvertBinary", true, ValueTypes.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_BINARY = new AttributeDescriptor<>("messageConvertBinary", true, ValueTypes.BOOLEAN, true);
 
     /**
      * Charset to use when converting byte[] to a string (should default to UTF8 if not specified); values must be
      * string that matches a charset as defined in {@link java.nio.charset.Charset}
      */
-    AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueTypes.STRING, "UTF8");
+    public static final AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueTypes.STRING, "UTF8");
 
     /**
      * Max length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
      * for {@link String} protocols it could be the number of characters but for {@link Byte} protocols it could be the
      * number of bytes. This is typically used for I/O based {@link Protocol}s.
      */
-    AttributeDescriptor<Integer> MESSAGE_MAX_LENGTH = new AttributeDescriptor<>("messageMaxLength", true, ValueTypes.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> MESSAGE_MAX_LENGTH = new AttributeDescriptor<>("messageMaxLength", true, ValueTypes.POSITIVE_INTEGER, null);
 
     /**
      * Min length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
      * for {@link String} protocols it could be the number of characters but for {@link Byte} protocols it could be the
      * number of bytes. This is typically used for I/O based {@link Protocol}s.
      */
-    AttributeDescriptor<Integer> MESSAGE_MIN_LENGTH = new AttributeDescriptor<>("messageMinLength", true, ValueTypes.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> MESSAGE_MIN_LENGTH = new AttributeDescriptor<>("messageMinLength", true, ValueTypes.POSITIVE_INTEGER, null);
 
     /**
      * Defines a delimiter for messages received by a {@link Protocol}. Multiples of this {@link MetaItem} can be used
      * to add multiple delimiters (the first matched delimiter should be used to generate the shortest possible match(.
      * This is typically used for I/O based {@link Protocol}s.
      */
-    AttributeDescriptor<String> MESSAGE_DELIMITER = new AttributeDescriptor<>("messageDelimiter", true, ValueTypes.STRING, null);
+    public static final AttributeDescriptor<String> MESSAGE_DELIMITER = new AttributeDescriptor<>("messageDelimiter", true, ValueTypes.STRING, null);
 
     /**
      * For protocols that use {@link #MESSAGE_DELIMITER}, this indicates whether or not the matched delimiter
      * should be stripped from the message.
      */
-    AttributeDescriptor<Boolean> MESSAGE_STRIP_DELIMITER = new AttributeDescriptor<>("messageStripDelimiter", true, ValueTypes.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_STRIP_DELIMITER = new AttributeDescriptor<>("messageStripDelimiter", true, ValueTypes.BOOLEAN, true);
 
     /**
      * {@link OAuthGrant} for connecting to services that require OAuth authentication
      */
-    AttributeDescriptor<OAuthGrant> OAUTH_GRANT = new AttributeDescriptor<>("oAuthGrant", true, ValueTypes.OAUTH_GRANT, null);
+    public static final AttributeDescriptor<OAuthGrant> OAUTH_GRANT = new AttributeDescriptor<>("oAuthGrant", true, ValueTypes.OAUTH_GRANT, null);
 
     /**
      * Basic authentication username and password
      */
-    AttributeDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new AttributeDescriptor<>("usernamePassword", true, ValueTypes.USERNAME_AND_PASSWORD, null);
+    public static final AttributeDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new AttributeDescriptor<>("usernamePassword", true, ValueTypes.USERNAME_AND_PASSWORD, null);
 
     /**
      * TCP/IP network host name/IP address
      */
-    AttributeDescriptor<String> HOST = new AttributeDescriptor<>("host", true, ValueTypes.HOSTNAME_OR_IP_ADDRESS, null);
+    public static final AttributeDescriptor<String> HOST = new AttributeDescriptor<>("host", true, ValueTypes.HOSTNAME_OR_IP_ADDRESS, null);
 
     /**
      * TCP/IP network port number
      */
-    AttributeDescriptor<Integer> PORT = new AttributeDescriptor<>("port", true, ValueTypes.PORT, null);
+    public static final AttributeDescriptor<Integer> PORT = new AttributeDescriptor<>("port", true, ValueTypes.PORT, null);
 
     /**
      * Serial port name/address
      */
-    AttributeDescriptor<String> SERIAL_PORT = new AttributeDescriptor<>("serialPort", true, ValueTypes.STRING, null);
+    public static final AttributeDescriptor<String> SERIAL_PORT = new AttributeDescriptor<>("serialPort", true, ValueTypes.STRING, null);
 
     /**
      * Serial baudrate to use for connection
      */
-    AttributeDescriptor<Integer> SERIAL_BAUDRATE = new AttributeDescriptor<>("serialBaudrate", true, ValueTypes.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> SERIAL_BAUDRATE = new AttributeDescriptor<>("serialBaudrate", true, ValueTypes.POSITIVE_INTEGER, null);
 
+    public static final AttributeDescriptor<Integer> POLLING_MILLIS = new AttributeDescriptor<>("pollingMillis", true, ValueTypes.POSITIVE_INTEGER, null);
 
 
     /* LINKED ATTRIBUTE META BELOW HERE */
@@ -131,7 +132,7 @@ public abstract class Agent extends Asset {
      * Defines {@link ValueFilter}s to apply to an incoming value before it is written to a protocol linked attribute;
      * this is particularly useful for generic protocols. The message should pass through the filters in array order.
      */
-    public static final MetaDescriptor<ValueFilter[]> VALUE_FILTERS = new MetaDescriptor<>("valueFilters", VALUE_FILTER.asArray(), null);
+    public static final MetaDescriptor<ValueFilter[]> META_VALUE_FILTERS = new MetaDescriptor<>("valueFilters", VALUE_FILTER.asArray(), null);
 
     /**
      * Defines a value converter map to allow for basic value type conversion; the incoming value will be converted to
@@ -139,12 +140,12 @@ public abstract class Agent extends Asset {
      * attribute. An example use case is an API that returns "ACTIVE"/"DISABLED" strings but you want to connect this to
      * a {@link ValueTypes#BOOLEAN} attribute.
      */
-    public static final MetaDescriptor<ObjectNode> VALUE_CONVERTER = new MetaDescriptor<>("valueConverter", ValueTypes.OBJECT, null);
+    public static final MetaDescriptor<ObjectNode> META_VALUE_CONVERTER = new MetaDescriptor<>("valueConverter", ValueTypes.OBJECT, null);
 
     /**
-     * Similar to {@link #VALUE_CONVERTER} but will applied to outgoing values allowing for the opposite conversion.
+     * Similar to {@link #META_VALUE_CONVERTER} but will applied to outgoing values allowing for the opposite conversion.
      */
-    public static final MetaDescriptor<ObjectNode> WRITE_VALUE_CONVERTER = new MetaDescriptor<>("writeValueConverter", ValueTypes.OBJECT, null);
+    public static final MetaDescriptor<ObjectNode> META_WRITE_VALUE_CONVERTER = new MetaDescriptor<>("writeValueConverter", ValueTypes.OBJECT, null);
 
     /**
      * JSON string to be used for attribute writes and can contain {@link Protocol#DYNAMIC_VALUE_PLACEHOLDER}s; this allows the
@@ -156,36 +157,35 @@ public abstract class Agent extends Asset {
      * <p>
      * A value of 'null' will produce a literal null.
      */
-    public static final MetaDescriptor<String> WRITE_VALUE = new MetaDescriptor<>("writeValue", ValueTypes.STRING, null);
+    public static final MetaDescriptor<String> META_WRITE_VALUE = new MetaDescriptor<>("writeValue", ValueTypes.STRING, null);
 
     /**
-     * Polling frequency in milliseconds for {@link Attribute}s whose value should be polled; can be set on the {@link
-     * ProtocolConfiguration} or the {@link Attribute} (the latter takes precedence).
+     * Polling frequency in milliseconds for {@link Attribute}s whose value should be polled.
      */
-    public static final MetaDescriptor<Integer> POLLING_MILLIS = new MetaDescriptor<>("pollingMillis", ValueTypes.POSITIVE_INTEGER, null);
+    public static final MetaDescriptor<Integer> META_POLLING_MILLIS = new MetaDescriptor<>("pollingMillis", ValueTypes.POSITIVE_INTEGER, null);
 
     /**
      * The predicate to use on incoming messages to determine if the message is intended for the {@link Attribute} that
      * has this {@link MetaItem}; it is particularly useful for pub-sub based {@link Protocol}s.
      */
-    public static final MetaDescriptor<ValuePredicate> MESSAGE_MATCH_PREDICATE = new MetaDescriptor<>("messageMatchPredicate", VALUE_PREDICATE, null);
+    public static final MetaDescriptor<ValuePredicate> META_MESSAGE_MATCH_PREDICATE = new MetaDescriptor<>("messageMatchPredicate", VALUE_PREDICATE, null);
 
     /**
      * {@link ValueFilter}s to apply to incoming messages prior to comparison with the {@link
-     * #MESSAGE_MATCH_PREDICATE}, if the predicate matches then the original un-filtered message is
+     * #META_MESSAGE_MATCH_PREDICATE}, if the predicate matches then the original un-filtered message is
      * intended for this linked {@link Attribute} and the message should be written to the {@link Attribute} where the
-     * actual value written can be filtered using the {@link #VALUE_FILTERS}.
+     * actual value written can be filtered using the {@link #META_VALUE_FILTERS}.
      */
-    public static final MetaDescriptor<ValueFilter[]> MESSAGE_MATCH_FILTERS = new MetaDescriptor<>("messageMatchFilters", VALUE_FILTER.asArray(), null);
+    public static final MetaDescriptor<ValueFilter[]> META_MESSAGE_MATCH_FILTERS = new MetaDescriptor<>("messageMatchFilters", VALUE_FILTER.asArray(), null);
 
-    protected MetaDescriptor<?>[] AGENT_LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaDescriptor<?>[] {
-        VALUE_FILTERS,
-        VALUE_CONVERTER,
-        WRITE_VALUE_CONVERTER,
-        WRITE_VALUE,
-        POLLING_MILLIS,
-        MESSAGE_MATCH_PREDICATE,
-        MESSAGE_MATCH_FILTERS
+    protected MetaDescriptor<?>[] LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaDescriptor<?>[] {
+        META_VALUE_FILTERS,
+        META_VALUE_CONVERTER,
+        META_WRITE_VALUE_CONVERTER,
+        META_WRITE_VALUE,
+        META_POLLING_MILLIS,
+        META_MESSAGE_MATCH_PREDICATE,
+        META_MESSAGE_MATCH_FILTERS
     };
 
 

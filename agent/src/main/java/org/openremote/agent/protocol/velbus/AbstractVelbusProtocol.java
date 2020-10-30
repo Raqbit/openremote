@@ -33,6 +33,8 @@ import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.file.FileInfo;
+import org.openremote.model.protocol.ProtocolAssetDiscovery;
+import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.EnumUtil;
 import org.openremote.model.util.Pair;
@@ -58,8 +60,8 @@ import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE
 import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 
 public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
-    ProtocolLinkedAttributeDiscovery,
-    ProtocolLinkedAttributeImport {
+    ProtocolAssetDiscovery,
+    ProtocolAssetImport {
 
     public static final String PROTOCOL_BASE_NAME = PROTOCOL_NAMESPACE + ":velbus";
     public static final String META_VELBUS_DEVICE_ADDRESS = PROTOCOL_BASE_NAME + ":deviceAddress";

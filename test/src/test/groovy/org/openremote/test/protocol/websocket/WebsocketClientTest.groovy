@@ -32,7 +32,7 @@ import org.openremote.manager.concurrent.ManagerExecutorService
 import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.AssetFilter
-import org.openremote.model.asset.agent.AgentStatusEvent
+
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.attribute.AttributeEvent
 import org.openremote.model.attribute.AttributeRef
@@ -53,7 +53,6 @@ import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMI
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD_DEFAULT
 import static org.openremote.model.Constants.KEYCLOAK_CLIENT_ID
 import static org.openremote.model.Constants.MASTER_REALM_ADMIN_USER
-import static org.openremote.model.attribute.MetaItem.isMetaNameEqualTo
 
 /**
  * This tests the {@link WebsocketIoClient} by connecting to the manager web socket API which means it also tests

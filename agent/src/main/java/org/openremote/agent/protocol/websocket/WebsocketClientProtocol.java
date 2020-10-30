@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.websocket;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;

@@ -24,7 +24,6 @@ import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
-import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.v2.MetaTypes;
@@ -51,24 +50,20 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * If the {@link Agent} was deleted or {@link Agent#isDisabled} then nothing happens otherwise:
  * <ol>
  * <li>{@link #connect} - If this call returns false then it is assumed that a permanent failure has occurred (i.e.
- *  the {@link Agent} is incorrectly configured) and this Agent's  status will be marked as e attribute linking will not occur.</li>
+ *  the {@link Agent} is incorrectly configured) and this Agent's status will be marked as e attribute linking will not occur.</li>
  * <li>{@link #linkAttribute} - Called for each attribute linked to the {@link Agent}</li>
  * </ol>
  * <h3>Configuring protocol instances</h3>
- * A protocol implementation must support multiple protocol configurations and therefore support multiple logical
- * instances. A protocol 'instance' can be defined by an attribute on an {@link Asset} that has a type of {@link
- * AssetType#AGENT}; the attribute must conform to {@link ProtocolConfiguration}.
+ * Each {@link Agent} asset has its' own {@link Protocol} instance and this instance is responsible for managing only
+ * the attributes linked to that specific instance.
  * <p>
- * When a protocol configuration is loaded/created for a protocol then the {@link #connect} method
- * will be called. The protocol should check the {@link Attribute#isEnabled} status of the protocol configuration
- * to determine whether or not the logical instance should be running or stopped.
- * <p>
- * The protocol is responsible for calling the provided consumer whenever the status of the logical instance changes
- * (e.g. if the configuration is not valid then the protocol should call the consumer with a value of {@link
- * ConnectionStatus#ERROR} and it should provide sensible logging to allow fault finding).
+ * <h3>Connection status</h3>
+ * The protocol instance is responsible for calling the provided {@link ConnectionStatus} consumer whenever the status
+ * of the logical (e.g. if the configuration is not valid then the protocol should call the consumer with a value of
+ * {@link ConnectionStatus#ERROR} and it should provide sensible logging to allow fault finding).
  * <h3>Connecting attributes to actuators and sensors</h3>
  * {@link Attribute}s of {@link Asset}s can be linked to a protocol configuration instance by creating an {@link
- * MetaItemType#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaItemType#AGENT_LINK}, other
+ * MetaTypes#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaTypes#AGENT_LINK}, other
  * protocol-specific meta items may also be required when an asset attribute is linked to a protocol configuration
  * instance. Attributes linked to a protocol configuration instance will get passed to the protocol via a call to {@link
  * #linkAttribute}.
@@ -85,27 +80,25 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * the {@link #ACTUATOR_TOPIC} where the message body will be an {@link AttributeEvent}. Each message also contains the
  * target protocol name in header {@link #ACTUATOR_TOPIC_TARGET_PROTOCOL}.
  * <p>
- * To simplify protocol development some common protocol behaviour is recommended:
+ * To simplify protocol development some common protocol behaviour is recommended for generic protocols:
  * <h1>Inbound value conversion (Protocol -> Linked Attribute)</h1>
  * <p>
- * Standard value filtering and/or conversion should be performed in the following order, this is encapsulated in {@link
- * Util#doInboundValueProcessing}:
+ * Standard value filtering and/or conversion should be performed in the following order:
  * <ol>
  * <li>Configurable value filtering which allows the value produced by the protocol to be filtered through any
  * number of {@link ValueFilter}s before being written to the linked attribute
- * (see {@link #META_ATTRIBUTE_VALUE_FILTERS})</li>
+ * (see {@link Agent#META_VALUE_FILTERS})</li>
  * <li>Configurable value conversion which allows the value produced by the protocol to be converted in a configurable
- * way before being written to the linked attribute (see {@link #META_ATTRIBUTE_VALUE_CONVERTER})</li>
- * <li>Automatic basic value conversion should be performed when the {@link ValueType} of the value produced by the
- * protocol and any configured value conversion does not match the linked attributes underlying {@link ValueType}; this
- * basic conversion should use the {@link Values#convertToValue} method</li>
+ * way before being written to the linked attribute (see {@link Agent#META_VALUE_CONVERTER})</li>
+ * <li>Automatic basic value conversion should be performed when the type of the value produced by the
+ * protocol and any configured value conversion does not match the linked attributes underlying value type; this
+ * basic conversion should use the {@link Values#convert} method</li>
  * </ol>
  * <h1>Outbound value conversion (Linked Attribute -> Protocol)</h1>
- * Standard value conversion should be performed in the following order, this is encapsulated in
- * {@link Util#doOutboundValueProcessing}:
+ * Standard value conversion should be performed in the following order:
  * <ol>
  * <li>Configurable value conversion which allows the value sent from the linked attribute to be converted in a
- * configurable way before being sent to the protocol for processing (see {@link #META_ATTRIBUTE_WRITE_VALUE_CONVERTER})
+ * configurable way before being sent to the protocol for processing (see {@link Agent#META_WRITE_VALUE_CONVERTER})
  * <li>Configurable dynamic value insertion (replacement of {@link #DYNAMIC_VALUE_PLACEHOLDER} strings within a
  * pre-defined JSON string with the value sent from the linked attribute (this allows for attribute values to be inserted
  * into a larger payload before processing by the protocol; it also allows the written value to be fixed or statically
@@ -120,13 +113,13 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <p>
  * The following summarises the method calls protocols should expect:
  * <p>
- * Protocol configuration (logical instance) is created/loaded:
+ * {@link Agent} asset is created/loaded:
  * <ol>
  * <li>{@link #connect}</li>
  * <li>{@link #linkAttribute}</li>
  * </ol>
  * <p>
- * Protocol configuration (logical instance) is modified:
+ * {@link Agent} is modified:
  * <ol>
  * <li>{@link #unlinkAttribute}</li>
  * <li>{@link #disconnect}</li>
@@ -134,7 +127,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <li>{@link #linkAttribute}</li>
  * </ol>
  * <p>
- * Protocol configuration (logical instance) is removed:
+ * {@link Agent} is removed:
  * <ol>
  * <li>{@link #unlinkAttribute}</li>
  * <li>{@link #disconnect}</li>
@@ -195,13 +188,13 @@ public interface Protocol<T extends Agent> {
      * Attributes are linked to an agent via an {@link MetaTypes#AGENT_LINK} meta item.
      * @return True if successful, false otherwise
      */
-    boolean linkAttribute(Asset asset, Attribute attribute);
+    boolean linkAttribute(Asset asset, Attribute<?> attribute);
 
     /**
      * Un-links an {@link Attribute} from its' agent; the agent will still be connected during this call. This is called
      * whenever the attribute is modified or removed or when the agent is modified or removed.
      */
-    void unlinkAttribute(Asset asset, Attribute attribute);
+    void unlinkAttribute(Asset asset, Attribute<?> attribute);
 
     /**
      * Called before {@link #connect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
@@ -229,12 +222,12 @@ public interface Protocol<T extends Agent> {
     void disconnect();
 
     /**
-     * Get the {@link Asset#getId} of the associated {@link Agent}
+     * Get the {@link Asset#getId} of the associated {@link Agent}; should be used in logging for instance identification
      */
     String getAgentId();
 
     /**
-     *  Get the {@link Asset#getName} of the associated {@link Agent}
+     *  Get the {@link Asset#getName} of the associated {@link Agent}; should be used in logging for instance identification
      */
     String getAgentName();
 }

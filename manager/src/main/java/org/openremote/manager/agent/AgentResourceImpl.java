@@ -28,7 +28,6 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.AgentResource;
-import org.openremote.model.asset.agent.AgentStatusEvent;
 import org.openremote.model.asset.agent.ProtocolDescriptor;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeValidationResult;

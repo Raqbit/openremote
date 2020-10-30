@@ -41,6 +41,7 @@ import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.Constants;
 import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.*;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.attribute.MetaItemDescriptor;
@@ -286,14 +287,6 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         clientEventService = container.getService(ClientEventService.class);
         gatewayService = container.getService(GatewayService.class);
         EventSubscriptionAuthorizer assetEventAuthorizer = AssetStorageService.assetInfoAuthorizer(identityService, this);
-
-        clientEventService.addSubscriptionAuthorizer((auth, subscription) ->
-            (subscription.isEventType(AssetTreeModifiedEvent.class))
-                && identityService.getIdentityProvider().canSubscribeWith(
-                auth,
-                subscription.getFilter() instanceof TenantFilter ? ((TenantFilter) subscription.getFilter()) : null,
-                ClientRole.READ_ASSETS)
-        );
 
         clientEventService.addSubscriptionAuthorizer((auth, subscription) -> {
              if (!subscription.isEventType(AssetEvent.class)) {
@@ -1987,7 +1980,6 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         });
     }
 
-    // TODO: Remove AssetTreeModifiedEvent once GWT client replaced
     protected void publishModificationEvents(PersistenceEvent<Asset> persistenceEvent) {
         Asset asset = persistenceEvent.getEntity();
         switch (persistenceEvent.getCause()) {
@@ -1998,24 +1990,6 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 clientEventService.publishEvent(
                     new AssetEvent(AssetEvent.Cause.CREATE, loadedAsset, null)
                 );
-
-                clientEventService.publishEvent(
-                    new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(), asset.getRealm(), asset.getId())
-                );
-                if (asset.getParentId() != null) {
-                    // Child asset created
-                    clientEventService.publishEvent(
-                        new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(),
-                            asset.getRealm(),
-                            asset.getParentId(),
-                            true)
-                    );
-                } else {
-                    // Child asset created (root asset)
-                    clientEventService.publishEvent(
-                        new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(), asset.getRealm(), true)
-                    );
-                }
 
                 // Raise attribute event for each attribute
                 asset.getAttributesStream().forEach(newAttribute ->
@@ -2046,38 +2020,14 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 // Did the name change?
                 String previousName = persistenceEvent.getPreviousState("name");
                 String currentName = persistenceEvent.getCurrentState("name");
-                if (!Objects.equals(previousName, currentName)) {
-                    clientEventService.publishEvent(
-                        new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(),
-                            asset.getRealm(),
-                            asset.getId())
-                    );
-                    break;
-                }
 
                 // Did the parent change?
                 String previousParentId = persistenceEvent.getPreviousState("parentId");
                 String currentParentId = persistenceEvent.getCurrentState("parentId");
-                if (!Objects.equals(previousParentId, currentParentId)) {
-                    clientEventService.publishEvent(
-                        new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(),
-                            asset.getRealm(),
-                            asset.getId())
-                    );
-                    break;
-                }
 
                 // Did the realm change?
                 String previousRealm = persistenceEvent.getPreviousState("realm");
                 String currentRealm = persistenceEvent.getCurrentState("realm");
-                if (!Objects.equals(previousRealm, currentRealm)) {
-                    clientEventService.publishEvent(
-                        new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(),
-                            asset.getRealm(),
-                            asset.getId())
-                    );
-                    break;
-                }
 
                 // Did any attributes change if so raise attribute events on the event bus
                 List<Attribute> oldAttributes = attributesFromJson(persistenceEvent.getPreviousState("attributes"),
@@ -2109,10 +2059,6 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
 
                 clientEventService.publishEvent(
                     new AssetEvent(AssetEvent.Cause.DELETE, asset, null)
-                );
-
-                clientEventService.publishEvent(
-                    new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(), asset.getRealm(), asset.getId())
                 );
 
                 // Raise attribute event with deleted flag for each attribute

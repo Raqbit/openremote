@@ -17,19 +17,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol;
+package org.openremote.model.protocol;
 
 import org.apache.commons.codec.binary.BinaryCodec;
 import org.apache.commons.codec.binary.Hex;
-import org.openremote.container.Container;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.attribute.*;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.AttributeExecuteStatus;
+import org.openremote.model.attribute.AttributeRef;
+import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.auth.OAuthGrant;
 import org.openremote.model.query.filter.StringPredicate;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.*;
+import org.openremote.model.value.ValueFilter;
+import org.openremote.model.value.Values;
 
 import java.io.IOException;
 import java.util.Locale;

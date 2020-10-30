@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol;
+package org.openremote.model.protocol;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -39,7 +39,7 @@ import org.openremote.model.file.FileInfo;
  * automatically if omitted.
  * </b>
  */
-public interface ProtocolLinkedAttributeImport {
+public interface ProtocolAssetImport {
 
     /**
      * Import devices for the specified {@link org.openremote.model.asset.agent.ProtocolConfiguration}

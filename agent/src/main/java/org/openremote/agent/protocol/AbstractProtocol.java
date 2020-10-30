@@ -32,6 +32,7 @@ import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.*;
+import org.openremote.model.protocol.*;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
@@ -403,22 +404,6 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
             LinkedProtocolInfo linkedProtocolInfo = linkedProtocolConfigurations.get(protocolConfiguration.getReferenceOrThrow());
             return linkedProtocolInfo.getCurrentConnectionStatus();
         });
-    }
-
-    @Override
-    final public ProtocolDescriptor getProtocolDescriptor() {
-        return new ProtocolDescriptor(
-            getProtocolName(),
-            getProtocolDisplayName(),
-            getVersion(),
-            this instanceof ProtocolConfigurationDiscovery,
-            this instanceof ProtocolConfigurationImport,
-            this instanceof ProtocolLinkedAttributeDiscovery,
-            this instanceof ProtocolLinkedAttributeImport,
-            getProtocolConfigurationTemplate(),
-            getProtocolConfigurationMetaItemDescriptors(),
-            buildLinkedAttributeMetaItemDescriptors()
-        );
     }
 
     protected List<MetaItemDescriptor> buildLinkedAttributeMetaItemDescriptors() {

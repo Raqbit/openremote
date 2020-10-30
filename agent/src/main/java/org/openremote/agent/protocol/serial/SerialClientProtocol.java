@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.serial;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.tcp.TcpIoClient;

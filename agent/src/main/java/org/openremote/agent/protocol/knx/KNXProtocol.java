@@ -3,7 +3,7 @@ package org.openremote.agent.protocol.knx;
 import org.apache.commons.io.IOUtils;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.asset.AssetTreeNode;
-import org.openremote.agent.protocol.ProtocolLinkedAttributeImport;
+import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.container.util.CodecUtil;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.ValidationFailure;
@@ -51,7 +51,7 @@ import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 /**
  * This protocol is used to connect to a KNX bus via an IP interface.
  */
-public class KNXProtocol extends AbstractProtocol implements ProtocolLinkedAttributeImport {
+public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, KNXProtocol.class);
 

@@ -37,7 +37,6 @@ import org.openremote.container.web.WebService;
 import org.openremote.manager.apps.ConsoleAppService;
 import org.openremote.manager.event.ClientEventService;
 import org.openremote.model.Constants;
-import org.openremote.model.asset.AssetTreeModifiedEvent;
 import org.openremote.model.event.shared.TenantFilter;
 import org.openremote.model.query.UserQuery;
 import org.openremote.model.query.filter.TenantPredicate;
@@ -631,10 +630,6 @@ public class ManagerKeycloakIdentityProvider extends KeycloakIdentityProvider im
                 persistenceEvent.getEntity().getClass()
             );
         }
-
-        clientEventService.publishEvent(
-            new AssetTreeModifiedEvent(timerService.getCurrentTimeMillis(), tenant.getRealm(), null)
-        );
     }
 
     public String addLDAPConfiguration(String realm, ComponentRepresentation componentRepresentation) {

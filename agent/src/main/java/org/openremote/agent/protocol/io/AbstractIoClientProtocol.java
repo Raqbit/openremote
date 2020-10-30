@@ -28,7 +28,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.container.Container;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;

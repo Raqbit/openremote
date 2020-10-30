@@ -26,7 +26,7 @@ import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.ProtocolUtil;
+import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.container.Container;
 import org.openremote.container.web.HeaderInjectorFilter;

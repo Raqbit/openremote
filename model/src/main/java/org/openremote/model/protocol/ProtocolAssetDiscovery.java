@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol;
+package org.openremote.model.protocol;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -32,7 +32,7 @@ import org.openremote.model.asset.AssetTreeNode;
  * The returned {@link Attribute}s must be logically grouped into {@link Asset}s and then ordered into the desired
  * hierarchy using {@link AssetTreeNode}s.
  */
-public interface ProtocolLinkedAttributeDiscovery {
+public interface ProtocolAssetDiscovery {
 
     /**
      * Discover all linked {@link Attribute}s for the specified {@link org.openremote.model.asset.agent.ProtocolConfiguration}.

@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.openremote.agent.protocol.ProtocolLinkedAttributeImport;
+import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.udp.UdpIoClient;
-import org.openremote.container.Container;
 import org.openremote.container.util.CodecUtil;
 import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.model.asset.Asset;
@@ -38,7 +37,7 @@ import static org.openremote.model.attribute.MetaItemDescriptorImpl.metaItemObje
 import static org.openremote.model.attribute.MetaItemType.AGENT_LINK;
 import static org.openremote.model.attribute.MetaItemType.READ_ONLY;
 
-public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIoClient<ArtnetPacket>> implements ProtocolLinkedAttributeImport {
+public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIoClient<ArtnetPacket>> implements ProtocolAssetImport {
 
     private static final String PROTOCOL_VERSION = "1.70";
     public static final String PROTOCOL_NAME = PROTOCOL_NAMESPACE + ":artnet";

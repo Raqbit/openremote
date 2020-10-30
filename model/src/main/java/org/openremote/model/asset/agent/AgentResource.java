@@ -21,6 +21,7 @@ package org.openremote.model.asset.agent;
 
 import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetResource;
 import org.openremote.model.asset.AssetTreeNode;
@@ -28,67 +29,28 @@ import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.file.FileInfo;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
+import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import java.util.List;
-import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * This resource is for Agent specific tasks; normal asset/attribute CRUD operations should still use
  * {@link AssetResource}.
- *
- *
- *
  */
 @Path("agent")
 public interface AgentResource {
 
     /**
-     * Retrieve all the protocols that the specified agent supports
-     */
-    @GET
-    @Path("protocol/{agentId}")
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
-    ProtocolDescriptor[] getSupportedProtocols(
-        @BeanParam RequestParams requestParams,
-        @PathParam("agentId") String agentId
-    );
-
-    /**
-     * Retrieve {@link org.openremote.model.asset.agent.ConnectionStatus} of all protocol configurations.
-     */
-    @GET
-    @Path("status/{agentId}")
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
-    List<AgentStatusEvent> getAgentStatus(
-        @BeanParam RequestParams requestParams,
-        @PathParam("agentId") String agentId
-    );
-
-    /**
-     * Retrieve all the protocols for all the agents
-     */
-    @GET
-    @Path("protocol")
-    @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
-    Map<String, ProtocolDescriptor[]> getAllSupportedProtocols(
-        @BeanParam RequestParams requestParams
-    );
-
-    /**
-     * Retrieve discovered protocol configurations for the specified protocol on the specified agent
+     * Get discovered protocol instances for the specified named agent {@link AssetDescriptor}; the associated
+     * {@link Protocol} must implement {@link ProtocolInstanceDiscovery} otherwise an empty set of results will be
+     * returned. The {@link Asset} parent where the {@link Agent} will be added must be specified so the backend
+     * can determine if the {@link Agent} is being created on an Edge gateway instance or on this
+     *
+     * @return A map of logical instance name and corresponding {@link Attribute}s that should be added to an
+     * {@link Agent} instance to configure it so that it connects to the discovered {@link Protocol} instance.
      */
     @GET
     @Path("configuration/{agentId}/{protocolName}")

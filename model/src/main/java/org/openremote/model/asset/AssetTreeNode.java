@@ -24,6 +24,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
+/**
+ * Allows {@link Asset}s to be represented in a hierarchical structure
+ */
 public class AssetTreeNode {
 
     public Asset asset;

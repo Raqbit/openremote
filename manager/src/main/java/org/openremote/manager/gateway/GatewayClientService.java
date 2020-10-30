@@ -22,6 +22,7 @@ package org.openremote.manager.gateway;
 import io.netty.channel.ChannelHandler;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.http.client.utils.URIBuilder;
+import org.openremote.model.ContainerProvider;
 import org.openremote.model.auth.OAuthClientCredentialsGrant;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.websocket.WebsocketIoClient;
@@ -273,6 +274,7 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     protected void onGatewayClientConnectionStatusChanged(GatewayConnection connection, ConnectionStatus connectionStatus) {
+        connection.
         LOG.info("Connection status change for gateway IO client '" + connectionStatus + "': " + connection);
         clientEventService.publishEvent(new GatewayConnectionStatusEvent(timerService.getCurrentTimeMillis(), connection.getLocalRealm(), connectionStatus));
     }

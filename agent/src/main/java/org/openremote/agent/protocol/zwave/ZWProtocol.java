@@ -20,9 +20,9 @@
 package org.openremote.agent.protocol.zwave;
 
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.ProtocolConfigurationDiscovery;
-import org.openremote.agent.protocol.ProtocolLinkedAttributeDiscovery;
-import org.openremote.agent.protocol.ProtocolLinkedAttributeImport;
+import org.openremote.model.protocol.ProtocolInstanceDiscovery;
+import org.openremote.model.protocol.ProtocolAssetDiscovery;
+import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -57,8 +57,8 @@ import static org.openremote.agent.protocol.zwave.ZWConfiguration.initProtocolCo
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE;
 
-public class ZWProtocol extends AbstractProtocol implements ProtocolLinkedAttributeDiscovery,
-    ProtocolConfigurationDiscovery, ProtocolLinkedAttributeImport {
+public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscovery,
+    ProtocolInstanceDiscovery, ProtocolAssetImport {
 
     // Constants ------------------------------------------------------------------------------------
 

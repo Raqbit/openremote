@@ -17,19 +17,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol;
+package org.openremote.model.protocol;
 
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.file.FileInfo;
 
 /**
- * To be used by protocols that support {@link org.openremote.model.asset.agent.ProtocolConfiguration}
- * import from one or more protocol specific files.
+ * To be used by protocols that support instance discovery.
  */
-public interface ProtocolConfigurationImport {
+public interface ProtocolInstanceDiscovery {
+
+    
 
     /**
-     * Import available {@link org.openremote.model.asset.agent.ProtocolConfiguration}s from the supplied file(s).
+     * Get discovered {@link org.openremote.model.asset.agent.ProtocolConfiguration}s.
      */
-    Attribute getProtocolConfigurationsByImport(FileInfo[] files);
+    Attribute[] discoverProtocolConfigurations();
 }

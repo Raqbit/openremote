@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.velbus;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.agent.protocol.ProtocolConfigurationDiscovery;
+import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.io.IoClient;
 import org.openremote.agent.protocol.serial.SerialIoClient;
@@ -37,7 +37,7 @@ import java.util.List;
 
 import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration;
 
-public class VelbusSerialProtocol extends AbstractVelbusProtocol implements ProtocolConfigurationDiscovery {
+public class VelbusSerialProtocol extends AbstractVelbusProtocol implements ProtocolInstanceDiscovery {
 
     public static final String PROTOCOL_NAME = PROTOCOL_BASE_NAME + "Serial";
     public static final String PROTOCOL_DISPLAY_NAME = "VELBUS Serial";
