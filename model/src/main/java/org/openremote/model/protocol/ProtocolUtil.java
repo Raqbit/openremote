@@ -22,6 +22,7 @@ package org.openremote.model.protocol;
 import org.apache.commons.codec.binary.BinaryCodec;
 import org.apache.commons.codec.binary.Hex;
 import org.openremote.model.AbstractValueHolder;
+import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeExecuteStatus;
@@ -46,7 +47,6 @@ public final class ProtocolUtil {
 
     protected ProtocolUtil() {
     }
-
 
     public static String bytesToHexString(byte[] bytes) {
         return Hex.encodeHexString(bytes);
@@ -75,11 +75,15 @@ public final class ProtocolUtil {
     }
 
     /**
-     * Extract the {@link ValueFilter}s from the specified {@link Attribute}
+     * Extract the {@link Agent#META_VALUE_FILTERS} {@link ValueFilter}s from the specified {@link Attribute}
      */
-    public static Optional<ValueFilter[]> getLinkedAttributeValueFilters(Attribute attribute) {
+    public static Optional<ValueFilter[]> getLinkedAttributeValueFilters(Attribute<?> attribute) {
         if (attribute == null) {
             return Optional.empty();
+        }
+
+        if (attribute.getValueType().equals(Agent.META_VALUE_FILTERS.getValueDescriptor())) {
+
         }
 
         Optional<ArrayValue> arrayValueOptional = attribute.getMetaItem(Protocol.META_ATTRIBUTE_VALUE_FILTERS)

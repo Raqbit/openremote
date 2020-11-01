@@ -17,26 +17,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.protocol;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.util.Optional;
+import org.openremote.model.asset.agent.Protocol;
 
 /**
- * Indicates that the implementing class provides a value of &lt;T&gt; the value should be immutable.
+ * Can be used by {@link Protocol}s that support one of the discovery and/or import mechanisms.
  */
-public interface ValueHolder<T> {
+public @interface ProtocolDiscoveryAndImport {
 
-    @JsonSerialize(converter = ValueDescriptor.ValueDescriptorStringConverter.class)
-    ValueDescriptor<T> getValueType();
+    Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryImpl() default ProtocolInstanceDiscovery.class;
 
-    Optional<T> getValue();
+    Class<? extends ProtocolAssetDiscovery> assetDiscoveryImpl() default ProtocolAssetDiscovery.class;
 
-    /**
-     * Provides basic type casting/coercion useful for unknown values
-     */
-    <U> Optional<U> getValueAs(Class<U> valueType);
-
-    void setValue(T value);
+    Class<? extends ProtocolAssetImport> assetImportImpl() default ProtocolAssetImport.class;
 }

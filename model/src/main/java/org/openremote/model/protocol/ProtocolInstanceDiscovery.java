@@ -19,17 +19,34 @@
  */
 package org.openremote.model.protocol;
 
+import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.attribute.Attribute;
 
+import java.util.function.Consumer;
+
 /**
- * To be used by protocols that support instance discovery.
+ * To be used by protocols that support instance discovery; these instances can be represented as {@link Agent}
+ * {@link Asset}s with {@link Attribute}s that contain the necessary configuration to establish a connection to the
+ * protocol instance.
+ * <p>
+ * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
+ * discovery is requested for the associated {@link org.openremote.model.asset.agent.Protocol}. Implementations are not re-used.
  */
 public interface ProtocolInstanceDiscovery {
 
-    
 
     /**
-     * Get discovered {@link org.openremote.model.asset.agent.ProtocolConfiguration}s.
+     * Start the process asynchronously; the implementation can make as many calls as it desires to the
+     * agentConsumer with the found agents; when the implementation has finished then it should
+     * call the stoppedCallback. If for some reason the process cannot be started then this method should
+     * return false and log more details.
      */
-    Attribute[] discoverProtocolConfigurations();
+    <T extends Agent> boolean start(Consumer<Agent> agentConsumer, Runnable stoppedCallback);
+
+    /**
+     * Can be called by initiator to stop the process; if the implementation has already stopped then this
+     * method should just return.
+     */
+    void stop();
 }

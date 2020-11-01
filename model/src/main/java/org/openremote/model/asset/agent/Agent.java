@@ -188,7 +188,6 @@ public abstract class Agent extends Asset {
         META_MESSAGE_MATCH_FILTERS
     };
 
-
     protected <T extends Agent> Agent(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);
     }
@@ -196,7 +195,7 @@ public abstract class Agent extends Asset {
     /**
      * Get the protocol instance for this Agent.
      */
-    public abstract Protocol<?> getProtocolInstance();
+    public abstract Protocol getProtocolInstance();
 
     public Optional<Boolean> isDisabled() {
         return getAttributes().getValueOrDefault(DISABLED);

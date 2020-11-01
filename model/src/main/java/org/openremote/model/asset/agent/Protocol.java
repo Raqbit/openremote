@@ -149,7 +149,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <li>{@link #unlinkAttribute}</li>
  * </ol>
  */
-public interface Protocol<T extends Agent> {
+public interface Protocol {
 
     Logger LOG = SyslogCategory.getLogger(PROTOCOL, Protocol.class);
     String ACTUATOR_TOPIC_TARGET_PROTOCOL = "Protocol";
@@ -200,7 +200,7 @@ public interface Protocol<T extends Agent> {
      * Called before {@link #connect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
      * register Camel routes and to store the associated {@link Agent} reference.
      */
-    void start(T agent, ContainerProvider container) throws Exception;
+    void start(Agent agent, ContainerProvider container) throws Exception;
 
     /**
      * Called after {@link #disconnect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.

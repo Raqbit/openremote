@@ -20,31 +20,36 @@
 package org.openremote.model.protocol;
 
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.file.FileInfo;
 
+import java.util.function.Consumer;
+
 /**
- * To be used by protocols that support device import from one or more protocol specific files.
+ * To be used by protocols that support device import from a protocol specific file. These devices can be represented as
+ * {@link Asset}s with {@link Attribute}s that contain the necessary {@link org.openremote.model.attribute.MetaItem}s
+ * to establish a link to the supplied {@link Agent}. These {@link Asset}s can then be structured in
+ * a hierarchical representation using {@link AssetTreeNode}s.
  * <p>
- * The import process should return an array of {@link Asset}s that represent the physical devices
- * connected to a particular {@link org.openremote.model.asset.agent.ProtocolConfiguration}. The device
- * assets should contain all the appropriate {@link Attribute}s needed for interacting with the
- * device. Each {@link Attribute} should be of the correct type and have any required
- * {@link org.openremote.model.attribute.MetaItem}s already set.
- * <p>
- * <b>
- * NOTE: It is not necessary to set an {@link org.openremote.model.asset.agent.AgentLink}
- * {@link org.openremote.model.attribute.MetaItem} for each attribute as the system will insert these
- * automatically if omitted.
- * </b>
+ * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
+ * discovery is requested for the associated {@link Protocol}. Implementations are not re-used.
  */
 public interface ProtocolAssetImport {
 
     /**
-     * Import devices for the specified {@link org.openremote.model.asset.agent.ProtocolConfiguration}
-     * using the supplied {@link FileInfo}.
-     * @throws IllegalStateException when there is an issue processing the provided {@link FileInfo}
+     * Start the process asynchronously; the implementation can make as many calls as it desires to the
+     * assetConsumer with the found assets; when the implementation has finished then it should
+     * call the stoppedCallback. If for some reason the process cannot be started then this method should
+     * return false and log more details.
      */
-    AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException;
+    boolean start(Agent agent, byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
+
+    /**
+     * Can be called by initiator to stop the process; if the implementation has already stopped then this
+     * method should just return.
+     */
+    void stop();
 }
