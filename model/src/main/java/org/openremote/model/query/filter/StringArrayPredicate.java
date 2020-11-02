@@ -20,6 +20,7 @@
 package org.openremote.model.query.filter;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class StringArrayPredicate implements ValuePredicate {
 
@@ -29,13 +30,23 @@ public class StringArrayPredicate implements ValuePredicate {
     public StringArrayPredicate() {
     }
 
-    public StringArrayPredicate(StringPredicate... predicates) {
+    public StringArrayPredicate(StringPredicate...predicates) {
         this.predicates = predicates;
     }
 
-    public StringArrayPredicate predicates(StringPredicate... predicates) {
+    public StringArrayPredicate predicates(StringPredicate...predicates) {
         this.predicates = predicates;
         return this;
+    }
+
+    @Override
+    public Predicate<Object> asPredicate() {
+        return obj -> {
+            if (predicates == null || predicates.length == 0) {
+                return false;
+            }
+            return Arrays.stream(predicates).map(StringPredicate::asPredicate).allMatch(p -> p.test(obj));
+        };
     }
 
     @Override

@@ -21,6 +21,7 @@ dependencies {
     compile "org.keycloak:keycloak-core:$keycloakVersion"
     compile "org.keycloak:keycloak-core:$keycloakVersion:sources"
 
+    compile "com.jayway.jsonpath:json-path:$jaywayJsonPathVersion"
     compile "org.jeasy:easy-rules-core:$easyRulesVersion"
     compile "org.mnode.ical4j:ical4j:$ical4jVersion"
     compile "org.reflections:reflections:$reflectionsVersion"

@@ -130,7 +130,7 @@ public enum SyslogCategory {
         return null;
     }
 
-    public static Logger getLogger(SyslogCategory category, Class loggerName) {
+    public static Logger getLogger(SyslogCategory category, Class<?> loggerName) {
         return getLogger(category, loggerName.getName());
     }
 

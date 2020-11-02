@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.Optional;
+
 import static org.openremote.model.value.SubStringValueFilter.NAME;
 
 @JsonTypeName(NAME)
@@ -44,7 +46,22 @@ public class SubStringValueFilter extends ValueFilter {
     }
 
     @Override
-    public Class<String> getValueType() {
-        return String.class;
+    public Object filter(Object value) {
+        Optional<String> valueStr = Values.getValue(value, String.class, true);
+        if (!valueStr.isPresent()) {
+            return null;
+        }
+
+        String result = null;
+
+        try {
+            if (endIndex != null) {
+                result = valueStr.get().substring(beginIndex, endIndex);
+            } else {
+                result = valueStr.get().substring(beginIndex);
+            }
+        } catch (IndexOutOfBoundsException ignored) {}
+
+        return result;
     }
 }

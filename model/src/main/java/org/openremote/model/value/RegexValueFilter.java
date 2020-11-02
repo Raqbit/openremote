@@ -22,9 +22,12 @@ package org.openremote.model.value;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import static org.openremote.model.value.RegexValueFilter.NAME;
 
@@ -33,29 +36,47 @@ public class RegexValueFilter extends ValueFilter {
 
     public static final String NAME = "regex";
 
+    @JsonDeserialize(using = FromStringDeserializer.class)
     public Pattern pattern;
     public int matchGroup;
     public int matchIndex;
 
     @JsonCreator
-    public RegexValueFilter(@JsonProperty("pattern") String regex,
+    public RegexValueFilter(@JsonProperty("pattern") Pattern pattern,
                             @JsonProperty("matchGroup") int matchGroup,
                             @JsonProperty("matchIndex") int matchIndex) {
-        try {
-            pattern = Pattern.compile(regex);
-            this.matchGroup = matchGroup;
-            this.matchIndex = matchIndex;
-        } catch (PatternSyntaxException ignore) {}
-    }
-
-    public RegexValueFilter(Pattern pattern, int matchGroup, int matchIndex) {
         this.pattern = pattern;
         this.matchGroup = matchGroup;
         this.matchIndex = matchIndex;
     }
 
     @Override
-    public Class<String> getValueType() {
-        return String.class;
+    public Object filter(Object value) {
+        if (pattern == null) {
+            return null;
+        }
+
+        Optional<String> valueStr = Values.getValue(value, String.class, true);
+        if (!valueStr.isPresent()) {
+            return null;
+        }
+
+        String filteredStr = null;
+        Matcher matcher = pattern.matcher(valueStr.get());
+        int matchIndex = 0;
+        boolean matched = matcher.find();
+
+        while(matched && matchIndex < this.matchIndex) {
+            matched = matcher.find();
+            matchIndex++;
+        }
+
+        if (matched) {
+            if (matchGroup <= matcher.groupCount()) {
+                filteredStr = matcher.group(matchGroup);
+            }
+        }
+
+        return filteredStr;
     }
 }

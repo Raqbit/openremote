@@ -19,6 +19,10 @@
  */
 package org.openremote.model.query.filter;
 
+import org.openremote.model.value.Values;
+
+import java.util.function.Predicate;
+
 public class BooleanPredicate implements ValuePredicate {
 
     public static final String name = "boolean";
@@ -34,6 +38,18 @@ public class BooleanPredicate implements ValuePredicate {
     public BooleanPredicate value(boolean value) {
         this.value = value;
         return this;
+    }
+
+    @Override
+    public Predicate<Object> asPredicate() {
+        return obj -> {
+            Boolean bool = Values.getValueCoerced(obj, Boolean.class).orElse(null);
+            if (bool == null) {
+                return false;
+            }
+
+            return bool == value;
+        };
     }
 
     @Override

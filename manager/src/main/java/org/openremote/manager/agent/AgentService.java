@@ -83,7 +83,7 @@ import static org.openremote.model.util.TextUtil.isValidURN;
 /**
  * Handles life cycle and communication with {@link Protocol}s.
  * <p>
- * Finds all {@link AssetType#AGENT} assets and manages their {@link ProtocolConfiguration}s.
+ * Finds all {@link Agent} assets and manages their {@link Protocol} instances.
  */
 public class AgentService extends RouteBuilder implements ContainerService, AssetUpdateProcessor, ProtocolAssetService, AssetModelProvider {
 
@@ -101,7 +101,6 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     protected final Map<String, Protocol> protocols = new HashMap<>();
     protected final Map<AttributeRef, List<Attribute>> linkedAttributes = new HashMap<>();
     protected Map<String, Asset> agentMap;
-    protected ParseContext jsonPathParser;
     protected boolean initDone;
     protected Container container;
 
@@ -148,13 +147,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 this)
         );
 
-        jsonPathParser = JsonPath.using(
-            Configuration.builder()
-                .jsonProvider(new JacksonJsonNodeJsonProvider())
-                .mappingProvider(new JacksonMappingProvider())
-                .build()
-                .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
-        );
+
 
         initDone = true;
     }
@@ -888,74 +881,6 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         });
     }
 
-    /**
-     * Apply the specified set of {@link ValueFilter}s to the specified {@link Value}
-     */
-    public Value applyValueFilters(Value value, ValueFilter<?>... filters) {
-
-        if (filters == null) {
-            return value;
-        }
-
-        LOG.fine("Applying value filters to value...");
-
-        for (ValueFilter<?> filter : filters) {
-            boolean filterOk = filter.getValueType() == Value.class || filter.getValueType() == value.getType().getModelType();
-
-            if (!filterOk) {
-                // Try and convert the value
-                ValueType filterValueType = null;
-                try {
-                    filterValueType = ValueType.fromModelType(filter.getValueType());
-                } catch (RuntimeException e) {
-                    LOG.fine("Failed to get model type from value type: " + filter.getValueType());
-                }
-                if (filterValueType == null) {
-                    LOG.fine("Value filter type unknown: " + filter.getValueType().getName());
-                    value = null;
-                } else {
-                    Optional<Value> val = Values.convertToValue(value, filterValueType);
-                    if (!val.isPresent()) {
-                        LOG.fine("Value filter type '" + filter.getValueType().getName()
-                            + "' is not compatible with actual value type '" + value.getType().getModelType().getName()
-                            + "': " + filter.getClass().getName());
-                    } else {
-                        filterOk = true;
-                    }
-                    value = val.orElse(null);
-                }
-            }
-
-            if (filterOk) {
-                try {
-                    Protocol.LOG.finest("Applying value filter: " + filter.getClass().getName());
-                    if (filter instanceof RegexValueFilter) {
-                        value = applyRegexFilter((StringValue)value, (RegexValueFilter)filter);
-                    } else if (filter instanceof SubStringValueFilter) {
-                        value = applySubstringFilter((StringValue)value, (SubStringValueFilter)filter);
-                    } else if (filter instanceof JsonPathFilter) {
-                        value = applyJsonPathFilter(value, (JsonPathFilter) filter);
-                    } else {
-                        throw new UnsupportedOperationException("Unsupported filter: " + filter);
-                    }
-                } catch (Exception e) {
-                    LOG.log(
-                        Level.SEVERE,
-                        "Value filter threw an exception during processing: "
-                            + filter.getClass().getName(),
-                        e);
-                    value = null;
-                }
-            }
-
-            if (value == null) {
-                break;
-            }
-        }
-
-        return value;
-    }
-
     @Override
     public void subscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset>> assetChangeConsumer) {
         if (protocolConfigurations.keySet().stream().noneMatch(attributeRef -> attributeRef.getEntityId().equals(agentId))) {
@@ -992,82 +917,5 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 }
                 return consumerList;
             }));
-    }
-
-    protected Value applySubstringFilter(StringValue value, SubStringValueFilter filter) {
-        if (value == null) {
-            return null;
-        }
-
-        String result = null;
-
-        try {
-            if (filter.endIndex != null) {
-                result = value.getString().substring(filter.beginIndex, filter.endIndex);
-            } else {
-                result = value.getString().substring(filter.beginIndex);
-            }
-        } catch (IndexOutOfBoundsException ignored) {}
-
-        return result == null ? null : Values.create(result);
-    }
-
-    protected Value applyRegexFilter(StringValue value, RegexValueFilter filter) {
-        if (value == null || filter.pattern == null) {
-            return null;
-        }
-
-        String filteredStr = null;
-        Matcher matcher = filter.pattern.matcher(value.getString());
-        int matchIndex = 0;
-        boolean matched = matcher.find();
-
-        while(matched && matchIndex<filter.matchIndex) {
-            matched = matcher.find();
-            matchIndex++;
-        }
-
-        if (matched) {
-            if (filter.matchGroup <= matcher.groupCount()) {
-                filteredStr = matcher.group(filter.matchGroup);
-            }
-        }
-
-        return filteredStr == null ? null : Values.create(filteredStr);
-    }
-
-    protected Value applyJsonPathFilter(Value value, JsonPathFilter filter) {
-        if (value == null || TextUtil.isNullOrEmpty(filter.path)) {
-            return null;
-        }
-
-        if (value.getType() == ValueType.STRING) {
-            try {
-                // Assume value is actually a JSON payload
-                value = Values.parse(((StringValue) value).getString()).orElse(null);
-            } catch (Exception e) {
-                value = null;
-            }
-        }
-
-        if (value == null) {
-            return null;
-        }
-
-        Object obj = jsonPathParser.parse(value.toJson()).read(filter.path);
-        String pathJson = obj != null ? obj.toString() : null;
-        if (TextUtil.isNullOrEmpty(pathJson)) {
-            return null;
-        }
-
-        if (filter.returnFirst || filter.returnLast) {
-            Value pathValue = Values.parse(pathJson).orElse(null);
-            if (pathValue != null && pathValue.getType() == ValueType.ARRAY) {
-                pathValue = Values.getArray(pathValue).flatMap(arr -> arr.length() > 0 ? filter.returnFirst ? arr.get(0) : arr.get(arr.length() - 1) : Optional.empty()).orElse(null);
-            }
-            return pathValue;
-        }
-
-        return Values.parse(pathJson).orElse(null);
     }
 }

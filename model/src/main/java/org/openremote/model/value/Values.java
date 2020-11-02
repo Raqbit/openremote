@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * Utilities for working with values and JSON
@@ -48,6 +49,7 @@ import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
 public class Values {
 
+    private static final Logger LOG = Logger.getLogger(Values.class.getName());
     public static final ObjectMapper JSON;
 
     static {
@@ -368,5 +370,32 @@ public class Values {
             name = "[L" + componentType.getName() + ";";
         }
         return classLoader != null ? classLoader.loadClass(name) : Class.forName(name);
+    }
+
+    /**
+     * Apply the specified set of {@link ValueFilter}s to the specified value
+     */
+    public static Object applyValueFilters(Object value, ValueFilter...filters) {
+
+        if (filters == null) {
+            return value;
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        LOG.fine("Applying value filters to value of type: " + value.getClass().getName());
+
+        for (ValueFilter filter : filters) {
+
+            value = filter.filter(value);
+
+            if (value == null) {
+                break;
+            }
+        }
+
+        return value;
     }
 }

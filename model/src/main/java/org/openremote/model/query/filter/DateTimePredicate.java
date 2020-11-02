@@ -21,6 +21,8 @@ package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
 
+import java.util.function.Predicate;
+
 /**
  * Predicate for date time values; provided values should be valid ISO 8601 datetime strings
  * (e.g. yyyy-MM-dd'T'HH:mm:ssZ or yyyy-MM-dd'T'HH:mm:ss\u00b1HH:mm), offset and time are optional, if no offset
@@ -67,6 +69,13 @@ public class DateTimePredicate implements ValuePredicate {
     public DateTimePredicate negate(boolean negate) {
         this.negate = negate;
         return this;
+    }
+
+    @Override
+    public Predicate<Object> asPredicate() {
+        return obj -> {
+
+        };
     }
 
     @Override

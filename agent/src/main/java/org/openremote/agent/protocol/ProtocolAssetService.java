@@ -19,14 +19,12 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceEvent;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueFilter;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -157,11 +155,6 @@ public interface ProtocolAssetService extends ContainerService {
      * belongs to.
      */
     Asset getAgent(Attribute protocolConfiguration);
-
-    /**
-     * Apply the specified set of {@link ValueFilter}s to the specified {@link Value}
-     */
-    Value applyValueFilters(Value value, ValueFilter<?>... filters);
 
     /**
      * Subscribe to changes of {@link Asset}s that are descendants of the specified agent.

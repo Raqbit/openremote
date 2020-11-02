@@ -21,6 +21,7 @@ package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.v2.NameHolder;
+import org.openremote.model.value.Values;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -56,27 +57,30 @@ public class StringPredicate implements ValuePredicate {
         this.value = value;
     }
 
-    public static Predicate<String> asPredicate(StringPredicate predicate) {
-        return string -> {
-            if (string == null && predicate.value == null)
-                return !predicate.negate;
+    public Predicate<Object> asPredicate() {
+        return obj -> {
+
+            String string = Values.getValueCoerced(obj, String.class).orElse(null);
+
+            if (string == null && value == null)
+                return !negate;
             if (string == null)
-                return predicate.negate;
-            if (predicate.value == null)
-                return predicate.negate;
+                return negate;
+            if (value == null)
+                return negate;
 
-            String shouldMatch = predicate.caseSensitive ? predicate.value : predicate.value.toUpperCase(Locale.ROOT);
-            String have = predicate.caseSensitive ? string : string.toUpperCase(Locale.ROOT);
+            String shouldMatch = caseSensitive ? value : value.toUpperCase(Locale.ROOT);
+            String have = caseSensitive ? string : string.toUpperCase(Locale.ROOT);
 
-            switch (predicate.match) {
+            switch (match) {
                 case BEGIN:
-                    return predicate.negate != have.startsWith(shouldMatch);
+                    return negate != have.startsWith(shouldMatch);
                 case END:
-                    return predicate.negate != have.endsWith(shouldMatch);
+                    return negate != have.endsWith(shouldMatch);
                 case CONTAINS:
-                    return predicate.negate != have.contains(shouldMatch);
+                    return negate != have.contains(shouldMatch);
             }
-            return predicate.negate != have.equals(shouldMatch);
+            return negate != have.equals(shouldMatch);
         };
     }
 

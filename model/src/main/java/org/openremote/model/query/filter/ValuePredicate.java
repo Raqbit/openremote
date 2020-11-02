@@ -22,6 +22,8 @@ package org.openremote.model.query.filter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.function.Predicate;
+
 @JsonSubTypes({
     @JsonSubTypes.Type(value = StringPredicate.class, name = StringPredicate.name),
     @JsonSubTypes.Type(value = BooleanPredicate.class, name = BooleanPredicate.name),
@@ -41,4 +43,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     property = "predicateType"
 )
 public interface ValuePredicate {
+
+    Predicate<Object> asPredicate();
 }

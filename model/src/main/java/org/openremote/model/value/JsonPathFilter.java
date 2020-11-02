@@ -22,6 +22,15 @@ package org.openremote.model.value;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import org.openremote.model.util.TextUtil;
+
+import java.util.Optional;
 
 import static org.openremote.model.value.RegexValueFilter.NAME;
 
@@ -31,6 +40,14 @@ import static org.openremote.model.value.RegexValueFilter.NAME;
  */
 @JsonTypeName(NAME)
 public class JsonPathFilter extends ValueFilter {
+
+    protected static ParseContext jsonPathParser = JsonPath.using(
+        Configuration.builder()
+        .jsonProvider(new JacksonJsonNodeJsonProvider())
+        .mappingProvider(new JacksonMappingProvider())
+        .build()
+                .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
+        );
 
     public static final String NAME = "jsonPath";
 
@@ -53,7 +70,32 @@ public class JsonPathFilter extends ValueFilter {
     }
 
     @Override
-    public Class<Object> getValueType() {
-        return Object.class;
+    public Object filter(Object value) {
+        if (TextUtil.isNullOrEmpty(path)) {
+            return null;
+        }
+
+        Optional<String> valueStr = Values.getValue(value, String.class, true);
+        if (!valueStr.isPresent()) {
+            return null;
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        Object obj = jsonPathParser.parse(valueStr.get()).read(path);
+        String pathJson = obj != null ? obj.toString() : null;
+        if (TextUtil.isNullOrEmpty(pathJson)) {
+            return null;
+        }
+
+        return Values.parse(pathJson).map(jsonNode -> {
+            if ((returnFirst || returnLast) && jsonNode.isArray()) {
+                jsonNode = jsonNode.get(returnFirst ? 0 : jsonNode.size() - 1);
+            }
+
+            return jsonNode;
+        }).orElse(null);
     }
 }
