@@ -220,9 +220,9 @@ public class RulesFacts extends Facts implements RuleListener {
         assetIdIndex.get(assetState.getId()).add(assetState);
 
         // Maintain index of all asset states for this asset by type
-        assetTypeIndex.putIfAbsent(assetState.getTypeString(), new ArrayDeque<>());
-        assetTypeIndex.get(assetState.getTypeString()).remove(assetState);
-        assetTypeIndex.get(assetState.getTypeString()).add(assetState);
+        assetTypeIndex.putIfAbsent(assetState.getType(), new ArrayDeque<>());
+        assetTypeIndex.get(assetState.getType()).remove(assetState);
+        assetTypeIndex.get(assetState.getType()).add(assetState);
 
         return this;
     }
@@ -240,7 +240,7 @@ public class RulesFacts extends Facts implements RuleListener {
         }
 
         // Maintain index of all asset states for this asset by type
-        Collection<AssetState> assetTypeIndexCollection = assetTypeIndex.get(assetState.getTypeString());
+        Collection<AssetState> assetTypeIndexCollection = assetTypeIndex.get(assetState.getType());
         if (assetTypeIndexCollection != null) {
             assetTypeIndexCollection.remove(assetState);
         }
@@ -624,7 +624,7 @@ public class RulesFacts extends Facts implements RuleListener {
                             assetIdIndexCollection.remove(assetState);
                         }
                         // Maintain index of all asset states for this asset by type
-                        Collection<AssetState> assetTypeIndexCollection = assetTypeIndex.get(assetState.getTypeString());
+                        Collection<AssetState> assetTypeIndexCollection = assetTypeIndex.get(assetState.getType());
                         if (assetTypeIndexCollection != null) {
                             assetTypeIndexCollection.remove(assetState);
                         }

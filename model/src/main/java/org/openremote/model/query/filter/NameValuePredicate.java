@@ -19,71 +19,56 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.attribute.Attribute;
-
-import java.util.Arrays;
-
 /**
- * Adds additional predicate logic to {@link NameValuePredicate}, allowing predicating on
- * {@link Attribute#getMeta} presence/absence and/or values. Can also predicate on the previous value of the
- * {@link Attribute} which is only relevant when applied to {@link org.openremote.model.rules.AssetState}.
+ * There is an implicit AND condition between the name and the value; the name is required and {@link #mustExist} or
+ * {@link #mustNotExist} can be set to control whether the {@link org.openremote.model.v2.AbstractNameValueHolderImpl}
+ * exists or doesn't; if neither are specified then it is assumed to be optional and then the {@link #value} can be
+ * used to predicate on the value of the {@link org.openremote.model.v2.AbstractNameValueHolderImpl} if it is present.
  */
-public class AttributePredicate extends NameValuePredicate {
+public class NameValuePredicate {
 
-    public NameValuePredicate[] meta;
-    public ValuePredicate previousValue;
+    public StringPredicate name;
+    public boolean mustNotExist;
+    public boolean mustExist;
+    public ValuePredicate value;
 
-    public AttributePredicate() {
+    public NameValuePredicate() {
     }
 
-    public AttributePredicate(String name) {
+    public NameValuePredicate(String name) {
         this(new StringPredicate(name));
     }
 
-    public AttributePredicate(StringPredicate name) {
+    public NameValuePredicate(StringPredicate name) {
         this.name = name;
     }
 
-    public AttributePredicate(ValuePredicate value) {
+    public NameValuePredicate(ValuePredicate value) {
         this.value = value;
     }
 
-    public AttributePredicate(StringPredicate name, ValuePredicate value) {
+    public NameValuePredicate(StringPredicate name, ValuePredicate value) {
         this.name = name;
         this.value = value;
     }
 
-    @Override
-    public AttributePredicate name(StringPredicate name) {
+    public NameValuePredicate name(StringPredicate name) {
         this.name = name;
         return this;
     }
 
-    @Override
-    public AttributePredicate value(ValuePredicate value) {
+    public NameValuePredicate value(ValuePredicate value) {
         this.value = value;
         return this;
     }
 
-    @Override
-    public AttributePredicate mustExist() {
-        this.mustExist = true;
-        return this;
-    }
-
-    @Override
-    public AttributePredicate mustNotExist() {
+    public NameValuePredicate mustNotExist() {
         this.mustNotExist = true;
         return this;
     }
 
-    public AttributePredicate previousValue(ValuePredicate previousValue) {
-        this.previousValue = previousValue;
-        return this;
-    }
-
-    public AttributePredicate meta(NameValuePredicate...meta) {
-        this.meta = meta;
+    public NameValuePredicate mustExist() {
+        this.mustExist = true;
         return this;
     }
 
@@ -94,8 +79,6 @@ public class AttributePredicate extends NameValuePredicate {
             ", mustExist=" + mustExist +
             ", mustNotExist=" + mustNotExist +
             ", value=" + value +
-            ", meta=" + Arrays.toString(meta) +
-            ", previousValue=" + previousValue +
             '}';
     }
 }

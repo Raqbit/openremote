@@ -19,10 +19,8 @@
  */
 package org.openremote.model.geo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
+import com.vividsolutions.jts.geom.Coordinate;
 
 import static org.openremote.model.geo.GeoJSONPoint.TYPE;
 
@@ -31,43 +29,44 @@ public class GeoJSONPoint extends GeoJSONGeometry {
 
     public static final String TYPE = "Point";
     @JsonProperty
-    protected Position coordinates;
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
+    protected Coordinate coordinates;
 
     @JsonCreator
-    public GeoJSONPoint(@JsonProperty("coordinates") Position coordinates) {
+    public GeoJSONPoint(@JsonProperty("coordinates") Coordinate coordinates) {
         super(TYPE);
         this.coordinates = coordinates;
     }
 
     public GeoJSONPoint(double x, double y) {
-        this(new Position(x, y));
+        this(new Coordinate(x, y));
     }
 
     public GeoJSONPoint(double x, double y, double z) {
-        this(new Position(x, y, z));
+        this(new Coordinate(x, y, z));
     }
 
-    public Position getCoordinates() {
+    public Coordinate getCoordinates() {
         return coordinates;
     }
 
     @JsonIgnore
     public double getX() {
-        return coordinates.getX();
+        return coordinates.x;
     }
 
     @JsonIgnore
     public double getY() {
-        return coordinates.getY();
+        return coordinates.y;
     }
 
     @JsonIgnore
     public Double getZ() {
-        return coordinates.getZ();
+        return coordinates.z;
     }
 
     @JsonIgnore
     public boolean hasZ() {
-        return coordinates.hasZ();
+        return coordinates.z != Coordinate.NULL_ORDINATE;
     }
 }

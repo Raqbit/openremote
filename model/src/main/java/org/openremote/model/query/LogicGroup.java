@@ -20,6 +20,7 @@
 package org.openremote.model.query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LogicGroup<T> {
@@ -66,8 +67,8 @@ public class LogicGroup<T> {
     public String toString() {
         return LogicGroup.class.getSimpleName() + "{" +
             "operator=" + operator +
-            ", items=" + items +
-            ", groups=" + groups +
+            ", items=" + (items == null ? "[]" : Arrays.toString(items.toArray())) +
+            ", groups=" + (groups == null ? "[]" : Arrays.toString(groups.toArray())) +
             '}';
     }
 }

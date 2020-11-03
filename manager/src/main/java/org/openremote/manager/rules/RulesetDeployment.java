@@ -31,7 +31,6 @@ import org.jeasy.rules.api.Rules;
 import org.jeasy.rules.core.RuleBuilder;
 import org.kohsuke.groovy.sandbox.GroovyValueFilter;
 import org.kohsuke.groovy.sandbox.SandboxTransformer;
-import org.openremote.container.Container;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.concurrent.ManagerExecutorService;
@@ -51,7 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.openremote.container.concurrent.GlobalLock.withLock;
-import static org.openremote.manager.rules.AssetQueryPredicate.getNextOrActiveFromTo;
+import static org.openremote.model.query.filter.CalendarEventPredicate.getNextOrActiveFromTo;
 
 public class RulesetDeployment {
 
@@ -183,7 +182,7 @@ public class RulesetDeployment {
 
     public void updateValidity() {
         if (validity != null && !hasExpired()) {
-            Pair<Long, Long> fromTo = getNextOrActiveFromTo(validity, new Date(timerService.getCurrentTimeMillis()));
+            Pair<Long, Long> fromTo = validity.getNextOrActiveFromTo(new Date(timerService.getCurrentTimeMillis()));
             if (fromTo == null) {
                 nextValidity = new Pair<>(Long.MIN_VALUE, Long.MIN_VALUE);
             } else {

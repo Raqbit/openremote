@@ -19,8 +19,11 @@
  */
 package org.openremote.model.query.filter;
 
+import org.openremote.model.value.Values;
+
 import java.util.Arrays;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class StringArrayPredicate implements ValuePredicate {
 
@@ -40,12 +43,38 @@ public class StringArrayPredicate implements ValuePredicate {
     }
 
     @Override
-    public Predicate<Object> asPredicate() {
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
         return obj -> {
+
             if (predicates == null || predicates.length == 0) {
+                return true;
+            }
+            
+            if (obj == null) {
                 return false;
             }
-            return Arrays.stream(predicates).map(StringPredicate::asPredicate).allMatch(p -> p.test(obj));
+
+            // Treat arrays as a special case
+            if (Values.isArray(obj.getClass())) {
+                @SuppressWarnings("OptionalGetWithoutIsPresent")
+                Object[] strings = Values.getValue(obj, Object[].class).get();
+
+                if (strings.length != predicates.length) {
+                    return false;
+                }
+
+                for (int i = 0; i < predicates.length; i++) {
+                    StringPredicate p = predicates[i];
+                    if (!p.asPredicate(currentMillisSupplier).test(strings[i])) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+
+            return Arrays.stream(predicates).map(stringPredicate -> stringPredicate.asPredicate(currentMillisSupplier)).allMatch(p -> p.test(obj));
         };
     }
 

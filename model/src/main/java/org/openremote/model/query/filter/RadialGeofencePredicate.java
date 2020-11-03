@@ -21,8 +21,13 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.geotools.referencing.GeodeticCalculator;
+import org.openremote.model.value.Values;
 
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class RadialGeofencePredicate extends GeofencePredicate {
 
@@ -85,5 +90,19 @@ public class RadialGeofencePredicate extends GeofencePredicate {
     @Override
     public double[] getCentrePoint() {
         return new double[]{lng, lat};
+    }
+
+    @Override
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj ->
+            Values.getValue(obj, Coordinate.class).map(coordinate -> {
+                GeodeticCalculator calculator = new GeodeticCalculator();
+                calculator.setStartingGeographicPoint(lng, lat);
+                calculator.setDestinationGeographicPoint(coordinate.x, coordinate.y);
+                if (negated) {
+                    return calculator.getOrthodromicDistance() > radius;
+                }
+                return calculator.getOrthodromicDistance() <= radius;
+            }).orElse(false);
     }
 }

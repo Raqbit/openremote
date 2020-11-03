@@ -20,8 +20,13 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
+import org.openremote.model.util.Pair;
+import org.openremote.model.util.TimeUtil;
+import org.openremote.model.value.Values;
 
+import java.util.Date;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Predicate for date time values; provided values should be valid ISO 8601 datetime strings
@@ -72,10 +77,44 @@ public class DateTimePredicate implements ValuePredicate {
     }
 
     @Override
-    public Predicate<Object> asPredicate() {
-        return obj -> {
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj ->
+            Values.getValueCoerced(obj, Date.class).map(date -> {
+                Pair<Long, Long> fromAndTo = asFromAndTo(currentMillisSupplier.get());
+                Long from = fromAndTo.key;
+                Long to = fromAndTo.value;
+                long timestamp = date.getTime();
 
-        };
+                boolean result = operator.compare(Long::compare, timestamp, from, to);
+                return negate != result;
+            }).orElse(false);
+    }
+
+    public Pair<Long, Long> asFromAndTo(long currentMillis) {
+
+        Long from;
+        Long to = null;
+
+        try {
+            if (TimeUtil.isTimeDuration(value)) {
+                from = currentMillis + TimeUtil.parseTimeDuration(value);
+            } else {
+                from = TimeUtil.parseTimeIso8601(value);
+            }
+
+            if (operator == AssetQuery.Operator.BETWEEN) {
+                if (TimeUtil.isTimeDuration(rangeValue)) {
+                    to = currentMillis + TimeUtil.parseTimeDuration(rangeValue);
+                } else {
+                    to = TimeUtil.parseTimeIso8601(rangeValue);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            from = null;
+            to = null;
+        }
+
+        return new Pair<>(from, to);
     }
 
     @Override

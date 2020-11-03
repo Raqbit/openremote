@@ -21,6 +21,13 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.openremote.model.value.Values;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 /**
  * Determines if the value is an array and meets the following:
  * <ul>
@@ -86,5 +93,40 @@ public class ArrayPredicate implements ValuePredicate {
     public ArrayPredicate lengthLessThan(int lengthLessThan) {
         this.lengthLessThan = lengthLessThan;
         return this;
+    }
+
+    @Override
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj -> {
+            if (obj == null || !Values.isArray(obj.getClass())) {
+                return false;
+            }
+
+            @SuppressWarnings("OptionalGetWithoutIsPresent")
+            Object[] arrayValue = Values.getValueCoerced(obj, Object[].class).get();
+            boolean result = true;
+
+            if (value != null) {
+                if (index != null) {
+                    result = arrayValue.length >= index && Objects.equals(arrayValue[index], value);
+                } else {
+                    result = Arrays.stream(arrayValue).anyMatch(av -> Objects.equals(av, value));
+                }
+            }
+
+            if (result && lengthEquals != null) {
+                result = arrayValue.length == lengthEquals;
+            }
+            if (result && lengthGreaterThan != null) {
+                result = arrayValue.length > lengthGreaterThan;
+            }
+            if (result && lengthLessThan != null) {
+                result = arrayValue.length < lengthLessThan;
+            }
+            if (negated) {
+                return !result;
+            }
+            return result;
+        };
     }
 }

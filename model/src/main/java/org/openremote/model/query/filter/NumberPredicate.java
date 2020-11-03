@@ -19,39 +19,32 @@
  */
 package org.openremote.model.query.filter;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import org.openremote.model.query.AssetQuery;
+import org.openremote.model.util.NumberComparator;
+import org.openremote.model.value.Values;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class NumberPredicate implements ValuePredicate {
 
     public static final String name = "number";
-    public double value;
-    public double rangeValue; // Used as upper bound when Operator.BETWEEN
+    public Number value;
+    public Number rangeValue; // Used as upper bound when Operator.BETWEEN
     public AssetQuery.Operator operator = AssetQuery.Operator.EQUALS;
-    public AssetQuery.NumberType numberType = AssetQuery.NumberType.DOUBLE;
     public boolean negate;
+    protected static NumberComparator comparator = new NumberComparator();
 
     protected NumberPredicate() {
     }
 
-    public NumberPredicate(double value) {
+    public NumberPredicate(Number value) {
         this.value = value;
     }
 
-    public NumberPredicate(double value, AssetQuery.Operator operator) {
+    public NumberPredicate(Number value, AssetQuery.Operator operator) {
         this.value = value;
         this.operator = operator;
-    }
-
-    public NumberPredicate(double value, AssetQuery.NumberType numberType) {
-        this.value = value;
-        this.numberType = numberType;
-    }
-
-    public NumberPredicate(double value, AssetQuery.Operator operator, AssetQuery.NumberType numberType) {
-        this.value = value;
-        this.operator = operator;
-        this.numberType = numberType;
     }
 
     public NumberPredicate predicate(double predicate) {
@@ -61,11 +54,6 @@ public class NumberPredicate implements ValuePredicate {
 
     public NumberPredicate numberMatch(AssetQuery.Operator operator) {
         this.operator = operator;
-        return this;
-    }
-
-    public NumberPredicate numberType(AssetQuery.NumberType numberType) {
-        this.numberType = numberType;
         return this;
     }
 
@@ -81,12 +69,20 @@ public class NumberPredicate implements ValuePredicate {
     }
 
     @Override
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj ->
+            Values.getValueCoerced(obj, Number.class).map(number -> {
+                boolean result = operator.compare(comparator, number, value, rangeValue);
+                return negate != result;
+            }).orElse(false);
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
             "value=" + value +
             ", rangeValue=" + rangeValue +
             ", operator=" + operator +
-            ", numberType=" + numberType +
             ", negate=" + negate +
             '}';
     }

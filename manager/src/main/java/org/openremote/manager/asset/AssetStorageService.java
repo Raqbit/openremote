@@ -23,7 +23,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolClientEventService;
-import org.openremote.container.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
@@ -34,7 +33,6 @@ import org.openremote.manager.asset.console.ConsoleResourceImpl;
 import org.openremote.manager.event.ClientEventService;
 import org.openremote.manager.event.EventSubscriptionAuthorizer;
 import org.openremote.manager.gateway.GatewayService;
-import org.openremote.manager.rules.AssetQueryPredicate;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.AbstractValueHolder;
@@ -82,7 +80,6 @@ import static org.openremote.container.persistence.PersistenceEvent.PERSISTENCE_
 import static org.openremote.container.persistence.PersistenceEvent.isPersistenceEventForEntityType;
 import static org.openremote.manager.event.ClientEventService.*;
 import static org.openremote.manager.rules.AssetQueryPredicate.asPredicate;
-import static org.openremote.model.attribute.Attribute.*;
 import static org.openremote.model.attribute.MetaItemType.ACCESS_RESTRICTED_READ;
 import static org.openremote.model.query.AssetQuery.*;
 import static org.openremote.model.query.AssetQuery.Access.PRIVATE;
@@ -1529,7 +1526,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                     isFirst = false;
 
                     sb.append("(");
-                    if (attributePredicate.notExists && attributePredicate.name != null && attributePredicate.name.value != null) {
+                    if (attributePredicate.mustNotExist && attributePredicate.name != null && attributePredicate.name.value != null) {
                         sb.append("NOT A.ATTRIBUTES ?? ?");
                         final int pos = binders.size() + 1;
                         binders.add(st -> st.setString(pos, attributePredicate.name.value));
@@ -1681,15 +1678,15 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                     .append(joinCounter)
                     .append(".Value #>> '{value}')::timestamp");
 
-                Pair<Long, Long> fromAndTo = AssetQueryPredicate.asFromAndTo(timerService.getCurrentTimeMillis(), dateTimePredicate);
+                Pair<Long, Long> fromAndTo = dateTimePredicate.asFromAndTo(timerService.getCurrentTimeMillis());
 
                 final int pos = binders.size() + 1;
-                binders.add(st -> st.setTimestamp(pos, new java.sql.Timestamp(fromAndTo.key)));
+                binders.add(st -> st.setTimestamp(pos, new java.sql.Timestamp(fromAndTo.key != null ? fromAndTo.key : 0L)));
                 attributeBuilder.append(buildOperatorFilter(dateTimePredicate.operator, dateTimePredicate.negate));
 
                 if (dateTimePredicate.operator == Operator.BETWEEN) {
                     final int pos2 = binders.size() + 1;
-                    binders.add(st -> st.setTimestamp(pos2, new java.sql.Timestamp(fromAndTo.value)));
+                    binders.add(st -> st.setTimestamp(pos2, new java.sql.Timestamp(fromAndTo.value != null ? fromAndTo.value : Long.MAX_VALUE)));
                 }
             } else if (attributePredicate.value instanceof NumberPredicate) {
                 NumberPredicate numberPredicate = (NumberPredicate) attributePredicate.value;

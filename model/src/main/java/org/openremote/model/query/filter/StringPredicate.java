@@ -26,6 +26,7 @@ import org.openremote.model.value.Values;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class StringPredicate implements ValuePredicate {
 
@@ -57,7 +58,7 @@ public class StringPredicate implements ValuePredicate {
         this.value = value;
     }
 
-    public Predicate<Object> asPredicate() {
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
         return obj -> {
 
             String string = Values.getValueCoerced(obj, String.class).orElse(null);

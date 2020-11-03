@@ -19,8 +19,16 @@
  */
 package org.openremote.model.query.filter;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 public class ValueNotEmptyPredicate implements ValuePredicate {
 
     public static final String name = "value-not-empty";
 
+    @Override
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj -> !Objects.isNull(obj);
+    }
 }

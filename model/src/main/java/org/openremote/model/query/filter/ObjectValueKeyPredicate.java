@@ -21,6 +21,11 @@ package org.openremote.model.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.openremote.model.value.Values;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class ObjectValueKeyPredicate implements ValuePredicate {
 
@@ -49,5 +54,15 @@ public class ObjectValueKeyPredicate implements ValuePredicate {
             "key=" + key +
             ", negated=" + negated +
             '}';
+    }
+
+    @Override
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
+        return obj ->
+            Values.getValueCoerced(obj, ObjectNode.class).map(objectValue -> {
+
+                boolean result = objectValue.has(key);
+                return negated != result;
+            }).orElse(false);
     }
 }

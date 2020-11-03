@@ -22,9 +22,12 @@ package org.openremote.model.calendar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Recur;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.util.Pair;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -105,5 +108,43 @@ public class CalendarEvent {
 
     public Recur getRecurrence() {
         return recurrence;
+    }
+
+    public Pair<Long, Long> getNextOrActiveFromTo(Date when) {
+
+        if (getEnd() == null) {
+            return new Pair<>(getStart().getTime(), Long.MAX_VALUE);
+        }
+
+        if (getStart().before(when) && getEnd().after(when) && (getEnd().getTime()-when.getTime() > 1000)) {
+            return new Pair<>(getStart().getTime(), getEnd().getTime());
+        }
+
+        Recur recurrence = getRecurrence();
+
+        if (recurrence == null) {
+            if (getEnd().before(when)) {
+                return null;
+            }
+            return new Pair<>(getStart().getTime(), getEnd().getTime());
+        }
+
+        long whenMillis = when.toInstant().minus(getEnd().getTime() - getStart().getTime(), ChronoUnit.MILLIS).toEpochMilli();
+        DateList matches = recurrence.getDates(new net.fortuna.ical4j.model.DateTime(getStart()), new net.fortuna.ical4j.model.DateTime(whenMillis), new net.fortuna.ical4j.model.DateTime(Long.MAX_VALUE), net.fortuna.ical4j.model.parameter.Value.DATE_TIME, 2);
+
+        if (matches.isEmpty()) {
+            return null;
+        }
+
+        long endTime = matches.get(0).getTime() + (getEnd().getTime()- getStart().getTime());
+
+        if (endTime <= when.getTime()) {
+            if (matches.size() == 2) {
+                return new Pair<>(matches.get(1).getTime(), matches.get(1).getTime() + (getEnd().getTime()- getStart().getTime()));
+            }
+            return null;
+        }
+
+        return new Pair<>(matches.get(0).getTime(), endTime);
     }
 }

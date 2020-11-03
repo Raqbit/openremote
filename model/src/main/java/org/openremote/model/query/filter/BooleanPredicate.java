@@ -22,6 +22,7 @@ package org.openremote.model.query.filter;
 import org.openremote.model.value.Values;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class BooleanPredicate implements ValuePredicate {
 
@@ -41,7 +42,7 @@ public class BooleanPredicate implements ValuePredicate {
     }
 
     @Override
-    public Predicate<Object> asPredicate() {
+    public Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier) {
         return obj -> {
             Boolean bool = Values.getValueCoerced(obj, Boolean.class).orElse(null);
             if (bool == null) {

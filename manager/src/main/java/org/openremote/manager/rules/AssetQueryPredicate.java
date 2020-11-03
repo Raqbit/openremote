@@ -19,28 +19,21 @@
  */
 package org.openremote.manager.rules;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.Recur;
-import org.geotools.referencing.GeodeticCalculator;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
-import org.openremote.model.attribute.Meta;
-import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.calendar.CalendarEvent;
-import org.openremote.model.geo.GeoJSONPoint;
+import org.openremote.model.attribute.MetaList;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.query.AssetQuery.NumberType;
 import org.openremote.model.query.LogicGroup;
-import org.openremote.model.query.filter.*;
+import org.openremote.model.query.filter.AttributePredicate;
+import org.openremote.model.query.filter.ParentPredicate;
+import org.openremote.model.query.filter.PathPredicate;
+import org.openremote.model.query.filter.TenantPredicate;
 import org.openremote.model.rules.AssetState;
-import org.openremote.model.util.Pair;
-import org.openremote.model.util.TimeUtil;
-import org.openremote.model.value.Values;
 
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -71,7 +64,7 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
 
         if (query.names != null && query.names.length > 0) {
             if (Arrays.stream(query.names)
-                    .map(StringPredicate::asPredicate)
+                    .map(stringPredicate -> stringPredicate.asPredicate(timerService::getCurrentTimeMillis))
                     .noneMatch(np -> np.test(assetState.getName()))) {
                 return false;
             }
@@ -87,8 +80,8 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
 
         if (query.types != null && query.types.length > 0) {
             if (Arrays.stream(query.types)
-                    .map(StringPredicate::asPredicate)
-                    .noneMatch(np -> np.test(assetState.getTypeString()))) {
+                    .map(stringPredicate -> stringPredicate.asPredicate(timerService::getCurrentTimeMillis))
+                    .noneMatch(np -> np.test(assetState.getType()))) {
                 return false;
             }
         }
@@ -116,194 +109,16 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
 
         // Apply user ID predicate last as it is the most expensive
         if (query.userIds != null && query.userIds.length > 0) {
-            if (!assetStorageService.isUserAsset(Arrays.asList(query.userIds), assetState.getId())) {
-                return false;
-            }
+            return assetStorageService.isUserAsset(Arrays.asList(query.userIds), assetState.getId());
         }
 
         return true;
     }
 
-    public static Predicate<ArrayValue> asPredicate(ArrayPredicate predicate) {
-        return arrayValue ->  {
-            if (arrayValue == null) {
-                return false;
-            }
-
-            boolean result = true;
-
-            if (predicate.value != null) {
-                if (predicate.index != null) {
-                    result = arrayValue.length() >= predicate.index && Objects.equals(arrayValue.get(predicate.index).orElse(null), predicate.value);
-                } else {
-                    result = arrayValue.stream().anyMatch(av -> Objects.equals(av, predicate.value));
-                }
-            }
-
-            if (result && predicate.lengthEquals != null) {
-                result = arrayValue.length() == predicate.lengthEquals;
-            }
-            if (result && predicate.lengthGreaterThan != null) {
-                result = arrayValue.length() > predicate.lengthGreaterThan;
-            }
-            if (result && predicate.lengthEquals != null) {
-                result = arrayValue.length() < predicate.lengthLessThan;
-            }
-            if (predicate.negated) {
-                return !result;
-            }
-            return result;
-        };
-    }
-
-    public static Predicate<ObjectValue> asPredicate(ObjectValueKeyPredicate predicate) {
-        return objectValue -> {
-            if (objectValue == null) {
-                return predicate.negated;
-            }
-
-            boolean result = objectValue.hasKey(predicate.key);
-            if (predicate.negated) {
-                return !result;
-            }
-            return result;
-        };
-    }
-
-    public static Predicate<Boolean> asPredicate(BooleanPredicate predicate) {
-        return b -> {
-            // If given a null, we assume it's false!
-            if (b == null)
-                b = false;
-            return b == predicate.value;
-        };
-    }
-
-    public static Predicate<String[]> asPredicate(StringArrayPredicate predicate) {
-        return strings -> {
-            if (strings == null && predicate.predicates == null)
-                return true;
-            if (strings == null)
-                return false;
-            if (predicate.predicates == null)
-                return false;
-            if (strings.length != predicate.predicates.length)
-                return false;
-            for (int i = 0; i < predicate.predicates.length; i++) {
-                StringPredicate p = predicate.predicates[i];
-                if (!StringPredicate.asPredicate(p).test(strings[i]))
-                    return false;
-            }
-            return true;
-        };
-    }
-
-    public static Predicate<Long> asPredicate(Supplier<Long> currentMillisProducer, DateTimePredicate predicate) {
-        return timestamp -> {
-            Pair<Long, Long> fromAndTo = asFromAndTo(currentMillisProducer.get(), predicate);
-
-            if (fromAndTo.key == null) {
-                throw new IllegalArgumentException("Date time predicate 'value' is not valid: " + predicate);
-            }
-
-            switch (predicate.operator) {
-
-                case EQUALS:
-                    if (predicate.negate) {
-                        return timestamp != fromAndTo.key.longValue();
-                    }
-                    return timestamp == fromAndTo.key.longValue();
-                case GREATER_THAN:
-                    if (predicate.negate) {
-                        return timestamp <= fromAndTo.key;
-                    }
-                    return timestamp > fromAndTo.key;
-                case GREATER_EQUALS:
-                    if (predicate.negate) {
-                        return timestamp < fromAndTo.key;
-                    }
-                    return timestamp >= fromAndTo.key;
-                case LESS_THAN:
-                    if (predicate.negate) {
-                        return timestamp >= fromAndTo.key;
-                    }
-                    return timestamp < fromAndTo.key;
-                case LESS_EQUALS:
-                    if (predicate.negate) {
-                        return timestamp > fromAndTo.key;
-                    }
-                    return timestamp <= fromAndTo.key;
-                case BETWEEN:
-                    if (fromAndTo.value == null) {
-                        throw new IllegalArgumentException("Date time predicate 'rangeValue' is not valid: " + predicate);
-                    }
-                    if (predicate.negate) {
-                        return !(timestamp > fromAndTo.key && timestamp < fromAndTo.value);
-                    }
-                    return timestamp > fromAndTo.key && timestamp < fromAndTo.value;
-            }
-
-            return false;
-        };
-    }
-
-    public static Predicate<Double> asPredicate(NumberPredicate predicate) {
-        return d -> {
-            if (d == null) {
-
-                // RT: Commented this out as shouldn't treat null like a value all operators should fail
-//                // If given a null and we want to know if it's "less than x", it's always less than x
-//                // TODO Should be consistent with BETWEEN behavior?
-//                if (predicate.operator == LESS_THAN || predicate.operator == LESS_EQUALS) {
-//                    return true;
-//                }
-
-                return false;
-            }
-
-            Number leftOperand = predicate.numberType == NumberType.DOUBLE ? d : d.intValue();
-            Number rightOperand = predicate.numberType == NumberType.DOUBLE ? predicate.value : (int) predicate.value;
-
-            switch (predicate.operator) {
-                case EQUALS:
-                    if (predicate.negate) {
-                        return !leftOperand.equals(rightOperand);
-                    }
-                    return leftOperand.equals(rightOperand);
-                case BETWEEN:
-                    if (predicate.negate) {
-                        return !(leftOperand.doubleValue() >= rightOperand.doubleValue() && leftOperand.doubleValue() <= predicate.rangeValue);
-                    }
-                    return leftOperand.doubleValue() >= rightOperand.doubleValue() && leftOperand.doubleValue() <= predicate.rangeValue;
-                case LESS_THAN:
-                    if (predicate.negate) {
-                        return leftOperand.doubleValue() >= rightOperand.doubleValue();
-                    }
-                    return leftOperand.doubleValue() < rightOperand.doubleValue();
-                case LESS_EQUALS:
-                    if (predicate.negate) {
-                        return leftOperand.doubleValue() > rightOperand.doubleValue();
-                    }
-                    return leftOperand.doubleValue() <= rightOperand.doubleValue();
-                case GREATER_THAN:
-                    if (predicate.negate) {
-                        return leftOperand.doubleValue() <= rightOperand.doubleValue();
-                    }
-                    return leftOperand.doubleValue() > rightOperand.doubleValue();
-                case GREATER_EQUALS:
-                    if (predicate.negate) {
-                        return leftOperand.doubleValue() < rightOperand.doubleValue();
-                    }
-                    return leftOperand.doubleValue() >= rightOperand.doubleValue();
-            }
-            return false;
-        };
-    }
-
     public static Predicate<AssetState> asPredicate(ParentPredicate predicate) {
         return assetState ->
             (predicate.id == null || predicate.id.equals(assetState.getParentId()))
-                && (predicate.type == null || predicate.type.equals(assetState.getParentTypeString()))
+                && (predicate.type == null || predicate.type.equals(assetState.getParentType()))
                 && (predicate.name == null || predicate.name.equals(assetState.getParentName()))
                 && (!predicate.noParent || assetState.getParentId() == null);
     }
@@ -317,221 +132,73 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
             predicate == null || (predicate.realm != null && predicate.realm.equals(assetState.getRealm()));
     }
 
-    public static Predicate<Coordinate> asPredicate(GeofencePredicate predicate) {
-        return coordinate -> {
-            if (coordinate == null) {
-                return false;
-            }
+    public static Predicate<AssetState> asPredicate(Supplier<Long> currentMillisSupplier, AttributePredicate predicate) {
 
-            if (predicate instanceof RadialGeofencePredicate) {
-                //TODO geotools version to gradle properties
-                RadialGeofencePredicate radialLocationPredicate = (RadialGeofencePredicate) predicate;
-                GeodeticCalculator calculator = new GeodeticCalculator();
-                calculator.setStartingGeographicPoint(radialLocationPredicate.lng, radialLocationPredicate.lat);
-                calculator.setDestinationGeographicPoint(coordinate.x, coordinate.y);
-                if (predicate.negated) {
-                    return calculator.getOrthodromicDistance() > radialLocationPredicate.radius;
-                }
-                return calculator.getOrthodromicDistance() <= radialLocationPredicate.radius;
-            } else if (predicate instanceof RectangularGeofencePredicate) {
-                // Again this is a euclidean plane so doesn't work perfectly for WGS lat/lng - the bigger the rectangle the less accurate it is)
-                RectangularGeofencePredicate rectangularLocationPredicate = (RectangularGeofencePredicate) predicate;
-                Envelope envelope = new Envelope(rectangularLocationPredicate.lngMin,
-                    rectangularLocationPredicate.lngMax,
-                    rectangularLocationPredicate.latMin,
-                    rectangularLocationPredicate.latMax);
-                if (predicate.negated) {
-                    return !envelope.contains(coordinate);
-                }
-                return envelope.contains(coordinate);
-            } else {
-                throw new UnsupportedOperationException("Location predicate '" + predicate.getClass().getSimpleName() + "' not supported in rules matching");
-            }
-        };
-    }
+        Predicate<Object> namePredicate = predicate.name != null
+            ? predicate.name.asPredicate(currentMillisSupplier) : str -> true;
 
-    public static Predicate<AssetState> asPredicate(Supplier<Long> currentMillisProducer, AttributePredicate predicate) {
-
-        Predicate<String> namePredicate = predicate.name != null
-                ? StringPredicate.asPredicate(predicate.name) : str -> true;
-
-        Predicate<Value> valuePredicate = value -> {
+        Predicate<Object> valuePredicate = value -> {
             if (predicate.value == null) {
                 return true;
             }
-            return asPredicate(currentMillisProducer, predicate.value).test(value);
+            return predicate.value.asPredicate(currentMillisSupplier).test(value);
         };
 
-        return assetState -> namePredicate.test(assetState.getAttributeName())
-                && valuePredicate.test(assetState.getValue().orElse(null));
-    }
-
-    public static Predicate<AssetState> asPredicate(Supplier<Long> currentMillisProducer, NewAttributePredicate predicate) {
-
-        Predicate<AssetState> attributePredicate = asPredicate(currentMillisProducer, (AttributePredicate)predicate);
-
-        Predicate<Meta> metaPredicate = meta -> {
-
+        Predicate<MetaList> metaPredicate = meta -> {
             if (predicate.meta == null || predicate.meta.length == 0) {
                 return true;
             }
 
-            for (MetaPredicate p : predicate.meta) {
-                if (!AssetQueryPredicate.asPredicate(currentMillisProducer, p).test(meta)) {
-                    return false;
-                }
-            }
-            return true;
+            return Arrays.stream(predicate.meta)
+                .allMatch(metaItemPredicate -> {
+
+                    boolean matched = true;
+
+                    if (metaItemPredicate.mustExist) {
+                        matched = meta.stream()
+                            .anyMatch(metaItem ->
+                                metaItemPredicate.name.asPredicate(currentMillisSupplier).test(metaItem.getName())
+                            );
+                    } else if (metaItemPredicate.mustNotExist) {
+                        matched = meta.stream()
+                            .noneMatch(metaItem ->
+                                metaItemPredicate.name.asPredicate(currentMillisSupplier).test(metaItem.getName())
+                            );
+                    }
+
+                    if (!matched) {
+                        return false;
+                    }
+
+                    if (metaItemPredicate.value != null) {
+                        // Get meta that match the name predicate and see if any of them match the value predicate
+                        matched = meta.stream()
+                            .filter(metaItem ->
+                                metaItemPredicate.name == null
+                                    || metaItemPredicate.name
+                                        .asPredicate(currentMillisSupplier)
+                                        .test(metaItem.getName()))
+                            .anyMatch(metaItem ->
+                                metaItemPredicate.value
+                                    .asPredicate(currentMillisSupplier)
+                                    .test(metaItem.getValue().orElse(null)));
+                    }
+
+                    return matched;
+                });
         };
 
-        Predicate<Value> oldValuePredicate = value -> {
-            if (predicate.lastValue == null) {
+        Predicate<Object> oldValuePredicate = value -> {
+            if (predicate.previousValue == null) {
                 return true;
             }
-            return AssetQueryPredicate.asPredicate(currentMillisProducer, predicate.lastValue).test(value);
+            return predicate.previousValue.asPredicate(currentMillisSupplier).test(value);
         };
 
-        return assetState -> attributePredicate.test(assetState)
-                && metaPredicate.test(assetState.getMeta())
-                && oldValuePredicate.test(assetState.getOldValue().orElse(null));
-    }
-
-    public static Predicate<Value> asPredicate(Supplier<Long> currentMillisProducer, ValuePredicate predicate) {
-        return value -> {
-            if (predicate == null)
-                return true;
-
-            if (predicate instanceof ValueEmptyPredicate) {
-
-                return value == null;
-            } else if (predicate instanceof ValueNotEmptyPredicate) {
-
-                return value != null;
-
-            } else if (predicate instanceof StringPredicate) {
-
-                StringPredicate p = (StringPredicate) predicate;
-                return StringPredicate.asPredicate(p).test(Values.getString(value).orElse(null));
-
-            } else if (predicate instanceof BooleanPredicate) {
-
-                BooleanPredicate p = (BooleanPredicate) predicate;
-                return asPredicate(p).test(Values.getBoolean(value).orElse(null));
-
-            } else if (predicate instanceof NumberPredicate) {
-
-                NumberPredicate p = (NumberPredicate) predicate;
-                return asPredicate(p).test(Values.getNumber(value).orElse(null));
-
-            } else if (predicate instanceof DateTimePredicate) {
-
-                DateTimePredicate p = (DateTimePredicate) predicate;
-                return asPredicate(currentMillisProducer, p).test(Values.getNumber(value).map(Double::longValue).orElse(null));
-            } else if (predicate instanceof GeofencePredicate) {
-
-                GeofencePredicate p = (GeofencePredicate) predicate;
-                return asPredicate(p).test(Optional.ofNullable(value)
-                        .flatMap(GeoJSONPoint::fromValue)
-                        .map(point -> new Coordinate(point.getX(), point.getY()))
-                        .orElse(null));
-            } else if (predicate instanceof ObjectValueKeyPredicate) {
-
-                ObjectValueKeyPredicate p = (ObjectValueKeyPredicate) predicate;
-                return asPredicate(p).test(Optional.ofNullable(value)
-                        .flatMap(Values::getObject)
-                        .orElse(null));
-            }  else if (predicate instanceof ArrayPredicate) {
-
-                ArrayPredicate p = (ArrayPredicate) predicate;
-                return asPredicate(p).test(Optional.ofNullable(value)
-                        .flatMap(Values::getArray)
-                        .orElse(null));
-            } else if (predicate instanceof CalendarEventPredicate) {
-
-                CalendarEventPredicate p = (CalendarEventPredicate) predicate;
-                return asPredicate(p).test(Values.getObject(value).flatMap(CalendarEvent::fromValue).orElse(null));
-            } else {
-                // TODO Implement more
-                throw new UnsupportedOperationException(
-                        "Restriction by attribute value not implemented in rules matching for " + predicate.getClass()
-                );
-            }
-        };
-    }
-
-    public static Predicate<CalendarEvent> asPredicate(CalendarEventPredicate p) {
-
-        return calendarEvent -> {
-            if (calendarEvent == null) {
-                return true;
-            }
-
-            Date when = p.timestamp;
-
-            Pair<Long, Long> nextOrActive = getNextOrActiveFromTo(calendarEvent, when);
-            if (nextOrActive == null) {
-                return false;
-            }
-
-            return nextOrActive.key <= when.getTime() && nextOrActive.value > when.getTime();
-        };
-    }
-
-    public static Pair<Long, Long> getNextOrActiveFromTo(CalendarEvent calendarEvent, Date when) {
-
-        if (calendarEvent.getEnd() == null) {
-            return new Pair<>(calendarEvent.getStart().getTime(), Long.MAX_VALUE);
-        }
-
-        if (calendarEvent.getStart().before(when) && calendarEvent.getEnd().after(when) && (calendarEvent.getEnd().getTime()-when.getTime() > 1000)) {
-            return new Pair<>(calendarEvent.getStart().getTime(), calendarEvent.getEnd().getTime());
-        }
-
-        Recur recurrence = calendarEvent.getRecurrence();
-
-        if (recurrence == null) {
-            if (calendarEvent.getEnd().before(when)) {
-                return null;
-            }
-            return new Pair<>(calendarEvent.getStart().getTime(), calendarEvent.getEnd().getTime());
-        }
-
-        long whenMillis = when.toInstant().minus(calendarEvent.getEnd().getTime() - calendarEvent.getStart().getTime(), ChronoUnit.MILLIS).toEpochMilli();
-        DateList matches = recurrence.getDates(new net.fortuna.ical4j.model.DateTime(calendarEvent.getStart()), new net.fortuna.ical4j.model.DateTime(whenMillis), new net.fortuna.ical4j.model.DateTime(Long.MAX_VALUE), net.fortuna.ical4j.model.parameter.Value.DATE_TIME, 2);
-
-        if (matches.isEmpty()) {
-            return null;
-        }
-
-        long endTime = matches.get(0).getTime() + (calendarEvent.getEnd().getTime()-calendarEvent.getStart().getTime());
-
-        if (endTime <= when.getTime()) {
-            if (matches.size() == 2) {
-                return new Pair<>(matches.get(1).getTime(), matches.get(1).getTime() + (calendarEvent.getEnd().getTime()-calendarEvent.getStart().getTime()));
-            }
-            return null;
-        }
-
-        return new Pair<>(matches.get(0).getTime(), endTime);
-    }
-
-    public static Predicate<Meta> asPredicate(Supplier<Long> currentMillisProducer, MetaPredicate predicate) {
-
-        Predicate<MetaItem> metaItemPredicate = metaItem -> {
-            if (predicate.itemNamePredicate != null) {
-                if (!metaItem.getName().map(name -> StringPredicate.asPredicate(predicate.itemNamePredicate).test(name)).orElse(false)) {
-                    return false;
-                }
-            }
-            if (predicate.itemValuePredicate != null) {
-                if (!metaItem.getValue().map(value -> asPredicate(currentMillisProducer, predicate.itemValuePredicate).test(value)).orElse(false)) {
-                    return false;
-                }
-            }
-            return true;
-        };
-
-        return meta -> meta.stream().anyMatch(metaItemPredicate);
+        return assetState -> namePredicate.test(assetState.getAttributeName())
+            && valuePredicate.test(assetState.getValue().orElse(null))
+            && oldValuePredicate.test(assetState.getOldValue().orElse(null))
+            && metaPredicate.test(assetState.getMeta());
     }
 
     public static Predicate<AssetState> asPredicate(Supplier<Long> currentMillisProducer, LogicGroup<AttributePredicate> condition) {
@@ -546,12 +213,8 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
         if (condition.getItems().size() > 0) {
             assetStatePredicates.addAll(
                 condition.getItems().stream()
-                            .map(p -> {
-                                if (p instanceof NewAttributePredicate) {
-                                    return asPredicate(currentMillisProducer, (NewAttributePredicate)p);
-                                }
-                                return asPredicate(currentMillisProducer, p);
-                            }).collect(Collectors.toList())
+                            .map(p -> asPredicate(currentMillisProducer, p))
+                    .collect(Collectors.toList())
             );
         }
 
@@ -565,7 +228,7 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
         return asPredicate(assetStatePredicates, operator);
     }
 
-    protected static boolean groupIsEmpty(LogicGroup condition) {
+    protected static boolean groupIsEmpty(LogicGroup<?> condition) {
         return condition.getItems().size() == 0
             && (condition.groups == null || condition.groups.isEmpty());
     }
@@ -595,30 +258,4 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
         };
     }
 
-    public static Pair<Long, Long> asFromAndTo(long currentMillis, DateTimePredicate dateTimePredicate) {
-
-        Long from;
-        Long to = null;
-
-        try {
-            if (TimeUtil.isTimeDuration(dateTimePredicate.value)) {
-                from = currentMillis + TimeUtil.parseTimeDuration(dateTimePredicate.value);
-            } else {
-                from = TimeUtil.parseTimeIso8601(dateTimePredicate.value);
-            }
-
-            if (dateTimePredicate.operator == AssetQuery.Operator.BETWEEN) {
-                if (TimeUtil.isTimeDuration(dateTimePredicate.rangeValue)) {
-                    to = currentMillis + TimeUtil.parseTimeDuration(dateTimePredicate.rangeValue);
-                } else {
-                    to = TimeUtil.parseTimeIso8601(dateTimePredicate.rangeValue);
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            from = null;
-            to = null;
-        }
-
-        return new Pair<>(from, to);
-    }
 }

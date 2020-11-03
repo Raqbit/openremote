@@ -26,7 +26,7 @@ import org.openremote.model.v2.MetaDescriptor;
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link org.openremote.model.asset.Asset}
  */
-public class AgentDescriptor<T extends Agent, S extends Protocol<T>> extends AssetDescriptor<T> {
+public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetDescriptor<T> {
 
     protected Class<S> protocolClass;
     protected boolean instanceDiscovery;

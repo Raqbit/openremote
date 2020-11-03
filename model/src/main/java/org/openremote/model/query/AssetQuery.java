@@ -25,6 +25,7 @@ import org.openremote.model.v2.MetaDescriptor;
 import org.openremote.model.v2.NameHolder;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
@@ -225,12 +226,34 @@ public class AssetQuery {
         GREATER_EQUALS,
         LESS_THAN,
         LESS_EQUALS,
-        BETWEEN
-    }
+        BETWEEN;
 
-    public enum NumberType {
-        DOUBLE,
-        INTEGER
+        public <T> boolean compare(Comparator<T> comparator, T x, T y) {
+            return compare(comparator, x, y, null);
+        }
+
+        public <T> boolean compare(Comparator<T> comparator, T x, T y, T z) {
+            // Get null friendly comparator
+            comparator = Comparator.nullsFirst(comparator);
+            int comparatorResult = comparator.compare(x, y);
+
+            switch (this) {
+                case EQUALS:
+                    return comparatorResult == 0;
+                case GREATER_THAN:
+                    return comparatorResult > 0;
+                case GREATER_EQUALS:
+                    return comparatorResult >= 0;
+                case LESS_THAN:
+                    return comparatorResult < 0;
+                case LESS_EQUALS:
+                    return comparatorResult <= 0;
+                case BETWEEN:
+                    int comparatorResultUpper = comparator.compare(x, z);
+                    return comparatorResult >= 0 && comparatorResultUpper < 1;
+            }
+            return false;
+        }
     }
 
     public boolean recursive;
@@ -246,7 +269,6 @@ public class AssetQuery {
     public String[] userIds;
     public StringPredicate[] types;
     public LogicGroup<AttributePredicate> attributes;
-    public MetaPredicate[] attributeMeta;
     // Ordering
     public OrderBy orderBy;
     public int limit;
@@ -412,11 +434,6 @@ public class AssetQuery {
         return attributeValue(name, new NumberPredicate(d, operator));
     }
 
-    public AssetQuery attributeMeta(MetaPredicate... attributeMetaPredicates) {
-        this.attributeMeta = attributeMetaPredicates;
-        return this;
-    }
-
     public AssetQuery orderBy(OrderBy orderBy) {
         this.orderBy = orderBy;
         return this;
@@ -434,7 +451,6 @@ public class AssetQuery {
                 ", userId='" + Arrays.toString(userIds) + '\'' +
                 ", type=" + Arrays.toString(types) +
                 ", attribute=" + (attributes != null ? attributes.toString() : "null") +
-                ", attributeMeta=" + Arrays.toString(attributeMeta) +
                 ", orderBy=" + orderBy +
                 ", recursive=" + recursive +
                 '}';

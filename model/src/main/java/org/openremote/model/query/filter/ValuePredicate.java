@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @JsonSubTypes({
     @JsonSubTypes.Type(value = StringPredicate.class, name = StringPredicate.name),
@@ -44,5 +45,5 @@ import java.util.function.Predicate;
 )
 public interface ValuePredicate {
 
-    Predicate<Object> asPredicate();
+    Predicate<Object> asPredicate(Supplier<Long> currentMillisSupplier);
 }

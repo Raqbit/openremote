@@ -110,7 +110,9 @@ public class Values {
         if (value instanceof JsonNode) {
             JsonNode node = (JsonNode) value;
             if (Number.class.isAssignableFrom(type)) {
-                if (type == Integer.class && (node.isInt() || coerce)) {
+                if (type == Number.class && !coerce) {
+                    return Optional.ofNullable((T)node.numberValue());
+                } else if (type == Integer.class && (node.isInt() || coerce)) {
                     return Optional.of((T) Integer.valueOf(node.asInt()));
                 } else if (type == Double.class && (node.isDouble() || coerce)) {
                     return Optional.of((T) Double.valueOf(node.asDouble()));
@@ -341,6 +343,10 @@ public class Values {
     public static <T> T convert(Class<T> targetType, Object object) {
         Map<String, Object> props = JSON.convertValue(object, Map.class);
         return JSON.convertValue(props, targetType);
+    }
+
+    public static boolean isArray(Class<?> clazz) {
+        return clazz.isArray() || clazz == ArrayNode.class;
     }
 
     public static Class<?> getArrayClass(Class<?> componentType) throws ClassNotFoundException {
