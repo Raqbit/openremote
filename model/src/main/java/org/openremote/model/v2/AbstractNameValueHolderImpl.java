@@ -20,6 +20,7 @@
 package org.openremote.model.v2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openremote.model.util.TextUtil;
 
 import javax.validation.constraints.NotNull;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, NameHolder {
 
+    @JsonSerialize(converter = ValueDescriptor.ValueDescriptorStringConverter.class)
     protected ValueDescriptor<T> type;
     protected T value;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -64,9 +66,6 @@ public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, 
         if (valueType.isAssignableFrom(getValueType().getType())) {
             return Optional.ofNullable((U)value);
         }
-
-
-
         return Optional.empty();
     }
 

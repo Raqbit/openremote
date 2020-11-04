@@ -30,7 +30,7 @@ import io.undertow.servlet.api.FilterInfo;
 import io.undertow.servlet.util.ImmediateInstanceHandle;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.json.JacksonConfig;
 import org.openremote.container.json.ModelValueMessageBodyConverter;
 import org.openremote.container.security.CORSFilter;
@@ -109,7 +109,7 @@ public abstract class WebService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         devMode = container.isDevMode();
         host = getString(container.getConfig(), WEBSERVER_LISTEN_HOST, WEBSERVER_LISTEN_HOST_DEFAULT);
         port = getInteger(container.getConfig(), WEBSERVER_LISTEN_PORT, WEBSERVER_LISTEN_PORT_DEFAULT);
@@ -137,7 +137,7 @@ public abstract class WebService implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         if (undertow != null) {
             undertow.start();
             LOG.info("Webserver ready on http://" + host + ":" + port);
@@ -145,7 +145,7 @@ public abstract class WebService implements ContainerService {
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         if (undertow != null) {
             undertow.stop();
             undertow = null;

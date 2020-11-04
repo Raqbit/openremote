@@ -188,7 +188,7 @@ public class ControllerProtocol extends AbstractProtocol {
     private Map<AttributeRef, Boolean> initStatusDone = new HashMap<>();
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         super.init(container);
         client = createClient(executorService, CONNECTION_POOL_SIZE, 70000, null);
     }

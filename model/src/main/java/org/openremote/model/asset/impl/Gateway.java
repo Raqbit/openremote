@@ -23,16 +23,16 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class Gateway extends Asset {
 
-    public static final AttributeDescriptor<String> CLIENT_ID = new AttributeDescriptor<>("clientId", false, ValueTypes.STRING, null);
-    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientId", false, ValueTypes.UUID, null);
-    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("gatewayStatus", false, ValueTypes.CONNECTION_STATUS, null);
-    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", false, ValueTypes.BOOLEAN, null);
+    public static final AttributeDescriptor<String> CLIENT_ID = new AttributeDescriptor<>("clientId", false, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientId", false, ValueType.UUID, null);
+    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("gatewayStatus", false, ValueType.CONNECTION_STATUS, null);
+    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", false, ValueType.BOOLEAN, null);
 
     public static final AssetDescriptor<Gateway> DESCRIPTOR = new AssetDescriptor<>("Gateway", "router-wireless", null, Gateway.class);
 

@@ -20,7 +20,7 @@
 package org.openremote.container.timer;
 
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 
 import java.time.Instant;
 import java.util.Date;
@@ -91,7 +91,7 @@ public class TimerService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         this.clock = Clock.valueOf(
             getString(container.getConfig(), TIMER_CLOCK_TYPE, TIMER_CLOCK_TYPE_DEFAULT)
         );
@@ -99,12 +99,12 @@ public class TimerService implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

@@ -642,7 +642,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         super.init(container);
         client = createClient();
     }

@@ -21,11 +21,10 @@ package org.openremote.model.attribute;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -69,27 +68,38 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
      * Expects an {@link ObjectNode}; for each key-value entry the value is checked to make sure it is also an
      * {@link ObjectNode} if it isn't then an {@link ObjectNode} is constructed and the value entry is assigned to the
      * value field. The key of the entry is then assigned to the name field and then this {@link ObjectNode} is
-     * deserialized as an instance of {@link #innerClass} using the same deserialization context.
+     * deserialized as an instance of the inner type which is determined using the {@link ContextualDeserializer}.
      */
-    public static class NamedListDeserializer<T extends NameHolder & ValueHolder<?>> extends StdDeserializer<NamedList<T>> {
+    public static class NamedListDeserializer extends StdDeserializer<NamedList<?>> implements ContextualDeserializer {
 
-        protected Class<T> innerClass;
+        public NamedListDeserializer() {
+            super(NamedList.class);
+        }
 
-        public NamedListDeserializer(Class<NamedList<T>> vc, Class<T> innerClass) {
-            super(vc);
-            this.innerClass = innerClass;
+        public NamedListDeserializer(JavaType valueType) {
+            super(valueType);
         }
 
         @Override
-        public NamedList<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
+            JavaType wrapperType = property.getType();
+            JavaType valueType = wrapperType.containedType(0);
+            return new NamedListDeserializer(wrapperType);
+        }
+
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        @Override
+        public NamedList<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
             JsonNode node = jp.getCodec().readTree(jp);
 
             if (node.getNodeType() != JsonNodeType.OBJECT) {
                 throw new InvalidFormatException(jp, "Expected an object but got type: " + node.getNodeType(), node, NamedList.class);
             }
 
-            NamedList<T> list = new NamedList<>();
+            JavaType innerType = getValueType().containedType(0);
+            NamedList list = new NamedList<>();
             ObjectNode namedListObj = (ObjectNode) node;
+
             for (Iterator<Map.Entry<String, JsonNode>> it = namedListObj.fields(); it.hasNext(); ) {
                 Map.Entry<String, JsonNode> item = it.next();
 
@@ -104,7 +114,7 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
                 }
 
                 ((ObjectNode)itemNode).put("name", name);
-                T itemObj = ctxt.readValue(itemNode.traverse(), innerClass);
+                NameHolder itemObj = ctxt.readValue(itemNode.traverse(), innerType);
                 list.add(itemObj);
             }
             return list;

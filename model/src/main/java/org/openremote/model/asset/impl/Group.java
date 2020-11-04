@@ -22,13 +22,13 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class Group extends Asset {
 
-    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", false, ValueTypes.STRING, null);
+    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", false, ValueType.STRING, null);
 
     public static final AssetDescriptor<Group> DESCRIPTOR = new AssetDescriptor<>("Group", "folder", "B3B3B3", Group.class);
 

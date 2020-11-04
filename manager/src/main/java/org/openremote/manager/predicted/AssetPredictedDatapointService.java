@@ -22,9 +22,7 @@ package org.openremote.manager.predicted;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolPredictedAssetService;
-import org.openremote.container.Container;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
@@ -61,7 +59,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         persistenceService = container.getService(PersistenceService.class);
         assetStorageService = container.getService(AssetStorageService.class);
 
@@ -76,12 +74,12 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

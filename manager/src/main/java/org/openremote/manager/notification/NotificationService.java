@@ -24,7 +24,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.security.AuthContext;
@@ -108,7 +108,7 @@ public class NotificationService extends RouteBuilder implements ContainerServic
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         this.timerService = container.getService(TimerService.class);
         this.persistenceService = container.getService(PersistenceService.class);
         this.assetStorageService = container.getService(AssetStorageService.class);
@@ -128,12 +128,12 @@ public class NotificationService extends RouteBuilder implements ContainerServic
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

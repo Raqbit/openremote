@@ -26,7 +26,7 @@ import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaList;
 import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.v2.MetaDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -201,9 +201,9 @@ public abstract class Ruleset {
     @Transient
     protected String error;
 
-    public static final MetaDescriptor<Boolean> CONTINUE_ON_ERROR = new MetaDescriptor<>("continueOnError", ValueTypes.BOOLEAN, null);
-    public static final MetaDescriptor<CalendarEvent> VALIDITY = new MetaDescriptor<>("validity", ValueTypes.CALENDAR_EVENT, null);
-    public static final MetaDescriptor<Boolean> TRIGGER_ON_PREDICTED_DATA = new MetaDescriptor<>("triggerOnPredictedData", ValueTypes.BOOLEAN, null);
+    public static final MetaDescriptor<Boolean> CONTINUE_ON_ERROR = new MetaDescriptor<>("continueOnError", ValueType.BOOLEAN, null);
+    public static final MetaDescriptor<CalendarEvent> VALIDITY = new MetaDescriptor<>("validity", ValueType.CALENDAR_EVENT, null);
+    public static final MetaDescriptor<Boolean> TRIGGER_ON_PREDICTED_DATA = new MetaDescriptor<>("triggerOnPredictedData", ValueType.BOOLEAN, null);
 
     protected Ruleset() {
     }

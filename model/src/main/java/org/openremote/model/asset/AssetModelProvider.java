@@ -19,17 +19,22 @@
  */
 package org.openremote.model.asset;
 
+import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.v2.MetaDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
+import java.util.ServiceLoader;
+
 /**
- * Extend the asset model in custom projects.
+ * Provides model descriptors that are processed by {@link AssetModelUtil}; implementations can be discovered
+ * using the standard {@link ServiceLoader} mechanism or can be manually registered by adding an instance to the
+ * {@link AssetModelUtil#getModelProviders()}.
  */
 public interface AssetModelProvider {
 
-    MetaDescriptor<?>[] getMetaDescriptors();
-
     AssetDescriptor<?>[] getAssetDescriptors();
+
+    MetaDescriptor<?>[] getMetaDescriptors();
 
     ValueDescriptor<?>[] getValueDescriptors();
 }

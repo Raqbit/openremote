@@ -141,7 +141,7 @@ public abstract class AbstractHttpServerProtocol extends AbstractProtocol {
     protected WebService webService;
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         super.init(container);
         this.container = container;
         this.devMode = container.isDevMode();

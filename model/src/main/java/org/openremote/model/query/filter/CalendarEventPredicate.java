@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.util.Pair;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 import org.openremote.model.value.Values;
 
 import java.util.Date;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 /**
  * Can be applied to {@link org.openremote.model.attribute.Attribute}s of type
- * {@link ValueTypes#CALENDAR_EVENT}.
+ * {@link ValueType#CALENDAR_EVENT}.
  */
 public class CalendarEventPredicate implements ValuePredicate {
 

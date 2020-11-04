@@ -20,7 +20,7 @@
 package org.openremote.manager.apps;
 
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.security.ManagerIdentityService;
@@ -45,7 +45,7 @@ public class ConsoleAppService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
 
         this.timerService = container.getService(TimerService.class);
         this.managerWebService = container.getService(ManagerWebService.class);
@@ -58,11 +58,11 @@ public class ConsoleAppService implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
     }
 
     public String[] getInstalled() throws Exception {

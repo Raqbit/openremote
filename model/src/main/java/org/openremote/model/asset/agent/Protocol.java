@@ -19,14 +19,13 @@
  */
 package org.openremote.model.asset.agent;
 
-import org.openremote.model.ContainerProvider;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.v2.MetaTypes;
+import org.openremote.model.v2.MetaType;
 import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
@@ -63,7 +62,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * {@link ConnectionStatus#ERROR} and it should provide sensible logging to allow fault finding).
  * <h3>Connecting attributes to actuators and sensors</h3>
  * {@link Attribute}s of {@link Asset}s can be linked to a protocol configuration instance by creating an {@link
- * MetaTypes#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaTypes#AGENT_LINK}, other
+ * MetaType#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaType#AGENT_LINK}, other
  * protocol-specific meta items may also be required when an asset attribute is linked to a protocol configuration
  * instance. Attributes linked to a protocol configuration instance will get passed to the protocol via a call to {@link
  * #linkAttribute}.
@@ -185,7 +184,7 @@ public interface Protocol {
      * <p>
      * If the attribute is not valid for this protocol then it is up to the protocol to log the issue and return false.
      * <p>
-     * Attributes are linked to an agent via an {@link MetaTypes#AGENT_LINK} meta item.
+     * Attributes are linked to an agent via an {@link MetaType#AGENT_LINK} meta item.
      * @return True if successful, false otherwise
      */
     boolean linkAttribute(Asset asset, Attribute<?> attribute);
@@ -200,13 +199,13 @@ public interface Protocol {
      * Called before {@link #connect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
      * register Camel routes and to store the associated {@link Agent} reference.
      */
-    void start(Agent agent, ContainerProvider container) throws Exception;
+    void start(Agent agent, Container container) throws Exception;
 
     /**
      * Called after {@link #disconnect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
      * remove Camel routes.
      */
-    void stop(ContainerProvider container) throws Exception;
+    void stop(Container container) throws Exception;
 
     /**
      * Connect/initialise the protocol instance using the settings defined in the {@link Agent};

@@ -20,8 +20,7 @@
 package org.openremote.manager.system;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
@@ -39,17 +38,17 @@ public class SystemHealthStatusProvider implements HealthStatusProvider, Contain
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
 
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

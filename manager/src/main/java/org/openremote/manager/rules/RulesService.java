@@ -21,7 +21,7 @@ package org.openremote.manager.rules;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;
@@ -133,7 +133,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         timerService = container.getService(TimerService.class);
         executorService = container.getService(ManagerExecutorService.class);
         persistenceService = container.getService(PersistenceService.class);
@@ -225,7 +225,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
         if (!geofenceAssetAdapters.isEmpty()) {
             LOG.info("GeoefenceAssetAdapters found: " + geofenceAssetAdapters.size());
@@ -290,7 +290,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         withLock(getClass().getSimpleName() + "::stop", () -> {
             for (GeofenceAssetAdapter geofenceAssetAdapter : geofenceAssetAdapters) {
                 try {

@@ -21,8 +21,7 @@ package org.openremote.container.persistence;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zaxxer.hikari.HikariPoolMXBean;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
@@ -49,17 +48,17 @@ public class PersistenceHealthStatusProvider implements HealthStatusProvider, Co
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         persistenceService = container.getService(PersistenceService.class);
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

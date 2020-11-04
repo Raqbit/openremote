@@ -17,11 +17,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model;
+package org.openremote.container;
 
 /**
- * The {@link ContainerProvider} is a registry of services, the order of services in a container is important and is determined
- * by the {@link #getPriority} value; when starting the {@link ContainerProvider} using the auto service discovery mechanism.
+ * The {@link Container} is a registry of services, the order of services in a container is important and is determined
+ * by the {@link #getPriority} value; when starting the {@link Container} using the auto service discovery mechanism.
  * If the container is started with an explicit list of services then the insertion order is used.
  * <p>
  * Service startup lifecycle:
@@ -53,20 +53,17 @@ public interface ContainerService {
     /**
      * All services are initialized in the order they have been added to the container (if container started with
      * explicit list of services) otherwise they are initialized in order of {@link #getPriority}.
-     * @param container
      */
-    void init(ContainerProvider container) throws Exception;
+    void init(Container container) throws Exception;
 
     /**
      * After initialization, services are started in the order they have been added to the container (if container
      * started with explicit list of services) otherwise they are started in order of {@link #getPriority}.
-     * @param container
      */
-    void start(ContainerProvider container) throws Exception;
+    void start(Container container) throws Exception;
 
     /**
      * When the container is shutting down, it stops all services in the reverse order they were started.
-     * @param container
      */
-    void stop(ContainerProvider container) throws Exception;
+    void stop(Container container) throws Exception;
 }

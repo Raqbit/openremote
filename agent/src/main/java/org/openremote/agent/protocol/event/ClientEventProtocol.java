@@ -75,7 +75,7 @@ public class ClientEventProtocol extends AbstractProtocol {
     protected Map<String, Attribute> clientIdProtocolConfigMap = new HashMap<>();
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         super.init(container);
         protocolClientEventService.addExchangeInterceptor(this::onMessageIntercept);
     }

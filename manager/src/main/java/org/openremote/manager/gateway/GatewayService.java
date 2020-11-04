@@ -23,7 +23,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.agent.protocol.ProtocolClientEventService;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.web.ConnectionConstants;
@@ -96,7 +96,7 @@ public class GatewayService extends RouteBuilder implements ContainerService, As
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         assetStorageService = container.getService(AssetStorageService.class);
         assetProcessingService = container.getService(AssetProcessingService.class);
         identityService = container.getService(ManagerIdentityService.class);
@@ -115,7 +115,7 @@ public class GatewayService extends RouteBuilder implements ContainerService, As
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
         if (!active) {
             return;
@@ -159,7 +159,7 @@ public class GatewayService extends RouteBuilder implements ContainerService, As
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         // TODO: Stop all connectors
         gatewayConnectorMap.values().forEach(GatewayConnector::disconnect);
         gatewayConnectorMap.clear();

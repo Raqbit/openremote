@@ -23,27 +23,23 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.codec.binary.BinaryCodec;
 import org.apache.commons.codec.binary.Hex;
-import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeExecuteStatus;
-import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeState;
-import org.openremote.model.auth.OAuthGrant;
-import org.openremote.model.query.filter.StringPredicate;
 import org.openremote.model.query.filter.ValuePredicate;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import static org.openremote.model.value.Values.NULL_LITERAL;
@@ -93,7 +89,7 @@ public final class ProtocolUtil {
         final AtomicReference<Object> valRef = new AtomicReference<>(value);
 
         // Check if attribute type is executable
-        if (attribute.getValueType().equals(ValueTypes.EXECUTION_STATUS)) {
+        if (attribute.getValueType().equals(ValueType.EXECUTION_STATUS)) {
             AttributeExecuteStatus status = Values.getValueCoerced(value, AttributeExecuteStatus.class).orElse(null);
 
             if (status == AttributeExecuteStatus.REQUEST_START && writeValue != null) {
@@ -220,7 +216,7 @@ public final class ProtocolUtil {
             .orElse(new Pair<>(true, value));
     }
 
-    public static Consumer<String> createGenericAttributeMessageConsumer(String assetId, Attribute<?> attribute, Consumer<AttributeState> stateConsumer) {
+    public static Consumer<String> createGenericAttributeMessageConsumer(String assetId, Attribute<?> attribute, Supplier<Long> currentMillisSupplier, Consumer<AttributeState> stateConsumer) {
 
         ValueFilter[] matchFilters = attribute.getMeta().getValue(Agent.META_MESSAGE_MATCH_FILTERS).orElse(null);
         ValuePredicate matchPredicate = attribute.getMeta().getValue(Agent.META_MESSAGE_MATCH_PREDICATE).orElse(null);
@@ -232,10 +228,10 @@ public final class ProtocolUtil {
         return message -> {
             if (!TextUtil.isNullOrEmpty(message)) {
                 Object messageFiltered = applyValueFilters(message, matchFilters);
-                if (messageFiltered != null && matchPredicate) {
-                    if (StringPredicate.asPredicate(matchPredicate).test(message)) {
-                        Protocol.LOG.finest("Message matches attribute so writing state to state consumer for attribute: " + attributeRef);
-                        stateConsumer.accept(new AttributeState(attributeRef, stringValue));
+                if (messageFiltered != null) {
+                    if (matchPredicate.asPredicate(currentMillisSupplier).test(messageFiltered)) {
+                        Protocol.LOG.finest("Inbound message meets attribute matching meta so writing state to state consumer for attribute: asssetId=" + assetId + ", attribute=" + attribute.getName());
+                        stateConsumer.accept(new AttributeState(assetId, attribute.getName(), message));
                     }
                 }
             }

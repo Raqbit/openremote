@@ -28,7 +28,6 @@ import java.util.Optional;
  */
 public interface ValueHolder<T> {
 
-    @JsonSerialize(converter = ValueDescriptor.ValueDescriptorStringConverter.class)
     ValueDescriptor<T> getValueType();
 
     Optional<T> getValue();

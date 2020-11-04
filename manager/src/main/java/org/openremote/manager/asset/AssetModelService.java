@@ -19,20 +19,14 @@
  */
 package org.openremote.manager.asset;
 
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.ContainerService;
-import org.openremote.model.asset.Asset;
+import org.openremote.container.Container;
+import org.openremote.container.ContainerService;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentDescriptorImpl;
 import org.openremote.model.asset.agent.ProtocolDescriptor;
 import org.openremote.model.attribute.*;
-import org.openremote.model.util.EnumUtil;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -45,84 +39,9 @@ import static org.openremote.model.util.TextUtil.isNullOrEmpty;
  * can then consume. Other backend services can also register {@link AssetModelProvider}s by calling
  * {@link #addAssetModelProvider}.
  */
-public class AssetModelService implements ContainerService, AssetModelProvider {
-
-    /**
-     * Built in model provider that extracts descriptors from {@link Asset} classes
-     */
-    public static class StandardModelProvider implements AssetModelProvider {
-
-        protected ContainerProvider container;
-
-        public StandardModelProvider(ContainerProvider container) {
-            this.container = container;
-
-            // Search all classes if this is slow then can look to require a fixed namespace prefix for assets
-            Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setScanners(
-                    new SubTypesScanner(true)
-                ));
-            LOG.fine("Scanning classpath for Asset classes");
-            Set<Class<? extends Asset>> assetClasses = reflections.getSubTypesOf(Asset.class);
-
-        }
-
-        @Override
-        public MetaItemDescriptor[] getMetaDescriptors() {
-            return new MetaItemDescriptor[0];
-        }
-
-        @Override
-        public AssetDescriptor[] getAssetDescriptors() {
-            return new AssetDescriptor[0];
-        }
-
-        @Override
-        public AgentDescriptor[] getAgentDescriptors() {
-            return container.getServices(Protocol.class).stream().map((protocol) -> {
-                ProtocolDescriptor pd = protocol.getProtocolDescriptor();
-
-                if (pd != null) {
-                    // Translate meta item descriptors into asset descriptors
-                    AttributeDescriptor[] attributeDescriptors = pd.getProtocolConfigurationMetaItems() == null ? new AttributeDescriptor[0] : pd.getProtocolConfigurationMetaItems().stream()
-                        .map((descriptor) -> {
-                            AttributeValueDescriptor valueDescriptor = EnumUtil.enumFromString(AttributeValueType.class, descriptor.getValueType().name()).orElse(AttributeValueType.OBJECT);
-
-                            return new AttributeDescriptorImpl(
-                                descriptor.getUrn(),
-                                valueDescriptor,
-                                descriptor.getInitialValue()
-                            );
-                        }).toArray(AttributeDescriptor[]::new);
-
-                    return new AgentDescriptorImpl(
-                        pd.getDisplayName(),
-                        pd.getName(),
-                        "cogs",
-                        null,
-                        attributeDescriptors)
-                        .setInstanceDiscovery(pd.isConfigurationDiscovery())
-                        .setInstanceImport(pd.isConfigurationImport())
-                        .setAssetDiscovery(pd.isDeviceDiscovery())
-                        .setAssetImport(pd.isDeviceImport());
-                }
-                return null;
-            }).filter(Objects::nonNull).toArray(AgentDescriptor[]::new);
-        }
-
-        @Override
-        public AttributeDescriptor[] getAttributeDescriptors() {
-            return new AttributeDescriptor[0];
-        }
-
-        @Override
-        public AttributeValueDescriptor[] getValueDescriptors() {
-            return new AttributeValueDescriptor[0];
-        }
-    }
+public class AssetModelService implements ContainerService {
 
     private static final Logger LOG = Logger.getLogger(AssetModelService.class.getName());
-    protected final List<AssetModelProvider> assetModelProviders = new ArrayList<>();
     protected final List<AgentDescriptor> agentDescriptors = new ArrayList<>();
     protected final List<AssetDescriptor> assetDescriptors = new ArrayList<>();
     protected final List<AttributeDescriptor> attributeDescriptors = new ArrayList<>();
@@ -136,22 +55,21 @@ public class AssetModelService implements ContainerService, AssetModelProvider {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         // Add the standard model provider
         addAssetModelProvider(new StandardModelProvider(container));
 
-        // Find all service loader registered model providers
-        ServiceLoader.load(AssetModelProvider.class).forEach(this::addAssetModelProvider);
+
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         assetModelProviders.forEach(this::addProviderDescriptors);
         started = true;
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
     }
 
     public void addAssetModelProvider(AssetModelProvider assetModelProvider) {

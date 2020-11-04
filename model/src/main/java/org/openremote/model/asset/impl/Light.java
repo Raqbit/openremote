@@ -23,17 +23,17 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaTypes;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class Light extends Device {
 
-    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueTypes.BOOLEAN, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ON_OFF)
+    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_ON_OFF)
     );
-    public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
+    public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueType.PERCENTAGE_INTEGER_0_100, null);
 
     public static final AssetDescriptor<Light> DESCRIPTOR = new AssetDescriptor<>("Light", "lightbulb", "e6688a", Light.class);
 

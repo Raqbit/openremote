@@ -27,7 +27,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget
 import org.keycloak.representations.AccessTokenResponse
 import org.openremote.container.Container
-import org.openremote.model.ContainerService
+import org.openremote.container.ContainerService
 import org.openremote.container.message.MessageBrokerService
 import org.openremote.container.security.IdentityService
 import org.openremote.container.security.PasswordAuthForm

@@ -22,16 +22,16 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class Building extends Asset {
 
-    public static final AttributeDescriptor<String> STREET = new AttributeDescriptor<>("street", true, ValueTypes.STRING, null);
-    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", true, ValueTypes.STRING, null);
-    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", true, ValueTypes.STRING, null);
-    public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", true, ValueTypes.STRING, null);
+    public static final AttributeDescriptor<String> STREET = new AttributeDescriptor<>("street", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", true, ValueType.STRING, null);
 
     public static final AssetDescriptor<Building> DESCRIPTOR = new AssetDescriptor<>("Building", "office-building", "4b5966", Building.class);
 

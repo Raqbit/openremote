@@ -23,33 +23,33 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaTypes;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class ElectricityProducer extends Device {
 
-    public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueTypes.STRING, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueType.STRING, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
+    public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
-    public static final AttributeDescriptor<Integer> EFFICIENCY = new AttributeDescriptor<>("efficiency", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null);
-    public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> EFFICIENCY = new AttributeDescriptor<>("efficiency", true, ValueType.PERCENTAGE_INTEGER_0_100, null);
+    public static final AttributeDescriptor<Double> POWER_TOTAL = new AttributeDescriptor<>("powerTotal", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> POWER_FORECAST_DEVIATION = new AttributeDescriptor<>("powerForecastDeviation", true, ValueTypes.NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> POWER_FORECAST_DEVIATION = new AttributeDescriptor<>("powerForecastDeviation", true, ValueType.NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> ENERGY_TOTAL = new AttributeDescriptor<>("energyTotal", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> ENERGY_TOTAL = new AttributeDescriptor<>("energyTotal", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_ENERGY_KILOWATT_HOUR),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", true, ValueTypes.DIRECTION, null);
+    public static final AttributeDescriptor<Integer> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", true, ValueType.DIRECTION, null);
 
     public static final AssetDescriptor<ElectricityProducer> DESCRIPTOR = new AssetDescriptor<>("Electricity producer", "ev-station", "8A293D", ElectricityProducer.class);
 

@@ -20,8 +20,7 @@
 package org.openremote.manager.system;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
@@ -55,14 +54,14 @@ public class SslHealthStatusProvider implements X509TrustManager, HealthStatusPr
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         sslEnabled = getBoolean(container.getConfig(), IDENTITY_NETWORK_SECURE, IDENTITY_NETWORK_SECURE_DEFAULT);
         hostname = container.getConfig().getOrDefault(IDENTITY_NETWORK_HOST, IDENTITY_NETWORK_HOST_DEFAULT);
         port = getInteger(container.getConfig(), IDENTITY_NETWORK_WEBSERVER_PORT, IDENTITY_NETWORK_WEBSERVER_PORT_DEFAULT);
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         if (sslEnabled) {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{this}, null);
@@ -70,7 +69,7 @@ public class SslHealthStatusProvider implements X509TrustManager, HealthStatusPr
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

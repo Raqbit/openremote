@@ -20,8 +20,7 @@
 package org.openremote.manager.predicted;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 
@@ -36,17 +35,17 @@ public class AssetPredictedDatapointHealthStatusProvider implements HealthStatus
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         assetPredictedDatapointService = container.getService(AssetPredictedDatapointService.class);
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

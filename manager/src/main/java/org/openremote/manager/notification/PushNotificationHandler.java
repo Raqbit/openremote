@@ -26,7 +26,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.manager.asset.AssetStorageService;
@@ -76,7 +76,7 @@ public class PushNotificationHandler extends RouteBuilder implements Notificatio
         return ContainerService.DEFAULT_PRIORITY;
     }
 
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         this.assetStorageService = container.getService(AssetStorageService.class);
         container.getService(MessageBrokerService.class).getContext().addRoutes(this);
 
@@ -107,7 +107,7 @@ public class PushNotificationHandler extends RouteBuilder implements Notificatio
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
         if (!isValid()) {
             LOG.warning("FCM configuration invalid so cannot start");
@@ -131,7 +131,7 @@ public class PushNotificationHandler extends RouteBuilder implements Notificatio
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

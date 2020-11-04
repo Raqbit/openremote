@@ -22,6 +22,7 @@ package org.openremote.model.asset;
 import org.apache.commons.lang3.StringUtils;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.AttributeDescriptorProvider;
+import org.openremote.model.v2.ModelDescriptor;
 import org.openremote.model.v2.NameHolder;
 
 import java.lang.reflect.Method;
@@ -96,6 +97,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
     public static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
         Map<String, AttributeDescriptor<?>> descriptors = new HashMap<>();
         Class<?> currentType = type;
+
         Consumer<AttributeDescriptor<?>> descriptorConsumer = attributeDescriptor -> {
             if (descriptors.containsKey(attributeDescriptor.getName())) {
                 throw new IllegalArgumentException("Duplicate attribute descriptor name '" + attributeDescriptor.getName() + "' for asset type hierarchy: " + type.getName());
@@ -106,7 +108,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
         while (currentType != Object.class) {
             Arrays.stream(type.getDeclaredFields())
                 .filter(field ->
-                    field.getType() == AttributeDescriptor.class && isStatic(field.getModifiers()) && isPublic(field.getModifiers()))
+                    field.getType() == AttributeDescriptor.class && isStatic(field.getModifiers()) && isPublic(field.getModifiers()) && field.getDeclaredAnnotation(ModelDescriptor.class) != null)
                 .map(descriptorField -> {
                     try {
                         AttributeDescriptor<?> descriptor = (AttributeDescriptor<?>)descriptorField.get(null);

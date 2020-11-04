@@ -24,7 +24,7 @@ import org.flywaydb.core.api.MigrationInfo;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 
 import javax.persistence.EntityManager;
@@ -91,7 +91,7 @@ public class PersistenceService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         this.messageBrokerService = container.hasService(MessageBrokerService.class)
             ? container.getService(MessageBrokerService.class)
             : null;
@@ -121,12 +121,12 @@ public class PersistenceService implements ContainerService {
 
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         if (entityManagerFactory != null) {
             entityManagerFactory.close();
         }

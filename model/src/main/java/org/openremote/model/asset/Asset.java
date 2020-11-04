@@ -28,7 +28,7 @@ import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -225,13 +225,13 @@ public class Asset implements IdentifiableEntity {
      * WILL INHERIT THESE DESCRIPTORS ALSO; IT IS REQUIRED THAT EACH DESCRIPTOR HAS CORRESPONDING GETTER WITH OPTIONAL
      * SETTER, THIS ENSURES BASIC COMPILE TIME CHECKING OF CONFLICTS BUT JUST MAKES GOOD SENSE FOR CONSUMERS
     */
-    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueTypes.GEO_JSON_POINT, null);
+    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueType.GEO_JSON_POINT, null);
 
-    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueTypes.EMAIL, null);
+    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueType.EMAIL, null);
 
-    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueTypes.STRING.asArray(), null);
+    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueType.STRING.asArray(), null);
 
-    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueTypes.STRING, null);
+    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueType.STRING, null);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")
@@ -511,70 +511,8 @@ public class Asset implements IdentifiableEntity {
 //    FUNCTIONAL METHODS BELOW
 //    ---------------------------------------------------
 //
-//    /**
-//     * Complies to the GeoJSON specification RFC 7946
-//     */
-//    public GeoJSONPoint getCoordinates() {
-//        return getAttributesStream()
-//            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
-//            .findFirst()
-//            .flatMap(AbstractValueHolder::getValue)
-//            .flatMap(GeoJSONPoint::fromValue)
-//            .orElse(null);
-//    }
-//
-//    /**
-//     * Complies to the GeoJSON specification RFC 7946
-//     */
-//    public void setCoordinates(GeoJSONPoint coordinates) {
-//        Attribute locationAttribute = getAttributesStream()
-//            .filter(attribute -> attribute.getNameOrThrow().equals(LOCATION.getAttributeName()))
-//            .findFirst().orElse(new Attribute(LOCATION));
-//
-//        locationAttribute.setValue(coordinates == null ? null : coordinates.toValue());
-//        replaceAttribute(locationAttribute);
-//    }
-//
-//
-//
-//    public boolean hasGeoFeature() {
-//        return getCoordinates() != null;
-//    }
-//
-//    public GeoJSON getGeoFeature(int maxNameLength) {
-//        if (!hasGeoFeature())
-//            return GeoJSONFeatureCollection.EMPTY;
-//
-//        return new GeoJSONFeatureCollection(
-//            new GeoJSONFeature(getCoordinates())
-//                .setProperty("id", getId())
-//                .setProperty("title", TextUtil.ellipsize(getName(), maxNameLength))
-//        );
-//    }
-//
-//    public static boolean isAssetNameEqualTo(Asset asset, String name) {
-//        return asset != null && asset.getName().equals(name);
-//    }
-//
-//    public static boolean isAssetTypeEqualTo(Asset asset, String assetType) {
-//        return asset != null
-//            && asset.getType() != null
-//            && asset.getType().equals(assetType);
-//    }
-//
 //    public static boolean isAssetTypeEqualTo(Asset asset, AssetType assetType) {
 //        return asset != null && asset.getWellKnownType() == assetType;
-//    }
-//
-//    public static void removeAttributes(Asset asset, Predicate<Attribute> filter) {
-//        if (asset == null)
-//            return;
-//
-//        asset.getAttributesList().removeIf(filter);
-//    }
-//
-//    public static Asset map(Asset assetToMap, Asset asset) {
-//        return map(assetToMap, asset, null, null, null, null, null, null);
 //    }
 //
 //    public static Asset map(Asset assetToMap, Asset asset,

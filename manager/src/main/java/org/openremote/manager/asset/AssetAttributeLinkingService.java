@@ -20,7 +20,7 @@
 package org.openremote.manager.asset;
 
 import org.openremote.model.protocol.ProtocolUtil;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.manager.agent.AgentService;
 import org.openremote.manager.asset.AssetProcessingException.Reason;
 import org.openremote.model.asset.Asset;
@@ -97,18 +97,18 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         assetProcessingService = container.getService(AssetProcessingService.class);
         assetStorageService = container.getService(AssetStorageService.class);
         agentService = container.getService(AgentService.class);
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
     }
 
     @Override

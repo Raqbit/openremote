@@ -30,17 +30,14 @@ import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.auth.OAuthGrant;
 import org.openremote.model.auth.UsernamePassword;
 import org.openremote.model.calendar.CalendarEvent;
-import org.openremote.model.console.ConsoleProvider;
 import org.openremote.model.console.ConsoleProviders;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.util.TimeUtil;
 import org.openremote.model.value.ColorRGB;
-import org.openremote.model.value.ValueFilter;
 
 import javax.validation.constraints.*;
-import java.util.List;
 
-public final class ValueTypes {
+public final class ValueType {
 
     public static final ValueDescriptor<Boolean> BOOLEAN = new ValueDescriptor<>("Boolean", Boolean.class);
 
@@ -66,7 +63,7 @@ public final class ValueTypes {
     @Min(0)
     @Max(100)
     public static final ValueDescriptor<Integer> PERCENTAGE_INTEGER_0_100 = new ValueDescriptor<>("Positive integer 0-100", Integer.class,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_PERCENTAGE)
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_PERCENTAGE)
     );
 
     @Min(0)
@@ -79,14 +76,14 @@ public final class ValueTypes {
     public static final ValueDescriptor<String> TIMESTAMP_ISO8601 = new ValueDescriptor<>("Timestamp ISO8601", String.class);
 
     public static final ValueDescriptor<Integer> DURATION = new ValueDescriptor<>("Duration", Integer.class,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_TIME_SECONDS)
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_TIME_SECONDS)
     );
 
     @Pattern(regexp = TimeUtil.DURATION_REGEXP)
     public static final ValueDescriptor<String> DURATION_STRING = new ValueDescriptor<>("Duration string", String.class);
 
     public static final ValueDescriptor<String> PASSWORD = new ValueDescriptor<>("Password", String.class,
-        new MetaItem<>(MetaTypes.SECRET)
+        new MetaItem<>(MetaType.SECRET)
     );
 
     @Pattern(regexp = "[a-fA-F0-9]{6}")
@@ -94,7 +91,7 @@ public final class ValueTypes {
 
     @DecimalMin("-273.15")
     public static final ValueDescriptor<Double> TEMPERATURE = new ValueDescriptor<>("Temperature", Double.class,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS)
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS)
     );
 
     @Pattern(regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
@@ -137,6 +134,6 @@ public final class ValueTypes {
 
     public static final ValueDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new ValueDescriptor<>("Username and password", UsernamePassword.class);
 
-    protected ValueTypes() {
+    protected ValueType() {
     }
 }

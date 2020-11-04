@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol;
 
 import org.openremote.container.persistence.PersistenceEvent;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;

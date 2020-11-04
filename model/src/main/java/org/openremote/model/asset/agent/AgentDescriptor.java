@@ -19,7 +19,12 @@
  */
 package org.openremote.model.asset.agent;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.protocol.ProtocolAssetDiscovery;
+import org.openremote.model.protocol.ProtocolAssetImport;
+import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaDescriptor;
 
@@ -28,41 +33,46 @@ import org.openremote.model.v2.MetaDescriptor;
  */
 public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetDescriptor<T> {
 
+    public static class DiscoveryBooleanConverter extends StdConverter<Class<?>, Boolean> {
+
+        @Override
+        public Boolean convert(Class<?> value) {
+            return value != null;
+        }
+    }
+
     protected Class<S> protocolClass;
-    protected boolean instanceDiscovery;
-    protected boolean instanceImport;
-    protected boolean assetDiscovery;
-    protected boolean assetImport;
+    @JsonSerialize(converter = DiscoveryBooleanConverter.class)
+    protected Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory;
+    @JsonSerialize(converter = DiscoveryBooleanConverter.class)
+    protected Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory;
+    @JsonSerialize(converter = DiscoveryBooleanConverter.class)
+    protected Class<? extends ProtocolAssetImport> assetImportFactory;
     protected MetaDescriptor<?>[] linkedAttributeDescriptors;
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport, MetaDescriptor<?>...linkedAttributeDescriptors) {
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaDescriptor<?>...linkedAttributeDescriptors) {
         super(name, icon, colour, type, additionalAttributeDescriptors);
         this.protocolClass = protocolClass;
-        this.instanceDiscovery = instanceDiscovery;
-        this.instanceImport = instanceImport;
-        this.assetDiscovery = assetDiscovery;
-        this.assetImport = assetImport;
+        this.instanceDiscoveryFactory = instanceDiscoveryFactory;
+        this.assetDiscoveryFactory = assetDiscoveryFactory;
+        this.assetImportFactory = assetImportFactory;
         this.linkedAttributeDescriptors = linkedAttributeDescriptors;
     }
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, Class<S> protocolClass, boolean instanceDiscovery, boolean instanceImport, boolean assetDiscovery, boolean assetImport, MetaDescriptor<?>...linkedAttributeDescriptors) {
-        this(name, icon, colour, type, null, protocolClass, instanceDiscovery, instanceImport, assetDiscovery, assetImport, linkedAttributeDescriptors);
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaDescriptor<?>...linkedAttributeDescriptors) {
+        this(name, icon, colour, type, null, protocolClass, instanceDiscoveryFactory, assetDiscoveryFactory, assetImportFactory, linkedAttributeDescriptors);
     }
 
-    public boolean isInstanceDiscovery() {
-        return instanceDiscovery;
+    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscoveryFactory() {
+        return instanceDiscoveryFactory;
     }
 
-    public boolean isInstanceImport() {
-        return instanceImport;
+    public Class<? extends ProtocolAssetDiscovery> getAssetDiscoveryFactory() {
+        return assetDiscoveryFactory;
     }
 
-    public boolean isAssetDiscovery() {
-        return assetDiscovery;
-    }
-
-    public boolean isAssetImport() {
-        return assetImport;
+    public Class<? extends ProtocolAssetImport> getAssetImportFactory() {
+        return assetImportFactory;
     }
 
     public MetaDescriptor<?>[] getLinkedAttributeDescriptors() {

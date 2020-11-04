@@ -21,7 +21,7 @@ package org.openremote.model.simulator.element;
 
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 public class SwitchSimulatorElement extends SimulatorElement {
 
@@ -31,6 +31,6 @@ public class SwitchSimulatorElement extends SimulatorElement {
     }
 
     public SwitchSimulatorElement(AttributeRef attributeRef) {
-        super(attributeRef, ValueTypes.BOOLEAN);
+        super(attributeRef, ValueType.BOOLEAN);
     }
 }

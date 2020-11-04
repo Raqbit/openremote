@@ -20,7 +20,7 @@
 package org.openremote.manager.syslog;
 
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.manager.concurrent.ManagerExecutorService;
 import org.openremote.manager.event.ClientEventService;
@@ -67,7 +67,7 @@ public class SyslogService extends Handler implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         executorService = container.getService(ManagerExecutorService.class);
 
         if (container.hasService(ClientEventService.class) && container.hasService(PersistenceService.class)) {
@@ -98,7 +98,7 @@ public class SyslogService extends Handler implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         if (persistenceService != null) {
             // Flush batch every 3 seconds (wait 10 seconds for database (schema) to be ready in dev mode)
             flushBatchFuture = executorService.scheduleAtFixedRate(this::flushBatch, 10 * 1000, 3 * 1000);
@@ -123,7 +123,7 @@ public class SyslogService extends Handler implements ContainerService {
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         if (flushBatchFuture != null) {
             flushBatchFuture.cancel(true);
             flushBatchFuture = null;

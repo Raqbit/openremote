@@ -55,7 +55,7 @@ public class SchemaExporter {
                 }
 
                 @Override
-                public void start(ContainerProvider container) throws Exception {
+                public void start(Container container) throws Exception {
                     Map<String, Object> createSchemaProperties = new HashMap<>(persistenceUnitProperties);
                     createSchemaProperties.put(
                         "javax.persistence.schema-generation.scripts.action",

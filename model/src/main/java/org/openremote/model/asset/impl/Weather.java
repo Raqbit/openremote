@@ -24,45 +24,45 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaTypes;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class Weather extends Asset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueTypes.TEMPERATURE, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.TEMPERATURE, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> UV_INDEX = new AttributeDescriptor<>("uVIndex", false, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.LABEL, "UV index"),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> UV_INDEX = new AttributeDescriptor<>("uVIndex", false, ValueType.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaType.LABEL, "UV index"),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> SUN_IRRADIANCE = new AttributeDescriptor<>("sunIrradiance", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> SUN_IRRADIANCE = new AttributeDescriptor<>("sunIrradiance", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_AZIMUTH = new AttributeDescriptor<>("sunAzimuth", true, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> SUN_AZIMUTH = new AttributeDescriptor<>("sunAzimuth", true, ValueType.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_ZENITH = new AttributeDescriptor<>("sunZenith", true, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> SUN_ZENITH = new AttributeDescriptor<>("sunZenith", true, ValueType.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_ALTITUDE = new AttributeDescriptor<>("sunAltitude", true, ValueTypes.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> SUN_ALTITUDE = new AttributeDescriptor<>("sunAltitude", true, ValueType.POSITIVE_INTEGER, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> WIND_SPEED = new AttributeDescriptor<>("windSpeed", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_SPEED_KILOMETERS_HOUR),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> WIND_SPEED = new AttributeDescriptor<>("windSpeed", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_SPEED_KILOMETERS_HOUR),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> WIND_DIRECTION = new AttributeDescriptor<>("sunAltitude", true, ValueTypes.DIRECTION, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> WIND_DIRECTION = new AttributeDescriptor<>("sunAltitude", true, ValueType.DIRECTION, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> RAINFALL = new AttributeDescriptor<>("rainfall", true, ValueTypes.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaTypes.UNIT_TYPE, Constants.UNITS_DISTANCE_MILLIMETRES),
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Double> RAINFALL = new AttributeDescriptor<>("rainfall", true, ValueType.POSITIVE_NUMBER, null,
+        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_DISTANCE_MILLIMETRES),
+        new MetaItem<>(MetaType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> HUMIDITY = new AttributeDescriptor<>("humidity", true, ValueTypes.PERCENTAGE_INTEGER_0_100, null,
-        new MetaItem<>(MetaTypes.READ_ONLY)
+    public static final AttributeDescriptor<Integer> HUMIDITY = new AttributeDescriptor<>("humidity", true, ValueType.PERCENTAGE_INTEGER_0_100, null,
+        new MetaItem<>(MetaType.READ_ONLY)
     );
 
     public static final AssetDescriptor<Weather> DESCRIPTOR = new AssetDescriptor<>("Weather", "weather-partly-cloudy", "49B0D8", Weather.class);

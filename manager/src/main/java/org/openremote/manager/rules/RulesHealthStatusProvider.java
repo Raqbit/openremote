@@ -20,8 +20,7 @@
 package org.openremote.manager.rules;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.TenantRuleset;
 import org.openremote.model.system.HealthStatusProvider;
@@ -40,17 +39,17 @@ public class RulesHealthStatusProvider implements HealthStatusProvider, Containe
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         rulesService = container.getService(RulesService.class);
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
 
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
 
     }
 

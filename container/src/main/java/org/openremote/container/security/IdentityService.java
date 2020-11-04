@@ -26,7 +26,7 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.util.HttpString;
 import org.jboss.resteasy.spi.CorsHeaders;
 import org.openremote.container.Container;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.security.keycloak.KeycloakIdentityProvider;
 
@@ -56,7 +56,7 @@ public abstract class IdentityService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         devMode = container.isDevMode();
 
         String identityProviderType = getString(container.getConfig(), IDENTITY_PROVIDER, IDENTITY_PROVIDER_DEFAULT);
@@ -65,12 +65,12 @@ public abstract class IdentityService implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         identityProvider.start(container);
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         identityProvider.stop(container);
     }
 

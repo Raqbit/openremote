@@ -19,12 +19,6 @@
  */
 package org.openremote.manager.agent;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.ParseContext;
-import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.agent.protocol.ProtocolAssetService;
 import org.openremote.container.Container;
@@ -36,7 +30,7 @@ import org.openremote.manager.event.ClientEventService;
 import org.openremote.manager.gateway.GatewayService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.AssetType;
@@ -50,7 +44,6 @@ import org.openremote.model.query.filter.RefPredicate;
 import org.openremote.model.security.ClientRole;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.*;
 
 import javax.persistence.EntityManager;
 import java.util.*;
@@ -58,7 +51,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -114,7 +106,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
         this.container = container;
         timerService = container.getService(TimerService.class);
         identityService = container.getService(ManagerIdentityService.class);
@@ -153,7 +145,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         container.getService(MessageBrokerService.class).getContext().addRoutes(this);
 
         // Load all protocol instances and fail hard and fast when a duplicate is found
@@ -190,7 +182,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         agentMap.values().forEach(agent ->
             unlinkProtocolConfigurations(
                 agent,

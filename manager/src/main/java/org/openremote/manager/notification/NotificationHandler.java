@@ -19,7 +19,7 @@
  */
 package org.openremote.manager.notification;
 
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.notification.AbstractNotificationMessage;
 import org.openremote.model.notification.Notification;

@@ -27,9 +27,9 @@ import org.openremote.model.rules.TemporaryFact;
 
 import javax.validation.constraints.Pattern;
 
-import static org.openremote.model.v2.ValueTypes.*;
+import static org.openremote.model.v2.ValueType.*;
 
-public final class MetaTypes {
+public final class MetaType {
 
     /* PROTOCOL / SERVICE META */
 
@@ -42,7 +42,7 @@ public final class MetaTypes {
      * Links the attribute to another attribute, so an attribute event on the attribute triggers the same attribute
      * event on the linked attribute.
      */
-    public static final MetaDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaDescriptor<>("attributeLink", ValueTypes.ATTRIBUTE_LINK, null);
+    public static final MetaDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaDescriptor<>("attributeLink", ValueType.ATTRIBUTE_LINK, null);
 
 
 
@@ -168,6 +168,6 @@ public final class MetaTypes {
      */
     public static final MetaDescriptor<Boolean> SHOW_ON_DASHBOARD = new MetaDescriptor<>("showOnDashboard", BOOLEAN, true);
 
-    protected MetaTypes() {
+    protected MetaType() {
     }
 }

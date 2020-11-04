@@ -24,13 +24,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.asset.AssetDescriptorImpl;
-import org.openremote.model.attribute.*;
-import org.openremote.model.geo.Position;
-import org.openremote.model.json.ValueJsonDeserializer;
-import org.openremote.model.json.ValueJsonSerializer;
-import org.openremote.model.util.AssetModelUtil;
-import org.openremote.model.value.*;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -64,15 +57,7 @@ public class ORModelModule extends SimpleModule {
     @SuppressWarnings("unchecked")
     public ORModelModule() {
         super("ORModelModule", new Version(1, 0, 0, "latest", null, null));
-        ValueJsonSerializer valueSerializer = new ValueJsonSerializer();
-        ValueJsonDeserializer valueDeserializer = new ValueJsonDeserializer();
-        this.addSerializer(Value.class, valueSerializer);
-        this.addDeserializer(Value.class, valueDeserializer);
-        this.addDeserializer(ObjectValue.class, valueDeserializer);
-        this.addDeserializer(ArrayValue.class, valueDeserializer);
-        this.addDeserializer(StringValue.class, valueDeserializer);
-        this.addDeserializer(NumberValue.class, valueDeserializer);
-        this.addDeserializer(BooleanValue.class, valueDeserializer);
+
         this.addDeserializer(AssetDescriptor.class, new DescriptorDeserializer<>(
             name -> AssetModelUtil.getAssetDescriptor(name).orElse(null),
             AssetDescriptorImpl.class

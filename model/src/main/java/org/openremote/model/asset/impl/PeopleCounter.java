@@ -21,18 +21,18 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
 public class PeopleCounter extends Device {
 
-    public static final AttributeDescriptor<Integer> COUNT_IN = new AttributeDescriptor<>("countIn", true, ValueTypes.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_OUT = new AttributeDescriptor<>("countOut", true, ValueTypes.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_TOTAL = new AttributeDescriptor<>("countTotal", true, ValueTypes.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_IN_PER_MINUTE = new AttributeDescriptor<>("countInMinute", true, ValueTypes.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_OUT_PER_MINUTE = new AttributeDescriptor<>("countOutMinute", true, ValueTypes.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Double> COUNT_GROWTH_PER_MINUTE = new AttributeDescriptor<>("countGrowthMinute", true, ValueTypes.NUMBER, null);
+    public static final AttributeDescriptor<Integer> COUNT_IN = new AttributeDescriptor<>("countIn", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> COUNT_OUT = new AttributeDescriptor<>("countOut", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> COUNT_TOTAL = new AttributeDescriptor<>("countTotal", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> COUNT_IN_PER_MINUTE = new AttributeDescriptor<>("countInMinute", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> COUNT_OUT_PER_MINUTE = new AttributeDescriptor<>("countOutMinute", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Double> COUNT_GROWTH_PER_MINUTE = new AttributeDescriptor<>("countGrowthMinute", true, ValueType.NUMBER, null);
 
     public static final AssetDescriptor<PeopleCounter> DESCRIPTOR = new AssetDescriptor<>("People counter", "account-multiple", "4b5966", PeopleCounter.class);
 

@@ -28,8 +28,7 @@ import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.openremote.container.web.WebService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
-import org.openremote.model.ContainerProvider;
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.Values;
 
@@ -147,7 +146,7 @@ public class MapService implements ContainerService {
     }
 
     @Override
-    public void init(ContainerProvider container) throws Exception {
+    public void init(Container container) throws Exception {
 
         mapTilesPath = Paths.get(getString(container.getConfig(), MAP_TILES_PATH, MAP_TILES_PATH_DEFAULT));
         if (!Files.isRegularFile(mapTilesPath)) {
@@ -201,7 +200,7 @@ public class MapService implements ContainerService {
     }
 
     @Override
-    public void start(ContainerProvider container) throws Exception {
+    public void start(Container container) throws Exception {
         LOG.info("Starting map service with tile data: " + mapTilesPath.toAbsolutePath());
         Class.forName(org.sqlite.JDBC.class.getName());
         connection = DriverManager.getConnection("jdbc:sqlite:" + mapTilesPath.toAbsolutePath());
@@ -247,7 +246,7 @@ public class MapService implements ContainerService {
     }
 
     @Override
-    public void stop(ContainerProvider container) throws Exception {
+    public void stop(Container container) throws Exception {
         if (connection != null) {
             connection.close();
         }

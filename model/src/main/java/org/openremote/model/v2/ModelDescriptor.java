@@ -17,20 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model;
+package org.openremote.model.v2;
 
-import java.util.Collection;
-import java.util.Map;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.util.AssetModelUtil;
 
-public interface ContainerProvider {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    Map<String, String> getConfig();
-
-    ContainerService[] getServices();
-
-    <T extends ContainerService> Collection<T> getServices(Class<T> type);
-
-    <T extends ContainerService> T getService(Class<T> type) throws IllegalStateException;
-
-    <T extends ContainerService> boolean hasService(Class<T> type);
+/**
+ * To be used on {@link AssetDescriptor}s, {@link AttributeDescriptor}s, {@link MetaDescriptor}s and
+ * {@link ValueDescriptor}s that should be discovered by the {@link AssetModelUtil.StandardModelProvider}.
+ */
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ModelDescriptor {
 }

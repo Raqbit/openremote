@@ -20,10 +20,9 @@
 package org.openremote.model.simulator.element;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.v2.ValueTypes;
+import org.openremote.model.v2.ValueType;
 import org.openremote.model.value.Values;
 
 import java.util.Arrays;
@@ -36,7 +35,7 @@ public class ReplaySimulatorElement extends SimulatorElement {
     }
 
     public ReplaySimulatorElement(AttributeRef attributeRef) {
-        super(attributeRef, ValueTypes.ARRAY);
+        super(attributeRef, ValueType.ARRAY);
     }
 
     public ReplaySimulatorDatapoint getNextDatapoint(long seconds) throws JsonProcessingException {

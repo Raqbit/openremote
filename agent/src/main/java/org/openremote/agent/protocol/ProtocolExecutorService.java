@@ -19,7 +19,7 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.model.ContainerService;
+import org.openremote.container.ContainerService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
