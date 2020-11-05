@@ -20,7 +20,7 @@
 package org.openremote.container.web;
 
 import org.keycloak.KeycloakPrincipal;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.security.AuthContext;
 import org.openremote.container.security.basic.BasicAuthContext;
 import org.openremote.container.security.keycloak.AccessTokenAuthContext;

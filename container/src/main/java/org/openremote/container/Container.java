@@ -22,6 +22,7 @@ package org.openremote.container;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.openremote.container.concurrent.ContainerThreads;
 import org.openremote.container.util.LogUtil;
+import org.openremote.model.ContainerService;
 import org.openremote.model.value.Values;
 
 import java.util.*;
@@ -43,7 +44,7 @@ import static org.openremote.container.util.MapAccess.getBoolean;
  * in {@link org.openremote.container.util.MapAccess}. Consider using {@link #DEV_MODE}
  * to distinguish between development and production environments.
  */
-public class Container {
+public class Container implements org.openremote.model.Container {
 
     public static final Logger LOG;
 

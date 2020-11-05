@@ -20,8 +20,8 @@
 package org.openremote.manager.concurrent;
 
 import org.openremote.agent.protocol.ProtocolExecutorService;
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.container.concurrent.ContainerScheduledExecutor;
 
 import java.util.Collection;

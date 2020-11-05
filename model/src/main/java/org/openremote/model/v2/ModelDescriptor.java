@@ -28,7 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * To be used on {@link AssetDescriptor}s, {@link AttributeDescriptor}s, {@link MetaDescriptor}s and
+ * To be used on {@link AssetDescriptor}s, {@link AttributeDescriptor}s, {@link MetaItemDescriptor}s and
  * {@link ValueDescriptor}s that should be discovered by the {@link AssetModelUtil.StandardModelProvider}.
  */
 @Target({ElementType.FIELD})

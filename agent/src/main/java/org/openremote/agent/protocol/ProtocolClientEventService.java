@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol;
 
 import org.apache.camel.Exchange;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.security.AuthContext;
 import org.openremote.container.web.ConnectionConstants;
 import org.openremote.model.Constants;

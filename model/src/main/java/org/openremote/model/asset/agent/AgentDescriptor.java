@@ -19,6 +19,7 @@
  */
 package org.openremote.model.asset.agent;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.asset.Asset;
@@ -27,11 +28,12 @@ import org.openremote.model.protocol.ProtocolAssetDiscovery;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.MetaItemDescriptor;
 
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link Asset}.
  */
+@JsonTypeName("agent")
 public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetDescriptor<T> {
 
     public static class DiscoveryBooleanConverter extends StdConverter<Class<?>, Boolean> {
@@ -49,9 +51,9 @@ public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetD
     protected Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory;
     @JsonSerialize(converter = DiscoveryBooleanConverter.class)
     protected Class<? extends ProtocolAssetImport> assetImportFactory;
-    protected MetaDescriptor<?>[] linkedAttributeDescriptors;
+    protected MetaItemDescriptor<?>[] linkedAttributeDescriptors;
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaDescriptor<?>...linkedAttributeDescriptors) {
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
         super(name, icon, colour, type, additionalAttributeDescriptors);
         this.protocolClass = protocolClass;
         this.instanceDiscoveryFactory = instanceDiscoveryFactory;
@@ -60,7 +62,7 @@ public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetD
         this.linkedAttributeDescriptors = linkedAttributeDescriptors;
     }
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaDescriptor<?>...linkedAttributeDescriptors) {
+    public AgentDescriptor(String name, String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
         this(name, icon, colour, type, null, protocolClass, instanceDiscoveryFactory, assetDiscoveryFactory, assetImportFactory, linkedAttributeDescriptors);
     }
 
@@ -76,7 +78,7 @@ public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetD
         return assetImportFactory;
     }
 
-    public MetaDescriptor<?>[] getLinkedAttributeDescriptors() {
+    public MetaItemDescriptor<?>[] getLinkedAttributeDescriptors() {
         return linkedAttributeDescriptors;
     }
 

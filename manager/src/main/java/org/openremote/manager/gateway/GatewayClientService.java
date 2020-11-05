@@ -25,7 +25,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.openremote.model.auth.OAuthClientCredentialsGrant;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.websocket.WebsocketIoClient;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;

@@ -36,13 +36,13 @@ public final class MetaType {
     /**
      * Links the attribute to an agent, connecting it to a sensor and/or actuator.
      */
-    public static final MetaDescriptor<String> AGENT_LINK = new MetaDescriptor<>("agentLink", ASSET_ID, null);
+    public static final MetaItemDescriptor<String> AGENT_LINK = new MetaItemDescriptor<>("agentLink", ASSET_ID, null);
 
     /**
      * Links the attribute to another attribute, so an attribute event on the attribute triggers the same attribute
      * event on the linked attribute.
      */
-    public static final MetaDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaDescriptor<>("attributeLink", ValueType.ATTRIBUTE_LINK, null);
+    public static final MetaItemDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaItemDescriptor<>("attributeLink", ValueType.ATTRIBUTE_LINK, null);
 
 
 
@@ -51,31 +51,31 @@ public final class MetaType {
     /**
      * Marks the attribute as readable by unauthenticated public clients.
      */
-    public static final MetaDescriptor<Boolean> ACCESS_PUBLIC_READ = new MetaDescriptor<>("accessPublicRead", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> ACCESS_PUBLIC_READ = new MetaItemDescriptor<>("accessPublicRead", BOOLEAN, true);
 
     /**
      * Marks the attribute as writable by unauthenticated public clients.
      */
-    public static final MetaDescriptor<Boolean> ACCESS_PUBLIC_WRITE = new MetaDescriptor<>("accessPublicWrite", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> ACCESS_PUBLIC_WRITE = new MetaItemDescriptor<>("accessPublicWrite", BOOLEAN, true);
 
     /**
      * Marks the attribute as readable by restricted clients and therefore users who are linked to the asset, see {@link
      * UserAsset}.
      */
-    public static final MetaDescriptor<Boolean> ACCESS_RESTRICTED_READ = new MetaDescriptor<>("accessRestrictedRead", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> ACCESS_RESTRICTED_READ = new MetaItemDescriptor<>("accessRestrictedRead", BOOLEAN, true);
 
     /**
      * Marks the attribute as writable by restricted clients and therefore users who are linked to the asset, see {@link
      * UserAsset}.
      */
-    public static final MetaDescriptor<Boolean> ACCESS_RESTRICTED_WRITE = new MetaDescriptor<>("accessRestrictedWrite", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> ACCESS_RESTRICTED_WRITE = new MetaItemDescriptor<>("accessRestrictedWrite", BOOLEAN, true);
 
     /**
      * Marks the attribute as read-only for non-superuser clients. South-bound {@link AttributeEvent}s by regular or
      * restricted users are ignored. North-bound {@link AttributeEvent}s made by protocols and rules engine are
      * possible.
      */
-    public static final MetaDescriptor<Boolean> READ_ONLY = new MetaDescriptor<>("readOnly", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> READ_ONLY = new MetaItemDescriptor<>("readOnly", BOOLEAN, true);
 
 
     /* DATA POINT META */
@@ -83,18 +83,18 @@ public final class MetaType {
     /**
      * Should attribute values be stored in time series database
      */
-    public static final MetaDescriptor<Boolean> STORE_DATA_POINTS = new MetaDescriptor<>("storeDataPoints", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> STORE_DATA_POINTS = new MetaItemDescriptor<>("storeDataPoints", BOOLEAN, true);
 
     /**
      * How long to store attribute values in time series database (data older than this will be automatically purged)
      */
-    public static final MetaDescriptor<Integer> DATA_POINTS_MAX_AGE_DAYS = new MetaDescriptor<>("dataPointsMaxAgeDays", POSITIVE_INTEGER, null);
+    public static final MetaItemDescriptor<Integer> DATA_POINTS_MAX_AGE_DAYS = new MetaItemDescriptor<>("dataPointsMaxAgeDays", POSITIVE_INTEGER, null);
 
     /**
      * Could possibly have predicted data points
      */
     // TODO: Re-evaluate this can this info be retrieved automatically using prediction service
-    public static final MetaDescriptor<Boolean> HAS_PREDICTED_DATA_POINTS = new MetaDescriptor<>("hasPredictedDataPoints", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> HAS_PREDICTED_DATA_POINTS = new MetaItemDescriptor<>("hasPredictedDataPoints", BOOLEAN, true);
 
 
 
@@ -111,7 +111,7 @@ public final class MetaType {
      * Also see {@link TemporaryFact#GUARANTEED_MIN_EXPIRATION_MILLIS}.
      */
     @Pattern(regexp = "^([+-])?((\\d+)[Dd])?\\s*((\\d+)[Hh])?\\s*((\\d+)[Mm])?\\s*((\\d+)[Ss])?\\s*((\\d+)([Mm][Ss])?)?$")
-    public static final MetaDescriptor<String> RULE_EVENT_EXPIRES = new MetaDescriptor<>("ruleEventExpires", STRING, null);
+    public static final MetaItemDescriptor<String> RULE_EVENT_EXPIRES = new MetaItemDescriptor<>("ruleEventExpires", STRING, null);
 
     /**
      * Should attribute writes be processed by the rules engines as temporary facts. When an attribute is updated, the
@@ -120,7 +120,7 @@ public final class MetaType {
      * AssetState}s for the same attribute over time, to evaluate the change history of an attribute, add this meta
      * item.
      */
-    public static final MetaDescriptor<Boolean> RULE_EVENT = new MetaDescriptor<>("ruleEvent", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> RULE_EVENT = new MetaItemDescriptor<>("ruleEvent", BOOLEAN, true);
 
     /**
      * Should attribute writes be processed by the rules engines as {@link AssetState} facts, with a lifecycle that
@@ -129,7 +129,7 @@ public final class MetaType {
      * (replaced). If you want evaluate the change history of an attribute, you typically need to combine this with
      * {@link #RULE_EVENT}.
      */
-    public static final MetaDescriptor<Boolean> RULE_STATE = new MetaDescriptor<>("ruleState", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> RULE_STATE = new MetaItemDescriptor<>("ruleState", BOOLEAN, true);
 
 
 
@@ -138,35 +138,35 @@ public final class MetaType {
     /**
      * A human-friendly string that can be displayed in UI instead of the raw attribute name.
      */
-    public static final MetaDescriptor<String> LABEL = new MetaDescriptor<>("label", STRING, null);
+    public static final MetaItemDescriptor<String> LABEL = new MetaItemDescriptor<>("label", STRING, null);
 
     /**
      * Format string that can be used to render the attribute value, see https://github.com/alexei/sprintf.js.
      */
-    public static final MetaDescriptor<String> FORMAT = new MetaDescriptor<>("format", STRING, null);
+    public static final MetaItemDescriptor<String> FORMAT = new MetaItemDescriptor<>("format", STRING, null);
 
     /**
      * Indicates the unit type that this value represents.
      * For e.g. if the value represents currency and it's in euro's then the unit type would be EUR.
      * For e.g. if the value represents distance and it's in kilometers then the unit type would be KM.
      */
-    public static final MetaDescriptor<String> UNIT_TYPE = new MetaDescriptor<>("unitType", STRING, null);
+    public static final MetaItemDescriptor<String> UNIT_TYPE = new MetaItemDescriptor<>("unitType", STRING, null);
 
     /**
      * Marks the value as secret and indicates that clients should display this in a concealed manner (e.g. password
      * input with optional show)
      */
-    public static final MetaDescriptor<Boolean> SECRET = new MetaDescriptor<>("secret", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> SECRET = new MetaItemDescriptor<>("secret", BOOLEAN, true);
 
     /**
      * Indicates that any input should support multiline text entry
      */
-    public static final MetaDescriptor<Boolean> MULTILINE = new MetaDescriptor<>("multiline", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> MULTILINE = new MetaItemDescriptor<>("multiline", BOOLEAN, true);
 
     /**
      * If there is a dashboard, some kind of attribute overview, should this attribute be shown.
      */
-    public static final MetaDescriptor<Boolean> SHOW_ON_DASHBOARD = new MetaDescriptor<>("showOnDashboard", BOOLEAN, true);
+    public static final MetaItemDescriptor<Boolean> SHOW_ON_DASHBOARD = new MetaItemDescriptor<>("showOnDashboard", BOOLEAN, true);
 
     protected MetaType() {
     }

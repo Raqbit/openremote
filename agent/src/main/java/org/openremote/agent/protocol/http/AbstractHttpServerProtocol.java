@@ -31,7 +31,7 @@ import org.jboss.resteasy.plugins.interceptors.RoleBasedSecurityFeature;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.json.JacksonConfig;
 import org.openremote.container.json.ModelValueMessageBodyConverter;
 import org.openremote.container.security.IdentityService;

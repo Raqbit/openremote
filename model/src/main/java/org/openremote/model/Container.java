@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,21 +17,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.manager;
+package org.openremote.model;
 
-import org.openremote.model.Container;
+import java.util.Collection;
+import java.util.Map;
 
-public class Main {
+public interface Container {
 
-    public static void main(String[] args) throws Exception {
+    boolean isDevMode();
 
-        Container container = new Container();
+    Map<String, String> getConfig();
 
-        try {
-            container.startBackground();
-        } catch (Exception e) {
-            container.stop();
-            System.exit(1);
-        }
-    }
+    ContainerService[] getServices();
+
+    <T extends ContainerService> Collection<T> getServices(Class<T> type);
+
+    <T extends ContainerService> T getService(Class<T> type) throws IllegalStateException;
+
+    <T extends ContainerService> boolean hasService(Class<T> type);
 }

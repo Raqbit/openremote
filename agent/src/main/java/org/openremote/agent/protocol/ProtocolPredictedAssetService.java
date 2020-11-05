@@ -19,7 +19,7 @@
  */
 package org.openremote.agent.protocol;
 
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.value.Value;
 

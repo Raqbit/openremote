@@ -19,8 +19,8 @@
  */
 package org.openremote.container.timer;
 
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 
 import java.time.Instant;
 import java.util.Date;

@@ -20,7 +20,7 @@
 package org.openremote.manager.rules.geofence;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.manager.asset.AssetStorageService;

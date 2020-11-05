@@ -1,7 +1,7 @@
 package org.openremote.manager.rules.flow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.manager.rules.RulesBuilder;
 import org.openremote.manager.rules.RulesEngine;
 import org.openremote.model.query.AssetQuery;

@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.event;
 import org.apache.camel.Exchange;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.agent.protocol.ProtocolClientEventService;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.web.ConnectionConstants;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.asset.Asset;

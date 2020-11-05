@@ -20,7 +20,7 @@
 package org.openremote.manager.asset;
 
 import org.openremote.model.protocol.ProtocolUtil;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.manager.agent.AgentService;
 import org.openremote.manager.asset.AssetProcessingException.Reason;
 import org.openremote.model.asset.Asset;

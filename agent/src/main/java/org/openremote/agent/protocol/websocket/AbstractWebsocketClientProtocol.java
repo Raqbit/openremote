@@ -24,7 +24,7 @@ import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.BasicAuthHelper;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.model.auth.OAuthGrant;

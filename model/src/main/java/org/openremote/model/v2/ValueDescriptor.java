@@ -31,7 +31,7 @@ import java.util.Collection;
 /**
  * Describes a value that can be used by {@link Attribute}s and {@link MetaItem}s.
  */
-public class ValueDescriptor<T> implements MetaHolder {
+public class ValueDescriptor<T> implements NameHolder, MetaHolder {
 
     protected static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
         public ValueArrayDescriptor(String name, Class<T> type, MetaList meta) {

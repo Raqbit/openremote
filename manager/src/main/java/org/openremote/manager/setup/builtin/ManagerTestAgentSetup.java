@@ -21,7 +21,7 @@ package org.openremote.manager.setup.builtin;
 
 import org.openremote.agent.protocol.knx.KNXProtocol;
 import org.openremote.agent.protocol.velbus.VelbusSerialProtocol;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.manager.setup.AbstractManagerSetup;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.security.Tenant;

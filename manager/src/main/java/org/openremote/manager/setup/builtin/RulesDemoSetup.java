@@ -20,7 +20,7 @@
 package org.openremote.manager.setup.builtin;
 
 import org.apache.commons.io.IOUtils;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.manager.setup.AbstractManagerSetup;
 import org.openremote.model.rules.Ruleset;
 import org.openremote.model.rules.TenantRuleset;

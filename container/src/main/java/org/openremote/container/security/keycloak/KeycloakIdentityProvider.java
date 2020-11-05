@@ -37,7 +37,7 @@ import org.keycloak.adapters.KeycloakDeploymentBuilder;
 import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 import org.keycloak.representations.idm.PublishedRealmRepresentation;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.security.IdentityProvider;
 import org.openremote.container.web.*;
 import org.openremote.model.auth.OAuthPasswordGrant;

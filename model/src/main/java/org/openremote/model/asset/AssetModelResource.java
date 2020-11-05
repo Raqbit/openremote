@@ -21,7 +21,7 @@ package org.openremote.model.asset;
 
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
-import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
 import javax.ws.rs.BeanParam;
@@ -57,7 +57,7 @@ public interface AssetModelResource {
     ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
 
     /**
-     * Retrieve meta descriptors {@link MetaDescriptor} present.
+     * Retrieve meta descriptors {@link MetaItemDescriptor} present.
      * <p>
      */
     @GET
@@ -65,5 +65,5 @@ public interface AssetModelResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @SuppressWarnings("unusable-by-js")
-    MetaDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
+    MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
 }

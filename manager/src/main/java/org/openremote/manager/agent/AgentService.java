@@ -21,7 +21,7 @@ package org.openremote.manager.agent;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.agent.protocol.ProtocolAssetService;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.timer.TimerService;
@@ -30,9 +30,8 @@ import org.openremote.manager.event.ClientEventService;
 import org.openremote.manager.gateway.GatewayService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.*;
 import org.openremote.model.attribute.*;
@@ -77,10 +76,10 @@ import static org.openremote.model.util.TextUtil.isValidURN;
  * <p>
  * Finds all {@link Agent} assets and manages their {@link Protocol} instances.
  */
-public class AgentService extends RouteBuilder implements ContainerService, AssetUpdateProcessor, ProtocolAssetService, AssetModelProvider {
+public class AgentService extends RouteBuilder implements ContainerService, AssetUpdateProcessor, ProtocolAssetService {
 
     private static final Logger LOG = Logger.getLogger(AgentService.class.getName());
-    public static final int PRIORITY = DEFAULT_PRIORITY + 100; // Start quite late to ensure protocols etc. are initialised
+    public static final int PRIORITY = DEFAULT_PRIORITY + 100; // Start quite late to ensure asset model etc. are initialised
     protected TimerService timerService;
     protected ManagerIdentityService identityService;
     protected AssetProcessingService assetProcessingService;
@@ -88,18 +87,13 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     protected MessageBrokerService messageBrokerService;
     protected ClientEventService clientEventService;
     protected GatewayService gatewayService;
-    protected final Map<AttributeRef, Pair<Attribute, ConnectionStatus>> protocolConfigurations = new HashMap<>();
+    protected final Map<String, Asset> agentMap = new HashMap<>();
+    protected final Map<String, Protocol> protocolInstanceMap = new HashMap<>();
     protected final Map<String, List<Consumer<PersistenceEvent<Asset>>>> childAssetSubscriptions = new HashMap<>();
-    protected final Map<String, Protocol> protocols = new HashMap<>();
-    protected final Map<AttributeRef, List<Attribute>> linkedAttributes = new HashMap<>();
-    protected Map<String, Asset> agentMap;
+    protected final Map<String, List<Attribute<?>>> linkedAttributes = new HashMap<>();
     protected boolean initDone;
     protected Container container;
 
-    /**
-     * It's important that {@link Protocol}s have a lower priority than this service so they are fully initialized
-     * before this service is started.
-     */
     @Override
     public int getPriority() {
         return PRIORITY;
@@ -115,21 +109,10 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         messageBrokerService = container.getService(MessageBrokerService.class);
         clientEventService = container.getService(ClientEventService.class);
         gatewayService = container.getService(GatewayService.class);
-        localAgentConnector = new LocalAgentConnector(this);
-
-        // Register this service as an asset model provider
-        container.getService(AssetModelService.class).addAssetModelProvider(this);
 
         if (initDone) {
             return;
         }
-
-        clientEventService.addSubscriptionAuthorizer((auth, subscription) ->
-            subscription.isEventType(AgentStatusEvent.class)
-                && identityService.getIdentityProvider()
-                .canSubscribeWith(auth, subscription.getFilter() instanceof TenantFilter<?>
-                    ? ((TenantFilter<?>) subscription.getFilter())
-                    : null, ClientRole.READ_ASSETS));
 
         container.getService(ManagerWebService.class).getApiSingletons().add(
             new AgentResourceImpl(
@@ -138,8 +121,6 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 assetStorageService,
                 this)
         );
-
-
 
         initDone = true;
     }
@@ -159,12 +140,12 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                         throw new IllegalStateException(
                             "Protocol name is not a valid URN: " + discoveredProtocol.getClass()
                         );
-                    if (protocols.containsKey(discoveredProtocol.getProtocolName()))
+                    if (protocolInstanceMap.containsKey(discoveredProtocol.getProtocolName()))
                         throw new IllegalStateException(
                             "A protocol with the name '" + discoveredProtocol.getProtocolName()
                                 + "' has already been loaded: " + discoveredProtocol.getClass()
                         );
-                    protocols.put(discoveredProtocol.getProtocolName(), discoveredProtocol);
+                    protocolInstanceMap.put(discoveredProtocol.getProtocolName(), discoveredProtocol);
                 }
             );
 
@@ -190,7 +171,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                     .filter(ProtocolConfiguration::isProtocolConfiguration)
                     .collect(Collectors.toList())));
         agentMap.clear();
-        protocols.clear();
+        protocolInstanceMap.clear();
     }
 
     @Override
@@ -683,7 +664,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     protected Protocol getProtocol(Attribute protocolConfiguration) {
-        return protocols.get(protocolConfiguration.getValueAsString().orElse(null));
+        return protocolInstanceMap.get(protocolConfiguration.getValueAsString().orElse(null));
     }
 
     protected void linkAttributes(Agent agent, Asset asset, Collection<Attribute> attributes) {

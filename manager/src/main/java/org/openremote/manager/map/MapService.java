@@ -28,7 +28,7 @@ import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.openremote.container.web.WebService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.Values;
 

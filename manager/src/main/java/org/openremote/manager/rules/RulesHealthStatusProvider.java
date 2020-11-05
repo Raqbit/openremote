@@ -20,7 +20,7 @@
 package org.openremote.manager.rules;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.TenantRuleset;
 import org.openremote.model.system.HealthStatusProvider;

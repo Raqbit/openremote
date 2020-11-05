@@ -20,7 +20,7 @@
 package org.openremote.manager.security;
 
 import org.apache.http.HttpStatus;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.i18n.I18NService;
 import org.openremote.manager.web.ManagerWebResource;

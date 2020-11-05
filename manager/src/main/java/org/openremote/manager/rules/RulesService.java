@@ -20,8 +20,8 @@
 package org.openremote.manager.rules;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;

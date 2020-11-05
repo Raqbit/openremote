@@ -57,22 +57,22 @@ public class ORModelModule extends SimpleModule {
     @SuppressWarnings("unchecked")
     public ORModelModule() {
         super("ORModelModule", new Version(1, 0, 0, "latest", null, null));
-
-        this.addDeserializer(AssetDescriptor.class, new DescriptorDeserializer<>(
-            name -> AssetModelUtil.getAssetDescriptor(name).orElse(null),
-            AssetDescriptorImpl.class
-        ));
-        this.addDeserializer(AttributeDescriptor.class, new DescriptorDeserializer<>(
-            name -> AssetModelUtil.getAttributeDescriptor(name).orElse(null),
-            AttributeDescriptorImpl.class
-        ));
-        this.addDeserializer(AttributeValueDescriptor.class, new DescriptorDeserializer<>(
-            name -> AssetModelUtil.getAttributeValueDescriptor(name).orElse(null),
-            AttributeValueDescriptorImpl.class
-        ));
-        this.addDeserializer(MetaItemDescriptor.class, new DescriptorDeserializer<>(
-            urn -> AssetModelUtil.getMetaItemDescriptor(urn).orElse(null),
-            MetaItemDescriptorImpl.class
-        ));
+//
+//        this.addDeserializer(AssetDescriptor.class, new DescriptorDeserializer<>(
+//            name -> AssetModelUtil.getAssetDescriptor(name).orElse(null),
+//            AssetDescriptorImpl.class
+//        ));
+//        this.addDeserializer(AttributeDescriptor.class, new DescriptorDeserializer<>(
+//            name -> AssetModelUtil.getAttributeDescriptor(name).orElse(null),
+//            AttributeDescriptorImpl.class
+//        ));
+//        this.addDeserializer(AttributeValueDescriptor.class, new DescriptorDeserializer<>(
+//            name -> AssetModelUtil.getAttributeValueDescriptor(name).orElse(null),
+//            AttributeValueDescriptorImpl.class
+//        ));
+//        this.addDeserializer(MetaItemDescriptor.class, new DescriptorDeserializer<>(
+//            urn -> AssetModelUtil.getMetaItemDescriptor(urn).orElse(null),
+//            MetaItemDescriptorImpl.class
+//        ));
     }
 }

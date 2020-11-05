@@ -20,7 +20,7 @@
 package org.openremote.model.asset;
 
 import org.openremote.model.util.AssetModelUtil;
-import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
 import java.util.ServiceLoader;
@@ -34,7 +34,7 @@ public interface AssetModelProvider {
 
     AssetDescriptor<?>[] getAssetDescriptors();
 
-    MetaDescriptor<?>[] getMetaDescriptors();
+    MetaItemDescriptor<?>[] getMetaItemDescriptors();
 
     ValueDescriptor<?>[] getValueDescriptors();
 }

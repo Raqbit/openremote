@@ -23,7 +23,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolClientEventService;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;

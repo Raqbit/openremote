@@ -20,7 +20,7 @@
 package org.openremote.container.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.model.value.Values;
 
 import javax.ws.rs.Produces;

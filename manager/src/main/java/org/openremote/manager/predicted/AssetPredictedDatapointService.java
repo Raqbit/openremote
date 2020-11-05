@@ -22,7 +22,7 @@ package org.openremote.manager.predicted;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolPredictedAssetService;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;

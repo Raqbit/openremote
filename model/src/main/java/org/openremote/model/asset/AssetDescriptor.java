@@ -19,6 +19,8 @@
  */
 package org.openremote.model.asset;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.AttributeDescriptorProvider;
@@ -47,6 +49,8 @@ import static java.lang.reflect.Modifier.isStatic;
  * Asset}, this way asset types inherit {@link AttributeDescriptor}s, and an inherited {@link AttributeDescriptor}
  * cannot be overridden, any attempt to override will result in an {@link IllegalStateException}
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "descriptorType")
+@JsonTypeName("asset")
 public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDescriptorProvider {
 
     protected String name;

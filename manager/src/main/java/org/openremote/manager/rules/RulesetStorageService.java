@@ -21,8 +21,8 @@ package org.openremote.manager.rules;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;

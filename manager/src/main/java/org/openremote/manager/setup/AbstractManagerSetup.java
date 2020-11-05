@@ -22,7 +22,7 @@ package org.openremote.manager.setup;
 import org.openremote.agent.protocol.macro.MacroAction;
 import org.openremote.agent.protocol.macro.MacroProtocol;
 import org.openremote.agent.protocol.timer.TimerValue;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.manager.asset.AssetProcessingService;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.concurrent.ManagerExecutorService;

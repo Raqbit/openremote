@@ -21,7 +21,7 @@ package org.openremote.manager.setup.builtin;
 
 import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.agent.protocol.simulator.SimulatorProtocol;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.manager.setup.AbstractManagerSetup;
 import org.openremote.model.apps.ConsoleAppConfig;

@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.openremote.model.jackson.ORModelModule;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -63,7 +62,7 @@ public class Values {
             .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
             .setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY)
-            .registerModule(new ORModelModule())
+            //.registerModule(new ORModelModule())
             .registerModule(new Jdk8Module())
             .registerModule(new JavaTimeModule())
             .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));

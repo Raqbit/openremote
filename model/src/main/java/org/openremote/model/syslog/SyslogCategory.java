@@ -62,6 +62,10 @@ public enum SyslogCategory {
         true,
         "GatewayService",
         "GatewayConnector"
+    ),
+    MODEL_AND_VALUES(
+        "Model and Value",
+        true
     );
 
     protected final String categoryLabel;

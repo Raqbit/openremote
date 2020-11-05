@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,21 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.manager;
+package org.openremote.container.persistence;
 
-import org.openremote.model.Container;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vladmihalcea.hibernate.type.util.ObjectMapperSupplier;
+import org.openremote.model.value.Values;
 
-public class Main {
+public class CustomObjectMapperSupplier implements ObjectMapperSupplier {
 
-    public static void main(String[] args) throws Exception {
-
-        Container container = new Container();
-
-        try {
-            container.startBackground();
-        } catch (Exception e) {
-            container.stop();
-            System.exit(1);
-        }
+    @Override
+    public ObjectMapper get() {
+        return Values.JSON;
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.openremote.model.asset.agent;
 
+import org.openremote.model.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;

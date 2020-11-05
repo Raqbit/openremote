@@ -20,7 +20,7 @@
 package org.openremote.manager.agent;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
@@ -76,7 +76,7 @@ public class AgentHealthStatusProvider implements HealthStatusProvider, Containe
 
         ObjectNode objectValue = Values.JSON.createObjectNode();
         objectValue.put("agents", agentService.getAgents().size());
-        objectValue.put("protocols", agentService.protocols.size());
+        objectValue.put("protocols", agentService.protocolInstanceMap.size());
 
         for (Asset agent : agentService.getAgents().values()) {
             AtomicInteger total = new AtomicInteger(0);

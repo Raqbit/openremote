@@ -28,7 +28,7 @@ import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.web.HeaderInjectorFilter;
 import org.openremote.model.auth.OAuthGrant;
 import org.openremote.container.web.QueryParameterInjectorFilter;

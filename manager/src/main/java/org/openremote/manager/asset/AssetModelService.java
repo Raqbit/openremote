@@ -19,8 +19,8 @@
  */
 package org.openremote.manager.asset;
 
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.agent.AgentDescriptor;
@@ -89,7 +89,7 @@ public class AssetModelService implements ContainerService {
         assetDescriptors.addAll(Arrays.asList(assetModelProvider.getAssetDescriptors()));
         attributeDescriptors.addAll(Arrays.asList(assetModelProvider.getAttributeDescriptors()));
         attributeValueDescriptors.addAll(Arrays.asList(assetModelProvider.getValueDescriptors()));
-        metaItemDescriptors.addAll(Arrays.asList(assetModelProvider.getMetaDescriptors()));
+        metaItemDescriptors.addAll(Arrays.asList(assetModelProvider.getMetaItemDescriptors()));
     }
 
     @Override

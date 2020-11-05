@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.container;
+package org.openremote.model;
 
 /**
  * The {@link Container} is a registry of services, the order of services in a container is important and is determined
@@ -53,17 +53,20 @@ public interface ContainerService {
     /**
      * All services are initialized in the order they have been added to the container (if container started with
      * explicit list of services) otherwise they are initialized in order of {@link #getPriority}.
+     * @param container
      */
     void init(Container container) throws Exception;
 
     /**
      * After initialization, services are started in the order they have been added to the container (if container
      * started with explicit list of services) otherwise they are started in order of {@link #getPriority}.
+     * @param container
      */
     void start(Container container) throws Exception;
 
     /**
      * When the container is shutting down, it stops all services in the reverse order they were started.
+     * @param container
      */
     void stop(Container container) throws Exception;
 }

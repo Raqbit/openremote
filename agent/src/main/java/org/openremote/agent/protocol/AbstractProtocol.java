@@ -22,7 +22,7 @@ package org.openremote.agent.protocol;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.model.asset.agent.*;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.concurrent.GlobalLock;
 import org.openremote.container.message.MessageBrokerContext;
 import org.openremote.container.message.MessageBrokerService;

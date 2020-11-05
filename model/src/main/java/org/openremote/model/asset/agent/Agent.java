@@ -139,7 +139,7 @@ public abstract class Agent extends Asset {
      * Defines {@link ValueFilter}s to apply to an incoming value before it is written to a protocol linked attribute;
      * this is particularly useful for generic protocols. The message should pass through the filters in array order.
      */
-    public static final MetaDescriptor<ValueFilter[]> META_VALUE_FILTERS = new MetaDescriptor<>("valueFilters", VALUE_FILTER.asArray(), null);
+    public static final MetaItemDescriptor<ValueFilter[]> META_VALUE_FILTERS = new MetaItemDescriptor<>("valueFilters", VALUE_FILTER.asArray(), null);
 
     /**
      * Defines a value converter map to allow for basic value type conversion; the incoming value will be converted to
@@ -147,12 +147,12 @@ public abstract class Agent extends Asset {
      * attribute. An example use case is an API that returns "ACTIVE"/"DISABLED" strings but you want to connect this to
      * a {@link ValueType#BOOLEAN} attribute.
      */
-    public static final MetaDescriptor<ObjectNode> META_VALUE_CONVERTER = new MetaDescriptor<>("valueConverter", ValueType.OBJECT, null);
+    public static final MetaItemDescriptor<ObjectNode> META_VALUE_CONVERTER = new MetaItemDescriptor<>("valueConverter", ValueType.OBJECT, null);
 
     /**
      * Similar to {@link #META_VALUE_CONVERTER} but will applied to outgoing values allowing for the opposite conversion.
      */
-    public static final MetaDescriptor<ObjectNode> META_WRITE_VALUE_CONVERTER = new MetaDescriptor<>("writeValueConverter", ValueType.OBJECT, null);
+    public static final MetaItemDescriptor<ObjectNode> META_WRITE_VALUE_CONVERTER = new MetaItemDescriptor<>("writeValueConverter", ValueType.OBJECT, null);
 
     /**
      * JSON string to be used for attribute writes and can contain {@link Protocol#DYNAMIC_VALUE_PLACEHOLDER}s; this allows the
@@ -164,18 +164,18 @@ public abstract class Agent extends Asset {
      * <p>
      * A value of 'null' will produce a literal null.
      */
-    public static final MetaDescriptor<String> META_WRITE_VALUE = new MetaDescriptor<>("writeValue", ValueType.STRING, null);
+    public static final MetaItemDescriptor<String> META_WRITE_VALUE = new MetaItemDescriptor<>("writeValue", ValueType.STRING, null);
 
     /**
      * Polling frequency in milliseconds for {@link Attribute}s whose value should be polled.
      */
-    public static final MetaDescriptor<Integer> META_POLLING_MILLIS = new MetaDescriptor<>("pollingMillis", ValueType.POSITIVE_INTEGER, null);
+    public static final MetaItemDescriptor<Integer> META_POLLING_MILLIS = new MetaItemDescriptor<>("pollingMillis", ValueType.POSITIVE_INTEGER, null);
 
     /**
      * The predicate to use on incoming messages to determine if the message is intended for the {@link Attribute} that
      * has this {@link MetaItem}; it is particularly useful for pub-sub based {@link Protocol}s.
      */
-    public static final MetaDescriptor<ValuePredicate> META_MESSAGE_MATCH_PREDICATE = new MetaDescriptor<>("messageMatchPredicate", VALUE_PREDICATE, null);
+    public static final MetaItemDescriptor<ValuePredicate> META_MESSAGE_MATCH_PREDICATE = new MetaItemDescriptor<>("messageMatchPredicate", VALUE_PREDICATE, null);
 
     /**
      * {@link ValueFilter}s to apply to incoming messages prior to comparison with the {@link
@@ -183,9 +183,9 @@ public abstract class Agent extends Asset {
      * intended for this linked {@link Attribute} and the message should be written to the {@link Attribute} where the
      * actual value written can be filtered using the {@link #META_VALUE_FILTERS}.
      */
-    public static final MetaDescriptor<ValueFilter[]> META_MESSAGE_MATCH_FILTERS = new MetaDescriptor<>("messageMatchFilters", VALUE_FILTER.asArray(), null);
+    public static final MetaItemDescriptor<ValueFilter[]> META_MESSAGE_MATCH_FILTERS = new MetaItemDescriptor<>("messageMatchFilters", VALUE_FILTER.asArray(), null);
 
-    protected MetaDescriptor<?>[] GENERIC_PROTOCOL_LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaDescriptor<?>[] {
+    protected MetaItemDescriptor<?>[] GENERIC_PROTOCOL_LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaItemDescriptor<?>[] {
         META_VALUE_FILTERS,
         META_VALUE_CONVERTER,
         META_WRITE_VALUE_CONVERTER,

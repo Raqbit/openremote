@@ -25,8 +25,8 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.util.HttpString;
 import org.jboss.resteasy.spi.CorsHeaders;
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.security.keycloak.KeycloakIdentityProvider;
 

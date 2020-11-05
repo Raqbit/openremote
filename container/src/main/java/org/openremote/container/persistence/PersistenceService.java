@@ -23,8 +23,8 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.openremote.container.Container;
-import org.openremote.container.ContainerService;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 
 import javax.persistence.EntityManager;

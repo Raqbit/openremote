@@ -24,7 +24,7 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.representations.idm.*;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.persistence.PersistenceService;

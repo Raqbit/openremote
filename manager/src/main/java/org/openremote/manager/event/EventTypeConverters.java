@@ -42,7 +42,7 @@ package org.openremote.manager.event;
 import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConverters;
-import org.openremote.container.Container;
+import org.openremote.model.Container;
 import org.openremote.model.event.TriggeredEventSubscription;
 import org.openremote.model.event.shared.*;
 

@@ -20,7 +20,7 @@
 package org.openremote.manager.predicted;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.openremote.container.ContainerService;
+import org.openremote.model.ContainerService;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.value.Values;
 

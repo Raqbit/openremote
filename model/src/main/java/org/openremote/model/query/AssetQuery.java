@@ -19,9 +19,10 @@
  */
 package org.openremote.model.query;
 
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.query.filter.*;
-import org.openremote.model.v2.MetaDescriptor;
+import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.NameHolder;
 
 import java.util.Arrays;
@@ -84,7 +85,7 @@ public class AssetQuery {
             return this;
         }
 
-        public Select meta(MetaDescriptor<?>... meta) {
+        public Select meta(MetaItemDescriptor<?>... meta) {
             if (meta == null) {
                 this.meta = null;
                 return this;
@@ -267,7 +268,7 @@ public class AssetQuery {
     public PathPredicate[] paths;
     public TenantPredicate tenant;
     public String[] userIds;
-    public StringPredicate[] types;
+    public Class<? extends Asset>[] types;
     public LogicGroup<AttributePredicate> attributes;
     // Ordering
     public OrderBy orderBy;
@@ -352,29 +353,21 @@ public class AssetQuery {
         return this;
     }
 
-    public AssetQuery types(StringPredicate... typePredicates) {
-        this.types = typePredicates;
-        return this;
-    }
-
-    public AssetQuery types(String... types) {
-        if (types == null || types.length == 0) {
-            this.types = null;
-            return this;
-        }
-
-        this.types = Arrays.stream(types).map(StringPredicate::new).toArray(StringPredicate[]::new);
-        return this;
-    }
-
     public AssetQuery types(AssetDescriptor<?>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;
         }
 
-        this.types = Arrays.stream(types).map(at -> new StringPredicate(at.getName())).toArray(StringPredicate[]::new);
+        this.types = Arrays.stream(types).map(AssetDescriptor::getType).toArray(Class<? extends Asset>[]::new);
         return this;
+    }
+
+    public AssetQuery types(Class<? extends Asset>... types) {
+        if (types == null || types.length == 0) {
+            this.types = null;
+            return this;
+        }
     }
 
     public AssetQuery attributes(AttributePredicate... attributePredicates) {
