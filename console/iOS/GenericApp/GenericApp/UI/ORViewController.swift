@@ -54,7 +54,7 @@ class ORViewcontroller : UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let applicationConfig = appConfig {
-            myWebView?.load(URLRequest(url: URL(string: applicationConfig.initialUrl.stringByURLEncoding()!)!))
+            loadURL(url: URL(string: applicationConfig.initialUrl.stringByURLEncoding()!)!)
         }
     }
 
@@ -119,6 +119,11 @@ class ORViewcontroller : UIViewController {
             menuButton?.setImage(#imageLiteral(resourceName: "ic_menu"), for: .normal)
             menuButton?.setImage(#imageLiteral(resourceName: "ic_menu"), for: .selected)
             menuButton?.setImage(#imageLiteral(resourceName: "ic_menu"), for: .highlighted)
+            menuButton?.isHidden = true
+
+            if let secondColor = appConfig?.secondaryColor {
+                menuButton?.tintColor = UIColor(hexaRGB: secondColor)
+            }
 
             view.addSubview(menuButton!)
             view.bringSubviewToFront(menuButton!)
@@ -131,7 +136,7 @@ class ORViewcontroller : UIViewController {
                     ]
                     return [
                         menuButton!.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: 20),
-                        menuButton!.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40)
+                        menuButton!.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -20)
                     ]
                 } else if appConfig!.menuPosition == "TOP_RIGHT" {
                     self.popoverOptions = [
@@ -140,7 +145,7 @@ class ORViewcontroller : UIViewController {
                     ]
                     return [
                         menuButton!.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: 20),
-                        menuButton!.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 40)
+                        menuButton!.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 20)
                     ]
                 } else if appConfig!.menuPosition == "TOP_LEFT" {
                     self.popoverOptions = [
@@ -149,16 +154,17 @@ class ORViewcontroller : UIViewController {
                     ]
                     return [
                         menuButton!.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 20),
-                        menuButton!.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 40)
+                        menuButton!.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 20)
                     ]
                 }
                 self.popoverOptions = [
                     .type(.up),
                     .arrowSize(.zero),
+
                 ]
                 return [
                     menuButton!.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 20),
-                    menuButton!.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -40)
+                    menuButton!.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -20)
                 ]
             }()
 
@@ -168,7 +174,7 @@ class ORViewcontroller : UIViewController {
 
     @objc func pressed(sender: UIButton!) {
         let linkCount = appConfig?.links?.count ?? 0
-        let tableView = UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width / 2, height: CGFloat(linkCount * 40)))
+        let tableView = UITableView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width / 2, height: CGFloat(linkCount * 60)))
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isScrollEnabled = false
@@ -222,6 +228,10 @@ extension ORViewcontroller: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.popover?.dismiss()
         loadURL(url: URL(string: appConfig!.links![indexPath.row].pageLink.stringByURLEncoding()!)!)
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
 }
 
@@ -381,6 +391,12 @@ extension ORViewcontroller: WKNavigationDelegate {
                     decisionHandler(.cancel)
                 }
             } else {
+                if let config = appConfig, let button = menuButton {
+                    if config.url.stringByURLEncoding() == navigationAction.request.url?.absoluteString {
+                        button.isHidden = false
+                    }
+                }
+
                 decisionHandler(.allow)
             }
         }

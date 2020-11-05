@@ -20,6 +20,7 @@
 package org.openremote.model.v2;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaList;
 import org.openremote.model.value.Values;
@@ -27,6 +28,9 @@ import org.openremote.model.value.Values;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * Describes a value that can be used by {@link Attribute}s and {@link MetaItem}s.
+ */
 public class ValueDescriptor<T> implements MetaHolder {
 
     protected static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {

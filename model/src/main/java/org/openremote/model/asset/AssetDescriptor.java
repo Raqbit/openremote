@@ -41,8 +41,11 @@ import static java.lang.reflect.Modifier.isStatic;
  * Describes a type of {@link Asset}; the {@link #getType()} must be unique within the context of the manager within
  * which the Asset resides.
  * <p>
- * A custom project can add its own descriptors through {@link org.openremote.model.asset.AssetModelProvider}.
- * <p>
+ * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s also using reflection (see
+ * {@link #getAttributeDescriptors}) by looking for static public fields of type {@link
+ * AttributeDescriptor} with the {@link ModelDescriptor} on its' own class and on all super classes up to {@link
+ * Asset}, this way asset types inherit {@link AttributeDescriptor}s, and an inherited {@link AttributeDescriptor}
+ * cannot be overridden, any attempt to override will result in an {@link IllegalStateException}
  */
 public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDescriptorProvider {
 

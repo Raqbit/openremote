@@ -33,37 +33,35 @@ import org.reflections.util.ConfigurationBuilder;
 import java.util.*;
 
 /**
- * Utility class for retrieving asset model descriptors
+ * Utility class for retrieving asset model descriptors; the {@link StandardModelProvider} will discover descriptors
+ * using reflection on the {@link Asset} classes loaded at runtime (see {@link StandardModelProvider} for details).
+ * <p>
+ * Custom descriptors can be added by simply adding new {@link Asset}/{@link Agent} sub types and following the discovery
+ * rules described in {@link StandardModelProvider}; alternatively a custom {@link AssetModelProvider} implementation
+ * can be created and discovered with the {@link ServiceLoader} or manually added to this class via
+ * {@link #getModelProviders()}.
  */
 public class AssetModelUtil {
-
-    protected static boolean initialised;
-    protected static final List<AssetModelProvider> assetModelProviders = new ArrayList<>(Collections.singletonList(new StandardModelProvider()));
-
-    static {
-        // Find all service loader registered model providers
-        ServiceLoader.load(AssetModelProvider.class).forEach(assetModelProviders::add);
-    }
 
     /**
      * Built in model provider that dynamically extracts descriptors at runtime as follows:
      * <h2>{@link AssetDescriptor}s/{@link AgentDescriptor}s</h2>
-     * The {@link Asset} class and classes that extend it are searched for public static fields of type
-     * {@link AssetDescriptor} ({@link AgentDescriptor} for {@link Agent}s) with the {@link ModelDescriptor} annotation.
+     * The {@link Asset} class and classes that extend it are searched for public static fields of type {@link
+     * AssetDescriptor} ({@link AgentDescriptor} for {@link Agent}s) with the {@link ModelDescriptor} annotation.
      * <p>
-     * For a given class only one annotated {@link AssetDescriptor}/{@link AgentDescriptor} should be present otherwise
-     * an {@link IllegalStateException} will be thrown. An {@link Agent} class must declare an {@link AgentDescriptor}
-     * rather than an {@link AssetDescriptor} otherwise an {@link IllegalStateException} will be thrown. 
+     * For a given {@link Asset}/{@link Agent} class only one annotated {@link AssetDescriptor}/{@link AgentDescriptor}
+     * should be present otherwise an {@link IllegalStateException} will be thrown. An {@link Agent} class must declare
+     * an {@link AgentDescriptor} rather than an {@link AssetDescriptor} and vice versa otherwise an
+     * {@link IllegalStateException} will be thrown.
      * <p>
-     * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s also using reflection (see
-     * {@link AssetDescriptor#getAttributeDescriptors}) by looking for static public fields of type
-     * {@link AttributeDescriptor} with the {@link ModelDescriptor} on its' own class and on all super classes up to
-     * {@link Asset}, this way asset types inherit {@link AttributeDescriptor}s, and an inherited
-     * {@link AttributeDescriptor} cannot be overridden, any attempt to override will result in an
-     * {@link IllegalStateException}
+     * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s (see
+     * {@link AssetDescriptor#getAttributeDescriptors})
      * <h2>{@link MetaDescriptor}s from {@link MetaType}</h2>
+     * Extracts public static fields of type {@link MetaDescriptor} from {@link MetaType} and {@link Asset} classes;
+     * {@link MetaDescriptor}s defined in {@link Asset} classes must be annotated with {@link ModelDescriptor}.
      * <h2>{@link ValueDescriptor}s from {@link ValueType}</h2>
-     *
+     * Extracts public static fields of type {@link ValueDescriptor} from {@link ValueType} and {@link Asset} classes;
+     * {@link ValueDescriptor}s defined in {@link Asset} classes must be annotated with {@link ModelDescriptor}.
      */
     public static class StandardModelProvider implements AssetModelProvider {
 
@@ -131,8 +129,16 @@ public class AssetModelUtil {
             return new AttributeValueDescriptor[0];
         }
     }
+    protected static final List<AssetModelProvider> assetModelProviders = new ArrayList<>(Collections.singletonList(new StandardModelProvider()));
+    protected static boolean initialised;
 
-    protected AssetModelUtil() {}
+    static {
+        // Find all service loader registered model providers
+        ServiceLoader.load(AssetModelProvider.class).forEach(assetModelProviders::add);
+    }
+
+    protected AssetModelUtil() {
+    }
 
     public static AssetDescriptor<?>[] getAssetDescriptors(Class<? extends Asset> parentAssetType) {
         if (!initialised) {
@@ -167,6 +173,19 @@ public class AssetModelUtil {
     }
 
     protected static void initialise() {
+        try {
+            initialiseOrThrow();
+        } catch (IllegalStateException e) {
+
+        }
+    }
+
+    /**
+     * Initialise the asset model and throw an {@link IllegalStateException} exception if a problem is detected; this
+     * can be called by applications at startup to fail hard and fast if the {@link AssetModelUtil} is un-usable
+     * @throws IllegalStateException
+     */
+    public static void initialiseOrThrow() throws IllegalStateException {
 
     }
 }

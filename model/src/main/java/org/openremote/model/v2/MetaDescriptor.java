@@ -19,6 +19,13 @@
  */
 package org.openremote.model.v2;
 
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.MetaItem;
+
+/**
+ * Describes a {@link MetaItem} that can be added to an {@link Attribute}; the {@link #getName()} must match the
+ * {@link MetaItem#getName()}.
+ */
 public class MetaDescriptor<T> implements NameValueDescriptorProvider<T> {
     protected String name;
     protected ValueDescriptor<T> valueDescriptor;
