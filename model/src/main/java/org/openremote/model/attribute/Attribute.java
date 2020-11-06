@@ -19,15 +19,16 @@
  */
 package org.openremote.model.attribute;
 
+import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.v2.AbstractNameValueHolderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 
@@ -93,11 +94,15 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 
     public void setValue(T value, long timestamp) {
         super.setValue(value);
+        if (timestamp <= this.timestamp) {
+            AssetModelUtil.LOG.warning("timestamp cannot be less than or equal to the current value so using system time");
+            timestamp = -1*System.currentTimeMillis();
+        }
         setTimestamp(timestamp);
     }
 
-    public long getTimestamp() {
-        return Math.abs(timestamp);
+    public Optional<Long> getTimestamp() {
+        return hasExplicitTimestamp() ? Optional.of(Math.abs(timestamp)) : Optional.empty();
     }
 
     public boolean hasExplicitTimestamp() {
@@ -345,63 +350,67 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
             && super.equals(obj);
     }
 
-//    /**
-//     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
-//     */
-//    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute> oldAttributes,
-//                                                                 List<Attribute> newAttributes) {
-//        return Attribute.getAddedOrModifiedAttributes(oldAttributes, newAttributes, key -> false);
-//    }
-//
-//    /**
-//     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
-//     */
-//    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute> oldAttributes,
-//                                                                 List<Attribute> newAttributes,
-//                                                                 Predicate<String> ignoredAttributeKeys) {
-//        return Attribute.getAddedOrModifiedAttributes(oldAttributes, newAttributes, name -> false, name -> false, ignoredAttributeKeys);
-//    }
-//
-//    /**
-//     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
-//     */
-//    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute> oldAttributes,
-//                                                                 List<Attribute> newAttributes,
-//                                                                 Predicate<String> ignoredAttributeNames,
-//                                                                 Predicate<String> ignoredAttributeKeys) {
-//        return Attribute.getAddedOrModifiedAttributes(
-//            oldAttributes,
-//            newAttributes,
-//            null,
-//            ignoredAttributeNames,
-//            ignoredAttributeKeys);
-//    }
-//
-//    /**
-//     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
-//     */
-//    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute> oldAttributes,
-//                                                                 List<Attribute> newAttributes,
-//                                                                 Predicate<String> limitToAttributeNames,
-//                                                                 Predicate<String> ignoredAttributeNames,
-//                                                                 Predicate<String> ignoredAttributeKeys) {
-//        return newAttributes.stream().filter(newAttribute -> oldAttributes.stream().noneMatch(
-//            oldAttribute -> newAttribute.getObjectValue().equalsIgnoreKeys(oldAttribute.getObjectValue(), ignoredAttributeKeys))
-//        ).filter(addedOrModifiedAttribute ->
-//            !addedOrModifiedAttribute.getName().isPresent() ||
-//                (limitToAttributeNames == null && ignoredAttributeNames == null) ||
-//                (limitToAttributeNames != null && limitToAttributeNames.test(addedOrModifiedAttribute.getName().get())) ||
-//                (ignoredAttributeNames != null && !ignoredAttributeNames.test(addedOrModifiedAttribute.getName().get()))
-//        );
-//    }
-//
-//    /**
-//     * @return All attributes that exist only in the new list (based on name).
-//     */
-//    public static Stream<Attribute> getAddedAttributes(List<Attribute> oldAttributes,
-//                                                       List<Attribute> newAttributes) {
-//        return newAttributes.stream().filter(newAttribute -> oldAttributes.stream().noneMatch(
-//            oldAttribute -> newAttribute.getNameOrThrow().equals(newAttribute.getNameOrThrow())
-//        ));
-//    }
+    /**
+     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
+     */
+    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute<?>> oldAttributes,
+                                                                 List<Attribute<?>> newAttributes) {
+        return Attribute.getAddedOrModifiedAttributes(oldAttributes, newAttributes, key -> false);
+    }
+
+    /**
+     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
+     */
+    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute<?>> oldAttributes,
+                                                                 List<Attribute<?>> newAttributes,
+                                                                 Predicate<String> ignoredAttributeKeys) {
+        return Attribute.getAddedOrModifiedAttributes(oldAttributes, newAttributes, name -> false, name -> false, ignoredAttributeKeys);
+    }
+
+    /**
+     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
+     */
+    public static Stream<Attribute> getAddedOrModifiedAttributes(List<Attribute<?>> oldAttributes,
+                                                                 List<Attribute<?>> newAttributes,
+                                                                 Predicate<String> ignoredAttributeNames,
+                                                                 Predicate<String> ignoredAttributeKeys) {
+        return Attribute.getAddedOrModifiedAttributes(
+            oldAttributes,
+            newAttributes,
+            null,
+            ignoredAttributeNames,
+            ignoredAttributeKeys);
+    }
+
+    /**
+     * @return All attributes that exist only in the new list or are different than any attribute in the old list.
+     */
+    public static Stream<Attribute<?>> getAddedOrModifiedAttributes(List<Attribute<?>> oldAttributes,
+                                                                 List<Attribute<?>> newAttributes,
+                                                                 Predicate<String> limitToAttributeNames,
+                                                                 Predicate<String> ignoredAttributeNames,
+                                                                 Predicate<String> ignoredAttributeKeys) {
+        return newAttributes.stream()
+            .filter(newAttribute ->
+                oldAttributes.stream().noneMatch(oldAttribute ->
+                    oldAttribute.getName().equals(newAttribute.getName())
+                        && oldAttribute.getTimestamp()
+                    oldAttribute newAttribute.getObjectValue().equalsIgnoreKeys(oldAttribute.getObjectValue(), ignoredAttributeKeys))
+        ).filter(addedOrModifiedAttribute ->
+            !addedOrModifiedAttribute.getName().isPresent() ||
+                (limitToAttributeNames == null && ignoredAttributeNames == null) ||
+                (limitToAttributeNames != null && limitToAttributeNames.test(addedOrModifiedAttribute.getName().get())) ||
+                (ignoredAttributeNames != null && !ignoredAttributeNames.test(addedOrModifiedAttribute.getName().get()))
+        );
+    }
+
+    /**
+     * @return All attributes that exist only in the new list (based on name).
+     */
+    public static Stream<Attribute> getAddedAttributes(List<Attribute> oldAttributes,
+                                                       List<Attribute> newAttributes) {
+        return newAttributes.stream().filter(newAttribute -> oldAttributes.stream().noneMatch(
+            oldAttribute -> newAttribute.getName().equals(newAttribute.getName())
+        ));
+    }
 }

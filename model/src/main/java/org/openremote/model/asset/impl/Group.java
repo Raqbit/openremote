@@ -29,8 +29,8 @@ import java.util.Optional;
 public class Group extends Asset {
 
     public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", false, ValueType.STRING, null);
-
-    public static final AssetDescriptor<Group> DESCRIPTOR = new AssetDescriptor<>("Group", "folder", "B3B3B3", Group.class);
+public static final String t = Group.class.getSimpleName();
+    public static final AssetDescriptor<Group> DESCRIPTOR = new AssetDescriptor<>("folder", "B3B3B3", Group.class);
 
     public Group(String name) {
         super(name, DESCRIPTOR);

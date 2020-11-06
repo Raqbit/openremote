@@ -24,7 +24,7 @@ import org.openremote.model.asset.AssetDescriptor;
 
 public class Floor extends Asset {
 
-    public static final AssetDescriptor<Floor> DESCRIPTOR = new AssetDescriptor<>("Floor", "stairs", null, Floor.class);
+    public static final AssetDescriptor<Floor> DESCRIPTOR = new AssetDescriptor<>("stairs", null, Floor.class);
 
     public Floor(String name) {
         super(name, DESCRIPTOR);

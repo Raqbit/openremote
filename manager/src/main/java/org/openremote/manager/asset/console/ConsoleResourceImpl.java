@@ -20,12 +20,11 @@
 package org.openremote.manager.asset.console;
 
 import org.openremote.container.timer.TimerService;
-import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.event.ClientEventService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetEvent;
 import org.openremote.model.asset.AssetType;
@@ -84,7 +83,7 @@ public class ConsoleResourceImpl extends ManagerWebResource implements ConsoleRe
         }
 
         // Validate the console registration
-        List<ValidationFailure> failures = new ArrayList<>();
+        List<AttributeValidationFailure> failures = new ArrayList<>();
         if (!ConsoleConfiguration.validateConsoleRegistration(consoleRegistration, failures)) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(failures).build());
         }
@@ -112,7 +111,7 @@ public class ConsoleResourceImpl extends ManagerWebResource implements ConsoleRe
         } else {
             // Check existing asset is a console
             if (consoleAsset.getWellKnownType() != AssetType.CONSOLE) {
-                throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(new ValidationFailure[] {new ValidationFailure(Asset.AssetTypeFailureReason.ASSET_TYPE_MISMATCH)}).build());
+                throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(new AttributeValidationFailure[] {new AttributeValidationFailure(Asset.AssetTypeFailureReason.ASSET_TYPE_MISMATCH)}).build());
             }
 
             ConsoleConfiguration.setConsoleName(consoleAsset, consoleRegistration.getName());

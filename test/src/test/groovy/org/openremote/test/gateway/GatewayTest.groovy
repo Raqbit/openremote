@@ -430,7 +430,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
             assert localBuilding1Room5Asset.getType() == AssetType.ROOM.type
             assert localBuilding1Room5Asset.getRealm() == managerTestSetup.realmBuildingTenant
             assert localBuilding1Room5Asset.getParentId() == mapAssetId(gateway.id, assetIds[0], false)
-            assert localBuilding1Room5Asset.getAttributesList().size() == 3
+            assert localBuilding1Room5Asset.getAttributes().size() == 3
         }
 
         when: "an asset is modified on the gateway and the local manager is notified"
@@ -454,7 +454,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
             assert localBuilding1Room5Asset.getType() == AssetType.ROOM.type
             assert localBuilding1Room5Asset.getRealm() == managerTestSetup.realmBuildingTenant
             assert localBuilding1Room5Asset.getParentId() == mapAssetId(gateway.id, assetIds[0], false)
-            assert localBuilding1Room5Asset.getAttributesList().size() == 4
+            assert localBuilding1Room5Asset.getAttributes().size() == 4
             assert localBuilding1Room5Asset.getAttribute("co2Level").flatMap{it.getValueAsNumber()}.orElse(0d) == 500d
         }
 
@@ -516,7 +516,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         assert localBuilding1Room5Asset.getType() == AssetType.ROOM.type
         assert localBuilding1Room5Asset.getRealm() == managerTestSetup.realmBuildingTenant
         assert localBuilding1Room5Asset.getParentId() == mapAssetId(gateway.id, assetIds[0], false)
-        assert localBuilding1Room5Asset.getAttributesList().size() == 3
+        assert localBuilding1Room5Asset.getAttributes().size() == 3
         assert localBuilding1Room5Asset.version == version
 
         when: "the client received messages are cleared"

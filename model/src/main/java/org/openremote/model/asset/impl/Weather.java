@@ -65,7 +65,7 @@ public class Weather extends Asset {
         new MetaItem<>(MetaType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<Weather> DESCRIPTOR = new AssetDescriptor<>("Weather", "weather-partly-cloudy", "49B0D8", Weather.class);
+    public static final AssetDescriptor<Weather> DESCRIPTOR = new AssetDescriptor<>("weather-partly-cloudy", "49B0D8", Weather.class);
 
     public Weather(String name) {
         super(name, DESCRIPTOR);

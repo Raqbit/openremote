@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.timer;
 
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeState;
@@ -64,7 +64,7 @@ final public class TimerConfiguration {
         if (!isTimerConfiguration(attribute)) {
             failure = true;
             if (result != null) {
-                result.addAttributeFailure(new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME));
+                result.addAttributeFailure(new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME));
             }
         }
 
@@ -82,7 +82,7 @@ final public class TimerConfiguration {
                             break;
                         }
                         result.addMetaFailure(
-                            i, new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Action")
+                            i, new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Action")
                         );
                     }
                 } else if (isMetaNameEqualTo(metaItem, META_TIMER_CRON_EXPRESSION)) {
@@ -93,7 +93,7 @@ final public class TimerConfiguration {
                             break;
                         }
                         result.addMetaFailure(
-                            i, new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Cron Expression")
+                            i, new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Cron Expression")
                         );
                     }
                 }
@@ -104,7 +104,7 @@ final public class TimerConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_CRON_EXPRESSION)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_CRON_EXPRESSION)
                 );
             }
         }
@@ -113,7 +113,7 @@ final public class TimerConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_ACTION)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_ACTION)
                 );
             }
         }

@@ -6,7 +6,7 @@ import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.container.util.CodecUtil;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
@@ -163,7 +163,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
                         String connectionType = actionMetaItem.getValueAsString().orElse("TUNNELLING");
                         if (!connectionType.equals("TUNNELLING") && !connectionType.equals("ROUTING")) {
                             result.addMetaFailure(
-                                new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, PATTERN_FAILURE_CONNECTION_TYPE)
+                                new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, PATTERN_FAILURE_CONNECTION_TYPE)
                             );
                         }
 
@@ -172,7 +172,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
                         ipFound = true;
                         if (isNullOrEmpty(actionMetaItem.getValueAsString().orElse(null))) {
                             result.addMetaFailure(
-                                new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
+                                new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
                             );
                         }
                     }
@@ -181,7 +181,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
 
             if (!ipFound) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_KNX_GATEWAY_HOST)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_KNX_GATEWAY_HOST)
                 );
             }
         }

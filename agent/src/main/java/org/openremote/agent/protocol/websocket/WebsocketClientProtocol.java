@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.websocket;
 
 import io.netty.channel.ChannelHandler;
 import org.openremote.model.protocol.ProtocolUtil;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -106,7 +106,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
                 getUsernameAndPassword(protocolConfiguration);
             } catch (IllegalArgumentException e) {
                 result.addAttributeFailure(
-                        new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME)
+                        new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME)
                 );
             }
         }

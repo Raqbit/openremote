@@ -218,7 +218,7 @@ public class Asset implements IdentifiableEntity {
     /**
      * Generic asset descriptor called "Thing"
      */
-    public static final AssetDescriptor<Asset> DESCRIPTOR = new AssetDescriptor<>("Thing", "cube-outline", null, Asset.class);
+    public static final AssetDescriptor<Asset> DESCRIPTOR = new AssetDescriptor<>("cube-outline", null, Asset.class);
 
     /*
      * ATTRIBUTE DESCRIPTORS DESCRIBING FIXED NAME ATTRIBUTES AND THEIR VALUE TYPE - ALL SUB TYPES OF THIS ASSET TYPE

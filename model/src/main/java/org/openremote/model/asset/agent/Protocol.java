@@ -35,8 +35,8 @@ import java.util.logging.Logger;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
- * A protocol instance is responsible for connecting devices and services to the context broker. A protocol instance
- * has a one-to-one mapping with an {@link Agent} and should get its' configuration parameters from the {@link Attribute}s
+ * A protocol instance is responsible for connecting devices and services to the context broker. A protocol instance has
+ * a one-to-one mapping with an {@link Agent} and should get its' configuration parameters from the {@link Attribute}s
  * of this {@link Agent}, how this is done is up to the {@link Agent}/{@link Protocol} creator to determine.
  * <h2>Lifecycle</h2>
  * When the system is started or a CRUD operation is performed on an {@link Agent} then the following calls are made:
@@ -44,23 +44,21 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * If a protocol instance already exists for the {@link Agent} then the following calls are made on that instance:
  * <ol>
  * <li>{@link #unlinkAttribute} - Called for each attribute linked to the {@link Agent}</li>
- * <li>{@link #disconnect}</li>
+ * <li>{@link #stop}</li>
  * </ol>
  * <h3>Create/initialise protocol instance</h3>
  * If the {@link Agent} was deleted or {@link Agent#isDisabled} then nothing happens otherwise:
  * <ol>
- * <li>{@link #connect} - If this call returns false then it is assumed that a permanent failure has occurred (i.e.
- *  the {@link Agent} is incorrectly configured) and this Agent's status will be marked as e attribute linking will not occur.</li>
+ * <li>{@link #start} - If this call throws an exception then it is assumed that a permanent failure has occurred (i.e.
+ *  the {@link Agent} is incorrectly configured) and this Agent's status will be marked as
+ *  {@link ConnectionStatus#ERROR_CONFIGURATION} and attribute linking will not occur.</li>
  * <li>{@link #linkAttribute} - Called for each attribute linked to the {@link Agent}</li>
  * </ol>
  * <h3>Configuring protocol instances</h3>
  * Each {@link Agent} asset has its' own {@link Protocol} instance and this instance is responsible for managing only
- * the attributes linked to that specific instance.
+ * the attributes linked to that specific instance, it is up to the specific {@link Agent} type to initialise an
+ * instance of its' own {@link Protocol}.
  * <p>
- * <h3>Connection status</h3>
- * The protocol instance is responsible for calling the provided {@link ConnectionStatus} consumer whenever the status
- * of the logical (e.g. if the configuration is not valid then the protocol should call the consumer with a value of
- * {@link ConnectionStatus#ERROR} and it should provide sensible logging to allow fault finding).
  * <h3>Connecting attributes to actuators and sensors</h3>
  * {@link Attribute}s of {@link Asset}s can be linked to a protocol configuration instance by creating an {@link
  * MetaType#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaType#AGENT_LINK}, other
@@ -107,30 +105,30 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * When sending the converted value onto the actual protocol implementation for processing the original
  * {@link AttributeEvent} as well as the converted value should be made available.
  * <p>
- * NOTE: That {@link #connect} will always be called
+ * NOTE: That {@link #start} will always be called
  * before {@link #linkAttribute} and {@link #unlinkAttribute} will always be called before
- * {@link #disconnect}.
+ * {@link #stop}.
  * <p>
  * The following summarises the method calls protocols should expect:
  * <p>
  * {@link Agent} asset is created/loaded:
  * <ol>
- * <li>{@link #connect}</li>
+ * <li>{@link #start}</li>
  * <li>{@link #linkAttribute}</li>
  * </ol>
  * <p>
  * {@link Agent} is modified:
  * <ol>
  * <li>{@link #unlinkAttribute}</li>
- * <li>{@link #disconnect}</li>
- * <li>{@link #connect}</li>
+ * <li>{@link #stop}</li>
+ * <li>{@link #start}</li>
  * <li>{@link #linkAttribute}</li>
  * </ol>
  * <p>
  * {@link Agent} is removed:
  * <ol>
  * <li>{@link #unlinkAttribute}</li>
- * <li>{@link #disconnect}</li>
+ * <li>{@link #stop}</li>
  * </ol>
  * <p>
  * Attribute linked to protocol configuration is created/loaded:
@@ -186,6 +184,7 @@ public interface Protocol {
      * If the attribute is not valid for this protocol then it is up to the protocol to log the issue and return false.
      * <p>
      * Attributes are linked to an agent via an {@link MetaType#AGENT_LINK} meta item.
+     *
      * @return True if successful, false otherwise
      */
     boolean linkAttribute(Asset asset, Attribute<?> attribute);
@@ -197,37 +196,23 @@ public interface Protocol {
     void unlinkAttribute(Asset asset, Attribute<?> attribute);
 
     /**
-     * Called before {@link #connect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
-     * register Camel routes and to store the associated {@link Agent} reference.
+     * Called before any calls to {@link #linkAttribute} to allow the protocol to perform required tasks with {@link
+     * ContainerService}s (e.g. register Camel routes). The protocol instance should validate the settings defined in
+     * the associated {@link Agent}; but whether or not the protocol establishes a connection/ fully initialises at this
+     * time is up to the protocol implementation, it could be desirable to wait until {@link #linkAttribute} is called
+     * for the first time, or it could be a connectionless protocol. If there is a configuration issue etc. then an
+     * appropriate exception should be thrown and suitable logs made.
      */
-    void start(Agent agent, Container container) throws Exception;
+    void start(Container container) throws Exception;
 
     /**
-     * Called after {@link #disconnect} to allow the protocol to perform required tasks with {@link ContainerService}s e.g.
-     * remove Camel routes.
+     * Called once all linked attributes have been unlinked via {@link #unlinkAttribute} to allow the protocol to
+     * perform required tasks with {@link ContainerService}s e.g. remove Camel routes, destroy/cleanup resources etc.
      */
     void stop(Container container) throws Exception;
 
     /**
-     * Connect/initialise the protocol instance using the settings defined in the {@link Agent};
-     * the {@link Agent} is responsible for instantiating the protocol instance and passing any
-     * required configuration to the protocol via the {@link Agent#getProtocolInstance}.
-     * @return true if the instance is usable and attributes should be linked, false otherwise
+     * Get the {@link Agent} associated with this protocol instance.
      */
-    boolean connect();
-
-    /**
-     * Disconnect/destroy the protocol instance, implementors should cleanup any resources associated with the instance.
-     */
-    void disconnect();
-
-    /**
-     * Get the {@link Asset#getId} of the associated {@link Agent}; should be used in logging for instance identification
-     */
-    String getAgentId();
-
-    /**
-     *  Get the {@link Asset#getName} of the associated {@link Agent}; should be used in logging for instance identification
-     */
-    String getAgentName();
+    Agent getAgent();
 }

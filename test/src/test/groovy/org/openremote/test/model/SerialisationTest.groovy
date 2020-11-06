@@ -21,7 +21,7 @@ package org.openremote.test.model
 
 import org.openremote.agent.protocol.simulator.SimulatorProtocol
 import org.openremote.container.Container
-import org.openremote.model.ValidationFailure
+import org.openremote.model.attribute.AttributeValidationFailure
 import org.openremote.model.ValueHolder
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
@@ -66,11 +66,11 @@ class SerialisationTest extends Specification {
         AttributeValidationResult result = new AttributeValidationResult(
             "myAttribute",
             [
-                new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_INVALID, "Test")
+                new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_INVALID, "Test")
             ],
             [
-                1: [new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_DUPLICATION)],
-                2: [new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, "my:meta")]
+                1: [new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_DUPLICATION)],
+                2: [new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, "my:meta")]
             ]
         )
 

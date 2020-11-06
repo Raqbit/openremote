@@ -239,7 +239,7 @@ public class GatewayService extends RouteBuilder implements ContainerService, As
             LOG.fine("Attribute event for a locally registered gateway asset (Asset ID=" + asset.getId() + "): " + attribute);
 
             // This is a change to a locally registered gateway
-            if (attribute.getNameOrThrow().equals("disabled")) {
+            if (attribute.getName().equals("disabled")) {
                 boolean disabled = attribute.getValueAsBoolean().orElse(false);
                 boolean isAlreadyDisabled = asset.getAttribute("disabled").flatMap(Attribute::getValueAsBoolean).orElse(false);
                 if (disabled != isAlreadyDisabled) {
@@ -269,9 +269,9 @@ public class GatewayService extends RouteBuilder implements ContainerService, As
                     connector.sendMessageToGateway(
                         new AttributeEvent(
                             mapAssetId(gatewayId, asset.getId(), true),
-                            attribute.getNameOrThrow(),
+                            attribute.getName(),
                             attribute.getValue().orElse(null),
-                            attribute.getValueTimestamp().orElse(0L))
+                            attribute.getTimestamp())
                             .setParentId(mapAssetId(gatewayId, asset.getParentId(), true)).setRealm(asset.getRealm()));
                 }
 

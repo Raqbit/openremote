@@ -51,7 +51,7 @@ public class ElectricityProducer extends Device {
     );
     public static final AttributeDescriptor<Integer> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", true, ValueType.DIRECTION, null);
 
-    public static final AssetDescriptor<ElectricityProducer> DESCRIPTOR = new AssetDescriptor<>("Electricity producer", "ev-station", "8A293D", ElectricityProducer.class);
+    public static final AssetDescriptor<ElectricityProducer> DESCRIPTOR = new AssetDescriptor<>("ev-station", "8A293D", ElectricityProducer.class);
 
     public ElectricityProducer(String name) {
         super(name, DESCRIPTOR);

@@ -22,7 +22,7 @@ package org.openremote.agent.protocol.simulator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -290,7 +290,7 @@ public class SimulatorProtocol extends AbstractProtocol {
             }
         } else if (attribute.getValue().isPresent()) {
             element.setValue(attribute.getValue().get());
-            List<ValidationFailure> failures = element.getValidationFailures();
+            List<AttributeValidationFailure> failures = element.getValidationFailures();
             if (!failures.isEmpty()) {
                 element.clearValue();
                 LOG.warning("Failed to initialize simulator element, initial value validation failures " + failures + ": " + attribute);
@@ -441,7 +441,7 @@ public class SimulatorProtocol extends AbstractProtocol {
 
             Optional<Value> oldValue = element.getValue();
             element.setValue(attributeState.getValue().orElse(null));
-            List<ValidationFailure> failures = element.getValidationFailures();
+            List<AttributeValidationFailure> failures = element.getValidationFailures();
 
             if (!failures.isEmpty()) {
                 // Reset to old value

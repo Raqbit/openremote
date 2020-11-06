@@ -205,7 +205,7 @@ public class ControllerProtocol extends AbstractProtocol {
 
     @Override
     protected void doConnect() {
-        LOG.fine("### Adding new protocol " + protocolConfiguration.getReferenceOrThrow() + " (" + protocolConfiguration.getNameOrThrow() + ")");
+        LOG.fine("### Adding new protocol " + protocolConfiguration.getReferenceOrThrow() + " (" + protocolConfiguration.getName() + ")");
 
         String baseURL = protocolConfiguration.getMetaItem(META_PROTOCOL_BASE_URI).flatMap(AbstractValueHolder::getValueAsString)
                 .orElseThrow(() -> new IllegalArgumentException("Missing or invalid required meta item: " + META_PROTOCOL_BASE_URI));
@@ -270,7 +270,7 @@ public class ControllerProtocol extends AbstractProtocol {
          * Build Sensor Status info for polling request
          */
         if (sensorName != null) {
-            LOG.fine("### Adding new sensor [" + deviceName + "," + sensorName + "] linked to " + agent.getReferenceOrThrow() + " (" + agent.getNameOrThrow() + ")");
+            LOG.fine("### Adding new sensor [" + deviceName + "," + sensorName + "] linked to " + agent.getReferenceOrThrow() + " (" + agent.getName() + ")");
             controllersMap.get(agent.getReferenceOrThrow()).addSensor(attribute.getReferenceOrThrow(), new ControllerSensor(deviceName, sensorName));
 
             //Properly stop previously existing polling on device name --> use of false parameter

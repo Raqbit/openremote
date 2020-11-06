@@ -40,10 +40,11 @@ import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
 
 /**
- * Describes a type of {@link Asset}; the {@link #getType()} must be unique within the context of the manager within
- * which the Asset resides.
+ * Describes a type of {@link Asset}; the {@link #getName()} must be unique within the context of the manager within
+ * which the Asset resides; as {@link #getName()} is just {@link Class#getSimpleName()} of {@link #getType()} it is
+ * important that Asset class names (excluding the package) do not clash
  * <p>
- * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s also using reflection (see
+ * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s using reflection (see
  * {@link #getAttributeDescriptors}) by looking for static public fields of type {@link
  * AttributeDescriptor} with the {@link ModelDescriptor} on its' own class and on all super classes up to {@link
  * Asset}, this way asset types inherit {@link AttributeDescriptor}s, and an inherited {@link AttributeDescriptor}
@@ -59,26 +60,20 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
     protected String icon;
     protected String colour;
 
-    /**
-     * {@link AttributeDescriptor}s are extracted automatically by traversing the type hierarchy starting at the
-     * specified type and working up to the {@link Asset} base type; {@link AttributeDescriptor}s must be specified
-     * as public static fields to be recognised.
-     * <p>
-     * Additional {@link AttributeDescriptor}s can be supplied where required for a given type, this is useful for
-     * custom asset types that aren't backed by a class but in general well known {@link Asset} types should have a
-     * corresponding class see {@link Asset} for more details.
-     */
-    public AssetDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) {
-        this.name = name;
+    public AssetDescriptor(String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) {
+        this.name = type.getSimpleName();
         this.icon = icon;
         this.colour = colour;
         this.type = type;
         this.attributeDescriptors = extractAttributeDescriptors(type, additionalAttributeDescriptors);
     }
-    public AssetDescriptor(String name, String icon, String colour, Class<T> type) {
-        this(name, icon, colour, type, null);
+    public AssetDescriptor(String icon, String colour, Class<T> type) {
+        this(icon, colour, type, null);
     }
 
+    /**
+     * The unique name of this descriptor and corresponds to the simple class name of {@link #getType()}.
+     */
     @Override
     public String getName() {
         return name;
@@ -88,6 +83,11 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
         return type;
     }
 
+    /**
+     * {@link AttributeDescriptor}s are extracted automatically by traversing the type hierarchy starting at the
+     * specified type and working up to the {@link Asset} base type; {@link AttributeDescriptor}s must be specified
+     * as public static fields to be recognised.
+     */
     @Override
     public AttributeDescriptor<?>[] getAttributeDescriptors() {
         return attributeDescriptors;
@@ -101,7 +101,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
         return colour;
     }
 
-    public static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
+    protected static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
         Map<String, AttributeDescriptor<?>> descriptors = new HashMap<>();
         Class<?> currentType = type;
 

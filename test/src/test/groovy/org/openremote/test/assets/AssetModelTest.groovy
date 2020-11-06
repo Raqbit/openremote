@@ -26,8 +26,8 @@ class AssetModelTest extends Specification {
         then: "the attributes should not have an identifier"
         !asset.getAttribute("foo1").get().getAssetId().isPresent()
         !asset.getAttribute("foo2").get().getAssetId().isPresent()
-        !asset.getAttributesList()[0].getAssetId().isPresent()
-        !asset.getAttributesList()[1].getAssetId().isPresent()
+        !asset.getAttributes()[0].getAssetId().isPresent()
+        !asset.getAttributes()[1].getAssetId().isPresent()
 
         when: "the asset identifier is set later"
         def id = UniqueIdentifierGenerator.generateId()
@@ -36,8 +36,8 @@ class AssetModelTest extends Specification {
         then: "the attributes should have an identifier"
         asset.getAttribute("foo1").get().getAssetId().get() == id
         asset.getAttribute("foo2").get().getAssetId().get() == id
-        asset.getAttributesList()[0].getAssetId().get() == id
-        asset.getAttributesList()[1].getAssetId().get() == id
+        asset.getAttributes()[0].getAssetId().get() == id
+        asset.getAttributes()[1].getAssetId().get() == id
     }
 
     def "Comparing asset attributes"() {

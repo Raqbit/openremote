@@ -140,7 +140,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                 st.setString(1, asset.getId());
                 st.setString(2, attribute.name);
                 st.setObject(3, pgJsonValue);
-                st.setTimestamp(4, attribute.getValueTimestamp().map(java.sql.Timestamp::new).orElse(null));
+                st.setTimestamp(4, attribute.getTimestamp().map(java.sql.Timestamp::new).orElse(null));
                 st.executeUpdate();
             });
         }
@@ -390,7 +390,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         }
 
         String whereStr = attributes.stream()
-                .map(attributeRef -> "('" + attributeRef.key + "','" + attributeRef.value.getNameOrThrow() + "')")
+                .map(attributeRef -> "('" + attributeRef.key + "','" + attributeRef.value.getName() + "')")
                 .collect(Collectors.joining(","));
 
         return " and (dp.entityId, dp.attributeName) " + (negate ? "not " : "") + "in (" + whereStr + ")";

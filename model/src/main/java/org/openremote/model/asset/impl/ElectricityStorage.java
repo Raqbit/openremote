@@ -81,7 +81,7 @@ public class ElectricityStorage extends Device {
         new MetaItem<>(MetaType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<ElectricityStorage> DESCRIPTOR = new AssetDescriptor<>("Electricity storage", "battery-charging", "1B7C89", ElectricityStorage.class);
+    public static final AssetDescriptor<ElectricityStorage> DESCRIPTOR = new AssetDescriptor<>("battery-charging", "1B7C89", ElectricityStorage.class);
 
     public ElectricityStorage(String name) {
         super(name, DESCRIPTOR);

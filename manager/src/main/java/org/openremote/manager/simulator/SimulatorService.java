@@ -21,6 +21,7 @@ package org.openremote.manager.simulator;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.agent.protocol.simulator.SimulatorProtocol;
+import org.openremote.model.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.security.AuthContext;
@@ -48,7 +49,6 @@ public class SimulatorService extends RouteBuilder implements ContainerService {
     protected ManagerIdentityService managerIdentityService;
     protected AssetStorageService assetStorageService;
     protected ClientEventService clientEventService;
-    protected SimulatorProtocol simulatorProtocol;
 
     @Override
     public int getPriority() {
@@ -60,7 +60,6 @@ public class SimulatorService extends RouteBuilder implements ContainerService {
         managerIdentityService = container.getService(ManagerIdentityService.class);
         assetStorageService = container.getService(AssetStorageService.class);
         clientEventService = container.getService(ClientEventService.class);
-        simulatorProtocol = container.getService(SimulatorProtocol.class);
 
         clientEventService.addSubscriptionAuthorizer((auth, subscription) -> {
             if (!subscription.isEventType(SimulatorState.class))
@@ -76,11 +75,6 @@ public class SimulatorService extends RouteBuilder implements ContainerService {
         });
 
         container.getService(MessageBrokerService.class).getContext().addRoutes(this);
-
-        // When a protocol instance has its values updated through linked attribute writes, publish a snapshot to all sessions
-        simulatorProtocol.setValuesChangedHandler(
-            protocolConfiguration -> publishSimulatorState(null, protocolConfiguration)
-        );
     }
 
     @Override

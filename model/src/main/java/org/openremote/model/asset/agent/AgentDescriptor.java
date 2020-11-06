@@ -54,7 +54,7 @@ public class AgentDescriptor<T extends Agent, S extends Protocol> extends AssetD
     protected MetaItemDescriptor<?>[] linkedAttributeDescriptors;
 
     public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
-        super(name, icon, colour, type, additionalAttributeDescriptors);
+        super(icon, colour, type, additionalAttributeDescriptors);
         this.protocolClass = protocolClass;
         this.instanceDiscoveryFactory = instanceDiscoveryFactory;
         this.assetDiscoveryFactory = assetDiscoveryFactory;

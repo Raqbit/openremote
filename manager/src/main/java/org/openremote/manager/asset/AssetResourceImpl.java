@@ -273,10 +273,10 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 }
 
                 // Merge updated with existing attributes
-                for (Attribute updatedAttribute : asset.getAttributesList()) {
+                for (Attribute updatedAttribute : asset.getAttributes()) {
 
                     // Proper validation happens on merge(), here we only need the name to continue
-                    String updatedAttributeName = updatedAttribute.getNameOrThrow();
+                    String updatedAttributeName = updatedAttribute.getName();
 
                     //Check if a well known attribute is added
                     checkForWellKnownAttributes(asset);
@@ -335,7 +335,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 }
 
                 // Remove missing attributes
-                resultAsset.getAttributesList().removeIf(existingAttribute ->
+                resultAsset.getAttributes().removeIf(existingAttribute ->
                     existingAttribute.getName().isPresent()
                         && !asset.hasAttribute(existingAttribute.getName().get()) && existingAttribute.isAccessRestrictedWrite()
                 );
@@ -470,7 +470,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 newAsset.getAttributesStream().forEach(assetAttribute -> {
                     if (assetDescriptor.getAttributeDescriptors() != null) {
                         Arrays.stream(assetDescriptor.getAttributeDescriptors())
-                                .filter(attrDescriptor -> attrDescriptor.getAttributeName().equals(assetAttribute.getNameOrThrow()))
+                                .filter(attrDescriptor -> attrDescriptor.getAttributeName().equals(assetAttribute.getName()))
                                 .findFirst()
                                 .ifPresent(defaultAttribute -> {
                                     if (defaultAttribute.getMetaItemDescriptors() != null) {

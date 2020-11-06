@@ -42,7 +42,7 @@ public class Ship extends Asset {
     );
     public static final AttributeDescriptor<String> SHIP_TYPE = new AttributeDescriptor<>("shipType", true, ValueType.STRING, null);
 
-    public static final AssetDescriptor<Ship> DESCRIPTOR = new AssetDescriptor<>("Ship", "ferry", "000080", Ship.class);
+    public static final AssetDescriptor<Ship> DESCRIPTOR = new AssetDescriptor<>("ferry", "000080", Ship.class);
 
     public <T extends Ship> Ship(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);

@@ -96,7 +96,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         assets.size() == 6
         assets.get(0).id == managerTestSetup.apartment1Id
         assets.get(1).id == managerTestSetup.apartment1LivingroomId
-        assets.get(1).getAttributesList().size() == 11
+        assets.get(1).getAttributes().size() == 11
         assets.get(1).getAttribute("motionSensor").isPresent()
         !assets.get(1).getAttribute("currentTemperature").get().getValue().isPresent()
         assets.get(1).getAttribute("currentTemperature").get().meta.size() == 1
@@ -122,7 +122,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         assets.size() == 6
         assets.get(0).id == managerTestSetup.apartment1Id
         assets.get(1).id == managerTestSetup.apartment1LivingroomId
-        assets.get(1).getAttributesList().size() == 7
+        assets.get(1).getAttributes().size() == 7
         !assets.get(1).getAttribute("motionSensor").isPresent()
         !assets.get(1).getAttribute("currentTemperature").get().getValue().isPresent()
         assets.get(1).getAttribute("currentTemperature").get().meta.size() == 1
@@ -146,7 +146,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         then: "only one asset should be retrieved"
         assets.size() == 1
         assets.get(0).id == managerTestSetup.apartment2LivingroomId
-        assets.get(0).getAttributesList().size() == 1
+        assets.get(0).getAttributes().size() == 1
         assets.get(0).getAttribute("windowOpen").isPresent()
         !assets.get(0).getAttribute("windowOpen").get().getValueAsBoolean().get()
         !assets.get(0).getAttribute("windowOpen").get().hasMetaItems()
@@ -173,7 +173,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         apartment1.parentType == null
         apartment1.realm == managerTestSetup.realmBuildingTenant
         apartment1.path == null
-        apartment1.getAttributesList().size() == 7
+        apartment1.getAttributes().size() == 7
         apartment1.getAttribute("ventilationAuto").isPresent()
         apartment1.getAttribute("ventilationLevel").isPresent()
         apartment1.getAttribute("alarmEnabled").isPresent()
@@ -403,7 +403,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         assets.find {it.id == managerTestSetup.apartment1Id} != null
         def livingroom = assets.find {it.id == managerTestSetup.apartment1LivingroomId}
         livingroom != null
-        livingroom.getAttributesList().size() == 7
+        livingroom.getAttributes().size() == 7
         !livingroom.getAttribute("currentTemperature").get().getValue().isPresent()
         livingroom.getAttribute("currentTemperature").get().meta.size() == 7
         !livingroom.getAttribute("targetTemperature").get().getValue().isPresent()
@@ -621,7 +621,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         asset.parentType == AssetType.RESIDENCE.getType()
         asset.realm == keycloakTestSetup.tenantBuilding.realm
         asset.path != null
-        asset.getAttributesList().size() == 3
+        asset.getAttributes().size() == 3
         asset.getAttribute("co2Level").isPresent()
         asset.getAttribute("co2Level").get().meta.size() == 11
         asset.getAttribute("lastPresenceDetected").isPresent()
@@ -647,7 +647,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         asset.parentType == AssetType.RESIDENCE.getType()
         asset.realm == keycloakTestSetup.tenantBuilding.realm
         asset.path != null
-        asset.getAttributesList().size() == 1
+        asset.getAttributes().size() == 1
         asset.getAttribute("co2Level").isPresent()
         asset.getAttribute("co2Level").get().meta.size() == 8
         !asset.getAttribute("lastPresenceDetected").isPresent()
@@ -691,10 +691,6 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         asset = assetStorageService.find(
             new AssetQuery().select(Select.selectExcludePathAndParentInfo()).attributes(
                 new LogicGroup<AttributePredicate>(LogicGroup.Operator.AND, [
-                    new AttributePredicate(
-                        new StringPredicate("windowOpen"), new BooleanPredicate(false)
-                    )
-                ], [
                     new LogicGroup(LogicGroup.Operator.OR, [
                         new AttributePredicate(
                             new StringPredicate("co2Level"), new NumberPredicate(340, Operator.GREATER_THAN, NumberType.INTEGER)
@@ -703,6 +699,10 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
                             new StringPredicate("co2Level"), new NumberPredicate(50, Operator.LESS_THAN, NumberType.INTEGER)
                         )
                     ], null)
+                ], [
+                    new AttributePredicate(
+                        new StringPredicate("windowOpen"), new BooleanPredicate(false)
+                    )
                 ])
             )
         )
@@ -718,10 +718,6 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         asset = assetStorageService.find(
             new AssetQuery().select(Select.selectExcludePathAndParentInfo()).attributes(
                 new LogicGroup<AttributePredicate>(LogicGroup.Operator.AND, [
-                    new AttributePredicate(
-                        new StringPredicate("windowOpen"), new BooleanPredicate(false)
-                    )
-                ], [
                     new LogicGroup(LogicGroup.Operator.OR, [
                         new AttributePredicate(
                             new StringPredicate("co2Level"), new NumberPredicate(360, Operator.GREATER_THAN, NumberType.INTEGER)
@@ -730,6 +726,10 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
                             new StringPredicate("co2Level"), new NumberPredicate(50, Operator.LESS_THAN, NumberType.INTEGER)
                         )
                     ], null)
+                ], [
+                    new AttributePredicate(
+                        new StringPredicate("windowOpen"), new BooleanPredicate(false)
+                    )
                 ])
             )
         )

@@ -76,10 +76,10 @@ public class AssetState implements Comparable<AssetState> {
         this.attributeName = attribute.getName();
         this.attributeValueType = attribute.getValueType();
         this.value = attribute.getValue().orElse(null);
-        this.timestamp = attribute.getTimestamp();
+        this.timestamp = attribute.getTimestamp().orElse(-1L);
         this.source = source;
         this.oldValue = asset.getAttributes().get(attributeName).flatMap(Attribute::getValue).orElse(null);
-        this.oldValueTimestamp = asset.getAttributes().get(attributeName).map(Attribute::getTimestamp).orElse(-1L);
+        this.oldValueTimestamp = asset.getAttributes().get(attributeName).flatMap(Attribute::getTimestamp).orElse(-1L);
         this.id = asset.getId();
         this.name = asset.getName();
         this.type = asset.getType();

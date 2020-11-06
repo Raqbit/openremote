@@ -33,7 +33,7 @@ public class Building extends Asset {
     public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", true, ValueType.STRING, null);
     public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", true, ValueType.STRING, null);
 
-    public static final AssetDescriptor<Building> DESCRIPTOR = new AssetDescriptor<>("Building", "office-building", "4b5966", Building.class);
+    public static final AssetDescriptor<Building> DESCRIPTOR = new AssetDescriptor<>("office-building", "4b5966", Building.class);
 
     public Building(String name) {
         super(name, DESCRIPTOR);

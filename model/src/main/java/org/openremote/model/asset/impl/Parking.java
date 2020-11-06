@@ -41,7 +41,7 @@ public class Parking extends Device {
         new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
 
-    public static final AssetDescriptor<Parking> DESCRIPTOR = new AssetDescriptor<>("Parking", "parking", "0260ae", Parking.class);
+    public static final AssetDescriptor<Parking> DESCRIPTOR = new AssetDescriptor<>("parking", "0260ae", Parking.class);
 
     public Parking(String name) {
         super(name, DESCRIPTOR);

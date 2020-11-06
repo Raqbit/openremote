@@ -27,7 +27,7 @@ import org.openremote.container.concurrent.GlobalLock;
 import org.openremote.container.message.MessageBrokerContext;
 import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.timer.TimerService;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -437,10 +437,10 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
         AttributeValidationResult result = new AttributeValidationResult(protocolConfiguration.getName().orElse(""));
 
         if (!ProtocolConfiguration.isProtocolConfiguration(protocolConfiguration)) {
-            result.addMetaFailure(new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, MetaItemType.PROTOCOL_CONFIGURATION.name()));
+            result.addMetaFailure(new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, MetaItemType.PROTOCOL_CONFIGURATION.name()));
         }
         if (!ProtocolConfiguration.isValidProtocolName(protocolConfiguration.getValueAsString().orElse(null))) {
-            result.addAttributeFailure(new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_INVALID));
+            result.addAttributeFailure(new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_INVALID));
         }
         return result;
     }
@@ -459,7 +459,8 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
+        return this.getClass().getSimpleName() + "{" +
+            "agent=" + agent +
             '}';
     }
 

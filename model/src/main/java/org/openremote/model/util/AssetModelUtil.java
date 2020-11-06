@@ -19,11 +19,13 @@
  */
 package org.openremote.model.util;
 
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.v2.*;
 import org.openremote.model.value.Values;
@@ -179,7 +181,7 @@ public class AssetModelUtil {
         }
     }
 
-    protected static Logger LOG = SyslogCategory.getLogger(MODEL_AND_VALUES, AssetModelUtil.class);
+    public static Logger LOG = SyslogCategory.getLogger(MODEL_AND_VALUES, AssetModelUtil.class);
     protected static final List<AssetModelProvider> assetModelProviders = new ArrayList<>(Collections.singletonList(new StandardModelProvider()));
     protected static AssetDescriptor<?>[] assetDescriptors;
     protected static MetaItemDescriptor<?>[] metaItemDescriptors;
@@ -207,6 +209,12 @@ public class AssetModelUtil {
         return Arrays.stream(assetDescriptors)
             .filter(assetDescriptor -> assetDescriptor.getType() == assetType)
             .map(assetDescriptor -> (AssetDescriptor<T>)assetDescriptor)
+            .findFirst();
+    }
+
+    public static Optional<AssetDescriptor<?>> getAssetDescriptor(String assetType) {
+        return Arrays.stream(assetDescriptors)
+            .filter(assetDescriptor -> assetDescriptor.getName().equals(assetType))
             .findFirst();
     }
 
@@ -295,5 +303,24 @@ public class AssetModelUtil {
         AssetModelUtil.assetDescriptors = assetDescriptors.toArray(new AssetDescriptor<?>[0]);
         AssetModelUtil.metaItemDescriptors = metaItemDescriptors.toArray(new MetaItemDescriptor<?>[0]);
         AssetModelUtil.valueDescriptors = valueDescriptors.toArray(new ValueDescriptor<?>[0]);
+    }
+
+    /**
+     * Validates the {@link Attribute}s of the specified {@link Asset} by comparing to the {@link AssetDescriptor} for
+     * the asset type; if the specific {@link AssetDescriptor} is not available then
+     */
+    // TODO: Implement validation using javax bean validation
+    public static AttributeValidationFailure[] validateAsset(Asset asset) {
+        AssetDescriptor<?> descriptor = getAssetDescriptor(asset.getType()).orElse(Asset.DESCRIPTOR);
+
+        Arrays.stream(descriptor.getAttributeDescriptors()).forEach(
+            attributeDescriptor -> {
+                if (!attributeDescriptor.isOptional()) {
+
+                }
+            }
+        );
+
+        return new AttributeValidationFailure[0];
     }
 }

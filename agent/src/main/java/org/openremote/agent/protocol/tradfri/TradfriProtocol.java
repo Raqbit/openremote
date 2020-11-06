@@ -9,7 +9,7 @@ import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.agent.protocol.tradfri.device.event.*;
 import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.AgentLink;
@@ -161,7 +161,7 @@ public class TradfriProtocol extends AbstractProtocol {
                         ipFound = true;
                         if (isNullOrEmpty(actionMetaItem.getValueAsString().orElse(null))) {
                             result.addMetaFailure(
-                                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
+                                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
                             );
                         }
                     }
@@ -169,7 +169,7 @@ public class TradfriProtocol extends AbstractProtocol {
             }
             if (!ipFound) {
                 result.addMetaFailure(
-                        new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TRADFRI_GATEWAY_HOST)
+                        new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TRADFRI_GATEWAY_HOST)
                 );
             }
         }

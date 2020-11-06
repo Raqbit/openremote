@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.zwave;
 
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
@@ -72,7 +72,7 @@ public class ZWConfiguration {
             failure = true;
             if (result != null) {
                 result.addAttributeFailure(
-                    new ValidationFailure(
+                    new AttributeValidationFailure(
                         ValueHolder.ValueFailureReason.VALUE_MISMATCH,
                         ZWProtocol.PROTOCOL_NAME));
             }
@@ -91,7 +91,7 @@ public class ZWConfiguration {
                             break;
                         }
                         result.addMetaFailure(i,
-                            new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
+                            new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
                     }
                 }
             }
@@ -101,7 +101,7 @@ public class ZWConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_ZWAVE_SERIAL_PORT)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_ZWAVE_SERIAL_PORT)
                 );
             }
         }

@@ -264,7 +264,7 @@ class JsonRulesTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the console sends a location update with a new location but still outside the geofence"
-        def timestamp = assetStorageService.find(consoleRegistration.id, true).getAttribute(LOCATION).flatMap{it.getValueTimestamp()}.orElse(timerService.getCurrentTimeMillis())
+        def timestamp = assetStorageService.find(consoleRegistration.id, true).getAttribute(LOCATION).flatMap{it.getTimestamp()}.orElse(timerService.getCurrentTimeMillis())
         def attributeEvent = new AttributeEvent(consoleRegistration.id, LOCATION.attributeName, new GeoJSONPoint(10d, 10d).toValue(), timestamp)
         assetProcessingService.sendAttributeEvent(attributeEvent, AttributeEvent.Source.CLIENT)
 
@@ -379,7 +379,7 @@ class JsonRulesTest extends Specification implements ManagerContainerTrait {
         then: "the event should have been committed to the DB"
         conditions.eventually {
             def console = assetStorageService.find(consoleRegistration.id, true)
-            assert console.getAttribute(LOCATION).flatMap{it.getValueTimestamp()}.orElse(0) == timestamp
+            assert console.getAttribute(LOCATION).flatMap{it.getTimestamp()}.orElse(0) == timestamp
         }
 
         and: "no notification should have been sent as outside the validity period"
@@ -401,7 +401,7 @@ class JsonRulesTest extends Specification implements ManagerContainerTrait {
         then: "the event should have been committed to the DB"
         conditions.eventually {
             def console = assetStorageService.find(consoleRegistration.id, true)
-            assert console.getAttribute(LOCATION).flatMap{it.getValueTimestamp()}.orElse(0) == timestamp
+            assert console.getAttribute(LOCATION).flatMap{it.getTimestamp()}.orElse(0) == timestamp
         }
 
         and: "another notification should have been sent as inside the validity period"
@@ -426,7 +426,7 @@ class JsonRulesTest extends Specification implements ManagerContainerTrait {
         then: "the event should have been committed to the DB"
         conditions.eventually {
             def console = assetStorageService.find(consoleRegistration.id, true)
-            assert console.getAttribute(LOCATION).flatMap{it.getValueTimestamp()}.orElse(0) == timestamp
+            assert console.getAttribute(LOCATION).flatMap{it.getTimestamp()}.orElse(0) == timestamp
         }
 
         and: "no notification should have been sent as outside the validity period"

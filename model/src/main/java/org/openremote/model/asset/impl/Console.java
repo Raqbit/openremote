@@ -36,7 +36,7 @@ public class Console extends Asset {
     public static final AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", false, ValueType.STRING, null);
     public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", false, ValueType.CONSOLE_PROVIDERS, null);
 
-    public static final AssetDescriptor<Console> DESCRIPTOR = new AssetDescriptor<>("Console", "monitor-cellphone", null, Console.class);
+    public static final AssetDescriptor<Console> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, Console.class);
 
     protected <T extends Console> Console(String name) {
         super(name, DESCRIPTOR);

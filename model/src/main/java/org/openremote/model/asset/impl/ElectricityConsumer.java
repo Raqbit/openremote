@@ -71,7 +71,7 @@ public class ElectricityConsumer extends Device {
         new MetaItem<>(MetaType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<ElectricityConsumer> DESCRIPTOR = new AssetDescriptor<>("Electricity consumer", "power-plug", "8A293D", ElectricityConsumer.class);
+    public static final AssetDescriptor<ElectricityConsumer> DESCRIPTOR = new AssetDescriptor<>("power-plug", "8A293D", ElectricityConsumer.class);
 
     public ElectricityConsumer(String name) {
         super(name, DESCRIPTOR);

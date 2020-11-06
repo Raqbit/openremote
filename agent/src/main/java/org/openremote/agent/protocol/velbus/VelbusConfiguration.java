@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.velbus;
 
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
@@ -64,7 +64,7 @@ public final class VelbusConfiguration {
             failure = true;
             if (result != null) {
                 result.addAttributeFailure(
-                    new ValidationFailure(
+                    new AttributeValidationFailure(
                         ValueHolder.ValueFailureReason.VALUE_MISMATCH,
                         VelbusTcpProtocol.PROTOCOL_NAME));
             }
@@ -84,7 +84,7 @@ public final class VelbusConfiguration {
                             break;
                         }
                         result.addMetaFailure(i,
-                            new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
+                            new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
                     }
                 } else if (isMetaNameEqualTo(metaItem, VelbusTcpProtocol.META_VELBUS_PORT)) {
                     portFound = true;
@@ -95,7 +95,7 @@ public final class VelbusConfiguration {
                             break;
                         }
                         result.addMetaFailure(i,
-                            new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, "1-65536"));
+                            new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, "1-65536"));
                     }
                 }
             }
@@ -105,7 +105,7 @@ public final class VelbusConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(
+                    new AttributeValidationFailure(
                         MetaItem.MetaItemFailureReason.META_ITEM_MISSING,
                         VelbusTcpProtocol.META_VELBUS_HOST));
             }
@@ -114,7 +114,7 @@ public final class VelbusConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(
+                    new AttributeValidationFailure(
                         MetaItem.MetaItemFailureReason.META_ITEM_MISSING,
                         VelbusTcpProtocol.META_VELBUS_PORT));
             }
@@ -130,7 +130,7 @@ public final class VelbusConfiguration {
             failure = true;
             if (result != null) {
                 result.addAttributeFailure(
-                    new ValidationFailure(
+                    new AttributeValidationFailure(
                         ValueHolder.ValueFailureReason.VALUE_MISMATCH,
                         VelbusSerialProtocol.PROTOCOL_NAME));
             }
@@ -150,7 +150,7 @@ public final class VelbusConfiguration {
                         }
 
                         result.addMetaFailure(i,
-                            new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
+                            new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name()));
                     }
                 } else if (isMetaNameEqualTo(metaItem, VelbusSerialProtocol.META_VELBUS_SERIAL_BAUDRATE)) {
                     int baudrate = metaItem.getValueAsInteger().orElse(0);
@@ -161,7 +161,7 @@ public final class VelbusConfiguration {
                         }
 
                         result.addMetaFailure(i,
-                            new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH));
+                            new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH));
                     }
                 }
             }
@@ -171,7 +171,7 @@ public final class VelbusConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, VelbusTcpProtocol.META_VELBUS_PORT)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, VelbusTcpProtocol.META_VELBUS_PORT)
                 );
             }
         }

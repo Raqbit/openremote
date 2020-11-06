@@ -31,7 +31,7 @@ public class Device extends Asset {
     public static final AttributeDescriptor<String> MANUFACTURER = new AttributeDescriptor<>("manufacturer", true, ValueType.STRING, null);
     public static final AttributeDescriptor<String> MODEL = new AttributeDescriptor<>("model", true, ValueType.STRING, null);
 
-    public static final AssetDescriptor<Device> DESCRIPTOR = new AssetDescriptor<>("Device", "cube-outline", null, Device.class);
+    public static final AssetDescriptor<Device> DESCRIPTOR = new AssetDescriptor<>("cube-outline", null, Device.class);
 
     public <T extends Device> Device(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);

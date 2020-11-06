@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.macro;
 
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeValidationResult;
@@ -67,7 +67,7 @@ final public class MacroConfiguration {
         if (!isMacroConfiguration(attribute)) {
             failure = true;
             if (result != null) {
-                result.addAttributeFailure(new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME));
+                result.addAttributeFailure(new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME));
             }
         }
 
@@ -83,7 +83,7 @@ final public class MacroConfiguration {
                             break;
                         }
                         result.addMetaFailure(
-                            i, new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Macro Action")
+                            i, new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Macro Action")
                         );
                     }
                 }
@@ -94,7 +94,7 @@ final public class MacroConfiguration {
             failure = true;
             if (result != null) {
                 result.addMetaFailure(
-                    new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_MACRO_ACTION)
+                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_MACRO_ACTION)
                 );
             }
         }

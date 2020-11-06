@@ -21,7 +21,6 @@ package org.openremote.model.attribute;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openremote.model.ValidationFailure;
 
 import java.util.*;
 
@@ -39,9 +38,9 @@ public class AttributeValidationResult {
     @JsonProperty
     protected String attributeName;
     @JsonProperty
-    protected List<ValidationFailure> attributeFailures;
+    protected List<AttributeValidationFailure> attributeFailures;
     @JsonProperty
-    protected Map<Integer, List<ValidationFailure>> metaFailures;
+    protected Map<Integer, List<AttributeValidationFailure>> metaFailures;
 
     public AttributeValidationResult(String attributeName) {
         this.attributeName = attributeName;
@@ -49,14 +48,14 @@ public class AttributeValidationResult {
 
     @JsonCreator
     public AttributeValidationResult(@JsonProperty("attributeName") String attributeName,
-                                     @JsonProperty("attributeFailures") List<ValidationFailure> attributeFailures,
-                                     @JsonProperty("metaFailures") Map<Integer, List<ValidationFailure>> metaFailures) {
+                                     @JsonProperty("attributeFailures") List<AttributeValidationFailure> attributeFailures,
+                                     @JsonProperty("metaFailures") Map<Integer, List<AttributeValidationFailure>> metaFailures) {
         this.attributeName = attributeName;
         this.attributeFailures = attributeFailures;
         this.metaFailures = metaFailures;
     }
 
-    public void addAttributeFailure(ValidationFailure attributeFailure) {
+    public void addAttributeFailure(AttributeValidationFailure attributeFailure) {
         if (attributeFailures == null) {
             attributeFailures = new ArrayList<>();
         }
@@ -64,11 +63,11 @@ public class AttributeValidationResult {
         attributeFailures.add(attributeFailure);
     }
 
-    public void addMetaFailure(ValidationFailure failure) {
+    public void addMetaFailure(AttributeValidationFailure failure) {
         addMetaFailure(-1, failure);
     }
 
-    public void addMetaFailure(int metaItemindex, ValidationFailure failure) {
+    public void addMetaFailure(int metaItemindex, AttributeValidationFailure failure) {
         if (metaFailures == null) {
             metaFailures = new HashMap<>();
         }
@@ -82,11 +81,11 @@ public class AttributeValidationResult {
         return attributeName;
     }
 
-    public List<ValidationFailure> getAttributeFailures() {
+    public List<AttributeValidationFailure> getAttributeFailures() {
         return attributeFailures;
     }
 
-    public Map<Integer, List<ValidationFailure>> getMetaFailures() {
+    public Map<Integer, List<AttributeValidationFailure>> getMetaFailures() {
         return metaFailures;
     }
 

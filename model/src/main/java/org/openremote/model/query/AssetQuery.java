@@ -353,21 +353,28 @@ public class AssetQuery {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public AssetQuery types(AssetDescriptor<?>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;
         }
 
-        this.types = Arrays.stream(types).map(AssetDescriptor::getType).toArray(Class<? extends Asset>[]::new);
+        this.types = Arrays.stream(types).map(AssetDescriptor::getType)
+            .toArray(size -> (Class<? extends Asset>[])new Class<?>[size]);
+
         return this;
     }
 
-    public AssetQuery types(Class<? extends Asset>... types) {
+    @SafeVarargs
+    public final AssetQuery types(Class<? extends Asset>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;
         }
+
+        this.types = types;
+        return this;
     }
 
     public AssetQuery attributes(AttributePredicate... attributePredicates) {

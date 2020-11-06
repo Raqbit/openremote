@@ -34,7 +34,7 @@ public class Microphone extends Device {
         new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_SOUND_DECIBELS)
     );
 
-    public static final AssetDescriptor<Microphone> DESCRIPTOR = new AssetDescriptor<>("Microphone", "microphone", "47A5FF", Microphone.class);
+    public static final AssetDescriptor<Microphone> DESCRIPTOR = new AssetDescriptor<>("microphone", "47A5FF", Microphone.class);
 
     public Microphone(String name) {
         super(name, DESCRIPTOR);

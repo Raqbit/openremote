@@ -21,6 +21,7 @@ package org.openremote.manager.rules;
 
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.MetaList;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.query.LogicGroup;
@@ -29,6 +30,7 @@ import org.openremote.model.query.filter.ParentPredicate;
 import org.openremote.model.query.filter.PathPredicate;
 import org.openremote.model.query.filter.TenantPredicate;
 import org.openremote.model.rules.AssetState;
+import org.openremote.model.util.AssetModelUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,9 +81,11 @@ public class AssetQueryPredicate implements Predicate<AssetState> {
         }
 
         if (query.types != null && query.types.length > 0) {
-            if (Arrays.stream(query.types)
-                    .map(stringPredicate -> stringPredicate.asPredicate(timerService::getCurrentTimeMillis))
-                    .noneMatch(np -> np.test(assetState.getType()))) {
+            if (Arrays.stream(query.types).noneMatch(type ->
+                        type.isAssignableFrom(
+                            AssetModelUtil.getAssetDescriptor(assetState.getType())
+                                .orElse(Asset.DESCRIPTOR).getType()))
+                    ) {
                 return false;
             }
         }

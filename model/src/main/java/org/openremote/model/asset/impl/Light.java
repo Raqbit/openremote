@@ -35,7 +35,7 @@ public class Light extends Device {
     );
     public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueType.PERCENTAGE_INTEGER_0_100, null);
 
-    public static final AssetDescriptor<Light> DESCRIPTOR = new AssetDescriptor<>("Light", "lightbulb", "e6688a", Light.class);
+    public static final AssetDescriptor<Light> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "e6688a", Light.class);
 
     public <T extends Light> Light(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);

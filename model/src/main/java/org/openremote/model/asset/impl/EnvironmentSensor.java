@@ -61,7 +61,7 @@ public class EnvironmentSensor extends Device {
         new MetaItem<>(MetaType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<EnvironmentSensor> DESCRIPTOR = new AssetDescriptor<>("Environment Sensor", "periodic-table-co2", "f18546", EnvironmentSensor.class);
+    public static final AssetDescriptor<EnvironmentSensor> DESCRIPTOR = new AssetDescriptor<>("periodic-table-co2", "f18546", EnvironmentSensor.class);
 
     public EnvironmentSensor(String name) {
         super(name, DESCRIPTOR);

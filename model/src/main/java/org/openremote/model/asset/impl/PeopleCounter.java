@@ -34,7 +34,7 @@ public class PeopleCounter extends Device {
     public static final AttributeDescriptor<Integer> COUNT_OUT_PER_MINUTE = new AttributeDescriptor<>("countOutMinute", true, ValueType.POSITIVE_INTEGER, null);
     public static final AttributeDescriptor<Double> COUNT_GROWTH_PER_MINUTE = new AttributeDescriptor<>("countGrowthMinute", true, ValueType.NUMBER, null);
 
-    public static final AssetDescriptor<PeopleCounter> DESCRIPTOR = new AssetDescriptor<>("People counter", "account-multiple", "4b5966", PeopleCounter.class);
+    public static final AssetDescriptor<PeopleCounter> DESCRIPTOR = new AssetDescriptor<>("account-multiple", "4b5966", PeopleCounter.class);
 
     public PeopleCounter(String name) {
         super(name, DESCRIPTOR);

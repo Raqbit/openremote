@@ -22,7 +22,7 @@ package org.openremote.agent.protocol;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.attribute.Attribute;
+import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.query.AssetQuery;
 
@@ -69,35 +69,35 @@ public interface ProtocolAssetService extends ContainerService {
         }
 
         /**
-         * Assigns the merged asset to the given user, can be <code>null</code> to not assign
-         * the asset to a user. The {@link #mergeAsset} call returns <code>null</code> if the
-         * user doesn't exist or the asset couldn't be assigned.
+         * Assigns the merged asset to the given user, can be <code>null</code> to not assign the asset to a user. The
+         * {@link #mergeAsset} call returns <code>null</code> if the user doesn't exist or the asset couldn't be
+         * assigned.
          */
         public String getAssignToUserName() {
             return assignToUserName;
         }
 
         /**
-         * Compare existing and merged asset state before doing the actual storage merge. If only the
-         * attributes in this predicate have change, then perform the merge on storage. Ignores what {#link getIgnoredAttributeNames}
-         * has stored if attributeNamesToEvaluate is not null.
+         * Compare existing and merged asset state before doing the actual storage merge. If only the attributes in this
+         * predicate have change, then perform the merge on storage. Ignores what {#link getIgnoredAttributeNames} has
+         * stored if attributeNamesToEvaluate is not null.
          */
         public Predicate<String> getAttributeNamesToEvaluate() {
             return attributeNamesToEvaluate;
         }
 
         /**
-         * Compare existing and merged asset state before doing the actual storage merge. If only the
-         * ignored attributes have changed, don't perform the merge on storage.
+         * Compare existing and merged asset state before doing the actual storage merge. If only the ignored attributes
+         * have changed, don't perform the merge on storage.
          */
         public Predicate<String> getIgnoredAttributeNames() {
             return ignoredAttributeNames;
         }
 
         /**
-         * Compare existing and merged asset state before doing the actual storage merge. If only the
-         * ignored keys of any attributes have changed, don't perform the merge on storage. If {#link getAttributeNamesToEvaluate}
-         * is not null, then ignoredAttributeKeys is ignored.
+         * Compare existing and merged asset state before doing the actual storage merge. If only the ignored keys of
+         * any attributes have changed, don't perform the merge on storage. If {#link getAttributeNamesToEvaluate} is
+         * not null, then ignoredAttributeKeys is ignored.
          */
         public Predicate<String> getIgnoredAttributeKeys() {
             return ignoredAttributeKeys;
@@ -105,21 +105,12 @@ public interface ProtocolAssetService extends ContainerService {
     }
 
     /**
-     * Protocols may store assets in the context or update existing assets. A unique identifier
-     * must be set by the protocol implementor, as well as a parent identifier. This operation
-     * stores transient or detached state and returns the current state. It will override any
-     * existing stored asset data, ignoring versions.
+     * Protocols may store assets in the context or update existing assets. A unique identifier must be set by the
+     * protocol implementor, and the parent must be the {@link Agent} associated with the requesting protocol instance.
+     * This operation stores transient or detached state and returns the current state. It will override any existing
+     * stored asset data, ignoring versions.
      */
     Asset mergeAsset(Asset asset);
-
-    /**
-     * Protocols may store assets in the context or update existing assets. A unique identifier
-     * must be set by the protocol implementor, as well as a parent identifier. This operation
-     * stores transient or detached state and returns the current state. It will override any
-     * existing stored asset data, ignoring versions. This call may return <code>null</code>
-     * if the desired {@link MergeOptions} were not successful.
-     */
-    Asset mergeAsset(Asset asset, MergeOptions options);
 
     /**
      * Protocols may remove assets from the context store.
@@ -127,6 +118,11 @@ public interface ProtocolAssetService extends ContainerService {
      * @return <code>false</code> if the delete could not be performed (asset may have children?)
      */
     boolean deleteAsset(String assetId);
+
+    /**
+     * Get asset of specified type from the store by ID.
+     */
+    <T extends Asset> T findAsset(String assetId, Class<T> assetType);
 
     /**
      * Get asset from the store by ID.

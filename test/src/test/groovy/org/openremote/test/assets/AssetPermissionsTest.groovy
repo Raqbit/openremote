@@ -648,7 +648,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         then: "the restricted asset details should be available"
         apartment1Livingroom.id == managerTestSetup.apartment1LivingroomId
         apartment1Livingroom.name == "Living Room 1"
-        def resultAttributes = apartment1Livingroom.getAttributesList()
+        def resultAttributes = apartment1Livingroom.getAttributes()
         resultAttributes.size() == 7
         def currentTemperature = apartment1Livingroom.getAttribute("currentTemperature").get()
         currentTemperature.getValueType().get() == AttributeValueType.TEMPERATURE

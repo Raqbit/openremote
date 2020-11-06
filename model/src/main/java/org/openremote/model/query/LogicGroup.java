@@ -33,11 +33,27 @@ public class LogicGroup<T> {
     public LogicGroup() {
     }
 
+    public LogicGroup(T... items) {
+        this(Arrays.asList(items));
+    }
+
     public LogicGroup(List<T> items) {
         this.items = items;
     }
 
-    public LogicGroup(Operator operator, List<T> items, List<LogicGroup<T>> groups) {
+    public LogicGroup(Operator operator, T... items) {
+        this(operator, Arrays.asList(items));
+    }
+
+    public LogicGroup(Operator operator, List<T> items) {
+        this(operator, null, items);
+    }
+
+    public LogicGroup(Operator operator, List<LogicGroup<T>> groups, T... items) {
+        this(operator, groups, Arrays.asList(items));
+    }
+
+    public LogicGroup(Operator operator, List<LogicGroup<T>> groups, List<T> items) {
         this.operator = operator;
         this.items = items;
         this.groups = groups;

@@ -51,7 +51,7 @@ public class ElectricityCharger extends Device {
         new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
 
-    public static final AssetDescriptor<ElectricityCharger> DESCRIPTOR = new AssetDescriptor<>("Electricity charger", "ev-station", "8A293D", ElectricityCharger.class);
+    public static final AssetDescriptor<ElectricityCharger> DESCRIPTOR = new AssetDescriptor<>("ev-station", "8A293D", ElectricityCharger.class);
 
     public ElectricityCharger(String name) {
         super(name, DESCRIPTOR);

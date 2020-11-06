@@ -34,7 +34,7 @@ import org.openremote.model.auth.OAuthGrant;
 import org.openremote.container.web.QueryParameterInjectorFilter;
 import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -1095,7 +1095,7 @@ public class HttpClientProtocol extends AbstractProtocol {
                 getPingMillis(protocolConfiguration);
             } catch (IllegalArgumentException e) {
                 result.addAttributeFailure(
-                        new ValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME)
+                        new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME)
                 );
             }
         }

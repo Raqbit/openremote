@@ -37,7 +37,7 @@ import org.openremote.manager.gateway.GatewayService;
 import org.openremote.manager.rules.RulesService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.model.Constants;
-import org.openremote.model.ValidationFailure;
+import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.*;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeEvent.Source;
@@ -352,7 +352,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                     // Check the last update timestamp of the attribute, ignoring any event that is older than last update
                     // TODO This means we drop out-of-sequence events but accept events with the same source timestamp
                     // TODO Several attribute events can occur in the same millisecond, then order of application is undefined
-                    oldAttribute.getValueTimestamp().filter(t -> t >= 0 && eventTime < t).ifPresent(
+                    oldAttribute.getTimestamp().filter(t -> t >= 0 && eventTime < t).ifPresent(
                         lastStateTime -> {
                             throw new AssetProcessingException(
                                 EVENT_OUTDATED,
@@ -366,7 +366,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                     updatedAttribute.setValue(event.getValue().orElse(null), eventTime);
 
                     // Validate constraints of attribute
-                    List<ValidationFailure> validationFailures = updatedAttribute.getValidationFailures();
+                    List<AttributeValidationFailure> validationFailures = updatedAttribute.getValidationFailures();
                     if (!validationFailures.isEmpty()) {
                         throw new AssetProcessingException(ATTRIBUTE_VALIDATION_FAILURE, validationFailures.toString());
                     }
@@ -493,7 +493,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         Value value = attribute.getValue().orElse(null);
 
         // If there is no timestamp, use system time (0 or -1 are "no timestamp")
-        Optional<Long> timestamp = attribute.getValueTimestamp();
+        Optional<Long> timestamp = attribute.getTimestamp();
         String valueTimestamp = Long.toString(
             timestamp.filter(ts -> ts > 0).orElseGet(() -> timerService.getCurrentTimeMillis())
         );
@@ -511,7 +511,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
             attribute.isAccessRestrictedRead(),
             new AttributeEvent(
                 asset.getId(),
-                attribute.getNameOrThrow(),
+                attribute.getName(),
                 attribute.getValue().orElse(null),
                 timerService.getCurrentTimeMillis()
             ).setParentId(asset.getParentId()).setRealm(asset.getRealm())

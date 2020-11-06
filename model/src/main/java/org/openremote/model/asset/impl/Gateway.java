@@ -34,7 +34,7 @@ public class Gateway extends Asset {
     public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("gatewayStatus", false, ValueType.CONNECTION_STATUS, null);
     public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", false, ValueType.BOOLEAN, null);
 
-    public static final AssetDescriptor<Gateway> DESCRIPTOR = new AssetDescriptor<>("Gateway", "router-wireless", null, Gateway.class);
+    public static final AssetDescriptor<Gateway> DESCRIPTOR = new AssetDescriptor<>("router-wireless", null, Gateway.class);
 
     public Gateway(String name) {
         super(name, DESCRIPTOR);

@@ -33,7 +33,7 @@ public class LightColored extends Light {
     public static final AttributeDescriptor<Integer> GROUP_NUMBER = new AttributeDescriptor<>("groupNumber", true, ValueType.POSITIVE_INTEGER, null);
     public static final AttributeDescriptor<String> SCENARIO = new AttributeDescriptor<>("scenario", true, ValueType.STRING, null);
 
-    public static final AssetDescriptor<LightColored> DESCRIPTOR = new AssetDescriptor<>("Light Colored", "lightbulb", "706CE6", LightColored.class);
+    public static final AssetDescriptor<LightColored> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "706CE6", LightColored.class);
 
     public LightColored(String name) {
         super(name, DESCRIPTOR);

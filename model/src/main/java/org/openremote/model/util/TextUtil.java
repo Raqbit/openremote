@@ -27,9 +27,6 @@ import java.util.regex.Pattern;
 
 public class TextUtil {
 
-    public static final String URN_PATTERN = "^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:([a-zA-Z0-9()+,\\-.:=@;$_!*']|%[0-9a-f]{2})+$";
-    public static final Pattern URN_REGEXP = Pattern.compile(URN_PATTERN);
-    public static final Predicate<String> URN_VALIDATOR  = name -> !isNullOrEmpty(name) && URN_REGEXP.matcher(name).matches();
     public static final String REGEXP_PATTERN_INTEGER = "^(-?[1-9]\\d*|0)$";
     public static final String REGEXP_PATTERN_INTEGER_POSITIVE = "^\\d+$";
     public static final String REGEXP_PATTERN_INTEGER_NEGATIVE = "^(-[1-9]\\d*|0)$";
@@ -217,10 +214,6 @@ public class TextUtil {
         }
 
         return str;
-    }
-
-    public static boolean isValidURN(String name) {
-        return URN_VALIDATOR.test(name);
     }
 
     public static String toLowerCamelCase(String s) {

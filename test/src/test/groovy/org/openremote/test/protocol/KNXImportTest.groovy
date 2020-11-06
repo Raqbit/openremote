@@ -112,7 +112,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
             assert assets.each {
                 !TextUtil.isNullOrEmpty(it.asset.id) &&
                     !TextUtil.isNullOrEmpty(it.asset.getName()) &&
-                    !it.asset.getAttributesList().isEmpty() &&
+                    !it.asset.import org.openremote.model.ContainerService;().isEmpty() &&
                     it.asset.getAttributesStream().allMatch({attr ->
                         AgentLink.getAgentLink(attr)
                             .map({agentLink -> agentLink.entityId == knxAgent.id && agentLink.attributeName == "knxConfigError1"})
@@ -125,7 +125,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
         and: "a given asset should have the correct attributes (Target Temperature)"
         def asset = assets.find {it.asset.name == "Target Temperature"}
         assert asset != null
-        assert asset.asset.getAttributesList().size() == 1
+        assert asset.asset.getAttributes().size() == 1
         def attribute = asset.asset.getAttribute("TargetTemperature").get()
         assert attribute != null
         def metaItem = attribute.getMetaItem(KNXProtocol.META_KNX_STATUS_GA).get()

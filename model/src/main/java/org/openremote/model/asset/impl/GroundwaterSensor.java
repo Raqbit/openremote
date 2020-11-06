@@ -36,7 +36,7 @@ public class GroundwaterSensor extends Device {
         new MetaItem<>(MetaType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<GroundwaterSensor> DESCRIPTOR = new AssetDescriptor<>("Groundwater Sensor", "water-outline", "95d0df", GroundwaterSensor.class);
+    public static final AssetDescriptor<GroundwaterSensor> DESCRIPTOR = new AssetDescriptor<>("water-outline", "95d0df", GroundwaterSensor.class);
 
     public GroundwaterSensor(String name) {
         super(name, DESCRIPTOR);

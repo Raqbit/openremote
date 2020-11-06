@@ -101,7 +101,7 @@ public class ElectricitySupplier extends Device {
         new MetaItem<>(MetaType.READ_ONLY, true)
     );
 
-    public static final AssetDescriptor<ElectricitySupplier> DESCRIPTOR = new AssetDescriptor<>("Electricity supplier", "upload-network", "9257A9", ElectricitySupplier.class);
+    public static final AssetDescriptor<ElectricitySupplier> DESCRIPTOR = new AssetDescriptor<>("upload-network", "9257A9", ElectricitySupplier.class);
 
     public ElectricitySupplier(String name) {
         super(name, DESCRIPTOR);
