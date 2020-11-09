@@ -47,7 +47,7 @@ public class AssetPredictedDatapoint extends Datapoint {
         super(attributeRef, value, timestamp);
     }
 
-    public AssetPredictedDatapoint(String entityId, String attributeName, Object value, long timestamp) {
-        super(entityId, attributeName, value, timestamp);
+    public AssetPredictedDatapoint(String assetId, String attributeName, Object value, long timestamp) {
+        super(assetId, attributeName, value, timestamp);
     }
 }

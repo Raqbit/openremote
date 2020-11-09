@@ -172,7 +172,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef protocolRef = agent.getReferenceOrThrow();
 
         if(getLinkedAttribute(attribute.getReference().orElse(null)) == null)
@@ -217,7 +217,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         Attribute assetAttribute = getLinkedAttribute(attribute.getReference().orElse(null));
         if(assetAttribute != null) {
             String assetId = assetAttribute.getAssetId().orElse(null);
@@ -429,7 +429,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                                 Map<String, Integer> values = new HashMap<>();
                                 for(String key : updatedLight.getRequiredValues())
                                     values.put(key, 0);
-                                List<Attribute> artNetLightAttributes = Arrays.asList(
+                                List<Attribute<?>> artNetLightAttributes = Arrays.asList(
                                         new Attribute("Id", NUMBER, Values.create(updatedLight.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                                         new Attribute("GroupId", NUMBER, Values.create(updatedLight.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                                         new Attribute("Universe", NUMBER, Values.create(updatedLight.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
@@ -497,7 +497,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
         Map<String, Integer> values = new HashMap<>();
         for(String key : light.getRequiredValues())
             values.put(key, 0);
-        List<Attribute> artNetLightAttributes = Arrays.asList(
+        List<Attribute<?>> artNetLightAttributes = Arrays.asList(
                 new Attribute("Id", NUMBER, Values.create(light.getLightId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                 new Attribute("GroupId", NUMBER, Values.create(light.getGroupId())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),
                 new Attribute("Universe", NUMBER, Values.create(light.getUniverse())).setMeta(new Meta(new MetaItem(READ_ONLY, Values.create(true)))),

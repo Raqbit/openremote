@@ -261,7 +261,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         String gatewayIp = agent.getMetaItem(META_KNX_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
@@ -308,7 +308,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
 
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         // If this attribute is registered for status updates then un-subscribe it

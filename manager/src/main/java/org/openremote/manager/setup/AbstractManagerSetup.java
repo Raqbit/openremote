@@ -379,7 +379,7 @@ public abstract class AbstractManagerSetup implements Setup {
         }
 
         Attribute[] createTimerAttributes(Asset apartment) {
-            List<Attribute> attributes = new ArrayList<>();
+            List<Attribute<?>> attributes = new ArrayList<>();
             for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
                 // "MONDAY" => "Monday"
                 String dayOfWeekLabel = dayOfWeek.name().substring(0, 1) + dayOfWeek.name().substring(1).toLowerCase(Locale.ROOT);

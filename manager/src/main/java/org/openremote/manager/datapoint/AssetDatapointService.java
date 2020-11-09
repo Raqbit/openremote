@@ -151,11 +151,11 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         return persistenceService.doReturningTransaction(entityManager ->
                 entityManager.createQuery(
                         "select dp from AssetDatapoint dp " +
-                                "where dp.entityId = :assetId " +
+                                "where dp.assetId = :assetId " +
                                 "and dp.attributeName = :attributeName " +
                                 "order by dp.timestamp desc",
                         AssetDatapoint.class)
-                        .setParameter("assetId", attributeRef.getEntityId())
+                        .setParameter("assetId", attributeRef.getAssetId())
                         .setParameter("attributeName", attributeRef.getAttributeName())
                         .getResultList());
     }
@@ -170,7 +170,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
 
             String queryStr = attributeRef == null ?
                     "select count(dp) from AssetDatapoint dp" :
-                    "select count(dp) from AssetDatapoint dp where dp.entityId = :assetId and dp.attributeName = :attributeName";
+                    "select count(dp) from AssetDatapoint dp where dp.assetId = :assetId and dp.attributeName = :attributeName";
 
             TypedQuery<Long> query = entityManager.createQuery(
                     queryStr,
@@ -178,7 +178,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
 
             if (attributeRef != null) {
                 query
-                    .setParameter("assetId", attributeRef.getEntityId())
+                    .setParameter("assetId", attributeRef.getAssetId())
                     .setParameter("attributeName", attributeRef.getAttributeName());
             }
 
@@ -191,9 +191,9 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                                long fromTimestamp,
                                                long toTimestamp) {
 
-        Asset asset = assetStorageService.find(attributeRef.getEntityId());
+        Asset asset = assetStorageService.find(attributeRef.getAssetId());
         if (asset == null) {
-            throw new IllegalStateException("Asset not found: " + attributeRef.getEntityId());
+            throw new IllegalStateException("Asset not found: " + attributeRef.getAssetId());
         }
         Attribute assetAttribute = asset.getAttribute(attributeRef.getAttributeName())
             .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeRef.getAttributeName()));
@@ -303,12 +303,12 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                 st.setString(5, truncateX);
                                 st.setLong(6, fromTimestampSeconds);
                                 st.setLong(7, toTimestampSeconds);
-                                st.setString(8, attributeRef.getEntityId());
+                                st.setString(8, attributeRef.getAssetId());
                                 st.setString(9, attributeRef.getAttributeName());
                             } else {
                                 st.setLong(1, fromTimestampSeconds);
                                 st.setLong(2, toTimestampSeconds);
-                                st.setString(3, attributeRef.getEntityId());
+                                st.setString(3, attributeRef.getAssetId());
                                 st.setString(4, attributeRef.getAttributeName());
                             }
 
@@ -337,13 +337,13 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                 new MetaPredicate(MetaItemType.STORE_DATA_POINTS))
                         .select(AssetQuery.Select.selectExcludePathAndParentInfo()));
 
-        List<Pair<String, Attribute>> attributes = assets.stream()
+        List<Pair<String, Attribute<?>>> attributes = assets.stream()
                 .map(asset -> asset
-                        .getAttributesStream()
+                         .getAttributes().stream()
                         .filter(assetAttribute ->
                                 assetAttribute.isStoreDatapoints()
                                         && assetAttribute.hasMetaItem(MetaItemType.DATA_POINTS_MAX_AGE_DAYS))
-                        .map(assetAttribute -> new Pair<String, Attribute>(asset.getId(), assetAttribute))
+                        .map(assetAttribute -> new Pair<String, Attribute<?>>(asset.getId(), assetAttribute))
                         .collect(toList()))
                 .flatMap(List::stream)
                 .collect(toList());
@@ -358,7 +358,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
 
         if (!attributes.isEmpty()) {
             // Purge data points that have specific age constraints
-            Map<Integer, List<Pair<String, Attribute>>> ageAttributeRefMap = attributes.stream()
+            Map<Integer, List<Pair<String, Attribute<?>>>> ageAttributeRefMap = attributes.stream()
                 .collect(groupingBy(attributeRef ->
                     attributeRef.value
                         .getMetaItem(MetaItemType.DATA_POINTS_MAX_AGE_DAYS)
@@ -383,7 +383,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         LOG.info("Finished data points purge daily task");
     }
 
-    protected String buildWhereClause(List<Pair<String, Attribute>> attributes, boolean negate) {
+    protected String buildWhereClause(List<Pair<String, Attribute<?>>> attributes, boolean negate) {
 
         if (attributes.isEmpty()) {
             return "";
@@ -393,7 +393,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                 .map(attributeRef -> "('" + attributeRef.key + "','" + attributeRef.value.getName() + "')")
                 .collect(Collectors.joining(","));
 
-        return " and (dp.entityId, dp.attributeName) " + (negate ? "not " : "") + "in (" + whereStr + ")";
+        return " and (dp.assetId, dp.attributeName) " + (negate ? "not " : "") + "in (" + whereStr + ")";
     }
 
     protected long getFirstRunMillis(Instant currentTime) {

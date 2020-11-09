@@ -125,7 +125,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartOffice.setRealm(masterRealm);
         smartOffice.setName("Smart Office");
         smartOffice.setType(BUILDING);
-        List<Attribute> smartOfficeAttributes = Arrays.asList(
+        List<Attribute<?>> smartOfficeAttributes = Arrays.asList(
                 new Attribute(AttributeType.LOCATION, locationValue),
                 new Attribute(AttributeType.GEO_STREET, Values.create("Torenallee 20")),
                 new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5617")),

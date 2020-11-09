@@ -94,7 +94,7 @@ public class SimulatorState extends SharedEvent {
     public void updateAssetNames(Consumer<Map<String, String>> updater) {
         clearAssetNames();
         for (SimulatorElement element : elements) {
-            assetIdAndName.put(element.getAttributeRef().getEntityId(), null);
+            assetIdAndName.put(element.getAttributeRef().getAssetId(), null);
         }
         updater.accept(assetIdAndName);
     }
@@ -109,7 +109,7 @@ public class SimulatorState extends SharedEvent {
 
     public String getElementName(SimulatorElement element) {
         AttributeRef ref = element.getAttributeRef();
-        return (assetIdAndName.containsKey(ref.getEntityId()) ? assetIdAndName.get(ref.getEntityId()) : ref.getEntityId())
+        return (assetIdAndName.containsKey(ref.getAssetId()) ? assetIdAndName.get(ref.getAssetId()) : ref.getAssetId())
             + ":" + ref.getAttributeName();
     }
 

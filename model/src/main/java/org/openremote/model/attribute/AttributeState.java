@@ -39,12 +39,12 @@ public class AttributeState {
     protected Object value;
     protected boolean deleted;
 
-    public AttributeState(String entityId, Attribute<?> attribute) {
-        this(entityId, attribute.getName(), attribute.getValue().orElse(null));
+    public AttributeState(String assetId, Attribute<?> attribute) {
+        this(assetId, attribute.getName(), attribute.getValue().orElse(null));
     }
 
-    public AttributeState(String entityId, String attributeName, Object value) {
-        this(new AttributeRef(entityId, attributeName), value);
+    public AttributeState(String assetId, String attributeName, Object value) {
+        this(new AttributeRef(assetId, attributeName), value);
     }
 
     @JsonCreator

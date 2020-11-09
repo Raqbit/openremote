@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.attribute.AttributeValidationFailure;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
@@ -258,7 +257,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         // Get element type from the attribute meta
         Optional<String> elementType = getElementType(attribute);
         if (!elementType.isPresent()) {
@@ -305,7 +304,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         elements.remove(attributeRef);
         attributeInstanceMap.remove(attributeRef);
@@ -335,15 +334,15 @@ public class SimulatorProtocol extends AbstractProtocol {
     /**
      * Call this to simulate an immediate sensor update (it uses the last value supplied from send to actuator).
      */
-    public void updateSensor(String entityId, String attributeName) {
-        updateSensor(new AttributeRef(entityId, attributeName));
+    public void updateSensor(String assetId, String attributeName) {
+        updateSensor(new AttributeRef(assetId, attributeName));
     }
 
     /**
      * Call this to simulate a sensor update after the specified delay (it uses the last value supplied from send to actuator).
      */
-    public void updateSensor(String entityId, String attributeName, int updateSensorDelayMilliseconds) {
-        updateSensor(new AttributeRef(entityId, attributeName), updateSensorDelayMilliseconds);
+    public void updateSensor(String assetId, String attributeName, int updateSensorDelayMilliseconds) {
+        updateSensor(new AttributeRef(assetId, attributeName), updateSensorDelayMilliseconds);
     }
 
     /**
@@ -390,8 +389,8 @@ public class SimulatorProtocol extends AbstractProtocol {
     /**
      * Call this to simulate a send to actuator.
      */
-    public boolean putValue(String entityId, String attributeName, Value value) {
-        return putValue(new AttributeState(new AttributeRef(entityId, attributeName), value));
+    public boolean putValue(String assetId, String attributeName, Value value) {
+        return putValue(new AttributeState(new AttributeRef(assetId, attributeName), value));
     }
 
     /**
@@ -462,8 +461,8 @@ public class SimulatorProtocol extends AbstractProtocol {
     /**
      * Call this to get the current value of an attribute.
      */
-    public Optional<Value> getValue(String entityId, String attributeName) {
-        return getValue(new AttributeRef(entityId, attributeName));
+    public Optional<Value> getValue(String assetId, String attributeName) {
+        return getValue(new AttributeRef(assetId, attributeName));
     }
 
     /**
@@ -560,10 +559,10 @@ public class SimulatorProtocol extends AbstractProtocol {
             }
             long nextRunRelative = nextRun - now;
 
-            LOG.info("Next update for asset " + attributeRef.getEntityId() + " for attribute " + attributeRef.getAttributeName() + " in " + nextRunRelative + " second(s)");
+            LOG.info("Next update for asset " + attributeRef.getAssetId() + " for attribute " + attributeRef.getAttributeName() + " in " + nextRunRelative + " second(s)");
             return executorService.schedule(() -> {
                 withLock(getProtocolName() + "::firingNextUpdate", () -> {
-                    LOG.info("Updating asset " + attributeRef.getEntityId() + " for attribute " + attributeRef.getAttributeName() + " with value " + nextDatapoint.value.toString());
+                    LOG.info("Updating asset " + attributeRef.getAssetId() + " for attribute " + attributeRef.getAttributeName() + " with value " + nextDatapoint.value.toString());
                     try {
                         updateLinkedAttribute(new AttributeState(attributeRef, nextDatapoint.value));
                     } catch (Exception e) {

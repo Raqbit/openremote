@@ -26,10 +26,12 @@ import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
@@ -61,7 +63,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <p>
  * <h3>Connecting attributes to actuators and sensors</h3>
  * {@link Attribute}s of {@link Asset}s can be linked to a protocol configuration instance by creating an {@link
- * MetaType#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaType#AGENT_LINK}, other
+ * MetaItemType#AGENT_LINK} {@link MetaItem} on an attribute. Besides the {@link MetaItemType#AGENT_LINK}, other
  * protocol-specific meta items may also be required when an asset attribute is linked to a protocol configuration
  * instance. Attributes linked to a protocol configuration instance will get passed to the protocol via a call to {@link
  * #linkAttribute}.
@@ -147,7 +149,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <li>{@link #unlinkAttribute}</li>
  * </ol>
  */
-public interface Protocol {
+public interface Protocol<T extends Agent> {
 
     Logger LOG = SyslogCategory.getLogger(PROTOCOL, Protocol.class);
     String ACTUATOR_TOPIC_TARGET_PROTOCOL = "Protocol";
@@ -173,9 +175,14 @@ public interface Protocol {
     String getProtocolName();
 
     /**
-     * Get the display friendly name for this protocol
+     * Get a unique string that describes this specific protocol instance
      */
-    String getProtocolDisplayName();
+    String getProtocolInstanceName();
+
+    /**
+     * Get list of {@link Attribute}s currently linked to this protocol instance grouped by {@link Asset} ID
+     */
+    Map<String, List<Attribute<?>>> getLinkedAttributes();
 
     /**
      * Links an {@link Attribute} to its' agent; the agent would have been connected before this call. This is called
@@ -183,17 +190,17 @@ public interface Protocol {
      * <p>
      * If the attribute is not valid for this protocol then it is up to the protocol to log the issue and return false.
      * <p>
-     * Attributes are linked to an agent via an {@link MetaType#AGENT_LINK} meta item.
+     * Attributes are linked to an agent via an {@link MetaItemType#AGENT_LINK} meta item.
      *
      * @return True if successful, false otherwise
      */
-    boolean linkAttribute(Asset asset, Attribute<?> attribute);
+    boolean linkAttribute(String assetId, Attribute<?> attribute);
 
     /**
      * Un-links an {@link Attribute} from its' agent; the agent will still be connected during this call. This is called
      * whenever the attribute is modified or removed or when the agent is modified or removed.
      */
-    void unlinkAttribute(Asset asset, Attribute<?> attribute);
+    void unlinkAttribute(String assetId, Attribute<?> attribute);
 
     /**
      * Called before any calls to {@link #linkAttribute} to allow the protocol to perform required tasks with {@link
@@ -214,5 +221,5 @@ public interface Protocol {
     /**
      * Get the {@link Agent} associated with this protocol instance.
      */
-    Agent getAgent();
+    T getAgent();
 }

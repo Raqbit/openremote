@@ -282,7 +282,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                     checkForWellKnownAttributes(asset);
 
                     // Check if attribute is present on the asset in storage
-                    Optional<Attribute> serverAttribute = resultAsset.getAttribute(updatedAttributeName);
+                    Optional<Attribute<?>> serverAttribute = resultAsset.getAttribute(updatedAttributeName);
                     if (serverAttribute.isPresent()) {
                         Attribute existingAttribute = serverAttribute.get();
 
@@ -344,7 +344,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
             // If attribute is type RULES_TEMPLATE_FILTER, enforce meta item RULE_STATE
             // TODO Only done for update(Asset) and not create(Asset) as we don't need that right now
             // TODO Implement "Saved Filter/Searches" properly, allowing restricted users to create rule state flags is not great
-            resultAsset.getAttributesStream().forEach(attribute -> {
+            resultAsset .getAttributes().stream().forEach(attribute -> {
                 if (attribute.getType().map(attributeType -> attributeType == AttributeValueType.RULES_TEMPLATE_FILTER).orElse(false)
                     && !attribute.hasMetaItem(MetaItemType.RULE_STATE)) {
                     attribute.addMeta(new MetaItem(MetaItemType.RULE_STATE, Values.create(true)));
@@ -362,7 +362,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
     }
 
     private void checkForWellKnownAttributes(Asset asset) {
-        asset.getAttributesStream().forEach(assetAttribute -> {
+        asset .getAttributes().stream().forEach(assetAttribute -> {
             AssetModelUtil.getAttributeDescriptor(assetAttribute.name).ifPresent(wellKnownAttribute -> {
                 //Check if the type matches
                 if (!wellKnownAttribute.getValueDescriptor().equals(assetAttribute.getTypeOrThrow())) {
@@ -467,7 +467,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
             AssetModelUtil.getAssetDescriptor(asset.getType()).ifPresent(assetDescriptor -> {
 
                 // Add meta items to well known attributes if not present
-                newAsset.getAttributesStream().forEach(assetAttribute -> {
+                newAsset .getAttributes().stream().forEach(assetAttribute -> {
                     if (assetDescriptor.getAttributeDescriptors() != null) {
                         Arrays.stream(assetDescriptor.getAttributeDescriptors())
                                 .filter(attrDescriptor -> attrDescriptor.getAttributeName().equals(assetAttribute.getName()))

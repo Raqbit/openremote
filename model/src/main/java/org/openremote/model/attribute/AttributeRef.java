@@ -29,29 +29,29 @@ import static org.openremote.model.util.TextUtil.requireNonNullAndNonEmpty;
 /**
  * A reference to an entity and an {@link Attribute}.
  * <p>
- * The {@link #entityId} and {@link #attributeName} are required to identify
+ * The {@link #assetId} and {@link #attributeName} are required to identify
  * an entity's attribute.
  * <p>
  * Two attribute references are {@link #equals} if they reference the same entity
  * and attribute.
  */
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
-@JsonPropertyOrder({"entityId", "attributeName"})
+@JsonPropertyOrder({"assetId", "attributeName"})
 public class AttributeRef {
 
-    protected String entityId;
+    protected String assetId;
     protected String attributeName;
 
     @JsonCreator
-    public AttributeRef(@JsonProperty("entityId") String entityId, @JsonProperty("attributeName") String attributeName) {
-        requireNonNullAndNonEmpty(entityId);
+    public AttributeRef(@JsonProperty("assetId") String assetId, @JsonProperty("attributeName") String attributeName) {
+        requireNonNullAndNonEmpty(assetId);
         requireNonNullAndNonEmpty(attributeName);
-        this.entityId = entityId;
+        this.assetId = assetId;
         this.attributeName = attributeName;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public String getAssetId() {
+        return assetId;
     }
 
     public String getAttributeName() {
@@ -63,12 +63,12 @@ public class AttributeRef {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AttributeRef that = (AttributeRef) o;
-        return entityId.equals(that.entityId) && attributeName.equals(that.attributeName);
+        return assetId.equals(that.assetId) && attributeName.equals(that.attributeName);
     }
 
     @Override
     public int hashCode() {
-        int result = entityId.hashCode();
+        int result = assetId.hashCode();
         result = 31 * result + attributeName.hashCode();
         return result;
     }
@@ -76,7 +76,7 @@ public class AttributeRef {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-            "entityId='" + entityId + '\'' +
+            "assetId='" + assetId + '\'' +
             ", attributeName='" + attributeName + '\'' +
             '}';
     }

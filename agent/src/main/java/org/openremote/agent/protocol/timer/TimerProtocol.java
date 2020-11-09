@@ -20,7 +20,6 @@
 package org.openremote.agent.protocol.timer;
 
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -299,7 +298,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         TimerValue timerValue = TimerConfiguration.getValue(attribute).orElse(null);
 
         if (timerValue == null) {
@@ -331,7 +330,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         // Nothing to do here
     }
 
@@ -377,7 +376,7 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     protected static String getTimerId(AttributeRef timerRef) {
-        return timerRef.getEntityId() + ":" + timerRef.getAttributeName();
+        return timerRef.getAssetId() + ":" + timerRef.getAttributeName();
     }
 
     protected static CronExpression createCronExpression(String expression) {

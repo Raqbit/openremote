@@ -23,7 +23,7 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
@@ -31,24 +31,24 @@ import java.util.Optional;
 public class ElectricityCharger extends Device {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", true, ValueType.STRING, null,
-        new MetaItem<>(MetaType.READ_ONLY)
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<String> CHARGER_TYPE = new AttributeDescriptor<>("chargerType", true, ValueType.STRING, null);
     public static final AttributeDescriptor<Double> POWER_CAPACITY = new AttributeDescriptor<>("powerCapacity", true, ValueType.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
     public static final AttributeDescriptor<Double> POWER_CONSUMPTION = new AttributeDescriptor<>("powerConsumption", true, ValueType.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
-        new MetaItem<>(MetaType.READ_ONLY)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT),
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> TARIFF_IMPORT = new AttributeDescriptor<>("tariffImport", true, ValueType.NUMBER, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
     );
     public static final AttributeDescriptor<Double> TARIFF_EXPORT = new AttributeDescriptor<>("tariffExport", true, ValueType.NUMBER, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)
     );
     public static final AttributeDescriptor<Double> TARIFF_START = new AttributeDescriptor<>("tariffStart", true, ValueType.NUMBER, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
 
     public static final AssetDescriptor<ElectricityCharger> DESCRIPTOR = new AssetDescriptor<>("ev-station", "8A293D", ElectricityCharger.class);

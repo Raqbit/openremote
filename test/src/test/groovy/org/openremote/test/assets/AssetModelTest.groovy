@@ -97,7 +97,7 @@ class AssetModelTest extends Specification {
                 new Attribute("a2", STRING, Values.create("a222"), timestamp),
                 new Attribute("a3", STRING, Values.create("a333"), timestamp),
         ]
-        addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB, { name -> name == "a3" }, { key -> false }).collect(Collectors.toList())
+        addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB, { name -> name == "a3" }).collect(Collectors.toList())
 
         then: "they should be the same"
         addedOrModifiedAttributes.size() == 0
@@ -133,7 +133,7 @@ class AssetModelTest extends Specification {
                 new Attribute("a1", STRING, Values.create("a111"), timestamp2),
                 new Attribute("a2", STRING, Values.create("a222"), timestamp2),
         ]
-        addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB, { key -> key == VALUE_TIMESTAMP_FIELD_NAME }).collect(Collectors.toList())
+        addedOrModifiedAttributes = getAddedOrModifiedAttributes(attributesA, attributesB).collect(Collectors.toList())
 
         then: "they should be the same"
         addedOrModifiedAttributes.size() == 0

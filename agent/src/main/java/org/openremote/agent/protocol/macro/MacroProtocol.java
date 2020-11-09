@@ -20,7 +20,6 @@
 package org.openremote.agent.protocol.macro;
 
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
@@ -198,7 +197,7 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef macroRef = agent.getReferenceOrThrow();
 
         // Check for executable meta item
@@ -249,7 +248,7 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
     }
 
     @Override

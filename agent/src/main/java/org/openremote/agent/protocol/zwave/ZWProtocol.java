@@ -24,7 +24,6 @@ import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.protocol.ProtocolAssetDiscovery;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -248,7 +247,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscove
     }
 
     @Override
-    protected synchronized void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected synchronized void doLinkAttribute(String assetId, Attribute<?> attribute) {
         Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {
@@ -274,7 +273,7 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscove
     }
 
     @Override
-    protected synchronized void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected synchronized void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (zwNetworkConsumerPair == null) {

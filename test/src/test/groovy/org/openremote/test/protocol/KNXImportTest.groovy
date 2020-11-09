@@ -76,7 +76,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
 
         then: "the protocol configurations should be linked and their deployment status should be available in the agent service"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(knxAgent.getAttribute("knxConfigError1").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
+            assert agentService.getAgentConnectionStatus(knxAgent.getAttribute("knxConfigError1").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
         }
 
         when: "an authenticated admin user"
@@ -115,7 +115,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
                     !it.asset.import org.openremote.model.ContainerService;().isEmpty() &&
                     it.asset.getAttributesStream().allMatch({attr ->
                         AgentLink.getAgentLink(attr)
-                            .map({agentLink -> agentLink.entityId == knxAgent.id && agentLink.attributeName == "knxConfigError1"})
+                            .map({agentLink -> agentLink.assetId == knxAgent.id && agentLink.attributeName == "knxConfigError1"})
                             .orElse(false)
                     })
     

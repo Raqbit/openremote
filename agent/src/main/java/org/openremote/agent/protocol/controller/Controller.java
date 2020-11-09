@@ -31,7 +31,7 @@ public class Controller {
 
     public Controller(AttributeRef attributeRef) {
         this.controllerConfigName = attributeRef.getAttributeName();
-        this.deviceId = DEVICE_ID_BASE + "_" + attributeRef.getAttributeName() + "_" + attributeRef.getEntityId();
+        this.deviceId = DEVICE_ID_BASE + "_" + attributeRef.getAttributeName() + "_" + attributeRef.getAssetId();
     }
 
     public void addSensor(AttributeRef attributeRef, ControllerSensor sensor) {

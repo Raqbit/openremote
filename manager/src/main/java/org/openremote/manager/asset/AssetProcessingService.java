@@ -227,7 +227,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
 
                 AttributeEvent event = exchange.getIn().getBody(AttributeEvent.class);
                 LOG.finest("Processing: " + event);
-                if (event.getEntityId() == null || event.getEntityId().isEmpty())
+                if (event.getAssetId() == null || event.getAssetId().isEmpty())
                     return;
                 if (event.getAttributeName() == null || event.getAttributeName().isEmpty())
                     return;
@@ -240,7 +240,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                 // will see consistent database state and we only commit if no processor failed. This
                 // still won't make this procedure consistent with the message queue from which we consume!
                 persistenceService.doTransaction(em -> {
-                    Asset asset = assetStorageService.find(em, event.getEntityId(), true);
+                    Asset asset = assetStorageService.find(em, event.getAssetId(), true);
                     if (asset == null)
                         throw new AssetProcessingException(ASSET_NOT_FOUND);
 
@@ -284,7 +284,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                                 if (identityService.getIdentityProvider().isRestrictedUser(authContext.getUserId())) {
                                     // Must be asset linked to user
                                     if (!assetStorageService.isUserAsset(authContext.getUserId(),
-                                                                         event.getEntityId())) {
+                                                                         event.getAssetId())) {
                                         throw new AssetProcessingException(INSUFFICIENT_ACCESS);
                                     }
                                     // Must be writable by restricted client
@@ -296,7 +296,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                             break;
 
                         case SENSOR:
-                            Optional<Attribute> protocolConfiguration =
+                            Optional<Attribute<?>> protocolConfiguration =
                                 getAgentLink(oldAttribute).flatMap(agentService::getProtocolConfiguration);
 
                             // Sensor event must be for an attribute linked to a protocol configuration

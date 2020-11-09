@@ -84,8 +84,7 @@ public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractNameValueHolderImpl<?> that = (AbstractNameValueHolderImpl<?>) o;
-        return Objects.equals(value, that.value) &&
-            name.equals(that.name);
+        return name.equals(that.name) && Objects.equals(value, that.value);
     }
 
     @Override

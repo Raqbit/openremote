@@ -92,7 +92,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
 
             String queryStr = attributeRef == null ?
                 "select count(dp) from AssetPredictedDatapoint dp" :
-                "select count(dp) from AssetPredictedDatapoint dp where dp.entityId = :assetId and dp.attributeName = :attributeName";
+                "select count(dp) from AssetPredictedDatapoint dp where dp.assetId = :assetId and dp.attributeName = :attributeName";
 
             TypedQuery<Long> query = entityManager.createQuery(
                 queryStr,
@@ -100,7 +100,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
 
             if (attributeRef != null) {
                 query
-                    .setParameter("assetId", attributeRef.getEntityId())
+                    .setParameter("assetId", attributeRef.getAssetId())
                     .setParameter("attributeName", attributeRef.getAttributeName());
             }
 
@@ -241,7 +241,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
     }
 
     public void updateValue(AttributeRef attributeRef, Object value, long timestamp) {
-        persistenceService.doTransaction(em -> upsertValue(em, attributeRef.getEntityId(), attributeRef.getAttributeName(), value, timestamp));
+        persistenceService.doTransaction(em -> upsertValue(em, attributeRef.getAssetId(), attributeRef.getAttributeName(), value, timestamp));
     }
 
     public void updateValue(String assetId, String attributeName, Object value, long timestamp) {

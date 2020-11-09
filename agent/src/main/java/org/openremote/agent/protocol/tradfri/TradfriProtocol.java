@@ -267,28 +267,28 @@ public class TradfriProtocol extends AbstractProtocol {
 
     /**
      * Links the attribute.
-     * @param asset
+     * @param assetId
      * @param attribute the attribute of the asset.
      */
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
        String gatewayIp = agent.getMetaItem(META_TRADFRI_GATEWAY_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse("");
        final AttributeRef attributeRef = attribute.getReferenceOrThrow();
        TradfriConnection tradfriConnection = getConnection(gatewayIp);
        if (tradfriConnection == null) return;
-       if(tradfriDevices.containsKey(attributeRef.getEntityId())){
-           Device device = tradfriDevices.get(attributeRef.getEntityId());
+       if(tradfriDevices.containsKey(attributeRef.getAssetId())){
+           Device device = tradfriDevices.get(attributeRef.getAssetId());
            addDevice(attributeRef, tradfriConnection, device);
        }
     }
 
     /**
      * Unlinks the attribute.
-     * @param asset
+     * @param assetId
      * @param attribute the attribute of the asset.
      */
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
         removeDevice(attributeRef);
     }

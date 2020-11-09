@@ -220,7 +220,7 @@ public class ZWNetwork {
                 // Device Info
 
                 Asset deviceInfoAsset = new Asset("Info", AssetType.THING);
-                List<Attribute> infoAttributes = createNodeInfoAttributes(node, agentLink);
+                List<Attribute<?>> infoAttributes = createNodeInfoAttributes(node, agentLink);
                 deviceInfoAsset.addAttributes(infoAttributes.toArray(new Attribute[infoAttributes.size()]));
                 deviceNode.addChild(new AssetTreeNode(deviceInfoAsset));
 
@@ -254,7 +254,7 @@ public class ZWNetwork {
                             Asset parameterAsset = new Asset(parameterLabel, AssetType.THING);
                             AssetTreeNode parameterNode = new AssetTreeNode(parameterAsset);
 
-                            List<Attribute> attributes = parameter.getChannels()
+                            List<Attribute<?>> attributes = parameter.getChannels()
                                 .stream()
                                 .map(channel -> {
                                     Attribute attribute = new Attribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
@@ -292,7 +292,7 @@ public class ZWNetwork {
         // Z-Wave Controller
 
         Asset networkManagementAsset = new Asset("Z-Wave Controller", AssetType.THING);
-        List<Attribute> attributes = controller.getSystemCommandManager().getChannels()
+        List<Attribute<?>> attributes = controller.getSystemCommandManager().getChannels()
             .stream()
             .filter(channel ->
                 consumerLinkMap.values().stream().noneMatch(link -> link.getChannel() == channel))
@@ -396,7 +396,7 @@ public class ZWNetwork {
 
         Asset device = new Asset(name, AssetType.THING);
 
-        List<Attribute> attributes = cmdClasses
+        List<Attribute<?>> attributes = cmdClasses
             .stream()
             .filter(commandClass -> commandClass.getID().toRaw() != ZWCommandClassID.COMMAND_CLASS_CONFIGURATION.toRaw() &&
                                     commandClass.getID().toRaw() != ZWCommandClassID.COMMAND_CLASS_ZWAVEPLUS_INFO.toRaw() &&
@@ -423,8 +423,8 @@ public class ZWNetwork {
         return new AssetTreeNode(device);
     }
     
-    private List<Attribute> createNodeInfoAttributes(ZWaveNode node, MetaItem agentLink) {
-        List<Attribute> attributes = new ArrayList<>();
+    private List<Attribute<?>> createNodeInfoAttributes(ZWaveNode node, MetaItem agentLink) {
+        List<Attribute<?>> attributes = new ArrayList<>();
 
         Attribute nodeIdAttrib = new Attribute(
             "nodeId", AttributeValueType.NUMBER, Values.create(node.getNodeID()))
@@ -503,7 +503,7 @@ public class ZWNetwork {
 
         // Z-Wave Plus Info
 
-        List<Attribute> zwPlusAttributes = node.getSupportedCommandClasses()
+        List<Attribute<?>> zwPlusAttributes = node.getSupportedCommandClasses()
             .stream()
             .filter(commandClass -> commandClass.getID().toRaw() == ZWCommandClassID.COMMAND_CLASS_ZWAVEPLUS_INFO.toRaw())
             .map(ZWCommandClass::getChannels)

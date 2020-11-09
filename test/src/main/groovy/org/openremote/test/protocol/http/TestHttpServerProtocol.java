@@ -20,8 +20,6 @@
 package org.openremote.test.protocol.http;
 
 import org.openremote.agent.protocol.http.AbstractHttpServerProtocol;
-import org.openremote.model.asset.Asset;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.MetaItemDescriptor;
@@ -53,11 +51,11 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
     }
 
     @Override

@@ -99,7 +99,7 @@ public class AssetsFacade<T extends Ruleset> extends Assets {
             return this;
 
         // Check if the asset ID of every event can be found with the default security of this facade
-        String[] ids = Arrays.stream(events).map(AttributeEvent::getEntityId).toArray(String[]::new);
+        String[] ids = Arrays.stream(events).map(AttributeEvent::getAssetId).toArray(String[]::new);
 
         AssetQuery query = new AssetQuery().ids(ids);
         long count = this.getResults(query).count();

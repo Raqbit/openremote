@@ -23,7 +23,6 @@ import io.netty.channel.ChannelHandler;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
 import org.openremote.model.attribute.*;
@@ -122,8 +121,8 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
-        super.doLinkAttribute(asset, attribute);
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+        super.doLinkAttribute(assetId, attribute);
 
         AttributeRef protocolRef = agent.getReferenceOrThrow();
         Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(attribute, assetService, this::updateLinkedAttribute);
@@ -145,7 +144,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         synchronized (protocolMessageConsumers) {
             protocolMessageConsumers.compute(agent.getReferenceOrThrow(), (ref, consumers) -> {
@@ -155,7 +154,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
                 return consumers;
             });
         }
-        super.doUnlinkAttribute(asset, attribute);
+        super.doUnlinkAttribute(assetId, attribute);
     }
 
     @Override

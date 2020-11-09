@@ -91,7 +91,7 @@ public class AgentHealthStatusProvider implements HealthStatusProvider, Containe
             // Get protocol configurations for this agent
             agentService.protocolConfigurations.entrySet()
                 .stream()
-                .filter(protocolConfigInfo -> Objects.equals(agent.getId(), protocolConfigInfo.getKey().getEntityId()))
+                .filter(protocolConfigInfo -> Objects.equals(agent.getId(), protocolConfigInfo.getKey().getAssetId()))
                 .forEach(protocolConfigInfo -> {
 
                     total.incrementAndGet();

@@ -44,7 +44,7 @@ public abstract class Agent extends Asset {
 
     @ModelDescriptor
     public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueType.CONNECTION_STATUS, null,
-        new MetaItem<>(MetaType.READ_ONLY)
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
 
     /**

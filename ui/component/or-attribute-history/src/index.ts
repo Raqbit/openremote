@@ -656,7 +656,7 @@ export class OrAttributeHistory extends translate(i18next)(LitElement) {
         }
 
         this._loading = true;
-        const assetId = this.attribute ? this.attribute.assetId! : this.attributeRef!.entityId!;
+        const assetId = this.attribute ? this.attribute.assetId! : this.attributeRef!.assetId!;
         const attributeName = this.attribute ? this.attribute.name! : this.attributeRef!.attributeName!;
 
         if (this._type === undefined) {

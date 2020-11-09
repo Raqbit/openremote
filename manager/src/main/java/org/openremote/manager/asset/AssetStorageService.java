@@ -348,7 +348,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                             assetId = exchange.getIn().getBody(ReadAssetEvent.class).getAssetId();
                         } else {
                             ReadAttributeEvent assetAttributeEvent = exchange.getIn().getBody(ReadAttributeEvent.class);
-                            assetId = assetAttributeEvent.getAttributeRef().getEntityId();
+                            assetId = assetAttributeEvent.getAttributeRef().getAssetId();
                             attributeName = assetAttributeEvent.getAttributeRef().getAttributeName();
                         }
 
@@ -556,6 +556,9 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     }
 
     /**
+     * Merge the requested {@link Asset} checking that it meets all constraint requirements before doing so; the
+     * timestamp of each {@link Attribute} will also be updated to the current system time if it has changed to assist
+     * with {@link Attribute} equality (see {@link Attribute#equals}).
      * @param overrideVersion If <code>true</code>, the merge will override the data in the database, independent of
      *                        version.
      * @param skipGatewayCheck Don't check if asset is a gateway asset and merge asset into local persistence service.
@@ -2060,7 +2063,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         List<String> names = attributeNames == null ? Collections.emptyList() : Arrays.asList(attributeNames);
 
         // Client may want to read a subset or all attributes of the asset
-        List<AttributeEvent> events = asset.getAttributesStream()
+        List<AttributeEvent> events = asset .getAttributes().stream()
             .filter(attribute -> names.isEmpty() || attribute.getName().filter(names::contains).isPresent())
             .map(attribute -> new AttributeEvent(new AttributeState(asset.getId(), attribute)))
             .collect(Collectors.toList());

@@ -72,7 +72,7 @@ public class ClientEventProtocol extends AbstractProtocol {
             false,
             null);
 
-    protected Map<String, Attribute> clientIdProtocolConfigMap = new HashMap<>();
+    protected Map<String, Attribute<?>> clientIdProtocolConfigMap = new HashMap<>();
 
     @Override
     public void init(Container container) throws Exception {
@@ -103,7 +103,7 @@ public class ClientEventProtocol extends AbstractProtocol {
 
         LOG.info("Creating client credentials for: " + protocolConfiguration);
         AttributeRef attributeRef = protocolConfiguration.getReferenceOrThrow();
-        String clientId = CLIENT_ID_PREFIX + attributeRef.getEntityId();
+        String clientId = CLIENT_ID_PREFIX + attributeRef.getAssetId();
 
         String clientSecret = protocolConfiguration.getMetaItem(META_PROTOCOL_CLIENT_SECRET.getUrn())
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -138,21 +138,21 @@ public class ClientEventProtocol extends AbstractProtocol {
         LOG.info("Removing client credentials for: " + protocolConfiguration);
         clientIdProtocolConfigMap.values().remove(protocolConfiguration);
         AttributeRef attributeRef = protocolConfiguration.getReferenceOrThrow();
-        protocolClientEventService.removeClientCredentials(agent.getRealm(), CLIENT_ID_PREFIX + attributeRef.getEntityId() + ":" + attributeRef.getAttributeName());
+        protocolClientEventService.removeClientCredentials(agent.getRealm(), CLIENT_ID_PREFIX + attributeRef.getAssetId() + ":" + attributeRef.getAttributeName());
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) throws Exception {
+    protected void doLinkAttribute(Asset asset, Attribute<?> attribute) throws Exception {
         // Nothing to do here
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(Asset asset, Attribute<?> attribute) {
         // Nothing to do here
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         // We'll get here when an attribute event is pushed through the processing chain as with all protocols it won't
         // make it to the end of the processing chain, and won't reach the client so we write it through immediately
         // so it will be sent to the client
@@ -176,7 +176,7 @@ public class ClientEventProtocol extends AbstractProtocol {
             return;
         }
 
-        Attribute protocolConfiguration = clientIdProtocolConfigMap.get(clientId);
+        Attribute<?> protocolConfiguration = clientIdProtocolConfigMap.get(clientId);
 
         if (protocolConfiguration == null) {
             LOG.info("Message received from a client for an unlinked protocol configuration, requesting disconnect");
@@ -200,7 +200,7 @@ public class ClientEventProtocol extends AbstractProtocol {
                 // Inbound attribute event is essentially a protocol sensor update
 
                 AttributeEvent attributeEvent = exchange.getIn().getBody(AttributeEvent.class);
-                Attribute linkedAttribute = getLinkedAttribute(attributeEvent.getAttributeRef());
+                Attribute<?> linkedAttribute = getLinkedAttribute(attributeEvent.getAttributeRef());
 
                 if (linkedAttribute == null) {
                     LOG.info("Message received from a client for an unlinked attribute, so ignoring");

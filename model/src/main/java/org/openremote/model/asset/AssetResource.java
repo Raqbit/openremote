@@ -24,7 +24,7 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
@@ -67,7 +67,7 @@ public interface AssetResource {
         public static final String WRITE_ATTRIBUTE_HTTP_METHOD = "PUT";
 
         public static String getWriteAttributeUrl(AttributeRef attributeRef) {
-            return "/asset/" + attributeRef.getEntityId() + "/attribute/" + attributeRef.getAttributeName();
+            return "/asset/" + attributeRef.getAssetId() + "/attribute/" + attributeRef.getAttributeName();
         }
     }
 
@@ -199,7 +199,7 @@ public interface AssetResource {
      * <p>
      * If the asset or attribute doesn't exist then a 404 status is returned.
      * <p>
-     * If an attribute is marked as {@link MetaType#ACCESS_PUBLIC_WRITE} then the attribute can be written publicly
+     * If an attribute is marked as {@link MetaItemType#ACCESS_PUBLIC_WRITE} then the attribute can be written publicly
      * <p>
      * This operation is ultimately asynchronous, any call will return before the actual attribute value is changed in
      * any storage or downstream processors. Thus any constraint violation or processing error will not be returned from

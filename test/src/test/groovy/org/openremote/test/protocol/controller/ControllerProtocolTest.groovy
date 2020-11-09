@@ -201,7 +201,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         then: "the protocol should authenticate and start pinging the server and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
             assert status == ConnectionStatus.CONNECTED
             assert controllerProtocol.controllerHeartbeat.get(controllerRef).isCancelled()
         }
@@ -258,8 +258,8 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         then: "the good protocol configuration should authenticate and start pinging the controller but the unavailable should remain DISCONNECTED"
         conditions.eventually {
-            def status2 = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME2))
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
+            def status2 = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME2))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
             assert status2 == ConnectionStatus.DISCONNECTED
             assert status == ConnectionStatus.CONNECTED
             assert !controllerProtocol.controllerHeartbeat.get(controllerRef2).isCancelled()
@@ -282,8 +282,8 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         then: "the protocol should authenticate and start pinging the server and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
-            def status3 = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME))
+            def status3 = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3))
             assert status == ConnectionStatus.CONNECTED
             assert status3 == ConnectionStatus.CONNECTED
             assert controllerProtocol.controllerHeartbeat.get(controllerRef).isCancelled()

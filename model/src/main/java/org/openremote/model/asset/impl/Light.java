@@ -23,7 +23,7 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class Light extends Device {
 
     public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN, null,
-        new MetaItem<>(MetaType.UNIT_TYPE, Constants.UNITS_ON_OFF)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_ON_OFF)
     );
     public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueType.PERCENTAGE_INTEGER_0_100, null);
 

@@ -10,7 +10,6 @@ import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
@@ -65,13 +64,13 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
             }
 
             @Override
-            protected void doLinkAttribute(Asset asset, Attribute attribute) {
+            protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
                 protocolDeployed = true
                 LOG.info("Mock Protocol: linkAttribute")
             }
 
             @Override
-            protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+            protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
                 LOG.info("Mock Protocol: unlinkAttribute")
             }
 

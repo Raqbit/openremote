@@ -29,7 +29,7 @@ import javax.validation.constraints.Pattern;
 
 import static org.openremote.model.v2.ValueType.*;
 
-public final class MetaType {
+public final class MetaItemType {
 
     /* PROTOCOL / SERVICE META */
 
@@ -168,6 +168,6 @@ public final class MetaType {
      */
     public static final MetaItemDescriptor<Boolean> SHOW_ON_DASHBOARD = new MetaItemDescriptor<>("showOnDashboard", BOOLEAN, true);
 
-    protected MetaType() {
+    protected MetaItemType() {
     }
 }

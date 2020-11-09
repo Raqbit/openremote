@@ -53,7 +53,7 @@ public class AssetEvent extends SharedEvent implements AssetInfo {
         this.updatedProperties = updatedProperties;
     }
 
-    public String getEntityId() {
+    public String getAssetId() {
         return asset.id;
     }
 

@@ -20,7 +20,6 @@
 package org.openremote.agent.protocol.controller;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.HttpHostConnectException;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -30,7 +29,6 @@ import org.openremote.agent.protocol.controller.command.ControllerCommandBasic;
 import org.openremote.agent.protocol.controller.command.ControllerCommandMapped;
 import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.container.web.WebTargetBuilder;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
@@ -249,7 +247,7 @@ public class ControllerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         String deviceName = Values.getMetaItemValueOrThrow(attribute, META_ATTRIBUTE_DEVICE_NAME, StringValue.class, true, true)
                 .map(StringValue::getString).orElse(null);
 
@@ -311,11 +309,11 @@ public class ControllerProtocol extends AbstractProtocol {
     /**
      * Clearing elements if an attribute is unlinked from Controller Agent
      * We don't have to clear {@link #pollingSensorList} as a check is done before scheduling task {@link #schedulePollingTask}
-     *  @param asset
+     * @param assetId
      * @param attribute
      */
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         controllersMap.get(agent.getReferenceOrThrow()).removeAttributeRef(attribute.getReferenceOrThrow());
     }
 

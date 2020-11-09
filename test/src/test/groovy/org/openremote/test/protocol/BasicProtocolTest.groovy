@@ -113,7 +113,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             }
 
             @Override
-            protected void doLinkAttribute(Asset asset, Attribute attribute) {
+            protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
                 protocolMethodCalls.add("LINK_ATTRIBUTE")
 
                 if (!attribute.getMetaItem("MOCK_ATTRIBUTE_REQUIRED_META").isPresent()) {
@@ -137,7 +137,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             }
 
             @Override
-            protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+            protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
                 protocolMethodCalls.add("UNLINK_ATTRIBUTE")
                 (protocolLinkedAttributes[agent.getName().orElse("")])
                         .removeAll { (it.getReferenceOrThrow() == attribute.getReferenceOrThrow())}
@@ -205,10 +205,10 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
             assert config2 != null
             assert config3 != null
             assert config4 == null
-            assert agentService.getProtocolConnectionStatus(config1.getReferenceOrThrow()) == ConnectionStatus.CONNECTED
-            assert agentService.getProtocolConnectionStatus(config2.getReferenceOrThrow()) == ConnectionStatus.ERROR
-            assert agentService.getProtocolConnectionStatus(config3.getReferenceOrThrow()) == ConnectionStatus.ERROR
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(mockAgent.id, "mockConfig4")) == ConnectionStatus.DISABLED
+            assert agentService.getAgentConnectionStatus(config1.getReferenceOrThrow()) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(config2.getReferenceOrThrow()) == ConnectionStatus.ERROR
+            assert agentService.getAgentConnectionStatus(config3.getReferenceOrThrow()) == ConnectionStatus.ERROR
+            assert agentService.getAgentConnectionStatus(new AttributeRef(mockAgent.id, "mockConfig4")) == ConnectionStatus.DISABLED
         }
 
         when: "a mock thing asset is created that links to the mock protocol configurations"
@@ -422,7 +422,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         conditions.eventually {
             assert protocolWriteAttributeEvents.size() == 1
             assert protocolWriteAttributeEvents[0].attributeName == "tempTarget1"
-            assert protocolWriteAttributeEvents[0].attributeRef.entityId == mockThing.getId()
+            assert protocolWriteAttributeEvents[0].attributeRef.assetId == mockThing.getId()
             Values.getNumber(protocolWriteAttributeEvents[0].value.orElse(null)).orElse(0d) == 30d
         }
 

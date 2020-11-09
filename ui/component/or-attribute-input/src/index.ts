@@ -702,7 +702,7 @@ export class OrAttributeInput extends subscribe(manager)(translate(i18next)(LitE
         }
         if (this.attribute) {
             return {
-                entityId: this.attribute.assetId!,
+                assetId: this.attribute.assetId!,
                 attributeName: this.attribute.name!
             }
         }

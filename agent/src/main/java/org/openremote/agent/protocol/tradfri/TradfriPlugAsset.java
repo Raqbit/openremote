@@ -56,7 +56,7 @@ public class TradfriPlugAsset extends TradfriAsset {
         EventHandler<PlugChangeOnEvent> plugOnOffEventHandler = new EventHandler<PlugChangeOnEvent>() {
             @Override
             public void handle(PlugChangeOnEvent event) {
-                Optional<Attribute> plugStatus = getAttribute("plugStatus");
+                Optional<Attribute<?>> plugStatus = getAttribute("plugStatus");
                 Plug plug = device.toPlug();
                 if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
                 assetService.mergeAsset(asset);
@@ -71,7 +71,7 @@ public class TradfriPlugAsset extends TradfriAsset {
     @Override
     public void setInitialValues() {
         Plug plug = device.toPlug();
-        Optional<Attribute> plugStatus = getAttribute("plugStatus");
+        Optional<Attribute<?>> plugStatus = getAttribute("plugStatus");
         if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
     }
 }

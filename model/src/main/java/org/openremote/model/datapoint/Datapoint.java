@@ -41,7 +41,7 @@ public abstract class Datapoint implements Serializable {
 
     @Id
     @Column(name = "ENTITY_ID", length = 36, nullable = false)
-    protected String entityId;
+    protected String assetId;
 
     @Id
     @Column(name = "ATTRIBUTE_NAME", nullable = false)
@@ -67,22 +67,22 @@ public abstract class Datapoint implements Serializable {
     }
 
     public Datapoint(AttributeRef attributeRef, Object value, long timestamp) {
-        this(attributeRef.getEntityId(), attributeRef.getAttributeName(), value, timestamp);
+        this(attributeRef.getAssetId(), attributeRef.getAttributeName(), value, timestamp);
     }
 
-    public Datapoint(String entityId, String attributeName, Object value, long timestamp) {
-        this.entityId = entityId;
+    public Datapoint(String assetId, String attributeName, Object value, long timestamp) {
+        this.assetId = assetId;
         this.attributeName = attributeName;
         this.timestamp = new Date(timestamp);
         this.value = value;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
     public String getAttributeName() {
@@ -117,20 +117,20 @@ public abstract class Datapoint implements Serializable {
         Datapoint datapoint = (Datapoint) o;
 
         return timestamp == datapoint.timestamp
-            && entityId.equals(datapoint.entityId)
+            && assetId.equals(datapoint.assetId)
             && attributeName.equals(datapoint.attributeName)
             && value.equals(datapoint.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entityId, attributeName, timestamp, value);
+        return Objects.hash(assetId, attributeName, timestamp, value);
     }
 
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-            "entityId='" + entityId + '\'' +
+            "assetId='" + assetId + '\'' +
             ", attributeName='" + attributeName + '\'' +
             ", timestamp=" + timestamp +
             ", value=" + (value != null ? value : "null") +

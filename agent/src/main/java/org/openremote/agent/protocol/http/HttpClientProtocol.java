@@ -36,7 +36,6 @@ import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.model.AbstractValueHolder;
 import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.ValueHolder;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
@@ -837,7 +836,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         String method = Values.getMetaItemValueOrThrow(
@@ -923,7 +922,7 @@ public class HttpClientProtocol extends AbstractProtocol {
 
         if (!TextUtil.isNullOrEmpty(pollingAttribute)) {
             synchronized (pollingLinkedAttributeMap) {
-                AttributeRef pollingSourceRef = new AttributeRef(attributeRef.getEntityId(), pollingAttribute);
+                AttributeRef pollingSourceRef = new AttributeRef(attributeRef.getAssetId(), pollingAttribute);
                 pollingLinkedAttributeMap.compute(pollingSourceRef, (ref, links) -> {
                     if (links == null) {
                         links = new HashSet<>();
@@ -1013,7 +1012,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
         requestMap.remove(attributeRef);
         cancelPolling(attributeRef);

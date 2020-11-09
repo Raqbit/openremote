@@ -172,7 +172,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
 
         then: "the protocol should authenticate and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
         }
 

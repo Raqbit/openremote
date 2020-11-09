@@ -26,7 +26,7 @@ import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.SecurityInfo;
 import io.undertow.servlet.api.WebResourceCollection;
 import io.undertow.websockets.jsr.DefaultContainerConfigurator;
-import io.undertow.websockets.jsr.UndertowContainer;
+import io.undertow.websockets.jsr.UndertowContainerProvider;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.keycloak.KeycloakPrincipal;
 import org.openremote.container.security.AuthContext;
@@ -56,7 +56,7 @@ public class DefaultWebsocketComponent extends WebsocketComponent {
     private static final Logger LOG = Logger.getLogger(DefaultWebsocketComponent.class.getName());
 
     static {
-        UndertowContainer.disableDefaultContainer();
+        UndertowContainerProvider.disableDefaultContainer();
     }
 
     final protected IdentityService identityService;

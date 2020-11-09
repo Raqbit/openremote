@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.event.shared.AssetInfo;
 import org.openremote.model.event.shared.SharedEvent;
+import org.openremote.model.v2.AttributeDescriptor;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -72,21 +73,25 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
     protected String realm;
     protected String parentId;
 
-    public AttributeEvent(String entityId, String attributeName, Object value) {
-        this(new AttributeState(new AttributeRef(entityId, attributeName), value));
+    public <T> AttributeEvent(String assetId, AttributeDescriptor<T> attributeDescriptor, T value) {
+        this(assetId, attributeDescriptor.getName(), value);
     }
 
-    public AttributeEvent(String entityId, String attributeName) {
-        this(new AttributeState(new AttributeRef(entityId, attributeName)));
+    public AttributeEvent(String assetId, String attributeName, Object value) {
+        this(new AttributeState(new AttributeRef(assetId, attributeName), value));
     }
 
-    public AttributeEvent(String entityId, String attributeName, boolean deleted) {
-        this(new AttributeState(new AttributeRef(entityId, attributeName)));
+    public AttributeEvent(String assetId, String attributeName) {
+        this(new AttributeState(new AttributeRef(assetId, attributeName)));
+    }
+
+    public AttributeEvent(String assetId, String attributeName, boolean deleted) {
+        this(new AttributeState(new AttributeRef(assetId, attributeName)));
         attributeState.deleted = deleted;
     }
 
-    public AttributeEvent(String entityId, String attributeName, Object value, long timestamp) {
-        this(new AttributeState(new AttributeRef(entityId, attributeName), value), timestamp);
+    public AttributeEvent(String assetId, String attributeName, Object value, long timestamp) {
+        this(new AttributeState(new AttributeRef(assetId, attributeName), value), timestamp);
     }
 
     public AttributeEvent(AttributeRef attributeRef, Object value) {
@@ -120,8 +125,8 @@ public class AttributeEvent extends SharedEvent implements AssetInfo {
         return getAttributeState().getAttributeRef();
     }
 
-    public String getEntityId() {
-        return getAttributeRef().getEntityId();
+    public String getAssetId() {
+        return getAttributeRef().getAssetId();
     }
 
     public String getRealm() {

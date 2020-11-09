@@ -131,7 +131,7 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
 
         then: "the protocol should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
         }
 
@@ -274,7 +274,7 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
 
         and: "the protocol should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
         }
 

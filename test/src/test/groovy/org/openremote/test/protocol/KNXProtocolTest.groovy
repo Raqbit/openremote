@@ -33,7 +33,6 @@ import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 
 import org.openremote.model.Constants
-import org.openremote.model.attribute.Attribute
 import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
@@ -107,13 +106,13 @@ class KNXProtocolTest extends Specification implements ManagerContainerTrait {
 
         then: "the protocol configurations should be linked and their deployment status should be available in the agent service"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(knxAgent.getAttribute("knxConfig").get().getReferenceOrThrow()) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(knxAgent.getAttribute("knxConfig").get().getReferenceOrThrow()) == ConnectionStatus.CONNECTED
         }
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(knxAgent.getAttribute("knxConfigError1").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
+            assert agentService.getAgentConnectionStatus(knxAgent.getAttribute("knxConfigError1").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
         }
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(knxAgent.getAttribute("knxConfigError2").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
+            assert agentService.getAgentConnectionStatus(knxAgent.getAttribute("knxConfigError2").get().getReferenceOrThrow()) == ConnectionStatus.ERROR_CONFIGURATION
         }
 
 

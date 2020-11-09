@@ -202,7 +202,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
                 !it.asset.getAttributes().isEmpty() &&
                 it.asset.getAttributesStream().allMatch({attr ->
                     AgentLink.getAgentLink(attr)
-                        .map({agentLink -> agentLink.entityId == agent.id && agentLink.attributeName == "protocolConfig"})
+                        .map({agentLink -> agentLink.assetId == agent.id && agentLink.attributeName == "protocolConfig"})
                         .orElse(false)
                 })
 

@@ -345,7 +345,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         then: "the protocol should authenticate and start pinging the server and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
             assert mockServer.pingCount > 2
         }
@@ -430,7 +430,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         then: "the protocol should authenticate and start pinging the server and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
             assert mockServer.pingCount > 2
         }
@@ -456,7 +456,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol should authenticate and start pinging the server and the connection status should become CONNECTED"
         conditions.eventually {
-            def status = agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
+            def status = agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig"))
             assert status == ConnectionStatus.CONNECTED
             assert mockServer.pingCount > 2
         }
@@ -652,9 +652,9 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         then: "the protocol configuration should be linked with a connection status of connected"
         conditions.eventually {
             assert httpClientProtocol.linkedProtocolConfigurations.size() == protocolCount + 3
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.CONNECTED
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig3")) == ConnectionStatus.CONNECTED
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig3")) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.CONNECTED
         }
 
         when: "attributes are linked to these protocol configurations"
@@ -704,7 +704,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol config connection status linked to by the failing poll request should become DISABLED"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig3")) == ConnectionStatus.DISABLED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig3")) == ConnectionStatus.DISABLED
         }
 
         when: "the success/failure count is stored"
@@ -727,7 +727,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol connection status should now be CONNECTED"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.CONNECTED
         }
 
         when: "a linked attribute value is updated"
@@ -744,7 +744,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol connection status should now be DISABLED"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.DISABLED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig2")) == ConnectionStatus.DISABLED
         }
 
         when: "a linked attribute value is updated again"
@@ -771,7 +771,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol connection status should now be ERROR_AUTHENTICATION"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.ERROR_AUTHENTICATION
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.ERROR_AUTHENTICATION
         }
 
         when: "a linked attribute value is updated"
@@ -788,7 +788,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "the protocol connection status should now be CONNECTED"
         conditions.eventually {
-            assert agentService.getProtocolConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.CONNECTED
+            assert agentService.getAgentConnectionStatus(new AttributeRef(agent.id, "protocolConfig4")) == ConnectionStatus.CONNECTED
         }
 
         when: "a linked attribute value is updated"

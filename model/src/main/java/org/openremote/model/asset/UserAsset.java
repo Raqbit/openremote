@@ -20,7 +20,7 @@
 package org.openremote.model.asset;
 
 import org.hibernate.annotations.Formula;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -35,15 +35,15 @@ import java.util.Date;
  * <ul>
  * <li>
  * When a restricted client reads assets, only dynamic attributes with
- * {@link MetaType#ACCESS_RESTRICTED_READ} are included.
+ * {@link MetaItemType#ACCESS_RESTRICTED_READ} are included.
  * A restricted client may submit a query for public assets and dynamic attributes with
- * {@link MetaType#ACCESS_PUBLIC_READ}.
+ * {@link MetaItemType#ACCESS_PUBLIC_READ}.
  * </li>
  * <li>
  * When a restricted client updates existing assets, new attributes can be added, but
- * only attributes with {@link MetaType#ACCESS_RESTRICTED_WRITE} can be updated or deleted; note Access meta items
- * cannot be modified. Any new attributes are automatically set with {@link MetaType#ACCESS_RESTRICTED_READ} and
- * {@link MetaType#ACCESS_RESTRICTED_WRITE}, thus ensuring that a restricted client can fully access its own attributes.
+ * only attributes with {@link MetaItemType#ACCESS_RESTRICTED_WRITE} can be updated or deleted; note Access meta items
+ * cannot be modified. Any new attributes are automatically set with {@link MetaItemType#ACCESS_RESTRICTED_READ} and
+ * {@link MetaItemType#ACCESS_RESTRICTED_WRITE}, thus ensuring that a restricted client can fully access its own attributes.
  * </li>
  * <li>
  * A restricted client can not create or delete assets. A restricted client can not change the name, parent, or

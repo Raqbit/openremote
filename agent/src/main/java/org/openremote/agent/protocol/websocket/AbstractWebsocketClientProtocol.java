@@ -31,7 +31,6 @@ import org.openremote.model.auth.OAuthGrant;
 import org.openremote.container.web.WebTargetBuilder;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.ProtocolConfiguration;
@@ -214,7 +213,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef protocolRef = agent.getReferenceOrThrow();
         ProtocolIoClient<T, WebsocketIoClient<T>> protocolClient = protocolIoClientMap.get(protocolRef);
         WebsocketIoClient<T> client = protocolClient.client;
@@ -231,7 +230,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef protocolRef = agent.getReferenceOrThrow();
         AttributeRef attributeRef = attribute.getReferenceOrThrow();
 

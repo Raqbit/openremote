@@ -127,7 +127,7 @@ final public class MacroConfiguration {
         return setMacroActions(attribute, Arrays.stream(actions));
     }
 
-    public static UnaryOperator<Attribute> setMacroActions(MacroAction... actions) {
+    public static UnaryOperator<Attribute<?>> setMacroActions(MacroAction... actions) {
         return attribute -> setMacroActions(attribute, actions);
     }
 
@@ -135,7 +135,7 @@ final public class MacroConfiguration {
         return setMacroActions(attribute, actions.stream());
     }
 
-    public static UnaryOperator<Attribute> setMacroActions(Collection<MacroAction> actions) {
+    public static UnaryOperator<Attribute<?>> setMacroActions(Collection<MacroAction> actions) {
         return attribute -> setMacroActions(attribute, actions);
     }
 

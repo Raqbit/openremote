@@ -165,7 +165,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
 
         Value value = sendConvertedValue.value;
 
-        Optional<Attribute> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
+        Optional<Attribute<?>> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
         if (attribute.isPresent()) {
             // Do built in value conversion
             Optional<ValueType> attributeValueType = attribute.get().getValueType().map(AttributeValueDescriptor::getValueType);
@@ -274,13 +274,13 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
         }
     }
 
-    protected static Optional<Attribute> getAttribute(EntityManager em,
+    protected static Optional<Attribute<?>> getAttribute(EntityManager em,
                                                  AssetStorageService assetStorageService,
                                                  AttributeRef attributeRef) {
         Asset asset = assetStorageService.find(
             em,
             new AssetQuery()
-                .ids(attributeRef.getEntityId())
+                .ids(attributeRef.getAssetId())
                 .select(new Select().attributes(attributeRef.getAttributeName()))
         );
 
@@ -296,7 +296,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
     protected static Value getCurrentValue(EntityManager em,
                                            AssetStorageService assetStorageService,
                                            AttributeRef attributeRef) {
-        Optional<Attribute> attribute = getAttribute(em, assetStorageService, attributeRef);
+        Optional<Attribute<?>> attribute = getAttribute(em, assetStorageService, attributeRef);
         return attribute.flatMap(Attribute::getValue).orElse(null);
     }
 

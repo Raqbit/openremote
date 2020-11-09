@@ -42,6 +42,14 @@ public class Pair<K, V> implements Serializable {
         return false;
     }
 
+    public K getKey() {
+        return key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(key, value);

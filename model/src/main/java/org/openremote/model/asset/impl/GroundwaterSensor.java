@@ -22,7 +22,7 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaType;
+import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
@@ -30,10 +30,10 @@ import java.util.Optional;
 public class GroundwaterSensor extends Device {
 
     public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.TEMPERATURE, null,
-        new MetaItem<>(MetaType.READ_ONLY)
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", true, ValueType.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaType.READ_ONLY)
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
 
     public static final AssetDescriptor<GroundwaterSensor> DESCRIPTOR = new AssetDescriptor<>("water-outline", "95d0df", GroundwaterSensor.class);

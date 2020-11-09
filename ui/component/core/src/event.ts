@@ -259,7 +259,7 @@ abstract class EventProviderImpl implements EventProvider {
         };
 
         const isAttributeRef = ids && typeof ids[0] !== "string";
-        const assetIds = isAttributeRef ? (ids as AttributeRef[]).map((id) => id.entityId!) : ids as string[] | null;
+        const assetIds = isAttributeRef ? (ids as AttributeRef[]).map((id) => id.assetId!) : ids as string[] | null;
 
         if (assetIds && assetIds.length > 0) {
             subscription.filter = {
@@ -318,14 +318,14 @@ abstract class EventProviderImpl implements EventProvider {
         }
 
         const isAttributeRef = typeof ids[0] !== "string";
-        const assetIds = isAttributeRef ? [...new Set((ids as AttributeRef[]).map((id) => id.entityId!))] : [...new Set(ids as string[])];
+        const assetIds = isAttributeRef ? [...new Set((ids as AttributeRef[]).map((id) => id.assetId!))] : [...new Set(ids as string[])];
         const attributes = isAttributeRef ? ids as AttributeRef[] : undefined;
         const subscriptionId = "AttributeEvent" + EventProviderImpl._subscriptionCounter++;
 
         // Check if we have an existing subscription for each asset, otherwise create one
         const assetSubscriptions = assetIds.map(
             (assetId) => {
-                const assetAttributes = attributes ? attributes.filter((attributeRef) => attributeRef.entityId === assetId) : undefined;
+                const assetAttributes = attributes ? attributes.filter((attributeRef) => attributeRef.assetId === assetId) : undefined;
                 let info = this._assetSubscriptionMap.get(assetId);
                 let promise: Promise<any> = Promise.resolve(assetId);
 
@@ -413,14 +413,14 @@ abstract class EventProviderImpl implements EventProvider {
                 if (info && info.asset) {
                     Object.entries(info.asset.attributes!).forEach(([attributeName, v]) => {
                         const attr = v as Attribute;
-                        if (!attributes || attributes.find((attributeRef) => attributeRef.entityId === info.asset!.id && attributeRef.attributeName === attributeName)) {
+                        if (!attributes || attributes.find((attributeRef) => attributeRef.assetId === info.asset!.id && attributeRef.attributeName === attributeName)) {
                             callback({
                                 eventType: "attribute",
                                 timestamp: attr.valueTimestamp,
                                 attributeState: {
                                     value: attr.value,
                                     attributeRef: {
-                                        entityId: assetId,
+                                        assetId: assetId,
                                         attributeName: attributeName
                                     }
                                 }

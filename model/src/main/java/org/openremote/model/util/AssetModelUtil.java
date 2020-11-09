@@ -69,8 +69,8 @@ public class AssetModelUtil {
      * <p>
      * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s (see
      * {@link AssetDescriptor#getAttributeDescriptors})
-     * <h2>{@link MetaItemDescriptor}s from {@link MetaType}</h2>
-     * Extracts public static fields of type {@link MetaItemDescriptor} from {@link MetaType} and {@link Asset} classes;
+     * <h2>{@link MetaItemDescriptor}s from {@link MetaItemType}</h2>
+     * Extracts public static fields of type {@link MetaItemDescriptor} from {@link MetaItemType} and {@link Asset} classes;
      * {@link MetaItemDescriptor}s defined in {@link Asset} classes must be annotated with {@link ModelDescriptor}.
      * <h2>{@link ValueDescriptor}s from {@link ValueType}</h2>
      * Extracts public static fields of type {@link ValueDescriptor} from {@link ValueType} and {@link Asset} classes;
@@ -124,7 +124,7 @@ public class AssetModelUtil {
 
         @Override
         public MetaItemDescriptor<?>[] getMetaItemDescriptors() {
-            return getDescriptors(MetaItemDescriptor.class, MetaType.class);
+            return getDescriptors(MetaItemDescriptor.class, MetaItemType.class);
         }
 
         @Override

@@ -117,7 +117,7 @@ public class MqttBrokerService implements ContainerService {
                                     .forEach(event -> {
                                         MqttConnection mqttConnection = mqttConnectionMap.get(sessionKey);
                                         if (mqttConnection != null) {
-                                            if (mqttConnection.assetSubscriptions.containsKey(event.getEntityId()) || mqttConnection.assetAttributeSubscriptions.containsKey(event.getAttributeRef())) {
+                                            if (mqttConnection.assetSubscriptions.containsKey(event.getAssetId()) || mqttConnection.assetAttributeSubscriptions.containsKey(event.getAttributeRef())) {
                                                 sendAttributeEvent(sessionKey, event);
                                             }
                                             if (mqttConnection.assetAttributeValueSubscriptions.containsKey(event.getAttributeRef())) {
@@ -156,7 +156,7 @@ public class MqttBrokerService implements ContainerService {
 
             MqttPublishMessage publishMessage = MqttMessageBuilders.publish()
                     .qos(MqttQoS.AT_MOST_ONCE)
-                    .topicName(ASSETS_TOPIC + TOPIC_SEPARATOR + attributeEvent.getEntityId())
+                    .topicName(ASSETS_TOPIC + TOPIC_SEPARATOR + attributeEvent.getAssetId())
                     .payload(payload)
                     .build();
 
@@ -171,7 +171,7 @@ public class MqttBrokerService implements ContainerService {
 
         MqttPublishMessage publishMessage = MqttMessageBuilders.publish()
                 .qos(MqttQoS.AT_MOST_ONCE)
-                .topicName(ASSETS_TOPIC + TOPIC_SEPARATOR + attributeEvent.getEntityId() + TOPIC_SEPARATOR + attributeEvent.getAttributeName())
+                .topicName(ASSETS_TOPIC + TOPIC_SEPARATOR + attributeEvent.getAssetId() + TOPIC_SEPARATOR + attributeEvent.getAttributeName())
                 .payload(payload)
                 .build();
 

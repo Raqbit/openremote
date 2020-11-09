@@ -171,7 +171,7 @@ public class AssetState implements Comparable<AssetState> {
      * Compares entity identifier, attribute name, value, source, and optional timestamp.
      */
     public boolean matches(AttributeEvent event, AttributeEvent.Source source, boolean ignoreTimestamp) {
-        return getId().equals(event.getEntityId())
+        return getId().equals(event.getAssetId())
             && getAttributeName().equals(event.getAttributeName())
             && getValue().equals(event.getValue())
             && (ignoreTimestamp || getTimestamp() == event.getTimestamp())

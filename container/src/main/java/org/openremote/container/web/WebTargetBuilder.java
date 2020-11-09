@@ -154,7 +154,7 @@ public class WebTargetBuilder {
         }
 
         if (oAuthGrant != null) {
-            WebTarget authTarget = client.target(oAuthGrant.tokenEndpointUri);
+            WebTarget authTarget = client.target(oAuthGrant.getTokenEndpointUri());
             OAuthFilter oAuthFilter = new OAuthFilter(authTarget, oAuthGrant);
             target.register(oAuthFilter, Priorities.AUTHENTICATION);
         } else if (basicAuthentication != null) {

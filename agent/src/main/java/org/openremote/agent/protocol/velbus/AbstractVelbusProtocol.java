@@ -176,7 +176,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doLinkAttribute(Asset asset, Attribute attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
 
         if (!agent.isEnabled()) {
             LOG.info("Protocol configuration is disabled so ignoring: " + agent.getReferenceOrThrow());
@@ -210,7 +210,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void doUnlinkAttribute(Asset asset, Attribute attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
         if (velbusNetworkConsumerPair == null) {

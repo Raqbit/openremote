@@ -39,7 +39,7 @@ public class PredictedFacade<T extends Ruleset> extends PredictedDatapoints {
 
     @Override
     public ValueDatapoint[] getValueDatapoints(AttributeRef attributeRef, DatapointInterval interval, long fromTimestamp, long toTimestamp) {
-        return assetPredictedDatapointService.getValueDatapoints(attributeRef.getEntityId(), attributeRef.getAttributeName(), interval, fromTimestamp, toTimestamp);
+        return assetPredictedDatapointService.getValueDatapoints(attributeRef.getAssetId(), attributeRef.getAttributeName(), interval, fromTimestamp, toTimestamp);
     }
 
     @Override
@@ -49,6 +49,6 @@ public class PredictedFacade<T extends Ruleset> extends PredictedDatapoints {
 
     @Override
     public void updateValue(AttributeRef attributeRef, Object value, long timestamp) {
-        updateValue(attributeRef.getEntityId(), attributeRef.getAttributeName(), value, timestamp);
+        updateValue(attributeRef.getAssetId(), attributeRef.getAttributeName(), value, timestamp);
     }
 }

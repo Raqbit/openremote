@@ -70,7 +70,6 @@ import static org.openremote.container.concurrent.GlobalLock.withLockReturning;
 import static org.openremote.container.persistence.PersistenceEvent.PERSISTENCE_TOPIC;
 import static org.openremote.container.persistence.PersistenceEvent.isPersistenceEventForEntityType;
 import static org.openremote.container.util.MapAccess.getString;
-import static org.openremote.model.attribute.Attribute.attributesFromJson;
 import static org.openremote.model.attribute.Attribute.getAddedOrModifiedAttributes;
 
 /**
@@ -268,7 +267,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             .count();//Needed in order to execute the stream. TODO: can this be done differently?
 
         LOG.info("Loading all assets with fact attributes to initialize state of rules engines");
-        Stream<Pair<Asset, Stream<Attribute>>> stateAttributes = findRuleStateAttributes();
+        Stream<Pair<Asset, Stream<Attribute<?>>>> stateAttributes = findRuleStateAttributes();
 
         // Push each attribute as an asset update through the rule engine chain
         // that will ensure the insert only happens to the engines in scope
@@ -425,8 +424,8 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             switch (persistenceEvent.getCause()) {
                 case CREATE: {
                     // New asset has been created so get attributes that have RULE_STATE meta
-                    List<Attribute> ruleStateAttributes =
-                        asset.getAttributesStream().filter(Attribute::isRuleState).collect(Collectors.toList());
+                    List<Attribute<?>> ruleStateAttributes =
+                        asset .getAttributes().stream().filter(Attribute::isRuleState).collect(Collectors.toList());
 
                     // Asset used to be loaded for each attribute which is inefficient
                     Asset loadedAsset = ruleStateAttributes.isEmpty() ? null : assetStorageService.find(asset.getId(),
@@ -459,13 +458,13 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
                     // Attributes have possibly changed so need to compare old and new attributes
                     // to determine which facts to retract and which to insert
-                    List<Attribute> oldRuleStateAttributes =
+                    List<Attribute<?>> oldRuleStateAttributes =
                         attributesFromJson(
                             (ObjectValue) persistenceEvent.getPreviousState()[attributesIndex],
                             asset.getId()
                         ).filter(Attribute::isRuleState).collect(Collectors.toList());
 
-                    List<Attribute> newRuleStateAttributes =
+                    List<Attribute<?>> newRuleStateAttributes =
                         attributesFromJson(
                             (ObjectValue) persistenceEvent.getCurrentState()[attributesIndex],
                             asset.getId()
@@ -492,7 +491,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
                 }
                 case DELETE:
                     // Retract any facts that were associated with this asset
-                    asset.getAttributesStream()
+                    asset .getAttributes().stream()
                         .filter(Attribute::isRuleState)
                         .forEach(attribute -> {
                             AssetState assetState = new AssetState(asset, attribute, Source.INTERNAL);
@@ -815,7 +814,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
         return rulesEngines;
     }
 
-    protected Stream<Pair<Asset, Stream<Attribute>>> findRuleStateAttributes() {
+    protected Stream<Pair<Asset, Stream<Attribute<?>>>> findRuleStateAttributes() {
         List<Asset> assets = assetStorageService.findAll(
             new AssetQuery()
                 .attributeMeta(
@@ -826,7 +825,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
         return assets.stream()
             .map((Asset asset) ->
-                new Pair<>(asset, asset.getAttributesStream().filter(Attribute::isRuleState))
+                new Pair<>(asset, asset .getAttributes().stream().filter(Attribute::isRuleState))
             );
     }
 
