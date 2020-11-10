@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,28 +17,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol.udp;
+package org.openremote.agent.protocol.tcp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.ValueType;
 
-/**
- * This is an abstract UDP client protocol for communicating with UDP servers; concrete implementations must implement
- * {@link #getEncoderDecoderProvider} to provide encoders/decoders for messages of type &lt;T&gt;.
- */
-public abstract class AbstractUdpClientProtocol<T, U extends IoAgent<T, UdpIoClient<T>>> extends AbstractIoClientProtocol<T, UdpIoClient<T>, U> {
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
-    protected AbstractUdpClientProtocol(U agent) {
-        super(agent);
+public class TcpClientAgent extends IoAgent<String, TcpIoClient<String>> {
+
+//    public static final AgentDescriptor<TcpClientAgent, TcpClientProtocol> DESCRIPTOR = new AgentDescriptor(
+//
+//    );
+
+    protected <T extends TcpClientAgent> TcpClientAgent(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
     }
 
     @Override
-    protected UdpIoClient<T> doCreateIoClient(U agent) throws Exception {
-
-        String host = agent.getHost().orElse(null);
-        Integer port = agent.getPort().orElse(null);
-        Integer bindPort = agent.getBindPort().orElse(null);
-
-        return new UdpIoClient<>(host, port, bindPort, executorService);
+    public AbstractIoClientProtocol<String, TcpIoClient<String>, TcpClientAgent> getProtocolInstance() {
+        return new TcpClientProtocol(this);
     }
 }

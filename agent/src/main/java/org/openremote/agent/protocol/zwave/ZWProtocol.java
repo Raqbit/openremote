@@ -19,7 +19,12 @@
  */
 package org.openremote.agent.protocol.zwave;
 
+import io.netty.channel.ChannelHandler;
 import org.openremote.agent.protocol.AbstractProtocol;
+import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
+import org.openremote.agent.protocol.io.AbstractNettyIoClient;
+import org.openremote.agent.protocol.serial.SerialIoClient;
+import org.openremote.model.Container;
 import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.protocol.ProtocolAssetDiscovery;
 import org.openremote.model.protocol.ProtocolAssetImport;
@@ -46,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import static org.openremote.agent.protocol.zwave.ZWConfiguration.getEndpointIdAsString;
@@ -56,72 +62,15 @@ import static org.openremote.agent.protocol.zwave.ZWConfiguration.initProtocolCo
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE;
 
-public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscovery,
+public class ZWProtocol extends AbstractIoClientProtocol<byte[], SerialIoClient<byte[]>, ZWAgent> implements ProtocolAssetDiscovery,
     ProtocolInstanceDiscovery, ProtocolAssetImport {
 
     // Constants ------------------------------------------------------------------------------------
 
-    public static final String PROTOCOL_NAME = PROTOCOL_NAMESPACE + ":zwave";
     public static final String PROTOCOL_DISPLAY_NAME = "Z-Wave";
-    public static final String VERSION = "1.0";
-    public static final String META_ZWAVE_SERIAL_PORT = PROTOCOL_NAME + ":port";
     public static final String META_ZWAVE_DEVICE_NODE_ID = PROTOCOL_NAME + ":deviceNodeId";
     public static final String META_ZWAVE_DEVICE_ENDPOINT = PROTOCOL_NAME + ":deviceEndpoint";
     public static final String META_ZWAVE_DEVICE_VALUE_LINK = PROTOCOL_NAME + ":deviceValueLink";
-    public static final int DEFAULT_ENDPOINT = 0;
-
-
-    public static final List<MetaItemDescriptor> PROTOCOL_META_ITEM_DESCRIPTORS = Collections.singletonList(
-        new MetaItemDescriptorImpl(
-            META_ZWAVE_SERIAL_PORT,
-            ValueType.STRING,
-            true,
-            null,
-            null,
-            1,
-            null,
-            false,
-            null, null, null
-        )
-    );
-
-    public static final List<MetaItemDescriptor> ATTRIBUTE_META_ITEM_DESCRIPTORS = Arrays.asList(
-        new MetaItemDescriptorImpl(
-            META_ZWAVE_DEVICE_NODE_ID,
-            ValueType.NUMBER,
-            true,
-            "^([1-9]\\d{0,1}|1[0-9][0-9]|2[0-2][0-9]|23[0-2])$", //1-232
-            "1-232",
-            1,
-            null,
-            false,
-            null, null, null
-        ),
-        new MetaItemDescriptorImpl(
-            META_ZWAVE_DEVICE_ENDPOINT,
-            ValueType.NUMBER,
-            true,
-            REGEXP_PATTERN_INTEGER_POSITIVE,
-            MetaItemDescriptor.PatternFailure.INTEGER_POSITIVE_NON_ZERO.name(),
-            1,
-            Values.create(DEFAULT_ENDPOINT),
-            false,
-            null, null, null
-        ),
-        new MetaItemDescriptorImpl(
-            META_ZWAVE_DEVICE_VALUE_LINK,
-            ValueType.STRING,
-            true,
-            null,
-            null,
-            1,
-            null,
-            false,
-            null, null, null
-        )
-    );
-
-
 
     // Class Members --------------------------------------------------------------------------------
 
@@ -130,184 +79,93 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscove
 
     // Protected Instance Fields --------------------------------------------------------------------
 
-    protected final Map<String, ZWNetwork> networkMap = new HashMap<>();
-    protected final Map<AttributeRef,  Pair<ZWNetwork, Consumer<ConnectionStatus>>> networkConfigurationMap = new HashMap<>();
-    protected final Map<AttributeRef, Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value>> sensorValueConsumerMap = new HashMap<>();
-
+    protected ZWNetwork network;
+    protected Map<AttributeRef, Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value>> sensorValueConsumerMap;
 
     // Implements Protocol --------------------------------------------------------------------------
 
     @Override
     public String getProtocolName() {
-        return PROTOCOL_NAME;
-    }
-
-    @Override
-    public String getProtocolDisplayName() {
         return PROTOCOL_DISPLAY_NAME;
     }
-
 
     // Implements AbstractProtocol ------------------------------------------------------------------
 
     @Override
-    protected List<MetaItemDescriptor> getProtocolConfigurationMetaItemDescriptors() {
-        List<MetaItemDescriptor> descriptors = new ArrayList<>(PROTOCOL_META_ITEM_DESCRIPTORS.size());
-        descriptors.addAll(PROTOCOL_META_ITEM_DESCRIPTORS);
-        return descriptors;
+    protected void doStart(Container container) throws Exception {
+
+        super.doStart(container);
+        ZWNetwork network = new ZWNetwork(client);
+        network.addConnectionStatusConsumer(this::setConnectionStatus);
+        network.connect();
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
-        AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
-        if (result.isValid()) {
-            ZWConfiguration.validateSerialConfiguration(protocolConfiguration, result);
-        }
-        return result;
-    }
-
-    @Override
-    public Attribute getProtocolConfigurationTemplate() {
-        return super.getProtocolConfigurationTemplate()
-            .addMeta(new MetaItem(META_ZWAVE_SERIAL_PORT, null));
-    }
-
-    @Override
-    protected List<MetaItemDescriptor> getLinkedAttributeMetaItemDescriptors() {
-        List<MetaItemDescriptor> descriptors = new ArrayList<>(ATTRIBUTE_META_ITEM_DESCRIPTORS.size());
-        descriptors.addAll(ATTRIBUTE_META_ITEM_DESCRIPTORS);
-        return descriptors;
-    }
-
-    @Override
-    protected void doConnect() {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
-        Optional<String> networkId = getUniqueNetworkIdentifier(protocolConfiguration);
-
-        if (!networkId.isPresent()) {
-            LOG.severe("No serial port provided for Z-Wave protocol configuration: " + protocolConfiguration);
-            updateStatus(protocolRef, ConnectionStatus.ERROR_CONFIGURATION);
-            return;
-        }
-
-        Consumer<ConnectionStatus> statusConsumer = status -> executorService.execute(
-            () -> updateStatus(protocolRef, status)
-         );
-
-        ZWNetwork zwNetwork = null;
-
-        synchronized (this) {
-            zwNetwork = networkMap.computeIfAbsent(
-                networkId.get(),
-                port -> {
-                    ZWControllerFactory factory = createControllerFactory(port);
-                    ZWNetwork network = new ZWNetwork(factory);
-                    network.addConnectionStatusConsumer(statusConsumer);
-                    return network;
-                }
-            );
-            networkConfigurationMap.put(protocolRef, new Pair<>(zwNetwork, statusConsumer));
-        }
-
-        if (protocolConfiguration.isEnabled() && zwNetwork.getConnectionStatus() == ConnectionStatus.DISCONNECTED) {
-            zwNetwork.connect();
-        }
-    }
-
-    @Override
-    protected void doDisconnect() {
-        AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
-        String networkId = getUniqueNetworkIdentifier(protocolConfiguration).orElse("");
-
-        // updateStatus(protocolRef, ConnectionStatus.DISCONNECTED);
-
-        ZWNetwork zwNetworkToDisconnect  = null;
-
-        synchronized (this) {
-            Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkAndConsumer= networkConfigurationMap.remove(protocolRef);
-
-            if (zwNetworkAndConsumer != null) {
-                zwNetworkAndConsumer.key.removeConnectionStatusConsumer(zwNetworkAndConsumer.value);
-
-                // Check if network is no longer used
-                if (networkConfigurationMap.isEmpty() ||
-                    networkConfigurationMap.values()
-                        .stream()
-                        .noneMatch(networkStatusConsumer -> zwNetworkAndConsumer.key.equals(networkStatusConsumer.key)))
-                {
-                    networkMap.remove(networkId);
-                    zwNetworkToDisconnect = zwNetworkAndConsumer.key;
-                }
-            }
-        }
-
-        if (zwNetworkToDisconnect != null) {
-            zwNetworkToDisconnect.disconnect();
+    protected void doStop(Container container) throws Exception {
+        if (network != null) {
+            network.removeConnectionStatusConsumer(this::setConnectionStatus);
+            network.disconnect();
         }
     }
 
     @Override
     protected synchronized void doLinkAttribute(String assetId, Attribute<?> attribute) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
 
-        if (zwNetworkConsumerPair == null) {
-            LOG.info("Protocol Configuration doesn't have a valid ZWNetwork so cannot link");
-            return;
-        }
+        int nodeId = attribute.getMeta().getValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
+        int endpoint = attribute.getMeta().getValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
+        String linkName = attribute.getMeta().getValue(ZWAgent.DEVICE_VALUE).orElse("");
+        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
-        ZWNetwork zwNetwork = zwNetworkConsumerPair.key;
-
-        int nodeId = getZWNodeId(attribute);
-        int endpoint = getZWEndpoint(attribute);
-        String linkName = getZWLinkName(attribute);
-
-        AttributeRef attributeRef = attribute.getReferenceOrThrow();
-        ValueType valueType = attribute.getValueType().orElse(AttributeValueType.STRING).getValueType();
-        LOG.fine("Linking attribute to device endpoint '" + getEndpointIdAsString(attribute) + "' and channel '" + linkName + "': " + attributeRef);
-
+        // TODO: Value must be compatible with the value type of the attribute...for non primitives the object types must match
         Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> sensorValueConsumer = value ->
-            updateLinkedAttribute(new AttributeState(attributeRef, toAttributeValue(value, valueType)));
+            updateLinkedAttribute(new AttributeState(attributeRef, value));
 
         sensorValueConsumerMap.put(attributeRef, sensorValueConsumer);
-        zwNetwork.addSensorValueConsumer(nodeId, endpoint, linkName, sensorValueConsumer);
+        network.addSensorValueConsumer(nodeId, endpoint, linkName, sensorValueConsumer);
     }
 
     @Override
     protected synchronized void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(agent.getReferenceOrThrow());
-
-        if (zwNetworkConsumerPair == null) {
-            return;
-        }
-
-        ZWNetwork zwNetwork = zwNetworkConsumerPair.key;
-        AttributeRef attributeRef = attribute.getReferenceOrThrow();
+        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> sensorValueConsumer = sensorValueConsumerMap.remove(attributeRef);
-        zwNetwork.removeSensorValueConsumer(sensorValueConsumer);
+        network.removeSensorValueConsumer(sensorValueConsumer);
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
+    protected byte[] createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+        int nodeId = attribute.getMeta().getValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
+        int endpoint = attribute.getMeta().getValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
+        String linkName = attribute.getMeta().getValue(ZWAgent.DEVICE_VALUE).orElse("");
 
-        if (zwNetworkConsumerPair == null) {
-            return;
-        }
-
-        ZWNetwork zwNetwork = zwNetworkConsumerPair.key;
-        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
-
-        if (attribute == null) {
-            return;
-        }
-
-        int nodeId = getZWNodeId(attribute);
-        int endpoint = getZWEndpoint(attribute);
-        String linkName = getZWLinkName(attribute);
-
-        zwNetwork.writeChannel(nodeId, endpoint, linkName, processedValue);
+        network.writeChannel(nodeId, endpoint, linkName, processedValue);
     }
 
+    @Override
+    protected SerialIoClient<byte[]> doCreateIoClient(ZWAgent agent) throws Exception {
+
+        Optional<String> port = agent.getSerialPort();
+
+        if (!port.isPresent()) {
+            LOG.severe("No serial port provided for Z-Wave protocol: " + agent);
+            throw new IllegalStateException("No serial port provided for Z-Wave protocol: " + agent);
+        }
+
+        return new SerialIoClient<>(port.get(), 115200, executorService);
+    }
+
+    @Override
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(SerialIoClient<byte[]> client, ZWAgent agent) {
+        return () -> new ChannelHandler[] {
+            new ZWPacketEncoder(),
+            new ZWPacketDecoder(),
+            new AbstractNettyIoClient.MessageToMessageDecoder<>(byte[].class, client)
+        };
+    }
+
+    @Override
+    protected void onMessageReceived(byte[] message) {
+
+    }
 
     // Implements ProtocolConfigurationDiscovery --------------------------------------------------
 
@@ -359,100 +217,5 @@ public class ZWProtocol extends AbstractProtocol implements ProtocolAssetDiscove
         configuration.setComPort(serialPort);
         ZWControllerFactory factory = new NettyZWControllerFactory(configuration, executorService);
         return factory;
-    }
-
-
-    // Private Instance Methods -------------------------------------------------------------------
-
-    private Optional<String> getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
-
-        // TODO : Z-Wave Home ID
-
-        return protocolConfiguration
-            .getMetaItem(META_ZWAVE_SERIAL_PORT)
-            .flatMap(AbstractValueHolder::getValueAsString);
-    }
-
-    private org.openremote.model.value.Value toAttributeValue(org.openremote.protocol.zwave.model.commandclasses.channel.value.Value zwValue, ValueType type) {
-        Value retValue = null;
-
-        switch(type) {
-            case OBJECT:
-                break;
-            case ARRAY:
-                retValue = toAttributeArray(zwValue);
-                break;
-            case STRING:
-                String strVal = zwValue.getString();
-                if (strVal != null) {
-                    retValue = Values.create(strVal);
-                }
-                break;
-            case NUMBER:
-                Double d = zwValue.getNumber();
-                if (d != null) {
-                    retValue = Values.create(d);
-                }
-                break;
-            case BOOLEAN:
-                Boolean b = zwValue.getBoolean();
-                if (b != null) {
-                    retValue = Values.create(b);
-                }
-                break;
-        }
-        return retValue;
-    }
-
-    private org.openremote.model.value.ArrayValue toAttributeArray(org.openremote.protocol.zwave.model.commandclasses.channel.value.Value value) {
-        if (value == null) {
-            return null;
-        }
-        ArrayValue retArray = null;
-        if (value instanceof org.openremote.protocol.zwave.model.commandclasses.channel.value.ArrayValue) {
-            org.openremote.protocol.zwave.model.commandclasses.channel.value.ArrayValue zwArray = (org.openremote.protocol.zwave.model.commandclasses.channel.value.ArrayValue)value;
-            retArray = Values.createArray();
-            for (int i = 0; i < zwArray.length(); i++) {
-                retArray.add(toAttributeArrayItem(zwArray.get(i)));
-            }
-            if (retArray.stream().anyMatch(val -> val == null)) {
-                return null;
-            }
-        }
-        return retArray;
-    }
-
-    private org.openremote.model.value.Value toAttributeArrayItem(org.openremote.protocol.zwave.model.commandclasses.channel.value.Value zwValue) {
-        if (zwValue == null) {
-            return null;
-        }
-        org.openremote.model.value.Value retValue = null;
-        switch(zwValue.getType()) {
-            case NUMBER:
-                Double d = zwValue.getNumber();
-                if (d != null) {
-                    retValue = Values.create(d);
-                }
-                break;
-            case INTEGER:
-                Integer i = zwValue.getInteger();
-                if (i != null) {
-                    retValue = Values.create(Double.valueOf(i));
-                }
-                break;
-            case BOOLEAN:
-                Boolean b = zwValue.getBoolean();
-                if (b != null) {
-                    retValue = Values.create(b);
-                }
-                break;
-            case STRING:
-                String s = zwValue.getString();
-                if (s != null) {
-                    retValue = Values.create(s);
-                }
-                break;
-        }
-        return retValue;
     }
 }

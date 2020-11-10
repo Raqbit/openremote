@@ -407,16 +407,18 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
     protected void stopAgent(Agent agent) {
         withLock(getClass().getSimpleName() + "::stopAgent", () -> {
-            Protocol protocol = protocolInstanceMap.remove(agent.getId());
+            Protocol<?> protocol = protocolInstanceMap.remove(agent.getId());
 
             if (protocol == null) {
                 LOG.severe("Cannot stop protocol as protocol instance not found for agent: " + agent);
                 return;
             }
 
-            protocol.getLinkedAttributes().forEach(
-                (assetId, linkedAttributes) -> unlinkAttributes(agent, assetId, linkedAttributes)
+            Map<String, List<Attribute<?>>> groupedAttributes = protocol.getLinkedAttributes().entrySet().stream().collect(
+                Collectors.groupingBy(entry -> entry.getKey().getAssetId(), mapping(Map.Entry::getValue, toList()))
             );
+
+            groupedAttributes.forEach((assetId, linkedAttributes) -> unlinkAttributes(agent, assetId, linkedAttributes));
 
             // Stop the protocol instance
             try {
@@ -432,7 +434,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
     protected void linkAttributes(Agent agent, String assetId, Collection<Attribute<?>> attributes) {
         withLock(getClass().getSimpleName() + "::linkAttributes", () -> {
-            Protocol protocol = getProtocolInstance(agent.getId());
+            Protocol<?> protocol = getProtocolInstance(agent.getId());
 
             if (protocol == null) {
                 LOG.severe("Cannot link protocol attributes as protocol instance not found for agent: " + agent);
@@ -443,17 +445,18 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
             attributes.forEach(attribute -> {
                 try {
+                    LOG.fine("Linking attribute '" + attribute + "' to protocol: " + protocol);
                     protocol.linkAttribute(assetId, attribute);
                 } catch (Exception ex) {
-                    LOG.log(Level.SEVERE, "Ignoring error on linking attribute '" + attribute + "' to protocol: " + protocol, ex);
+                    LOG.log(Level.SEVERE, "Failed to link attribute '" + attribute + "' to protocol: " + protocol, ex);
                 }
             });
         });
     }
 
-    protected void unlinkAttributes(Agent agent, String assetId, Collection<Attribute<?>> attributes) {
+    protected void unlinkAttributes(Agent agent, String assetId, List<Attribute<?>> attributes) {
         withLock(getClass().getSimpleName() + "::unlinkAttributes", () -> {
-            Protocol protocol = getProtocolInstance(agent.getId());
+            Protocol<?> protocol = getProtocolInstance(agent.getId());
 
             if (protocol == null) {
                 LOG.severe("Cannot unlink protocol attributes as protocol instance not found for agent: " + agent);
@@ -464,6 +467,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
             attributes.forEach(attribute -> {
                 try {
+                    LOG.fine("Unlinking attribute '" + attribute + "' to protocol: " + protocol);
                     protocol.unlinkAttribute(assetId, attribute);
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, "Ignoring error on unlinking attribute '" + attribute + "' from protocol: " + protocol, ex);

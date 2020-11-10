@@ -58,7 +58,7 @@ public abstract class AbstractSerialClientProtocol<T> extends AbstractIoClientPr
     }
 
     @Override
-    protected SerialIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
+    protected SerialIoClient<T> doCreateIoClient(Attribute protocolConfiguration) throws Exception {
 
         String port = Values.getMetaItemValueOrThrow(
             protocolConfiguration,

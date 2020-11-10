@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,12 +17,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol.zwave;
+package org.openremote.agent.protocol.io;
 
-import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.protocol.zwave.model.Controller;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.asset.agent.Agent;
 
-public interface ZWControllerFactory {
-    Controller createController(IoClient<SerialDataPacket> messageProcessor);
-    IoClient<SerialDataPacket> createMessageProcessor();
+public abstract class IoAgent<T, U extends IoClient<T>> extends Agent {
+
+    protected <T extends Agent> IoAgent(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
+    }
+
+    @Override
+    abstract public AbstractIoClientProtocol<T, U, ? extends IoAgent<T, U>> getProtocolInstance();
 }

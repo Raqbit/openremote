@@ -42,7 +42,7 @@ import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE
 /**
  * This protocol is responsible for executing macros.
  * <p>
- * It expects a {@link AttributeExecuteStatus} as the attribute event value on the {@link #processLinkedAttributeWrite}.
+ * It expects a {@link AttributeExecuteStatus} as the attribute event value on the {@link #doLinkedAttributeWrite}.
  * The protocol will then try to perform the request on the linked macro protocol configuration.
  * <p>
  * {@link Attribute}s can also read/write the macro configuration's {@link MacroAction} values by using the

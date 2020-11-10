@@ -123,7 +123,7 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
     }
 
     @Override
-    protected UdpIoClient<ArtnetPacket> createIoClient(Attribute protocolConfiguration) throws Exception {
+    protected UdpIoClient<ArtnetPacket> doCreateIoClient(Attribute protocolConfiguration) throws Exception {
         String host = Values.getMetaItemValueOrThrow(
                 protocolConfiguration,
                 META_PROTOCOL_HOST,

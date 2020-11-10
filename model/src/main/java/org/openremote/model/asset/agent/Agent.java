@@ -73,21 +73,13 @@ public abstract class Agent extends Asset {
     public static final AttributeDescriptor<Integer> MESSAGE_MAX_LENGTH = new AttributeDescriptor<>("messageMaxLength", true, ValueType.POSITIVE_INTEGER, null);
 
     /**
-     * Min length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
-     * for {@link String} protocols it could be the number of characters but for {@link Byte} protocols it could be the
-     * number of bytes. This is typically used for I/O based {@link Protocol}s.
+     * Defines a set of delimiters for messages received by a {@link Protocol}; the first matched delimiter should be
+     * used to generate the shortest possible match(This is typically used for I/O based {@link Protocol}s.
      */
-    public static final AttributeDescriptor<Integer> MESSAGE_MIN_LENGTH = new AttributeDescriptor<>("messageMinLength", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<String[]> MESSAGE_DELIMITERS = new AttributeDescriptor<>("messageDelimiters", true, ValueType.STRING.asArray(), null);
 
     /**
-     * Defines a delimiter for messages received by a {@link Protocol}. Multiples of this {@link MetaItem} can be used
-     * to add multiple delimiters (the first matched delimiter should be used to generate the shortest possible match(.
-     * This is typically used for I/O based {@link Protocol}s.
-     */
-    public static final AttributeDescriptor<String> MESSAGE_DELIMITER = new AttributeDescriptor<>("messageDelimiter", true, ValueType.STRING, null);
-
-    /**
-     * For protocols that use {@link #MESSAGE_DELIMITER}, this indicates whether or not the matched delimiter
+     * For protocols that use {@link #MESSAGE_DELIMITERS}, this indicates whether or not the matched delimiter
      * should be stripped from the message.
      */
     public static final AttributeDescriptor<Boolean> MESSAGE_STRIP_DELIMITER = new AttributeDescriptor<>("messageStripDelimiter", true, ValueType.BOOLEAN, true);
@@ -111,6 +103,11 @@ public abstract class Agent extends Asset {
      * TCP/IP network port number
      */
     public static final AttributeDescriptor<Integer> PORT = new AttributeDescriptor<>("port", true, ValueType.PORT, null);
+
+    /**
+     * TCP/IP network port number
+     */
+    public static final AttributeDescriptor<Integer> BIND_PORT = new AttributeDescriptor<>("bindPort", true, ValueType.PORT, null);
 
     /**
      * Serial port name/address
@@ -185,7 +182,7 @@ public abstract class Agent extends Asset {
      */
     public static final MetaItemDescriptor<ValueFilter[]> META_MESSAGE_MATCH_FILTERS = new MetaItemDescriptor<>("messageMatchFilters", VALUE_FILTER.asArray(), null);
 
-    protected MetaItemDescriptor<?>[] GENERIC_PROTOCOL_LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaItemDescriptor<?>[] {
+    protected static MetaItemDescriptor<?>[] GENERIC_PROTOCOL_LINKED_ATTRIBUTE_META_DESCRIPTORS = new MetaItemDescriptor<?>[] {
         META_VALUE_FILTERS,
         META_VALUE_CONVERTER,
         META_WRITE_VALUE_CONVERTER,
@@ -195,11 +192,16 @@ public abstract class Agent extends Asset {
         META_MESSAGE_MATCH_FILTERS
     };
 
-    protected AttributeDescriptor<?>[] GENERIC_PROTOCOL_ATTRIBUTE_DESCRIPTORS = new AttributeDescriptor<?>[] {
-
+    protected static AttributeDescriptor<?>[] GENERIC_PROTOCOL_ATTRIBUTE_DESCRIPTORS = new AttributeDescriptor<?>[] {
+        MESSAGE_CHARSET,
+        MESSAGE_CONVERT_BINARY,
+        MESSAGE_CONVERT_HEX,
+        MESSAGE_MAX_LENGTH,
+        MESSAGE_STRIP_DELIMITER,
+        MESSAGE_DELIMITERS
     };
 
-    protected <T extends Agent> Agent(String name, AssetDescriptor<T> descriptor) {
+    protected <T extends Agent, S extends Protocol<T>> Agent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);
     }
 
@@ -221,60 +223,59 @@ public abstract class Agent extends Asset {
         return getAttributes().getValueOrDefault(STATUS);
     }
 
-//
-//    public Optional<Boolean> getMessageConvertHex() {
-//        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_HEX);
-//    }
-//
-//    public Optional<Boolean> getMessageConvertBinary() {
-//        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_BINARY);
-//    }
-//
-//    public Optional<String> getMessageCharset() {
-//        return getAttributes().getValueOrDefault(MESSAGE_CHARSET);
-//    }
-//
-//    public Optional<Integer> getMessageMaxLength() {
-//        return getAttributes().getValueOrDefault(MESSAGE_MAX_LENGTH);
-//    }
-//
-//    public Optional<Integer> getMessageMinLength() {
-//        return getAttributes().getValueOrDefault(MESSAGE_MIN_LENGTH);
-//    }
-//
-//    public Optional<String> getMessageDelimiter() {
-//        return getAttributes().getValueOrDefault(MESSAGE_DELIMITER);
-//    }
-//
-//    public Optional<Boolean> getMessageStripDelimiter() {
-//        return getAttributes().getValueOrDefault(MESSAGE_STRIP_DELIMITER);
-//    }
-//
-//    public Optional<OAuthGrant> getOAuthGrant() {
-//        return getAttributes().getValueOrDefault(OAUTH_GRANT);
-//    }
-//
-//    public Optional<UsernamePassword> getUsernamePassword() {
-//        return getAttributes().getValueOrDefault(USERNAME_AND_PASSWORD);
-//    }
-//
-//    public Optional<String> getHost() {
-//        return getAttributes().getValueOrDefault(HOST);
-//    }
-//
-//    public Optional<Integer> getPort() {
-//        return getAttributes().getValueOrDefault(PORT);
-//    }
-//
-//    public Optional<String> getSerialPort() {
-//        return getAttributes().getValueOrDefault(SERIAL_PORT);
-//    }
-//
-//    public Optional<Integer> getSerialBaudrate() {
-//        return getAttributes().getValueOrDefault(SERIAL_BAUDRATE);
-//    }
-//
-//    public Optional<Integer> getPollingMillis() {
-//        return getAttributes().getValueOrDefault(POLLING_MILLIS);
-//    }
+    public Optional<Boolean> getMessageConvertHex() {
+        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_HEX);
+    }
+
+    public Optional<Boolean> getMessageConvertBinary() {
+        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_BINARY);
+    }
+
+    public Optional<String> getMessageCharset() {
+        return getAttributes().getValueOrDefault(MESSAGE_CHARSET);
+    }
+
+    public Optional<Integer> getMessageMaxLength() {
+        return getAttributes().getValueOrDefault(MESSAGE_MAX_LENGTH);
+    }
+
+    public Optional<String[]> getMessageDelimiters() {
+        return getAttributes().getValueOrDefault(MESSAGE_DELIMITERS);
+    }
+
+    public Optional<Boolean> getMessageStripDelimiter() {
+        return getAttributes().getValueOrDefault(MESSAGE_STRIP_DELIMITER);
+    }
+
+    public Optional<OAuthGrant> getOAuthGrant() {
+        return getAttributes().getValueOrDefault(OAUTH_GRANT);
+    }
+
+    public Optional<UsernamePassword> getUsernamePassword() {
+        return getAttributes().getValueOrDefault(USERNAME_AND_PASSWORD);
+    }
+
+    public Optional<String> getHost() {
+        return getAttributes().getValueOrDefault(HOST);
+    }
+
+    public Optional<Integer> getPort() {
+        return getAttributes().getValueOrDefault(PORT);
+    }
+
+    public Optional<Integer> getBindPort() {
+        return getAttributes().getValueOrDefault(BIND_PORT);
+    }
+
+    public Optional<String> getSerialPort() {
+        return getAttributes().getValueOrDefault(SERIAL_PORT);
+    }
+
+    public Optional<Integer> getSerialBaudrate() {
+        return getAttributes().getValueOrDefault(SERIAL_BAUDRATE);
+    }
+
+    public Optional<Integer> getPollingMillis() {
+        return getAttributes().getValueOrDefault(POLLING_MILLIS);
+    }
 }

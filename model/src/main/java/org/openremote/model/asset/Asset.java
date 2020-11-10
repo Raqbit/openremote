@@ -288,6 +288,10 @@ public class Asset implements IdentifiableEntity {
     Asset() {
     }
 
+    public Asset(String name) {
+        this(name, DESCRIPTOR);
+    }
+
     public <T extends Asset> Asset(String name, AssetDescriptor<T> descriptor) {
         setName(name);
         this.type = descriptor.getName();

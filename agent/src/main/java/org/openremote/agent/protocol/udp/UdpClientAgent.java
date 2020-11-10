@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -21,24 +21,22 @@ package org.openremote.agent.protocol.udp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.agent.protocol.tcp.TcpClientProtocol;
+import org.openremote.agent.protocol.tcp.TcpIoClient;
+import org.openremote.model.asset.AssetDescriptor;
 
-/**
- * This is an abstract UDP client protocol for communicating with UDP servers; concrete implementations must implement
- * {@link #getEncoderDecoderProvider} to provide encoders/decoders for messages of type &lt;T&gt;.
- */
-public abstract class AbstractUdpClientProtocol<T, U extends IoAgent<T, UdpIoClient<T>>> extends AbstractIoClientProtocol<T, UdpIoClient<T>, U> {
+public class UdpClientAgent extends IoAgent<String, UdpIoClient<String>> {
 
-    protected AbstractUdpClientProtocol(U agent) {
-        super(agent);
+//    public static final AgentDescriptor<TcpClientAgent, TcpClientProtocol> DESCRIPTOR = new AgentDescriptor(
+//
+//    );
+
+    protected <T extends UdpClientAgent> UdpClientAgent(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
     }
 
     @Override
-    protected UdpIoClient<T> doCreateIoClient(U agent) throws Exception {
-
-        String host = agent.getHost().orElse(null);
-        Integer port = agent.getPort().orElse(null);
-        Integer bindPort = agent.getBindPort().orElse(null);
-
-        return new UdpIoClient<>(host, port, bindPort, executorService);
+    public AbstractIoClientProtocol<String, UdpIoClient<String>, UdpClientAgent> getProtocolInstance() {
+        return new UdpClientProtocol(this);
     }
 }

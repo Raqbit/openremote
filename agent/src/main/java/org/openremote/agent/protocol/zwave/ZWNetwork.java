@@ -19,7 +19,9 @@
  */
 package org.openremote.agent.protocol.zwave;
 
+import org.openremote.agent.protocol.ProtocolExecutorService;
 import org.openremote.agent.protocol.io.IoClient;
+import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.controller.exception.ConfigurationException;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
@@ -63,19 +65,14 @@ import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_N
 import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_VALUE_LINK;
 import static org.openremote.protocol.zwave.model.ZWNodeInitializerListener.NodeInitState.INITIALIZATION_FINISHED;
 
-public class ZWNetwork {
+public class ZWNetwork extends SerialIoClient<byte[]> {
 
-    private final ZWControllerFactory controllerFactory;
     protected Controller controller;
-    protected IoClient<SerialDataPacket> ioClient;
     private final List<Consumer<ConnectionStatus>> connectionStatusConsumers = new CopyOnWriteArrayList<>();
     private final Map<Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value>, ChannelConsumerLink> consumerLinkMap = new HashMap<>();
 
-    public ZWNetwork(ZWControllerFactory controllerFactory) {
-        if (controllerFactory == null) {
-            throw new IllegalArgumentException("Missing controller factory.");
-        }
-        this.controllerFactory = controllerFactory;
+    public ZWNetwork(String port, Integer baudRate, ProtocolExecutorService executorService) {
+        super(port, baudRate, executorService);
     }
 
     public synchronized void connect() {
@@ -83,9 +80,7 @@ public class ZWNetwork {
             return;
         }
 
-        ioClient = controllerFactory.createMessageProcessor();
-        ioClient.addConnectionStatusConsumer(this::onConnectionStatusChanged);
-        controller = createController(ioClient);
+        controller = new Controller(NettyConnectionManager.create(configuration, messageProcessor));
         
         try {
             controller.connect();

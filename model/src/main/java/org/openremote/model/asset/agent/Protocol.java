@@ -24,13 +24,13 @@ import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
+import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -170,19 +170,26 @@ public interface Protocol<T extends Agent> {
     String DYNAMIC_TIME_PLACEHOLDER_REGEXP = "\"?\\{\\$time#?([a-z,A-Z,\\-,\\s,:]*)#?(-?\\d*)?}\"?";
 
     /**
+     * Prefixes the log message with {@link #getProtocolName} and {@link #getProtocolInstanceUri}.
+     */
+    default String prefixLogMessage(String msg) {
+        return getProtocolName() + " [" + getProtocolInstanceUri()  + "]: " + msg;
+    }
+
+    /**
      * Get the name for this protocol
      */
     String getProtocolName();
 
     /**
-     * Get a unique string that describes this specific protocol instance
+     * Get a URI that describes this specific protocol instance
      */
-    String getProtocolInstanceName();
+    String getProtocolInstanceUri();
 
     /**
      * Get list of {@link Attribute}s currently linked to this protocol instance grouped by {@link Asset} ID
      */
-    Map<String, List<Attribute<?>>> getLinkedAttributes();
+    Map<AttributeRef, Attribute<?>> getLinkedAttributes();
 
     /**
      * Links an {@link Attribute} to its' agent; the agent would have been connected before this call. This is called
@@ -191,16 +198,14 @@ public interface Protocol<T extends Agent> {
      * If the attribute is not valid for this protocol then it is up to the protocol to log the issue and return false.
      * <p>
      * Attributes are linked to an agent via an {@link MetaItemType#AGENT_LINK} meta item.
-     *
-     * @return True if successful, false otherwise
      */
-    boolean linkAttribute(String assetId, Attribute<?> attribute);
+    void linkAttribute(String assetId, Attribute<?> attribute) throws Exception;
 
     /**
      * Un-links an {@link Attribute} from its' agent; the agent will still be connected during this call. This is called
      * whenever the attribute is modified or removed or when the agent is modified or removed.
      */
-    void unlinkAttribute(String assetId, Attribute<?> attribute);
+    void unlinkAttribute(String assetId, Attribute<?> attribute) throws Exception;
 
     /**
      * Called before any calls to {@link #linkAttribute} to allow the protocol to perform required tasks with {@link

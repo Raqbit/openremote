@@ -24,6 +24,7 @@ import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.BasicAuthHelper;
+import org.openremote.agent.protocol.io.ProtocolIoClient;
 import org.openremote.model.Container;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.agent.protocol.http.HttpClientProtocol;
@@ -157,7 +158,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     }
 
     @Override
-    protected WebsocketIoClient<T> createIoClient(Attribute protocolConfiguration) throws Exception {
+    protected WebsocketIoClient<T> doCreateIoClient(Attribute protocolConfiguration) throws Exception {
         final AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
         String uriStr = protocolConfiguration.getMetaItem(META_PROTOCOL_CONNECT_URI)
@@ -216,7 +217,7 @@ public abstract class AbstractWebsocketClientProtocol<T> extends AbstractIoClien
     protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef protocolRef = agent.getReferenceOrThrow();
         ProtocolIoClient<T, WebsocketIoClient<T>> protocolClient = protocolIoClientMap.get(protocolRef);
-        WebsocketIoClient<T> client = protocolClient.client;
+        WebsocketIoClient<T> client = protocolClient.ioClient;
         Optional<WebsocketSubscription<T>[]> subscriptions = getSubscriptions(attribute);
 
         subscriptions.ifPresent(websocketSubscriptions -> {
