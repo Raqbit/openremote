@@ -49,7 +49,7 @@ public class ArtnetLightState {
             .toArray(size -> new Byte[size]);
     }
 
-    public void fromAttribute(AttributeEvent event, Attribute attr) {
+    public void fromAttribute(AttributeEvent event, Attribute<?> attr) {
         AttributeRef reference = event.getAttributeRef();
         MetaItem metaItem = attr.getMetaItem("lightId").orElse(null);
         int lampId = metaItem.getValueAsInteger().orElse(-1);

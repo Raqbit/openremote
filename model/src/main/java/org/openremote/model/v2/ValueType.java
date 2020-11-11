@@ -76,7 +76,7 @@ public final class ValueType {
     public static final ValueDescriptor<String> TIMESTAMP_ISO8601 = new ValueDescriptor<>("Timestamp ISO8601", String.class);
 
     public static final ValueDescriptor<Integer> DURATION = new ValueDescriptor<>("Duration", Integer.class,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TIME_SECONDS)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TIME_SECOND)
     );
 
     @Pattern(regexp = TimeUtil.DURATION_REGEXP)
@@ -88,11 +88,6 @@ public final class ValueType {
 
     @Pattern(regexp = "[a-fA-F0-9]{6}")
     public static final ValueDescriptor<String> COLOUR_HEX = new ValueDescriptor<>("Colour HEX", String.class);
-
-    @DecimalMin("-273.15")
-    public static final ValueDescriptor<Double> TEMPERATURE = new ValueDescriptor<>("Temperature", Double.class,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS)
-    );
 
     @Pattern(regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
     public static final ValueDescriptor<String> EMAIL = new ValueDescriptor<>("Email", String.class);

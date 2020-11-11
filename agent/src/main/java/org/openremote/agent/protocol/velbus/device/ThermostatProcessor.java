@@ -30,7 +30,7 @@ import java.util.*;
 
 import static org.openremote.agent.protocol.velbus.AbstractVelbusProtocol.LOG;
 import static org.openremote.model.Constants.UNITS_TEMPERATURE_CELSIUS;
-import static org.openremote.model.Constants.UNITS_TIME_MINUTES;
+import static org.openremote.model.Constants.UNITS_TIME_MINUTE;
 
 public class ThermostatProcessor extends FeatureProcessor {
 
@@ -141,18 +141,18 @@ public class ThermostatProcessor extends FeatureProcessor {
         new PropertyDescriptor("tempAlarm3", "Temp Alarm 3", "TEMP_ALARM3", AttributeValueType.STRING, true),
         new PropertyDescriptor("tempAlarm4", "Temp Alarm 4", "TEMP_ALARM4", AttributeValueType.STRING, true),
         new PropertyDescriptor("tempState", "Thermostat State", "TEMP_STATE", AttributeValueType.STRING),
-        new PropertyDescriptor("tempStateDisable", "Thermostat Disable (s)", "TEMP_STATE_DISABLE_SECONDS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
+        new PropertyDescriptor("tempStateDisable", "Thermostat Disable (s)", "TEMP_STATE_DISABLE_SECONDS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
         // Get current mode or set mode until next program step
         new PropertyDescriptor("tempMode", "Thermostat Mode", "TEMP_MODE", AttributeValueType.STRING),
         // MINS VALUE: 0 = Until next program step, -1 = Permanent, 1-65279 = for N mins
-        new PropertyDescriptor("coolComfortMins", "Thermostat Cool Comfort (mins)", "TEMP_MODE_COOL_COMFORT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("coolDayMins", "Cool Day (mins)", "TEMP_MODE_COOL_DAY_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("coolNightMins", "Cool Night (mins)", "TEMP_MODE_COOL_NIGHT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("coolSafeMins", "Cool Safe (mins)", "TEMP_MODE_COOL_SAFE_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("heatComfortMins", "Heat Comfort (mins)", "TEMP_MODE_HEAT_COMFORT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("heatDayMins", "Heat Day (mins)", "TEMP_MODE_HEAT_DAY_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("heatNightMins", "Heat Night (mins)", "TEMP_MODE_HEAT_NIGHT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
-        new PropertyDescriptor("heatSafeMins", "Heat Safe (mins)", "TEMP_MODE_HEAT_SAFE_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTES)),
+        new PropertyDescriptor("coolComfortMins", "Thermostat Cool Comfort (mins)", "TEMP_MODE_COOL_COMFORT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("coolDayMins", "Cool Day (mins)", "TEMP_MODE_COOL_DAY_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("coolNightMins", "Cool Night (mins)", "TEMP_MODE_COOL_NIGHT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("coolSafeMins", "Cool Safe (mins)", "TEMP_MODE_COOL_SAFE_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("heatComfortMins", "Heat Comfort (mins)", "TEMP_MODE_HEAT_COMFORT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("heatDayMins", "Heat Day (mins)", "TEMP_MODE_HEAT_DAY_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("heatNightMins", "Heat Night (mins)", "TEMP_MODE_HEAT_NIGHT_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
+        new PropertyDescriptor("heatSafeMins", "Heat Safe (mins)", "TEMP_MODE_HEAT_SAFE_MINS", AttributeValueType.DURATION.withUnitType(UNITS_TIME_MINUTE)),
         new PropertyDescriptor("tempTargetCurrent", "Temp Target Current", "TEMP_TARGET_CURRENT", AttributeValueType.TEMPERATURE.withUnitType(UNITS_TEMPERATURE_CELSIUS)),
         new PropertyDescriptor("tempTargetCoolComfort", "Temp Target Cool Comfort", "TEMP_TARGET_COOL_COMFORT", AttributeValueType.TEMPERATURE.withUnitType(UNITS_TEMPERATURE_CELSIUS)),
         new PropertyDescriptor("tempTargetCoolDay", "Temp Target Cool Day", "TEMP_TARGET_COOL_DAY", AttributeValueType.TEMPERATURE.withUnitType(UNITS_TEMPERATURE_CELSIUS)),

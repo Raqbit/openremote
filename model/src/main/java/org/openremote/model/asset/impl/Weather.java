@@ -31,7 +31,8 @@ import java.util.Optional;
 
 public class Weather extends Asset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.TEMPERATURE, null,
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER, null,
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> UV_INDEX = new AttributeDescriptor<>("uVIndex", false, ValueType.POSITIVE_INTEGER, null,
@@ -58,7 +59,7 @@ public class Weather extends Asset {
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<Double> RAINFALL = new AttributeDescriptor<>("rainfall", true, ValueType.POSITIVE_NUMBER, null,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DISTANCE_MILLIMETRES),
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DISTANCE_MILLIMETRE),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
     public static final AttributeDescriptor<Integer> HUMIDITY = new AttributeDescriptor<>("humidity", true, ValueType.PERCENTAGE_INTEGER_0_100, null,

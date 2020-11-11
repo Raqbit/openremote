@@ -24,8 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -346,6 +345,22 @@ public class Values {
 
     public static boolean isArray(Class<?> clazz) {
         return clazz.isArray() || clazz == ArrayNode.class;
+    }
+
+    public static boolean isBoolean(Class<?> clazz) {
+        return clazz == Boolean.class || clazz == BooleanNode.class;
+    }
+
+    public static boolean isNumber(Class<?> clazz) {
+        return Number.class.isAssignableFrom(clazz) || NumericNode.class.isAssignableFrom(clazz);
+    }
+
+    public static boolean isString(Class<?> clazz) {
+        return String.class.isAssignableFrom(clazz) || TextNode.class.isAssignableFrom(clazz) || BinaryNode.class.isAssignableFrom(clazz);
+    }
+
+    public static boolean isObject(Class<?> clazz) {
+        return !isArray(clazz) && !isBoolean(clazz) && !isNumber(clazz) && !isString(clazz);
     }
 
     public static Class<?> getArrayClass(Class<?> componentType) throws ClassNotFoundException {

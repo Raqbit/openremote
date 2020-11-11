@@ -302,13 +302,13 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), HttpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_PROTOCOL_BASE_URI,
                         Values.create("https://mockapi")
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         Protocol.META_PROTOCOL_OAUTH_GRANT,
                         new OAuthPasswordGrant("https://mockapi/token",
                             "TestClient",
@@ -317,23 +317,23 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                             "testuser",
                             "password").toObjectValue()
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_PROTOCOL_FOLLOW_REDIRECTS,
-                        Values.create(true)
+                        true
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_PROTOCOL_PING_PATH,
-                        Values.create("pingGet")
+                        "pingGet"
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_PROTOCOL_PING_MILLIS,
-                        Values.create(100)
+                        100
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_HEADERS,
                         Values.<ObjectValue>parse(/{"header1": "header1Value1", "header2": ["header2Value1","header2Value2"]}/).get()
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_QUERY_PARAMETERS,
                         Values.<ObjectValue>parse(/{"param1": "param1Value1", "param2": ["param2Value1","param2Value2"]}/).get()
                     )
@@ -373,13 +373,13 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         and: "a protocol configuration is added to the agent that uses POST ping mechanism"
         agent.addAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), HttpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
                     Values.create("https://mockapi")
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
                     new OAuthPasswordGrant("https://mockapi/token",
                         "TestClient",
@@ -388,39 +388,39 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                         "testuser",
                         "password").toObjectValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_FOLLOW_REDIRECTS,
-                    Values.create(true)
+                    true
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_HEADERS,
                     Values.<ObjectValue>parse(/{"header1": "header1Value1", "header2": ["header2Value1","header2Value2"]}/).get()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_QUERY_PARAMETERS,
                     Values.<ObjectValue>parse(/{"param1": "param1Value1", "param2": ["param2Value1","param2Value2"]}/).get()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_PATH,
-                    Values.create("pingPost")
+                    "pingPost"
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_CONTENT_TYPE,
                     Values.create(MediaType.APPLICATION_JSON)
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_MILLIS,
-                    Values.create(100)
+                    100
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_METHOD,
                     Values.create(HttpMethod.POST)
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_BODY,
                     Values.<ObjectValue>parse(/{"prop1": "prop1Value", "prop2": "prop2Value"}/).get()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_QUERY_PARAMETERS,
                     Values.<ObjectValue>parse(/{"param1": "param1Value2", "param3": "param3Value1"}/).get()
                 ),
@@ -438,7 +438,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         when: "the ping content type is manually configured"
         agent.getAttribute("protocolConfig").ifPresent{
             it.addMeta(
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_CONTENT_TYPE,
                     Values.create(MediaType.APPLICATION_XML)
                 )
@@ -465,56 +465,56 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
             // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
-            new Attribute("putRequestWithHeaders", AttributeValueType.OBJECT)
+            new Attribute<>("putRequestWithHeaders", AttributeValueType.OBJECT)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("put_request_with_headers")),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_METHOD, Values.create(HttpMethod.PUT)),
-                    new MetaItem(
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "put_request_with_headers"),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_METHOD, Values.create(HttpMethod.PUT)),
+                    new MetaItem<>(
                         Protocol.META_ATTRIBUTE_WRITE_VALUE,
                         Values.create('{"prop1": {$value}, "prop2": "prop2Value"}')
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_ATTRIBUTE_CONTENT_TYPE,
                         Values.create(MediaType.APPLICATION_JSON)
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_HEADERS,
                         Values.createObject().put("header1", (Value)null)
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         HttpClientProtocol.META_QUERY_PARAMETERS,
                         Values.<ObjectValue>parse(/{"param2": "param2Value3", "param3": "param3Value1"}/).get()
                     )
                 ),
             // attribute that sends requests to the server using GET with dynamic path
-            new Attribute("getRequestWithDynamicPath", AttributeValueType.BOOLEAN)
+            new Attribute<>("getRequestWithDynamicPath", AttributeValueType.BOOLEAN)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create('value/{$value}/set')),
-                    new MetaItem(Protocol.META_ATTRIBUTE_WRITE_VALUE_CONVERTER, Values.parse("{\n" +
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create('value/{$value}/set')),
+                    new MetaItem<>(Protocol.META_ATTRIBUTE_WRITE_VALUE_CONVERTER, Values.parse("{\n" +
                         "    \"TRUE\": \"on\",\n" +
                         "    \"FALSE\": \"off\"\n" +
                         "}").get())
                 ),
             // attribute that polls the server using GET and uses regex filter on response
-            new Attribute("getPollSlow", AttributeValueType.NUMBER)
+            new Attribute<>("getPollSlow", AttributeValueType.NUMBER)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_poll_slow")),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, Values.create(50)), // This is ms in testing
-                    new MetaItem(
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_poll_slow"),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, 50), // This is ms in testing
+                    new MetaItem<>(
                         Protocol.META_ATTRIBUTE_VALUE_FILTERS,
                         Values.createArray().add(Util.objectToValue(new RegexValueFilter("\\d+", 0, 0)).get())
                     )
                 ),
             // attribute that polls the server using GET and uses regex filter on response
-            new Attribute("getPollFast", AttributeValueType.NUMBER)
+            new Attribute<>("getPollFast", AttributeValueType.NUMBER)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_poll_fast")),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, Values.create(40)), // This is ms in testing
-                    new MetaItem(
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_poll_fast"),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, 40), // This is ms in testing
+                    new MetaItem<>(
                         Protocol.META_ATTRIBUTE_VALUE_FILTERS,
                         Values.createArray().add(Util.objectToValue(new RegexValueFilter("\\d+", 0, 1)).get())
                     )
@@ -559,7 +559,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         def count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset.id,
             "getRequestWithDynamicPath",
-            Values.create(true))
+            true)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request and returned a 200"
@@ -571,7 +571,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset.id,
             "getRequestWithDynamicPath",
-            Values.create(false))
+            false)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request and returned a 200"
@@ -581,13 +581,13 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         when: "a protocol configurations are added to the agent that don't use ping mechanism"
         agent.addAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig2"), HttpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig2"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
                     Values.create("https://mockapi")
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
                     new OAuthPasswordGrant("https://mockapi/token",
                         "TestClient",
@@ -596,20 +596,20 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                         "testuser",
                         "password").toObjectValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_FAILURE_CODES,
                     Values.createArray()
                         .add(Values.create(Response.Status.UNAUTHORIZED.statusCode))
                         .add(Values.create(Response.Status.FORBIDDEN.statusCode))
                 )
             ),
-            initProtocolConfiguration(new Attribute("protocolConfig3"), HttpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig3"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
                     Values.create("https://mockapi")
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
                     new OAuthPasswordGrant("https://mockapi/token",
                         "TestClient",
@@ -618,20 +618,20 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                         "testuser",
                         "password").toObjectValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_FAILURE_CODES,
                     Values.createArray()
                         .add(Values.create(Response.Status.UNAUTHORIZED.statusCode))
                         .add(Values.create(Response.Status.FORBIDDEN.statusCode))
                 )
             ),
-            initProtocolConfiguration(new Attribute("protocolConfig4"), HttpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig4"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
                     Values.create("https://mockapi")
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
                     new OAuthPasswordGrant("https://mockapi/token",
                         "TestClient",
@@ -640,9 +640,9 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                         "testuser",
                         "password").toObjectValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_FOLLOW_REDIRECTS,
-                    Values.create(true)
+                    true
                 )
             )
         )
@@ -660,36 +660,36 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         when: "attributes are linked to these protocol configurations"
         def asset2 = new Asset("Test Asset 2", AssetType.THING, agent)
         asset2.addAttributes(
-            new Attribute("getSuccess", AttributeValueType.STRING)
+            new Attribute<>("getSuccess", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig2").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_success_200"))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig2").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_success_200")
                 ),
-            new Attribute("getFailure", AttributeValueType.STRING)
+            new Attribute<>("getFailure", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig2").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_failure_401"))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig2").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_failure_401")
                 ),
-            new Attribute("pollFailure", AttributeValueType.STRING)
+            new Attribute<>("pollFailure", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig3").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_failure_401")),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, Values.create(50)), // This is ms in testing
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig3").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_failure_401"),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_POLLING_MILLIS, 50), // This is ms in testing
                 ),
-            new Attribute("getSuccess2", AttributeValueType.STRING)
+            new Attribute<>("getSuccess2", AttributeValueType.STRING)
                 .addMeta(
-                new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
-                new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_success_200"))
+                new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
+                new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_success_200")
             ),
-            new Attribute("getFailure2", AttributeValueType.STRING)
+            new Attribute<>("getFailure2", AttributeValueType.STRING)
                 .addMeta(
-                new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
-                new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("get_failure_401"))
+                new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
+                new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "get_failure_401")
             ),
-            new Attribute("getRedirect", AttributeValueType.STRING)
+            new Attribute<>("getRedirect", AttributeValueType.STRING)
                 .addMeta(
-                new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
-                new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create("redirect"))
+                new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig4").toArrayValue()),
+                new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "redirect")
             ),
         )
 
@@ -717,7 +717,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         when: "a linked attribute value is updated"
         attributeEvent = new AttributeEvent(asset2.id,
             "getSuccess",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request"
@@ -734,7 +734,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset2.id,
             "getFailure",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request and returned a 401"
@@ -751,7 +751,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset2.id,
             "getSuccess",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should not have received the request"
@@ -761,7 +761,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         when: "a linked attribute value is updated"
         attributeEvent = new AttributeEvent(asset2.id,
             "getFailure2",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request and returned a 401"
@@ -778,7 +778,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset2.id,
             "getSuccess2",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request and returned a 200"
@@ -795,7 +795,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         count = mockServer.successFailureCount
         attributeEvent = new AttributeEvent(asset2.id,
             "getRedirect",
-            Values.create("OK"))
+            "OK")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have sent a redirect request and the redirected endpoint returned a 200"

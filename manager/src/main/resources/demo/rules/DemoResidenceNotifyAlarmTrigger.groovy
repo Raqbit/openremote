@@ -166,7 +166,7 @@ rules.add()
                             .setBody("Aanwezigheid in " + alarmTrigger.roomName + " (" + facts.clock.time + ").")
                             .setButtons([
                             new PushNotificationButton("Details", new PushNotificationAction("#security")),
-                            new PushNotificationButton("Alarm uit", PushNotificationAction.writeAttributeValueAction(new AttributeRef(alarmTrigger.residenceId, "alarmEnabled"), Values.create(false)))
+                            new PushNotificationButton("Alarm uit", PushNotificationAction.writeAttributeValueAction(new AttributeRef(alarmTrigger.residenceId, "alarmEnabled"), false)))))
                     ]),
                     targets, null, null
             )

@@ -36,7 +36,7 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
     public TestResourceImpl resource1 = new TestResourceImpl();
 
     @Override
-    protected Set<Object> getApiSingletons(Attribute protocolConfiguration) {
+    protected Set<Object> getApiSingletons(Attribute<?> protocolConfiguration) {
         return new HashSet<>(Collections.singletonList(resource1));
     }
 
@@ -59,7 +59,7 @@ public class TestHttpServerProtocol extends AbstractHttpServerProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
     }
 
     @Override

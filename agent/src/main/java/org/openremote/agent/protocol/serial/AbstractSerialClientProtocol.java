@@ -50,15 +50,15 @@ public abstract class AbstractSerialClientProtocol<T> extends AbstractIoClientPr
     );
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
-                new MetaItem(META_PROTOCOL_SERIAL_PORT, null)
+                new MetaItem<>(META_PROTOCOL_SERIAL_PORT, null)
             );
     }
 
     @Override
-    protected SerialIoClient<T> doCreateIoClient(Attribute protocolConfiguration) throws Exception {
+    protected SerialIoClient<T> doCreateIoClient(Attribute<?> protocolConfiguration) throws Exception {
 
         String port = Values.getMetaItemValueOrThrow(
             protocolConfiguration,

@@ -873,7 +873,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "an alarm channel is locked for 1s"
-        device.writeProperty("CH8_LOCK", Values.create(1d))
+        device.writeProperty("CH8_LOCK", 1d)
 
         then: "the channel should become locked"
         conditions.eventually {
@@ -895,7 +895,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the channel lock is cancelled"
-        device.writeProperty("CH8_LOCK", Values.create(0d))
+        device.writeProperty("CH8_LOCK", 0d)
 
         then: "the channel should become unlocked again"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB 02 06 ED 10 04 00 01 00 EC 04 00 00"))
@@ -1050,7 +1050,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "an input channel is locked for 1s"
-        device.writeProperty("CH8_LOCK", Values.create(1d))
+        device.writeProperty("CH8_LOCK", 1d)
 
         then: "the channel should become locked"
         conditions.eventually {
@@ -1072,7 +1072,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the channel lock is cancelled"
-        device.writeProperty("CH8_LOCK", Values.create(0d))
+        device.writeProperty("CH8_LOCK", 0d)
 
         then: "the channel should become unlocked again"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB 30 07 ED 00 FF FF 00 00 00 D4 04"))
@@ -1405,7 +1405,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we set the thermostat mode to heat comfort with timer"
-        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", Values.create(1d))
+        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", 1d)
 
         then: "the state and mode should update"
         conditions.eventually {
@@ -1424,7 +1424,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we set the thermostat mode to heat comfort with timer"
-        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", Values.create(1d))
+        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", 1d)
 
         then: "the state and mode should update"
         conditions.eventually {
@@ -1443,7 +1443,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we set the thermostat mode to heat comfort with timer"
-        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", Values.create(1d))
+        device.writeProperty("TEMP_MODE_HEAT_COMFORT_MINS", 1d)
 
         then: "the state and mode should update"
         conditions.eventually {
@@ -1495,7 +1495,7 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "Reset the heat night target temperature"
         if (device != null) {
-            device.writeProperty("TEMP_TARGET_HEAT_NIGHT", Values.create(16d))
+            device.writeProperty("TEMP_TARGET_HEAT_NIGHT", 16d)
             device.writeProperty("TEMP_STATE", ThermostatProcessor.TemperatureState.NORMAL.toValue(ValueType.STRING))
             device.writeProperty("TEMP_MODE", ThermostatProcessor.TemperatureMode.HEAT_SAFE.toValue(ValueType.STRING))
         }
@@ -1544,8 +1544,8 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "alarm 1 is disabled and alarm 2 is enabled"
-        device.writeProperty("ALARM1_ENABLED", Values.create(false))
-        device.writeProperty("ALARM2_ENABLED", Values.create(true))
+        device.writeProperty("ALARM1_ENABLED", false)
+        device.writeProperty("ALARM2_ENABLED", true)
 
         then: "the alarms should update to match"
         conditions.eventually {
@@ -1554,8 +1554,8 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "sunrise is enabled and sunset disabled"
-        device.writeProperty("SUNRISE_ENABLED", Values.create(true))
-        device.writeProperty("SUNSET_ENABLED", Values.create(false))
+        device.writeProperty("SUNRISE_ENABLED", true)
+        device.writeProperty("SUNSET_ENABLED", false)
 
         then: "the alarms should update to match"
         conditions.eventually {
@@ -1564,7 +1564,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we enable program steps on channel 13"
-        device.writeProperty("CH13" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, Values.create(true))
+        device.writeProperty("CH13" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, true)
 
         then: "channel 13 program steps should be enabled and all channel program steps should now show as enabled"
         conditions.eventually {
@@ -1573,7 +1573,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "all channel program steps are disabled for 1s"
-        device.writeProperty("ALL" + ProgramsProcessor.PROGRAM_STEPS_DISABLED_SECONDS_SUFFIX, Values.create(1d))
+        device.writeProperty("ALL" + ProgramsProcessor.PROGRAM_STEPS_DISABLED_SECONDS_SUFFIX, 1d)
 
         then: "all channels should show as disabled"
         conditions.eventually {
@@ -1600,7 +1600,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "all channel 20 program steps are disabled for 1s"
-        device.writeProperty("CH20" + ProgramsProcessor.PROGRAM_STEPS_DISABLED_SECONDS_SUFFIX, Values.create(1d))
+        device.writeProperty("CH20" + ProgramsProcessor.PROGRAM_STEPS_DISABLED_SECONDS_SUFFIX, 1d)
 
         then: "only channel 20 should show as disabled"
         conditions.eventually {
@@ -1647,12 +1647,12 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "return initial state"
         if (device != null) {
-            device.writeProperty("ALARM1_ENABLED", Values.create(true))
-            device.writeProperty("ALARM2_ENABLED", Values.create(false))
-            device.writeProperty("SUNRISE_ENABLED", Values.create(false))
-            device.writeProperty("SUNSET_ENABLED", Values.create(true))
-            device.writeProperty("ALL" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, Values.create(true))
-            device.writeProperty("CH13" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, Values.create(false))
+            device.writeProperty("ALARM1_ENABLED", true)
+            device.writeProperty("ALARM2_ENABLED", false)
+            device.writeProperty("SUNRISE_ENABLED", false)
+            device.writeProperty("SUNSET_ENABLED", true)
+            device.writeProperty("ALL" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, true)
+            device.writeProperty("CH13" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, false)
             device.writeProperty("PROGRAM", ProgramsProcessor.Program.SUMMER.toValue(ValueType.STRING))
             device.writeProperty("ALARM1_WAKE_TIME", Values.create("16:00"))
             device.writeProperty("ALARM1_BED_TIME", Values.create("22:00"))
@@ -1688,7 +1688,7 @@ class VelbusBasicTest extends Specification {
         when: "some memo text is sent to the device"
         def msg = "Hello world. This is a test message for the OLED panels to make sure they work:30"
         messageProcessor.sentMessages.clear()
-        device.writeProperty("MEMO_TEXT", Values.create(msg))
+        device.writeProperty("MEMO_TEXT", msg)
 
         then: "the memo text property should contain the text and the correct packets should have been sent to the device"
         if (network.client == messageProcessor) {
@@ -1713,7 +1713,7 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "put the device state back"
         if (device != null) {
-            device.writeProperty("MEMO_TEXT", Values.create(""))
+            device.writeProperty("MEMO_TEXT", "")
         }
     }
 
@@ -1763,7 +1763,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is switched on"
-        device.writeProperty("CH4", Values.create(true))
+        device.writeProperty("CH4", true)
 
         then: "a relay should be on"
         conditions.eventually {
@@ -1772,7 +1772,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is switched off"
-        device.writeProperty("CH4", Values.create(false))
+        device.writeProperty("CH4", false)
 
         then: "a relay should be off"
         conditions.eventually {
@@ -1791,7 +1791,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the relay is switched off again"
-        device.writeProperty("CH1", Values.create(false))
+        device.writeProperty("CH1", false)
 
         then: "the relay should be off"
         conditions.eventually {
@@ -1801,7 +1801,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is set to intermittent for 1s"
-        device.writeProperty("CH2_INTERMITTENT", Values.create(1d))
+        device.writeProperty("CH2_INTERMITTENT", 1d)
 
         then: "the relay should be in intermittent state"
         conditions.eventually {
@@ -1828,7 +1828,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the relay intermittent state is cancelled"
-        device.writeProperty("CH2_INTERMITTENT", Values.create(0d))
+        device.writeProperty("CH2_INTERMITTENT", 0d)
 
         then: "the relay should return to normal"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB 51 08 FB 02 00 00 00 00 00 00 A0 04"))
@@ -1838,7 +1838,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is inhibited for 1s"
-        device.writeProperty("CH2_INHIBIT", Values.create(1d))
+        device.writeProperty("CH2_INHIBIT", 1d)
 
         then: "the relay should be inhibited"
         conditions.eventually {
@@ -1863,7 +1863,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the relay inhibit is cancelled"
-        device.writeProperty("CH2_INHIBIT", Values.create(0d))
+        device.writeProperty("CH2_INHIBIT", 0d)
 
         then: "the relay should return to normal"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB 51 08 FB 02 00 00 00 00 00 00 A0 04"))
@@ -1873,7 +1873,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is forced on for 1s"
-        device.writeProperty("CH3_FORCE_ON", Values.create(1d))
+        device.writeProperty("CH3_FORCE_ON", 1d)
 
         then: "a relay should be on"
         conditions.eventually {
@@ -1892,7 +1892,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is locked for 1s"
-        device.writeProperty("CH1_LOCK", Values.create(1d))
+        device.writeProperty("CH1_LOCK", 1d)
 
         then: "the relay should be off and disabled (forced off)"
         conditions.eventually {
@@ -1911,7 +1911,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is switched on for 1s"
-        device.writeProperty("CH1_ON", Values.create(1d))
+        device.writeProperty("CH1_ON", 1d)
 
         then: "the relay should be on and in normal state"
         conditions.eventually {
@@ -1941,7 +1941,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we cancel the on timer"
-        device.writeProperty("CH1_ON", Values.create(0d))
+        device.writeProperty("CH1_ON", 0d)
 
         then: "the relay should return to off"
         conditions.eventually {
@@ -1951,7 +1951,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is locked for 1s"
-        device.writeProperty("CH2_LOCK", Values.create(1d))
+        device.writeProperty("CH2_LOCK", 1d)
 
         then: "the relay should be disabled"
         conditions.eventually {
@@ -1976,7 +1976,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the relay lock is cancelled"
-        device.writeProperty("CH2_LOCK", Values.create(0d))
+        device.writeProperty("CH2_LOCK", 0d)
 
         then: "the relay should return to normal"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB 51 08 FB 02 00 00 00 00 00 00 A0 04"))
@@ -1987,11 +1987,11 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "put the device state back"
         if (device != null) {
-            device.writeProperty("CH1", Values.create(false))
-            device.writeProperty("CH2", Values.create(false))
-            device.writeProperty("CH3", Values.create(false))
-            device.writeProperty("CH4", Values.create(false))
-            device.writeProperty("CH5", Values.create(false))
+            device.writeProperty("CH1", false)
+            device.writeProperty("CH2", false)
+            device.writeProperty("CH3", false)
+            device.writeProperty("CH4", false)
+            device.writeProperty("CH5", false)
         }
     }
 
@@ -2043,7 +2043,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the counter is reset"
-        device.writeProperty("COUNTER1", Values.create(0d))
+        device.writeProperty("COUNTER1", 0d)
 
         then: "the counter should update to match"
         conditions.eventually {
@@ -2098,7 +2098,7 @@ class VelbusBasicTest extends Specification {
         }
 
 //        when: "an output channel is switched on"
-//        device.writeProperty("OUTPUT4", Values.create(true))
+//        device.writeProperty("OUTPUT4", true)
 //
 //        then: "the output should be on 100%"
 //        conditions.eventually {
@@ -2109,7 +2109,7 @@ class VelbusBasicTest extends Specification {
 //        }
 //
 //        when: "the output is switched off"
-//        device.writeProperty("OUTPUT4", Values.create(false))
+//        device.writeProperty("OUTPUT4", false)
 //
 //        then: "the output should be off"
 //        conditions.eventually {
@@ -2119,7 +2119,7 @@ class VelbusBasicTest extends Specification {
 //        }
 //
 //        when: "a output channel is set to 50%"
-//        device.writeProperty("OUTPUT4_LEVEL", Values.create(50d))
+//        device.writeProperty("OUTPUT4_LEVEL", 50d)
 //
 //        then: "the output should be on 5V"
 //        conditions.eventually {
@@ -2130,7 +2130,7 @@ class VelbusBasicTest extends Specification {
 //        }
 //
 //        when: "the output is switched off"
-//        device.writeProperty("OUTPUT4", Values.create(false))
+//        device.writeProperty("OUTPUT4", false)
 //
 //        then: "the output should be off"
 //        conditions.eventually {
@@ -2195,7 +2195,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer channel is switched on"
-        device.writeProperty("CH4", Values.create(true))
+        device.writeProperty("CH4", true)
 
         then: "the dimmer should be on 100%"
         conditions.eventually {
@@ -2206,7 +2206,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer is switched off"
-        device.writeProperty("CH4", Values.create(false))
+        device.writeProperty("CH4", false)
 
         then: "the dimmer should be off"
         conditions.eventually {
@@ -2216,7 +2216,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer channel is set to 50%"
-        device.writeProperty("CH4_LEVEL", Values.create(50d))
+        device.writeProperty("CH4_LEVEL", 50d)
 
         then: "the dimmer should be on 50%"
         conditions.eventually {
@@ -2227,7 +2227,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer is switched off"
-        device.writeProperty("CH4", Values.create(false))
+        device.writeProperty("CH4", false)
 
         then: "the dimmer should be off"
         conditions.eventually {
@@ -2249,7 +2249,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer is switched off again"
-        device.writeProperty("CH4", Values.create(false))
+        device.writeProperty("CH4", false)
 
         then: "the dimmer should be off"
         conditions.eventually {
@@ -2271,7 +2271,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer is switched off again"
-        device.writeProperty("CH2", Values.create(false))
+        device.writeProperty("CH2", false)
 
         then: "the dimmer should be off"
         conditions.eventually {
@@ -2282,7 +2282,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is switched on for 3s"
-        device.writeProperty("CH2_ON", Values.create(3))
+        device.writeProperty("CH2_ON", 3)
 
         then: "the dimmer should switch on"
         conditions.eventually {
@@ -2331,7 +2331,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is inhibited for 1s"
-        device.writeProperty("CH3_INHIBIT", Values.create(1d))
+        device.writeProperty("CH3_INHIBIT", 1d)
 
         then: "the dimmer should be inhibited"
         conditions.eventually {
@@ -2356,7 +2356,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer inhibit is cancelled"
-        device.writeProperty("CH3_INHIBIT", Values.create(0d))
+        device.writeProperty("CH3_INHIBIT", 0d)
 
         then: "the dimmer should return to normal"
         messageProcessor.onMessageReceived(VelbusPacket.fromString("0F FB BB 08 B8 04 00 00 00 00 00 00 77 04"))
@@ -2366,7 +2366,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is forced on for 5s"
-        device.writeProperty("CH3_FORCE_ON", Values.create(5d))
+        device.writeProperty("CH3_FORCE_ON", 5d)
 
         then: "the dimmer should be on"
         conditions.eventually {
@@ -2388,7 +2388,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is locked for 1s"
-        device.writeProperty("CH3_LOCK", Values.create(1d))
+        device.writeProperty("CH3_LOCK", 1d)
 
         then: "the dimmer should be off and locked"
         conditions.eventually {
@@ -2419,7 +2419,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we cancel the on timer"
-        device.writeProperty("CH3_ON", Values.create(0d))
+        device.writeProperty("CH3_ON", 0d)
 
         then: "the dimmer should return to off"
         conditions.eventually {
@@ -2429,7 +2429,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is locked for 1s"
-        device.writeProperty("CH3_LOCK", Values.create(1d))
+        device.writeProperty("CH3_LOCK", 1d)
 
         then: "the dimmer should be disabled"
         conditions.eventually {
@@ -2454,7 +2454,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the dimmer lock is cancelled"
-        device.writeProperty("CH3_LOCK", Values.create(0d))
+        device.writeProperty("CH3_LOCK", 0d)
 
         then: "the dimmer should return to normal"
         conditions.eventually {
@@ -2464,10 +2464,10 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "put the device state back"
         if (device != null) {
-            device.writeProperty("CH1", Values.create(false))
-            device.writeProperty("CH2", Values.create(false))
-            device.writeProperty("CH3", Values.create(false))
-            device.writeProperty("CH4", Values.create(false))
+            device.writeProperty("CH1", false)
+            device.writeProperty("CH2", false)
+            device.writeProperty("CH3", false)
+            device.writeProperty("CH4", false)
         }
     }
 
@@ -2506,7 +2506,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind channel set to down"
-        device.writeProperty("CH2", Values.create(true))
+        device.writeProperty("CH2", true)
 
         then: "the blind should reach 100%"
         conditions.eventually {
@@ -2524,7 +2524,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the blind is set to up"
-        device.writeProperty("CH2", Values.create(false))
+        device.writeProperty("CH2", false)
 
         then: "the dimmer should return to 0%"
         conditions.eventually {
@@ -2542,7 +2542,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind channel is set to 50%"
-        device.writeProperty("CH2_POSITION", Values.create(50d))
+        device.writeProperty("CH2_POSITION", 50d)
 
         then: "the blind should be at 50%"
         conditions.eventually {
@@ -2560,7 +2560,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the blind is set to up for 10s"
-        device.writeProperty("CH2_UP", Values.create(10d))
+        device.writeProperty("CH2_UP", 10d)
 
         then: "the blind should be up"
         conditions.eventually {
@@ -2579,7 +2579,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind channel is set to down for 15s"
-        device.writeProperty("CH2_DOWN", Values.create(15d))
+        device.writeProperty("CH2_DOWN", 15d)
 
         then: "the blind should be down"
         conditions.eventually {
@@ -2598,7 +2598,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is set to up"
-        device.writeProperty("CH2", Values.create(false))
+        device.writeProperty("CH2", false)
 
         then: "the blind should start moving up"
         conditions.eventually {
@@ -2621,7 +2621,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is inhibited for 1s"
-        device.writeProperty("CH2_INHIBIT", Values.create(1d))
+        device.writeProperty("CH2_INHIBIT", 1d)
 
         then: "the blind should be inhibited"
         conditions.eventually {
@@ -2646,7 +2646,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the blind inhibit is cancelled"
-        device.writeProperty("CH2_INHIBIT", Values.create(0d))
+        device.writeProperty("CH2_INHIBIT", 0d)
 
         then: "the blind should return to normal"
         conditions.eventually {
@@ -2666,7 +2666,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the blind inhibit is cancelled"
-        device.writeProperty("CH2_INHIBIT", Values.create(0d))
+        device.writeProperty("CH2_INHIBIT", 0d)
 
         then: "the blind should return to normal"
         conditions.eventually {
@@ -2675,7 +2675,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is forced up for 5s"
-        device.writeProperty("CH2_FORCE_UP", Values.create(5d))
+        device.writeProperty("CH2_FORCE_UP", 5d)
 
         then: "the blind should be up and forced"
         conditions.eventually {
@@ -2692,7 +2692,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is locked for 1s"
-        device.writeProperty("CH2_LOCK", Values.create(1d))
+        device.writeProperty("CH2_LOCK", 1d)
 
         then: "the blind should be locked"
         conditions.eventually {
@@ -2718,7 +2718,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the blind lock is cancelled"
-        device.writeProperty("CH2_LOCK", Values.create(0d))
+        device.writeProperty("CH2_LOCK", 0d)
 
         then: "the blind should return to normal"
         conditions.eventually {
@@ -2729,13 +2729,13 @@ class VelbusBasicTest extends Specification {
 
         cleanup: "put the device state back"
         if (device != null) {
-            //device.writeProperty("CH1", Values.create(false))
-            device.writeProperty("CH2", Values.create(false))
-            device.writeProperty("CH2_LOCK", Values.create(0d))
-            device.writeProperty("CH2_INHIBIT_DOWN", Values.create(0d))
-            device.writeProperty("CH2_INHIBIT_UP", Values.create(0d))
-            device.writeProperty("CH2_FORCE_UP", Values.create(0d))
-            device.writeProperty("CH2_FORCE_DOWN", Values.create(0d))
+            //device.writeProperty("CH1", false)
+            device.writeProperty("CH2", false)
+            device.writeProperty("CH2_LOCK", 0d)
+            device.writeProperty("CH2_INHIBIT_DOWN", 0d)
+            device.writeProperty("CH2_INHIBIT_UP", 0d)
+            device.writeProperty("CH2_FORCE_UP", 0d)
+            device.writeProperty("CH2_FORCE_DOWN", 0d)
         }
     }
 

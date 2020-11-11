@@ -148,13 +148,13 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
-            .addMeta(new MetaItem(META_MACRO_ACTION, EMPTY_ACTION.toObjectValue()));
+            .addMeta(new MetaItem<>(META_MACRO_ACTION, EMPTY_ACTION.toObjectValue()));
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             MacroConfiguration.validateMacroConfiguration(protocolConfiguration, result);
@@ -252,9 +252,9 @@ public class MacroProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
 
-        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute<?> attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (attribute.isExecutable()) {
             // This is a macro execution related write operation

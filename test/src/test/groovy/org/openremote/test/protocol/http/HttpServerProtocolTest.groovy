@@ -305,15 +305,15 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), TestHttpServerProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), TestHttpServerProtocol.PROTOCOL_NAME)
                 .addMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         AbstractHttpServerProtocol.META_PROTOCOL_DEPLOYMENT_PATH,
-                        Values.create("test")
+                        "test"
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         AbstractHttpServerProtocol.META_PROTOCOL_ROLE_BASED_SECURITY_ENABLED,
-                        Values.create(true)
+                        true
                     )
                 )
         )
@@ -330,7 +330,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         def testAsset = new Asset("Test Asset", AssetType.THING)
         testAsset.setId("12345")
         testAsset.setAttributes(
-            new Attribute("attribute1", AttributeValueType.STRING, Values.create("Test"))
+            new Attribute<>("attribute1", AttributeValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(1d, 2d))
         authenticatedTestResource.postAsset(testAsset)
@@ -362,11 +362,11 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
 
         when: "an additional instance of the Test HTTP Server protocol is deployed without security enabled"
         agent.addAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig2"), TestHttpServerProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig2"), TestHttpServerProtocol.PROTOCOL_NAME)
                 .addMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         AbstractHttpServerProtocol.META_PROTOCOL_DEPLOYMENT_PATH,
-                        Values.create("test2")
+                        "test2"
                     )
                 )
         )
@@ -388,7 +388,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         testAsset = new Asset("Test Asset 2", AssetType.THING)
         testAsset.setId("67890")
         testAsset.setAttributes(
-            new Attribute("attribute2", AttributeValueType.STRING, Values.create("Test"))
+            new Attribute<>("attribute2", AttributeValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(3d, 4d))
         authenticatedTestResource.postAsset(testAsset)

@@ -33,8 +33,7 @@ import java.util.function.Consumer;
  * to establish a link to the supplied {@link Agent}. These {@link Asset}s can then be structured in
  * a hierarchical representation using {@link AssetTreeNode}s.
  * <p>
- * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
- * discovery is requested for the associated {@link Protocol}. Implementations are not re-used.
+ * {@link Protocol}s that support {@link Asset} discovery must implement this interface.
  */
 public interface ProtocolAssetDiscovery {
 
@@ -44,11 +43,11 @@ public interface ProtocolAssetDiscovery {
      * call the stoppedCallback. If for some reason the process cannot be started then this method should
      * return false and log more details.
      */
-    boolean start(Agent agent, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
+    boolean startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
 
     /**
      * Can be called by initiator to stop the process; if the implementation has already stopped then this
      * method should just return.
      */
-    void stop();
+    void stopAssetDiscovery();
 }

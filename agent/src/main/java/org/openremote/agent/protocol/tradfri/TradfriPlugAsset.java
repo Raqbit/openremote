@@ -33,15 +33,15 @@ public class TradfriPlugAsset extends TradfriAsset {
      */
     @Override
     public void createAttributes() {
-        Attribute plugStatus = new Attribute("plugStatus", BOOLEAN, Values.create(false));
+        Attribute<?> plugStatus = new Attribute<>("plugStatus", BOOLEAN, false);
         plugStatus.addMeta(
-                new MetaItem(LABEL, Values.create("Plug Status")),
-                new MetaItem(DESCRIPTION, Values.create("The state of the TRÅDFRI plug (Checked means on, unchecked means off)")),
-                new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
-                new MetaItem(READ_ONLY, Values.create(false)),
-                new MetaItem(RULE_STATE, Values.create(true)),
-                new MetaItem(STORE_DATA_POINTS, Values.create(true)),
+                new MetaItem<>(LABEL, "Plug Status"),
+                new MetaItem<>(DESCRIPTION, Values.create("The state of the TRÅDFRI plug (Checked means on, unchecked means off)")),
+                new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
+                new MetaItem<>(READ_ONLY, false),
+                new MetaItem<>(RULE_STATE, true),
+                new MetaItem<>(STORE_DATA_POINTS, true),
                 agentLink
         );
         setAttributes(plugStatus);

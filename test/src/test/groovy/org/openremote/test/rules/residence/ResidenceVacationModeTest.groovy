@@ -76,7 +76,7 @@ class ResidenceVacationModeTest extends Specification implements ManagerContaine
         when: "the vacation days are set to 5"
         double fiveDaysInFuture = getClockTimeOf(container) + (5 * 24 * 60 * 60 * 1000)
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
-                managerTestSetup.apartment1Id, "vacationUntil", Values.create(fiveDaysInFuture)
+                managerTestSetup.apartment1Id, "vacationUntil", fiveDaysInFuture
         ))
 
         then: "the DAY scene should be executed and scene timers disabled"

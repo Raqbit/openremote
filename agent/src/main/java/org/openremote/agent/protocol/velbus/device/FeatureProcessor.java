@@ -146,9 +146,9 @@ public abstract class FeatureProcessor {
                 case STRING:
                     return Values.create(Integer.toString(value));
                 case NUMBER:
-                    return Values.create(value);
+                    return value;
                 case BOOLEAN:
-                    return value == 0 ? Values.create(false) : value == 1 ? Values.create(true) : null;
+                    return value == 0 ? false : value == 1 ? true : null;
             }
 
             return null;
@@ -179,9 +179,9 @@ public abstract class FeatureProcessor {
                 case STRING:
                     return Values.create(Double.toString(value));
                 case NUMBER:
-                    return Values.create(value);
+                    return value;
                 case BOOLEAN:
-                    return value == 0d ? Values.create(false) : value == 1d ? Values.create(true) : null;
+                    return value == 0d ? false : value == 1d ? true : null;
             }
 
             return null;
@@ -215,7 +215,7 @@ public abstract class FeatureProcessor {
                 case NUMBER:
                     return Values.create(value ? 1d : 0d);
                 case BOOLEAN:
-                    return Values.create(value);
+                    return value;
             }
 
             return null;
@@ -244,11 +244,11 @@ public abstract class FeatureProcessor {
                 case ARRAY:
                     return null;
                 case STRING:
-                    return Values.create(value);
+                    return value;
                 case NUMBER:
                     return null;
                 case BOOLEAN:
-                    return Values.create(value);
+                    return value;
             }
 
             return null;

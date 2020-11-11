@@ -102,25 +102,25 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), UdpClientProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), UdpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         UdpClientProtocol.META_PROTOCOL_HOST,
                         Values.create("127.0.0.1")
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         UdpClientProtocol.META_PROTOCOL_PORT,
-                        Values.create(echoServerPort)
+                        echoServerPort
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         UdpClientProtocol.META_PROTOCOL_BIND_PORT,
-                        Values.create(clientPort)
+                        clientPort
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         Protocol.META_PROTOCOL_DELIMITER,
                         Values.create(";")
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         Protocol.META_PROTOCOL_STRIP_DELIMITER
                     )
                 )
@@ -138,27 +138,27 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         when: "an asset is created with attributes linked to the protocol configuration"
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
-            new Attribute("echoHello", AttributeValueType.STRING)
+            new Attribute<>("echoHello", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"Hello {$value};"')),
-                    new MetaItem(MetaItemType.EXECUTABLE)
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"Hello {$value};"')),
+                    new MetaItem<>(MetaItemType.EXECUTABLE)
                 ),
-            new Attribute("echoWorld", AttributeValueType.STRING)
+            new Attribute<>("echoWorld", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("World;"))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("World;"))
                 ),
-            new Attribute("responseHello", AttributeValueType.STRING)
+            new Attribute<>("responseHello", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
                         new StringPredicate(AssetQuery.Match.BEGIN, true, "Hello").toModelValue())
                 ),
-            new Attribute("responseWorld", AttributeValueType.STRING)
+            new Attribute<>("responseWorld", AttributeValueType.STRING)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
+                    new MetaItem<>(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
                         new StringPredicate(AssetQuery.Match.BEGIN, true, "Hello").toModelValue())
                 )
         )
@@ -176,7 +176,7 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         when: "a linked attribute value is updated"
         def attributeEvent = new AttributeEvent(asset.id,
             "echoHello",
-            Values.create("there"))
+            "there")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "the server should have received the request"
@@ -261,8 +261,8 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         }
 
         when: "the linked attributes are also updated to work with hex server"
-        asset.getAttribute("echoHello").ifPresent({it.meta.replaceAll{it.name.get() == UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE.urn ? new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"abcdef"')) : it}})
-        asset.getAttribute("echoWorld").ifPresent({it.meta.replaceAll{it.name.get() == UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE.urn ? new MetaItem(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"123456"')) : it}})
+        asset.getAttribute("echoHello").ifPresent({it.meta.replaceAll{it.name.get() == UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE.urn ? new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"abcdef"')) : it}})
+        asset.getAttribute("echoWorld").ifPresent({it.meta.replaceAll{it.name.get() == UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE.urn ? new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"123456"')) : it}})
         asset = assetStorageService.merge(asset)
 
         then: "the attributes should be relinked"

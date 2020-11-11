@@ -118,11 +118,11 @@ public class TradfriProtocol extends AbstractProtocol {
      * @return the configuration template of the protocol.
      */
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
-                        new MetaItem(META_TRADFRI_GATEWAY_HOST, null),
-                        new MetaItem(META_TRADFRI_SECURITY_CODE, null)
+                        new MetaItem<>(META_TRADFRI_GATEWAY_HOST, null),
+                        new MetaItem<>(META_TRADFRI_SECURITY_CODE, null)
                 );
     }
 
@@ -150,7 +150,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @return the attribute validation result.
      */
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration){
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration){
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             boolean ipFound = false;
@@ -300,7 +300,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @param protocolConfiguration the protocol configuration.
      */
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         if (!protocolConfiguration.isEnabled()) {
             LOG.fine("Protocol configuration is disabled so ignoring write request");
             return;
@@ -363,7 +363,7 @@ public class TradfriProtocol extends AbstractProtocol {
      * @param agentLink the agent link.
      * @param protocolConfiguration the protocol configuration.
      */
-    private void addDevices(Device[] devices, MetaItem agentLink, Attribute protocolConfiguration){
+    private void addDevices(Device[] devices, MetaItem agentLink, Attribute<?> protocolConfiguration){
         String parentId = null;
         Optional<String> assetId = protocolConfiguration.getAssetId();
         if(assetId.isPresent()) parentId = assetId.get();

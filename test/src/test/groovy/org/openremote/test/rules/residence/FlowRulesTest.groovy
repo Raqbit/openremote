@@ -41,13 +41,13 @@ class FlowRulesTest extends Specification implements ManagerContainerTrait {
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
                 managerTestSetup.apartment1LivingroomId,
                 "targetTemperature",
-                Values.create(startTemperature)
+                startTemperature
         ))
 
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
                 managerTestSetup.apartment1Bedroom1Id,
                 "targetTemperature",
-                Values.create(0)
+                0
         ))
 
         when: "a valid node collection is added"

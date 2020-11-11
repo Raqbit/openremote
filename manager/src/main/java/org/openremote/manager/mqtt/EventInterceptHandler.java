@@ -214,15 +214,15 @@ public class EventInterceptHandler extends AbstractInterceptHandler {
                 Value value = null;
                 if (Character.isLetter(payloadContent.charAt(0))) {
                     if (payloadContent.equals(Boolean.TRUE.toString())) {
-                        value = Values.create(true);
+                        value = true;
                     }
                     if (payloadContent.equals(Boolean.FALSE.toString())) {
-                        value = Values.create(false);
+                        value = false;
                     }
                     payloadContent = '"' + payloadContent + '"';
                 }
                 if (value == null) {
-                    value = Values.parse(payloadContent).orElse(Values.create(payloadContent));
+                    value = Values.parse(payloadContent).orElse(payloadContent);
                 }
 
                 Map<String, Object> headers = prepareHeaders(connection);

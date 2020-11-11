@@ -90,8 +90,8 @@ public enum NodeModel {
     }),
             info -> {
                 Object value = info.getInternals()[0].getValue();
-                if (value == null) return Values.create(false);
-                if (!(value instanceof Boolean)) return Values.create(false);
+                if (value == null) return false;
+                if (!(value instanceof Boolean)) return false;
                 return Values.create((boolean) value);
             }),
 
@@ -108,7 +108,7 @@ public enum NodeModel {
                     return Values.create(a.getBoolean() && b.getBoolean());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(false);
+                    return false;
                 }
             }),
 
@@ -125,7 +125,7 @@ public enum NodeModel {
                     return Values.create(a.getBoolean() || b.getBoolean());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(false);
+                    return false;
                 }
             }),
 
@@ -140,7 +140,7 @@ public enum NodeModel {
                     return Values.create(!a.getBoolean());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(true);
+                    return true;
                 }
             }),
 
@@ -154,7 +154,7 @@ public enum NodeModel {
                     return Values.create(Float.parseFloat(Values.JSON.writeValueAsString(info.getInternals()[0].getValue())));
                 } catch (JsonProcessingException e) {
                     RulesEngine.RULES_LOG.warning("Number node returned invalid value");
-                    return Values.create(0f);
+                    return 0f;
                 }
             }),
 
@@ -171,7 +171,7 @@ public enum NodeModel {
                     return Values.create(a.getNumber() + b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -188,7 +188,7 @@ public enum NodeModel {
                     return Values.create(a.getNumber() - b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -205,7 +205,7 @@ public enum NodeModel {
                     return Values.create(a.getNumber() * b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -221,12 +221,12 @@ public enum NodeModel {
                     NumberValue b = (NumberValue) info.getValueFromInput(1);
 
                     if (b.getNumber() == 0)
-                        return Values.create(0f);
+                        return 0f;
 
                     return Values.create(a.getNumber() / b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -243,7 +243,7 @@ public enum NodeModel {
                     return Values.create(a.equals(b));
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(false);
+                    return false;
                 }
             }),
 
@@ -260,7 +260,7 @@ public enum NodeModel {
                     return Values.create(a.getNumber() > b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(false);
+                    return false;
                 }
             }),
 
@@ -277,7 +277,7 @@ public enum NodeModel {
                     return Values.create(a.getNumber() < b.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(false);
+                    return false;
                 }
             }),
 
@@ -306,7 +306,7 @@ public enum NodeModel {
                     return Values.create((float) Math.round(a.getNumber()));
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -321,7 +321,7 @@ public enum NodeModel {
                     return Values.create((float) Math.abs(a.getNumber()));
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -338,7 +338,7 @@ public enum NodeModel {
                     return Values.create((float) Math.pow(a.getNumber(), b.getNumber()));
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -355,14 +355,14 @@ public enum NodeModel {
                     try {
                         condition = (BooleanValue) info.getValueFromInput(0);
                     } catch (Exception e) {
-                        condition = Values.create(false);
+                        condition = false;
                     }
                     NumberValue then = (NumberValue) info.getValueFromInput(1);
                     NumberValue _else = (NumberValue) info.getValueFromInput(2);
                     return Values.create(condition.getBoolean() ? then.getNumber() : _else.getNumber());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -373,8 +373,8 @@ public enum NodeModel {
     }),
             info -> {
                 Object value = info.getInternals()[0].getValue();
-                if (value == null) return Values.create("");
-                if (!(value instanceof String)) return Values.create("");
+                if (value == null) return "";
+                if (!(value instanceof String)) return "";
                 return Values.create((String) value);
             }),
 
@@ -405,7 +405,7 @@ public enum NodeModel {
                     return Values.create(a.getString() + joiner + b.getString());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -422,14 +422,14 @@ public enum NodeModel {
                     try {
                         condition = (BooleanValue) info.getValueFromInput(0);
                     } catch (Exception e) {
-                        condition = Values.create(false);
+                        condition = false;
                     }
                     StringValue then = (StringValue) info.getValueFromInput(1);
                     StringValue _else = (StringValue) info.getValueFromInput(2);
                     return Values.create(condition.getBoolean() ? then.getString() : _else.getString());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -443,7 +443,7 @@ public enum NodeModel {
                     NumberValue a = (NumberValue) info.getValueFromInput(0);
                     return Values.create((float) Math.sin(a.getNumber()));
                 } catch (Exception e) {
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -457,7 +457,7 @@ public enum NodeModel {
                     NumberValue a = (NumberValue) info.getValueFromInput(0);
                     return Values.create((float) Math.cos(a.getNumber()));
                 } catch (Exception e) {
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -471,7 +471,7 @@ public enum NodeModel {
                     NumberValue a = (NumberValue) info.getValueFromInput(0);
                     return Values.create((float) Math.tan(a.getNumber()));
                 } catch (Exception e) {
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -485,7 +485,7 @@ public enum NodeModel {
                     NumberValue a = (NumberValue) info.getValueFromInput(0);
                     return Values.create((float) Math.sqrt(a.getNumber()));
                 } catch (Exception e) {
-                    return Values.create(0);
+                    return 0;
                 }
             }),
 
@@ -501,7 +501,7 @@ public enum NodeModel {
                     NumberValue b = (NumberValue) info.getValueFromInput(1);
                     return Values.create((float) (a.getNumber() % b.getNumber()));
                 } catch (Exception e) {
-                    return Values.create(0);
+                    return 0;
                 }
             }),
     ;

@@ -101,7 +101,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), velbusProtocol.getProtocolName())
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), velbusProtocol.getProtocolName())
         )
 
         agent = assetStorageService.merge(agent)
@@ -109,17 +109,17 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         and: "a device asset is created"
         def device = new Asset("VELBUS Demo VMBGPOD", AssetType.THING, agent)
         device.setAttributes(
-            new Attribute("ch1State", AttributeValueType.STRING)
+            new Attribute<>("ch1State", AttributeValueType.STRING)
                 .setMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         AbstractVelbusProtocol.META_VELBUS_DEVICE_ADDRESS,
-                        Values.create(48)
+                        48
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                         AbstractVelbusProtocol.META_VELBUS_DEVICE_VALUE_LINK,
-                        Values.create("CH1")
+                        "CH1"
                     ),
-                    new MetaItem(
+                    new MetaItem<>(
                             MetaItemType.AGENT_LINK,
                             new AttributeRef(agent.id, "protocolConfig").toArrayValue()
                     )
@@ -163,9 +163,9 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-            initProtocolConfiguration(new Attribute("protocolConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>("protocolConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
                 .addMeta(
-                    new MetaItem(VelbusSerialProtocol.META_VELBUS_SERIAL_PORT, Values.create("COM5"))
+                    new MetaItem<>(VelbusSerialProtocol.META_VELBUS_SERIAL_PORT, "COM5")
                 )
         )
 

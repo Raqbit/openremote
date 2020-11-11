@@ -67,7 +67,7 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             VelbusConfiguration.validateSerialConfiguration(protocolConfiguration, result);
@@ -76,13 +76,13 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
-            .addMeta(new MetaItem(META_VELBUS_SERIAL_PORT, null));
+            .addMeta(new MetaItem<>(META_VELBUS_SERIAL_PORT, null));
     }
 
     @Override
-    protected IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException {
+    protected IoClient<VelbusPacket> createIoClient(Attribute<?> protocolConfiguration) throws RuntimeException {
 
         // Extract port and baud rate
         String port = protocolConfiguration.getMetaItem(META_VELBUS_SERIAL_PORT).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
@@ -102,7 +102,7 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    protected String getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
+    protected String getUniqueNetworkIdentifier(Attribute<?> protocolConfiguration) {
         return protocolConfiguration
             .getMetaItem(META_VELBUS_SERIAL_PORT)
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -113,9 +113,9 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     public Attribute[] discoverProtocolConfigurations() {
         // TODO: Search for VELBUS USB devices
         return new Attribute[]{
-            initProtocolConfiguration(new Attribute(), PROTOCOL_NAME)
+            initProtocolConfiguration(new Attribute<>(), PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(META_VELBUS_SERIAL_PORT, Values.create("COM6"))
+                new MetaItem<>(META_VELBUS_SERIAL_PORT, "COM6")
             )
         };
     }

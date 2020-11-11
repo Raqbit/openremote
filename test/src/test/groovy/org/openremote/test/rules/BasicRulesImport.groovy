@@ -83,7 +83,7 @@ class BasicRulesImport {
             "Some apartment 2 demo rules",
             GROOVY,
             getClass().getResource("/org/openremote/test/rules/BasicMatchAllAssetStates.groovy").text)
-            .addMeta("visible", Values.create(true))
+            .addMeta("visible", true)
         apartment2RulesetId = rulesetStorageService.merge(ruleset).id
 
         ruleset = new AssetRuleset(

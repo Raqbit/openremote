@@ -122,7 +122,7 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(RequestParams requestParams, String agentId, Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(RequestParams requestParams, String agentId, Attribute<?> protocolConfiguration) {
         return withAgentConnector(agentId, agentConnector -> agentConnector.value.validateProtocolConfiguration(protocolConfiguration), () -> null);
     }
 

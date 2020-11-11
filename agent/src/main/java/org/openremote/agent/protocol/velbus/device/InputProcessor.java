@@ -85,11 +85,11 @@ public class InputProcessor extends ChannelProcessor {
                 case BOOLEAN:
                     switch (this) {
                         case PRESSED:
-                            return Values.create(false);
+                            return false;
                         case RELEASED:
                             return null;
                         case LONG_PRESSED:
-                            return Values.create(true);
+                            return true;
                     }
                 default:
                     return EnumUtil.enumToValue(this, valueType);

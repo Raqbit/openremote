@@ -81,7 +81,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
             REGEXP_PATTERN_INTEGER_POSITIVE_NON_ZERO,
             MetaItemDescriptor.PatternFailure.INTEGER_POSITIVE_NON_ZERO.name(),
             1,
-            Values.create(DEFAULT_TIME_INJECTION_INTERVAL_SECONDS),
+            DEFAULT_TIME_INJECTION_INTERVAL_SECONDS,
             false, null, null, null)
     );
 
@@ -231,7 +231,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         Pair<VelbusNetwork, Consumer<ConnectionStatus>> velbusNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
 
         if (velbusNetworkConsumerPair == null) {
@@ -239,7 +239,7 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
         }
 
         VelbusNetwork velbusNetwork = velbusNetworkConsumerPair.key;
-        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
+        Attribute<?> attribute = getLinkedAttribute(event.getAttributeRef());
 
         if (attribute == null) {
             return;
@@ -255,13 +255,13 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration) {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute<?> protocolConfiguration) {
         // TODO: Implement asset attribute discovery using the bus
         return new AssetTreeNode[0];
     }
 
     @Override
-    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
+    public AssetTreeNode[] discoverLinkedAttributes(Attribute<?> protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
         Document xmlDoc;
         try {
             String xmlStr = fileInfo.isBinary() ? new String(CodecUtil.decodeBase64(fileInfo.getContents()), "UTF8") : fileInfo.getContents();
@@ -302,31 +302,31 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
             name = isNullOrEmpty(name) ? deviceType.toString() : name;
             Asset device = new Asset(name, AssetType.THING);
             device.setAttributes(
-                new Attribute("build", AttributeValueType.STRING, Values.create(build))
+                new Attribute<>("build", AttributeValueType.STRING, build)
                     .setMeta(
-                        new MetaItem(MetaItemType.LABEL, Values.create("Build")),
-                        new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
+                        new MetaItem<>(MetaItemType.LABEL, "Build"),
+                        new MetaItem<>(MetaItemType.READ_ONLY, true)
                     ),
-                new Attribute("serialNumber", AttributeValueType.STRING, Values.create(serial))
+                new Attribute<>("serialNumber", AttributeValueType.STRING, serial)
                     .setMeta(
-                        new MetaItem(MetaItemType.LABEL, Values.create("Serial No")),
-                        new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
+                        new MetaItem<>(MetaItemType.LABEL, "Serial No"),
+                        new MetaItem<>(MetaItemType.READ_ONLY, true)
                     )
             );
 
             getLinkedAttributeDescriptors(deviceType.get(), baseAddress)
                 .forEach(descriptor -> {
-                    Attribute attribute = new Attribute(descriptor.getName(), descriptor.getAttributeValueDescriptor())
+                    Attribute<?> attribute = new Attribute<>(descriptor.getName(), descriptor.getAttributeValueDescriptor())
                         .setMeta(
                             agentLink,
-                            new MetaItem(MetaItemType.LABEL, Values.create(descriptor.getDisplayName()))
+                            new MetaItem<>(MetaItemType.LABEL, Values.create(descriptor.getDisplayName()))
                         )
                         .addMeta(descriptor.getMetaItems());
 
                     if (descriptor.isReadOnly()) {
-                        attribute.addMeta(new MetaItem(MetaItemType.READ_ONLY, Values.create(true)));
+                        attribute.addMeta(new MetaItem<>(MetaItemType.READ_ONLY, true));
                     } else if(descriptor.isExecutable()) {
-                        attribute.addMeta(new MetaItem(MetaItemType.EXECUTABLE, Values.create(true)));
+                        attribute.addMeta(new MetaItem<>(MetaItemType.EXECUTABLE, true));
                     }
 
                     device.addAttributes(attribute);
@@ -341,14 +341,14 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
     /**
      * Should return an instance of {@link IoClient} for the supplied protocolConfiguration
      */
-    protected abstract IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException;
+    protected abstract IoClient<VelbusPacket> createIoClient(Attribute<?> protocolConfiguration) throws RuntimeException;
 
 
     /**
      * Should return a String key that uniquely identifies the VelbusNetwork that corresponds with the supplied
      * {@link org.openremote.model.asset.agent.ProtocolConfiguration}
      */
-    protected abstract String getUniqueNetworkIdentifier(Attribute protocolConfiguration);
+    protected abstract String getUniqueNetworkIdentifier(Attribute<?> protocolConfiguration);
 
     public static List<LinkedAttributeDescriptor> getLinkedAttributeDescriptors(VelbusDeviceType deviceType, int deviceAddress) {
         List<LinkedAttributeDescriptor> descriptors = new ArrayList<>();
@@ -381,8 +381,8 @@ public abstract class AbstractVelbusProtocol extends AbstractProtocol implements
 
     public static MetaItem[] createLinkedAttributeMetaItems(int address, String deviceLink) {
         return new MetaItem[] {
-            new MetaItem(META_VELBUS_DEVICE_ADDRESS, Values.create(address)),
-            new MetaItem(META_VELBUS_DEVICE_VALUE_LINK, Values.create(deviceLink))
+            new MetaItem<>(META_VELBUS_DEVICE_ADDRESS, address),
+            new MetaItem<>(META_VELBUS_DEVICE_VALUE_LINK, deviceLink)
         };
     }
 }

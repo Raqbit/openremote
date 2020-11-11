@@ -163,7 +163,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
         mockAgent.setAttributes(
-                ProtocolConfiguration.initProtocolConfiguration(new Attribute("mock123"), mockProtocolName)
+                ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mock123"), mockProtocolName)
         )
         mockAgent.setRealm(keycloakTestSetup.masterTenant.realm)
         mockAgent = assetStorageService.merge(mockAgent)
@@ -171,33 +171,33 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         and: "a mock thing asset is created with a valid protocol attribute, an invalid protocol attribute and a plain attribute"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-                new Attribute("light1Toggle", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>("light1Toggle", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                        new MetaItem(
+                        new MetaItem<>(
                                 MetaItemType.DESCRIPTION,
-                                Values.create("The switch for the light 1 in the living room")
+                                "The switch for the light 1 in the living room"
                         ),
-                        new MetaItem(
+                        new MetaItem<>(
                                 MetaItemType.AGENT_LINK,
                                 new AttributeRef(mockAgent.getId(), "mock123").toArrayValue()
                         )
                 ),
-                new Attribute("light2Toggle", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>("light2Toggle", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                        new MetaItem(
+                        new MetaItem<>(
                                 MetaItemType.DESCRIPTION,
-                                Values.create("The switch for the light 2 in the living room")
+                                "The switch for the light 2 in the living room"
                         ),
-                        new MetaItem(
+                        new MetaItem<>(
                                 MetaItemType.AGENT_LINK,
                                 new AttributeRef("INVALID AGENT ID", managerTestSetup.agentProtocolConfigName).toArrayValue()
                         )
                 ),
-                new Attribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
+                new Attribute<>("plainAttribute", AttributeValueType.STRING, "demo")
                         .setMeta(
-                        new MetaItem(
+                        new MetaItem<>(
                                 MetaItemType.DESCRIPTION,
-                                Values.create("A plain string attribute for storing information")
+                                "A plain string attribute for storing information"
                         )
                 )
         )
@@ -209,7 +209,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         }
         when: "an attribute event occurs for a valid protocol linked attribute on the test asset"
         def light1toggleOn = new AttributeEvent(
-                new AttributeState(new AttributeRef(mockThing.getId(), "light1Toggle"), Values.create(false))
+                new AttributeState(new AttributeRef(mockThing.getId(), "light1Toggle"), false)
         )
         assetProcessingService.sendAttributeEvent(light1toggleOn)
 
@@ -258,7 +258,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         updatesPassedAttributeLinkingService.clear()
         sendToActuatorEvents.clear()
         def light2toggleOn = new AttributeEvent(
-                new AttributeState(new AttributeRef(mockThing.getId(), "light2Toggle"), Values.create(true))
+                new AttributeState(new AttributeRef(mockThing.getId(), "light2Toggle"), true)
         )
         assetProcessingService.sendAttributeEvent(light2toggleOn)
 
@@ -281,7 +281,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         updatesPassedAttributeLinkingService.clear()
         sendToActuatorEvents.clear()
         def plainAttributeTest = new AttributeEvent(
-                new AttributeState(new AttributeRef(mockThing.getId(), "plainAttribute"), Values.create("test"))
+                new AttributeState(new AttributeRef(mockThing.getId(), "plainAttribute"), "test")
         )
         assetProcessingService.sendAttributeEvent(plainAttributeTest)
 

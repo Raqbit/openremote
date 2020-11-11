@@ -84,7 +84,7 @@ class MacroProtocolTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "The target temperature of the home scene is modified via the apartment attribute"
-        def updateTargetTemp = new AttributeEvent(managerTestSetup.apartment1Id, "morningSceneTargetTemperature", Values.create(10d))
+        def updateTargetTemp = new AttributeEvent(managerTestSetup.apartment1Id, "morningSceneTargetTemperature", 10d)
         assetProcessingService.sendAttributeEvent(updateTargetTemp)
 
         then: "Apartment 1 home scene attribute status should reset to show as READY and home target temp should show new value"

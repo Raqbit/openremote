@@ -20,19 +20,13 @@
 package org.openremote.agent.protocol.zwave;
 
 import org.openremote.agent.protocol.ProtocolExecutorService;
-import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.controller.exception.ConfigurationException;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
-import org.openremote.model.asset.AssetType;
-import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.AttributeValueType;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.attribute.MetaItemType;
-import org.openremote.model.value.Value;
+import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.value.Values;
 import org.openremote.protocol.zwave.ConnectionException;
 import org.openremote.protocol.zwave.model.Controller;
@@ -46,33 +40,29 @@ import org.openremote.protocol.zwave.model.commandclasses.ZWParameterInt;
 import org.openremote.protocol.zwave.model.commandclasses.ZWParameterItem;
 import org.openremote.protocol.zwave.model.commandclasses.ZWParameterShort;
 import org.openremote.protocol.zwave.model.commandclasses.channel.Channel;
-import org.openremote.protocol.zwave.model.commandclasses.channel.value.ArrayValue;
-import org.openremote.protocol.zwave.model.commandclasses.channel.value.BooleanValue;
-import org.openremote.protocol.zwave.model.commandclasses.channel.value.NumberValue;
-import org.openremote.protocol.zwave.model.commandclasses.channel.value.StringValue;
-import org.openremote.protocol.zwave.model.commandclasses.channel.value.ValueType;
+import org.openremote.protocol.zwave.model.commandclasses.channel.value.*;
+import org.openremote.protocol.zwave.port.ZWavePortConfiguration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 import static java.util.stream.Collectors.toList;
-import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_ENDPOINT;
-import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_NODE_ID;
-import static org.openremote.agent.protocol.zwave.ZWProtocol.META_ZWAVE_DEVICE_VALUE_LINK;
 import static org.openremote.protocol.zwave.model.ZWNodeInitializerListener.NodeInitState.INITIALIZATION_FINISHED;
 
-public class ZWNetwork extends SerialIoClient<byte[]> {
+public class ZWNetwork {
 
     protected Controller controller;
     private final List<Consumer<ConnectionStatus>> connectionStatusConsumers = new CopyOnWriteArrayList<>();
-    private final Map<Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value>, ChannelConsumerLink> consumerLinkMap = new HashMap<>();
+    private final Map<Consumer<Value>, ChannelConsumerLink> consumerLinkMap = new HashMap<>();
+    protected String serialPort;
+    protected ZWSerialIoClient ioClient;
+    protected ProtocolExecutorService executorService;
 
-    public ZWNetwork(String port, Integer baudRate, ProtocolExecutorService executorService) {
-        super(port, baudRate, executorService);
+    public ZWNetwork(String serialPort, ProtocolExecutorService executorService) {
+        this.serialPort = serialPort;
+        this.executorService = executorService;
     }
 
     public synchronized void connect() {
@@ -80,17 +70,20 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
             return;
         }
 
-        controller = new Controller(NettyConnectionManager.create(configuration, messageProcessor));
+        // Need this config object for the Z-Wave lib
+        ZWavePortConfiguration configuration = new ZWavePortConfiguration();
+        configuration.setCommLayer(ZWavePortConfiguration.CommLayer.NETTY);
+        configuration.setComPort(serialPort);
+
+        ioClient = new ZWSerialIoClient(serialPort, executorService);
+        ioClient.addConnectionStatusConsumer(this::onConnectionStatusChanged);
+
+        controller = new Controller(NettyConnectionManager.create(configuration, ioClient));
         
         try {
             controller.connect();
-        } catch (ConfigurationException e) {
-            removeStatusChangedHandler(ioClient);
-            controller = null;
-            ioClient = null;
-            onConnectionStatusChanged(ConnectionStatus.ERROR_CONFIGURATION);
-        } catch (ConnectionException e) {
-            removeStatusChangedHandler(ioClient);
+        } catch (ConfigurationException | ConnectionException e) {
+            disposeClient();
             controller = null;
             ioClient = null;
             onConnectionStatusChanged(ConnectionStatus.ERROR_CONFIGURATION);
@@ -105,9 +98,9 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         try {
             controller.disconnect();
         } catch (ConnectionException e) {
-
+            ZWProtocol.LOG.log(Level.WARNING, "Exception thrown whilst disconnecting the controller", e);
         } finally {
-            removeStatusChangedHandler(ioClient);
+            disposeClient();
             ioClient = null;
             controller = null;
             onConnectionStatusChanged(ConnectionStatus.DISCONNECTED);
@@ -130,12 +123,12 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         connectionStatusConsumers.remove(connectionStatusConsumer);
     }
 
-    public synchronized void addSensorValueConsumer(int nodeId, int endpoint, String channelName, Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> consumer) {
+    public synchronized void addSensorValueConsumer(int nodeId, int endpoint, String channelName, Consumer<Value> consumer) {
         ChannelConsumerLink link = ChannelConsumerLink.createLink(nodeId, endpoint, channelName, consumer, controller);
         consumerLinkMap.put(consumer, link);
     }
 
-    public synchronized void removeSensorValueConsumer(Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> consumer) {
+    public synchronized void removeSensorValueConsumer(Consumer<Value> consumer) {
         ChannelConsumerLink link = consumerLinkMap.get(consumer);
         if (link != null) {
             consumerLinkMap.remove(consumer);
@@ -143,27 +136,11 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         }
     }
 
-    public synchronized void writeChannel(int nodeId, int endpoint, String linkName, Value value) {
+    public synchronized void writeChannel(int nodeId, int endpoint, String linkName, Object value) {
         Channel channel = findChannel(nodeId, endpoint, linkName);
         if (channel != null && value != null) {
-            org.openremote.protocol.zwave.model.commandclasses.channel.value.Value zwValue = null;
             ValueType type = channel.getValueType();
-            switch(type) {
-                case STRING:
-                     zwValue =Values.getString(value).map(val -> new StringValue(val)).orElse(null);
-                    break;
-                case NUMBER:
-                    zwValue = Values.getNumber(value).map(val -> new NumberValue(val)).orElse(null);
-                    break;
-                case INTEGER:
-                    zwValue = Values.getIntegerCoerced(value).map(val -> new NumberValue(val)).orElse(null);
-                    break;
-                case BOOLEAN:
-                    zwValue = Values.getBoolean(value).map(val -> new BooleanValue(val)).orElse(null);
-                    break;
-                case ARRAY:
-                    zwValue = toZWArray(Values.getArray(value).orElse(null));
-            }
+            Value zwValue = toZWValue(type, value);
 
             if (zwValue != null) {
                 channel.executeSetCommand(zwValue);
@@ -171,22 +148,112 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         }
     }
 
-    public synchronized AssetTreeNode[] discoverDevices(Attribute protocolConfiguration) {
+    private void disposeClient() {
+        if (ioClient != null) {
+            ioClient.removeConnectionStatusConsumer(this::onConnectionStatusChanged);
+            ioClient.disconnect(); // Ensure it's disconnected - don't know what Z-Wave lib does
+        }
+    }
+
+    protected void onConnectionStatusChanged(ConnectionStatus status) {
+        connectionStatusConsumers.forEach(consumer ->consumer.accept(status));
+    }
+
+    protected Value toZWValue(ValueType type, Object value) {
+        Value zwValue = null;
+
+        switch(type) {
+            case STRING:
+                zwValue = Values.getString(value).map(StringValue::new).orElse(null);
+                break;
+            case NUMBER:
+                zwValue = Values.getDouble(value).map(NumberValue::new).orElse(null);
+                break;
+            case INTEGER:
+                zwValue = Values.getInteger(value).map(NumberValue::new).orElse(null);
+                break;
+            case BOOLEAN:
+                zwValue = Values.getBoolean(value).map(BooleanValue::new).orElse(null);
+                break;
+            case ARRAY:
+
+                zwValue = Values.getValue(value, Object[].class).map(arrValue -> {
+
+                    ArrayValue zwArray = new ArrayValue();
+
+                    zwArray.addAll(
+                        Arrays.stream(arrValue)
+                            .map(arrValueItem -> {
+                                if (arrValueItem == null) {
+                                    return null;
+                                }
+
+                                // Just assume the item's data type is the desired type - bit strange but no other data
+                                ValueType valueType = null;
+                                Class<?> itemType = arrValueItem.getClass();
+                                if (Values.isArray(itemType)) {
+                                    valueType = ValueType.ARRAY;
+                                } else if (Values.isNumber(itemType)) {
+                                    valueType = ValueType.NUMBER;
+                                } else if (Values.isBoolean(itemType)) {
+                                    valueType = ValueType.BOOLEAN;
+                                } else if (Values.isString(itemType)) {
+                                    valueType = ValueType.STRING;
+                                }
+                                if (valueType == null) {
+                                    return null;
+                                }
+
+                                return toZWValue(valueType, arrValueItem);
+                            }).toArray(Value[]::new)
+                    );
+                    return zwArray;
+                }).orElse(null);
+        }
+
+        return zwValue;
+    }
+
+    private static void addAttributeChannelMetaItems(String agentId, Attribute<?> attribute, Channel channel) {
+        int nodeId = channel.getCommandClass() != null ? channel.getCommandClass().getContext().getNodeID() : 0;
+        int endpoint = channel.getCommandClass() != null ? channel.getCommandClass().getContext().getDestEndPoint() : 0;
+        String linkValue = channel.getLinkName();
+
+        attribute.getMeta().addOrReplace(
+            new MetaItem<>(MetaItemType.AGENT_LINK, agentId),
+            new MetaItem<>(ZWAgent.DEVICE_NODE_ID, nodeId),
+            new MetaItem<>(ZWAgent.DEVICE_ENDPOINT, endpoint),
+            new MetaItem<>(ZWAgent.DEVICE_VALUE, linkValue),
+            new MetaItem<>(MetaItemType.LABEL, channel.getDisplayName())
+        );
+
+        if (channel.isReadOnly()) {
+            attribute.getMeta().add(new MetaItem<>(MetaItemType.READ_ONLY, true));
+        }
+    }
+
+    
+    private Channel findChannel(int nodeId, int endpointNumber, String channelName) {
+        Channel channel = null;
+        if (controller != null) {
+            channel = controller.findChannel(nodeId, endpointNumber, channelName);
+        }
+        return channel;
+    }
+
+    public synchronized AssetTreeNode[] discoverDevices(ZWAgent agent) {
         if (controller == null) {
             return new AssetTreeNode[0];
         }
 
-        MetaItem agentLink = AgentLink.asAgentLinkMetaItem(protocolConfiguration.getReferenceOrThrow());
-
         // Filter nodes
-        
+
         List<ZWaveNode> nodes = controller.getNodes()
             .stream()
             .filter(node -> node.getState() == INITIALIZATION_FINISHED)
             .filter(node -> {
                 // Do not add devices that have already been discovered
-                List<ZWCommandClass> cmdClasses = new ArrayList<>();
-                cmdClasses.addAll(node.getSupportedCommandClasses());
+                List<ZWCommandClass> cmdClasses = new ArrayList<>(node.getSupportedCommandClasses());
                 for (ZWEndPoint curEndpoint : node.getEndPoints()) {
                     cmdClasses.addAll(curEndpoint.getCmdClasses());
                 }
@@ -205,27 +272,26 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
             .map(node -> {
 
                 // Root device
-                
+
                 AssetTreeNode deviceNode = createDeviceNode(
-                    agentLink,
+                    agent.getId(),
                     node.getSupportedCommandClasses(),
                     node.getGenericDeviceClassID().getDisplayName(node.getSpecificDeviceClassID())
                 );
 
                 // Device Info
 
-                Asset deviceInfoAsset = new Asset("Info", AssetType.THING);
-                List<Attribute<?>> infoAttributes = createNodeInfoAttributes(node, agentLink);
-                deviceInfoAsset.addAttributes(infoAttributes.toArray(new Attribute[infoAttributes.size()]));
+                Asset deviceInfoAsset = new Asset("Info");
+                deviceInfoAsset.getAttributes().addAll(createNodeInfoAttributes(agent.getId(), node));
                 deviceNode.addChild(new AssetTreeNode(deviceInfoAsset));
 
                 // Sub device
 
                 for (ZWEndPoint curEndpoint : node.getEndPoints()) {
                     String subDeviceName = curEndpoint.getGenericDeviceClassID().getDisplayName(curEndpoint.getSpecificDeviceClassID()) +
-                                           " - " + curEndpoint.getEndPointNumber();
+                        " - " + curEndpoint.getEndPointNumber();
                     AssetTreeNode subDeviceNode = createDeviceNode(
-                        agentLink,
+                        agent.getId(),
                         curEndpoint.getCmdClasses(),
                         subDeviceName
                     );
@@ -236,48 +302,45 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
 
                 List<ZWParameterItem> parameters = node.getParameters();
                 if (parameters.size() > 0) {
-                    AssetTreeNode parameterListNode = new AssetTreeNode(new Asset("Parameters", AssetType.THING));
+                    AssetTreeNode parameterListNode = new AssetTreeNode(new Asset("Parameters"));
                     deviceNode.addChild(parameterListNode);
 
                     List<AssetTreeNode> parameterNodes = parameters
                         .stream()
                         .filter(parameter -> parameter.getChannels().size() > 0)
                         .map(parameter -> {
-                            Integer number = parameter.getNumber();
-                            String parameterLabel = number.toString() + " : " + parameter.getDisplayName();
+                            int number = parameter.getNumber();
+                            String parameterLabel = number + " : " + parameter.getDisplayName();
                             String description = parameter.getDescription();
-                            Asset parameterAsset = new Asset(parameterLabel, AssetType.THING);
+                            Asset parameterAsset = new Asset(parameterLabel);
                             AssetTreeNode parameterNode = new AssetTreeNode(parameterAsset);
 
                             List<Attribute<?>> attributes = parameter.getChannels()
                                 .stream()
                                 .map(channel -> {
-                                    Attribute attribute = new Attribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
-                                        .setMeta(
-                                            agentLink,
-                                            new MetaItem(MetaItemType.LABEL, Values.create(channel.getDisplayName()))
-                                        )
-                                        .addMeta(getMetaItems(channel));
+                                    Attribute<?> attribute = new Attribute<>(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()));
+                                    addAttributeChannelMetaItems(agent.getId(), attribute, channel);
                                     addValidRangeMeta(attribute, parameter);
                                     return attribute;
                                 })
                                 .collect(toList());
+
                             if (description != null && description.length() > 0) {
-                                Attribute descriptionAttribute = new Attribute(
-                                    "description", AttributeValueType.STRING, Values.create("-")
-                                ).setMeta(
-                                    new MetaItem(MetaItemType.LABEL, Values.create("Description")),
-                                    new MetaItem(MetaItemType.READ_ONLY, Values.create(true)),
-                                    new MetaItem(MetaItemType.DESCRIPTION, Values.create(description))
+                                Attribute<String> descriptionAttribute = new Attribute<>(
+                                    "description", org.openremote.model.v2.ValueType.STRING, description
+                                );
+                                descriptionAttribute.getMeta().addAll(
+                                    new MetaItem<>(MetaItemType.LABEL, "Description"),
+                                    new MetaItem<>(MetaItemType.READ_ONLY, true)
                                 );
                                 attributes.add(descriptionAttribute);
                             }
-                            parameterAsset.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
+                            parameterAsset.getAttributes().addAll(attributes);
                             return parameterNode;
                         })
                         .collect(toList());
 
-                    parameterNodes.forEach(parameterNode -> parameterListNode.addChild(parameterNode));
+                    parameterNodes.forEach(parameterListNode::addChild);
                 }
 
                 return deviceNode;
@@ -286,110 +349,28 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
 
         // Z-Wave Controller
 
-        Asset networkManagementAsset = new Asset("Z-Wave Controller", AssetType.THING);
+        Asset networkManagementAsset = new Asset("Z-Wave Controller");
         List<Attribute<?>> attributes = controller.getSystemCommandManager().getChannels()
             .stream()
             .filter(channel ->
                 consumerLinkMap.values().stream().noneMatch(link -> link.getChannel() == channel))
             .map(channel -> {
-                Attribute attribute = new Attribute(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()))
-                    .setMeta(
-                        agentLink,
-                        new MetaItem(MetaItemType.LABEL, Values.create(channel.getDisplayName()))
-                    )
-                    .addMeta(getMetaItems(channel));
+                Attribute<?> attribute = new Attribute<>(channel.getName(), TypeMapper.toAttributeType(channel.getChannelType()));
+                addAttributeChannelMetaItems(agent.getId(), attribute, channel);
                 return attribute;
             })
             .collect(toList());
         if (attributes.size() > 0) {
-            networkManagementAsset.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
+            networkManagementAsset.getAttributes().addAll(attributes);
             assetNodes.add(new AssetTreeNode(networkManagementAsset));
         }
 
-        return assetNodes.toArray(new AssetTreeNode[assetNodes.size()]);
+        return assetNodes.toArray(new AssetTreeNode[0]);
     }
 
-    protected Controller createController(IoClient<SerialDataPacket> ioClient) {
-        return controllerFactory.createController(ioClient);
-    }
+    private AssetTreeNode createDeviceNode(String agentId, List<ZWCommandClass> cmdClasses, String name) {
 
-    protected void onConnectionStatusChanged(ConnectionStatus status) {
-        connectionStatusConsumers.forEach(consumer ->consumer.accept(status));
-    }
-
-    private MetaItem[] getMetaItems(Channel channel) {
-        int nodeId = channel.getCommandClass() != null ? channel.getCommandClass().getContext().getNodeID() : 0;
-        int endpoint = channel.getCommandClass() != null ? channel.getCommandClass().getContext().getDestEndPoint() : 0;
-        List<MetaItem> unitMetaItems = TypeMapper.toMetaItems(channel.getChannelType());
-        List<MetaItem> metaItems =  new ArrayList<>(3 + (channel.isReadOnly() ? 1 : 0) + unitMetaItems.size());
-        metaItems.add(new MetaItem(META_ZWAVE_DEVICE_NODE_ID, Values.create(nodeId)));
-        metaItems.add(new MetaItem(META_ZWAVE_DEVICE_ENDPOINT, Values.create(endpoint)));
-        metaItems.add(new MetaItem(META_ZWAVE_DEVICE_VALUE_LINK, Values.create(channel.getLinkName())));
-        if (channel.isReadOnly()) {
-            metaItems.add(new MetaItem(MetaItemType.READ_ONLY, Values.create(true)));
-        }
-        metaItems.addAll(unitMetaItems);
-        return metaItems.toArray(new MetaItem[metaItems.size()]);
-    }
-
-    private void removeStatusChangedHandler(IoClient<SerialDataPacket> ioClient) {
-        if (ioClient != null) {
-            ioClient.removeConnectionStatusConsumer(this::onConnectionStatusChanged);
-        }
-    }
-    
-    private Channel findChannel(int nodeId, int endpointNumber, String channelName) {
-        Channel channel = null;
-        if (controller != null) {
-            channel = controller.findChannel(nodeId, endpointNumber, channelName);
-        }
-        return channel;
-    }
-
-
-    private org.openremote.protocol.zwave.model.commandclasses.channel.value.ArrayValue toZWArray(org.openremote.model.value.ArrayValue arrValue) {
-        if (arrValue == null) {
-            return null;
-        }
-        ArrayValue zwArray = new ArrayValue();
-        org.openremote.protocol.zwave.model.commandclasses.channel.value.Value[] arr = new org.openremote.protocol.zwave.model.commandclasses.channel.value.Value[arrValue.length()];
-        zwArray.addAll(
-            arrValue
-                .stream()
-                .map(arrItem -> toZWArrayItem(arrItem))
-                .collect(toList())
-                .toArray(arr)
-        );
-        for (int i = 0; i < zwArray.length(); i++) {
-            if (zwArray.get(i) == null) {
-                return null;
-            }
-        }
-        return zwArray;
-    }
-
-    private org.openremote.protocol.zwave.model.commandclasses.channel.value.Value toZWArrayItem(org.openremote.model.value.Value value) {
-        if (value == null) {
-            return null;
-        }
-        org.openremote.protocol.zwave.model.commandclasses.channel.value.Value zwValue = null;
-        switch(value.getType()) {
-            case NUMBER:
-                zwValue = Values.getNumber(value).map(val -> new NumberValue(val)).orElse(null);
-                break;
-            case BOOLEAN:
-                zwValue = Values.getBoolean(value).map(val -> new BooleanValue(val)).orElse(null);
-                break;
-            case STRING:
-                zwValue = Values.getString(value).map(val -> new StringValue(val)).orElse(null);
-                break;
-        }
-        return zwValue;
-    }
-
-    private AssetTreeNode createDeviceNode(MetaItem agentLink, List<ZWCommandClass> cmdClasses, String name) {
-
-        Asset device = new Asset(name, AssetType.THING);
+        Asset device = new Asset(name);
 
         List<Attribute<?>> attributes = cmdClasses
             .stream()
@@ -403,96 +384,108 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
                 int endpoint = channel.getCommandClass().getContext().getDestEndPoint();
                 String attributeName = channel.getName() + (endpoint == 0 ? "" : "_" + endpoint);
                 String displayName = channel.getDisplayName() + (endpoint == 0 ? "" : " - " + endpoint);
-                Attribute attribute = new Attribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
-                    .setMeta(
-                        agentLink,
-                        new MetaItem(MetaItemType.LABEL, Values.create(displayName))
-                    )
-                    .addMeta(getMetaItems(channel));
+                Attribute<?> attribute = new Attribute<>(attributeName, TypeMapper.toAttributeType(channel.getChannelType()));
+                addAttributeChannelMetaItems(agentId, attribute, channel);
+                attribute.getMeta().addOrReplace(new MetaItem<>(MetaItemType.LABEL, displayName));
                 return attribute;
             })
             .collect(toList());
 
-        device.addAttributes(attributes.toArray(new Attribute[attributes.size()]));
+        device.getAttributes().addOrReplace(attributes);
 
         return new AssetTreeNode(device);
     }
     
-    private List<Attribute<?>> createNodeInfoAttributes(ZWaveNode node, MetaItem agentLink) {
+    private static List<Attribute<?>> createNodeInfoAttributes(String agentId, ZWaveNode node) {
         List<Attribute<?>> attributes = new ArrayList<>();
 
-        Attribute nodeIdAttrib = new Attribute(
-            "nodeId", AttributeValueType.NUMBER, Values.create(node.getNodeID()))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Node ID")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> nodeIdAttrib = new Attribute<>("nodeId", org.openremote.model.v2.ValueType.INTEGER, node.getNodeID());
+        nodeIdAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Node ID"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(nodeIdAttrib);
 
-        Attribute manufacturerIdAttrib = new Attribute(
-            "manufacturerId", AttributeValueType.STRING, Values.create(String.format("0x%04X",node.getManufacturerId())))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Manufacturer ID")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> manufacturerIdAttrib = new Attribute<>(
+            "manufacturerId",
+            org.openremote.model.v2.ValueType.STRING,
+            String.format("0x%04X",node.getManufacturerId()));
+        manufacturerIdAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Manufacturer ID"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(manufacturerIdAttrib);
 
-        Attribute manufacturerAttrib = new Attribute(
-            "manufacturerName", AttributeValueType.STRING, Values.create(ZWManufacturerID.fromRaw(node.getManufacturerId()).getName()))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Manufacturer")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> manufacturerAttrib = new Attribute<>(
+            "manufacturerName",
+            org.openremote.model.v2.ValueType.STRING,
+            ZWManufacturerID.fromRaw(node.getManufacturerId()).getName());
+        manufacturerAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Manufacturer"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(manufacturerAttrib);
 
-        Attribute flirsAttrib = new Attribute(
-            "isFlirs", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isFLIRS()))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("FLIRS")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> flirsAttrib = new Attribute<>(
+            "isFlirs",
+            org.openremote.model.v2.ValueType.BOOLEAN,
+            node.getNodeInfo().isFLIRS());
+        flirsAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "FLIRS"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(flirsAttrib);
 
-        Attribute routingAttrib = new Attribute(
-            "isRouting", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isRouting()))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Routing")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> routingAttrib = new Attribute<>(
+            "isRouting",
+            org.openremote.model.v2.ValueType.BOOLEAN,
+            node.getNodeInfo().isRouting());
+        routingAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Routing"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(routingAttrib);
 
-        Attribute listeningAttrib = new Attribute(
-            "isListening", AttributeValueType.BOOLEAN, Values.create(node.getNodeInfo().isListening()))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Listening")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> listeningAttrib = new Attribute<>(
+            "isListening",
+            org.openremote.model.v2.ValueType.BOOLEAN,
+            node.getNodeInfo().isListening());
+        listeningAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Listening"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(listeningAttrib);
 
-        Attribute productTypeIdAttrib = new Attribute(
-            "productTypeId", AttributeValueType.STRING, Values.create(String.format("0x%04X", node.getProductTypeID())))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Product Type ID")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> productTypeIdAttrib = new Attribute<>(
+            "productTypeId",
+            org.openremote.model.v2.ValueType.STRING,
+            String.format("0x%04X", node.getProductTypeID()));
+        productTypeIdAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Product Type ID"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(productTypeIdAttrib);
 
-        Attribute productIdAttrib = new Attribute(
-            "productId", AttributeValueType.STRING, Values.create(String.format("0x%04X", node.getProductID())))
-            .setMeta(
-                new MetaItem(MetaItemType.LABEL, Values.create("Product ID")),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-            );
+        Attribute<?> productIdAttrib = new Attribute<>(
+            "productId",
+            org.openremote.model.v2.ValueType.STRING,
+            String.format("0x%04X", node.getProductID()));
+        productIdAttrib.getMeta().addAll(
+            new MetaItem<>(MetaItemType.LABEL, "Product ID"),
+            new MetaItem<>(MetaItemType.READ_ONLY, true)
+        );
         attributes.add(productIdAttrib);
 
         String modelName = node.getModelName();
         if (modelName != null) {
-            Attribute modelNameAttrib = new Attribute(
-                "modelName", AttributeValueType.STRING, Values.create(modelName))
-                .setMeta(
-                    new MetaItem(MetaItemType.LABEL, Values.create("Model")),
-                    new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
-                );
+            Attribute<?> modelNameAttrib = new Attribute<>(
+                "modelName",
+                org.openremote.model.v2.ValueType.STRING,
+                modelName);
+            modelNameAttrib.getMeta().addAll(
+                new MetaItem<>(MetaItemType.LABEL, "Model"),
+                new MetaItem<>(MetaItemType.READ_ONLY, true)
+            );
             attributes.add(modelNameAttrib);
         }
 
@@ -505,13 +498,8 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
             .flatMap(List<Channel>::stream)
             .map(channel -> {
                 String attributeName = channel.getName();
-                String displayName = channel.getDisplayName();
-                Attribute attribute = new Attribute(attributeName, TypeMapper.toAttributeType(channel.getChannelType()))
-                    .setMeta(
-                        agentLink,
-                        new MetaItem(MetaItemType.LABEL, Values.create(displayName))
-                    )
-                    .addMeta(getMetaItems(channel));
+                Attribute<?> attribute = new Attribute<>(attributeName, TypeMapper.toAttributeType(channel.getChannelType()));
+                addAttributeChannelMetaItems(agentId, attribute, channel);
                 return attribute;
             })
             .collect(toList());
@@ -521,7 +509,7 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         return attributes;
     }
 
-    private void addValidRangeMeta(Attribute attribute, ZWParameterItem parameter) {
+    private void addValidRangeMeta(Attribute<?> attribute, ZWParameterItem parameter) {
         Long min = null;
         Long max = null;
         if (parameter instanceof ZWParameterByte) {
@@ -533,11 +521,6 @@ public class ZWNetwork extends SerialIoClient<byte[]> {
         } else if (parameter instanceof ZWParameterInt) {
             min = ((ZWParameterInt)parameter).getMinValue();
             max = ((ZWParameterInt)parameter).getMaxValue();
-        }
-
-        if (min != null && max != null) {
-            String validRangString = "[" + min + " - " + max + "]";
-            attribute.addMeta(new MetaItem(MetaItemType.DESCRIPTION, Values.create(validRangString)));
         }
     }
 }

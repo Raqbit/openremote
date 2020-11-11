@@ -36,8 +36,6 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  */
 public abstract class AbstractTcpClientProtocol<T, U extends IoAgent<T, TcpIoClient<T>>> extends AbstractIoClientProtocol<T, TcpIoClient<T>, U> {
 
-    public static final String PROTOCOL_NAME = PROTOCOL_NAMESPACE + ":tcpClient";
-
     protected AbstractTcpClientProtocol(U agent) {
         super(agent);
     }

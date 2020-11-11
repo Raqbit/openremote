@@ -114,7 +114,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
     @Override
     public boolean processAssetUpdate(EntityManager em,
                                       Asset asset,
-                                      Attribute attribute,
+                                      Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
 
         if (attribute.isStoreDatapoints()
@@ -195,7 +195,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         if (asset == null) {
             throw new IllegalStateException("Asset not found: " + attributeRef.getAssetId());
         }
-        Attribute assetAttribute = asset.getAttribute(attributeRef.getAttributeName())
+        Attribute<?> assetAttribute = asset.getAttribute(attributeRef.getAttributeName())
             .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeRef.getAttributeName()));
 
         return getValueDatapoints(asset.getId(), assetAttribute, datapointInterval, fromTimestamp, toTimestamp);

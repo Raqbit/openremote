@@ -325,7 +325,7 @@ public class ControllerProtocol extends AbstractProtocol {
      * @param protocolConfiguration
      */
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         LOG.fine("### Process Linked Attribute Write");
 
         AttributeRef attributeRef = event.getAttributeRef();
@@ -541,7 +541,7 @@ public class ControllerProtocol extends AbstractProtocol {
                     this.updateLinkedAttribute(new AttributeState(attributeRef, Values.create(Double.parseDouble(value))));
                     break;
                 default:
-                    this.updateLinkedAttribute(new AttributeState(attributeRef, Values.create(value)));
+                    this.updateLinkedAttribute(new AttributeState(attributeRef, value));
             }
         } catch (NumberFormatException e) {
             LOG.severe("### Error in parsing NUMBER value [" + value + "]");

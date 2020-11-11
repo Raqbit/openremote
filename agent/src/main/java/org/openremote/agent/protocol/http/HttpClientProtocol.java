@@ -567,7 +567,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     protected final Map<AttributeRef, Set<AttributeRef>> pollingLinkedAttributeMap = new HashMap<>();
     protected ResteasyClient client;
 
-    public static Optional<Pair<StringValue, StringValue>> getUsernameAndPassword(Attribute attribute) throws IllegalArgumentException {
+    public static Optional<Pair<StringValue, StringValue>> getUsernameAndPassword(Attribute<?> attribute) throws IllegalArgumentException {
         Optional<StringValue> username = Values.getMetaItemValueOrThrow(
                 attribute,
                 META_PROTOCOL_USERNAME,
@@ -587,7 +587,7 @@ public class HttpClientProtocol extends AbstractProtocol {
         return username.map(stringValue -> new Pair<>(stringValue, password.get()));
     }
 
-    public static Integer getPingMillis(Attribute attribute) throws IllegalArgumentException {
+    public static Integer getPingMillis(Attribute<?> attribute) throws IllegalArgumentException {
         return Values.getMetaItemValueOrThrow(
                 attribute,
                 META_PROTOCOL_PING_MILLIS,
@@ -600,44 +600,6 @@ public class HttpClientProtocol extends AbstractProtocol {
                                         new IllegalArgumentException("Ping polling seconds meta item must be an integer >= " + MIN_PING_MILLIS)
                                 ))
                 .orElse(DEFAULT_PING_MILLIS);
-    }
-
-    public static Optional<MultivaluedMap<String, String>> getMultivaluedMap(ObjectValue objectValue, boolean throwOnError) throws ClassCastException, IllegalArgumentException {
-        if (objectValue == null) {
-            return Optional.empty();
-        }
-
-        MultivaluedMap<String, String> multivaluedMap = new MultivaluedHashMap<>();
-        objectValue.stream()
-                .forEach((keyAndValue) -> {
-                    if (keyAndValue.value != null) {
-                        switch (keyAndValue.value.getType()) {
-
-                            case OBJECT:
-                                if (throwOnError) {
-                                    throw new IllegalArgumentException("Key '" + keyAndValue.key + "' is of unsupported type: ObjectValue");
-                                }
-                                break;
-                            case ARRAY:
-                                Values.getArrayElements(((ArrayValue) keyAndValue.value),
-                                        StringValue.class,
-                                        throwOnError,
-                                        false,
-                                        StringValue::getString)
-                                        .ifPresent(strs -> multivaluedMap.addAll(keyAndValue.key, strs));
-                                break;
-                            case STRING:
-                            case NUMBER:
-                            case BOOLEAN:
-                                multivaluedMap.add(keyAndValue.key, keyAndValue.value.toString());
-                                break;
-                        }
-                    } else {
-                        multivaluedMap.add(keyAndValue.key, null);
-                    }
-                });
-
-        return multivaluedMap.isEmpty() ? Optional.empty() : Optional.of(multivaluedMap);
     }
 
     @Override
@@ -946,8 +908,8 @@ public class HttpClientProtocol extends AbstractProtocol {
                 pollingMillis.orElse(null));
     }
 
-    protected void addHttpClientRequest(Attribute protocolConfiguration,
-                                        Attribute attribute,
+    protected void addHttpClientRequest(Attribute<?> protocolConfiguration,
+                                        Attribute<?> attribute,
                                         String path,
                                         String method,
                                         MultivaluedMap<String, String> headers,
@@ -1034,7 +996,7 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
         HttpClientRequest request = requestMap.get(event.getAttributeRef());
         Pair<ResteasyWebTarget, List<Integer>> clientAndFailureCodes = clientMap.get(protocolRef);
@@ -1077,15 +1039,15 @@ public class HttpClientProtocol extends AbstractProtocol {
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
-                        new MetaItem(META_PROTOCOL_BASE_URI, null)
+                        new MetaItem<>(META_PROTOCOL_BASE_URI, null)
                 );
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             try {
@@ -1207,7 +1169,7 @@ public class HttpClientProtocol extends AbstractProtocol {
         if (response != null && response.hasEntity() && response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             try {
                 String responseBody = response.readEntity(String.class);
-                value = responseBody != null ? Values.create(responseBody) : null;
+                value = responseBody != null ? responseBody : null;
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error occurred whilst trying to read response body", e);
                 response.close();

@@ -51,17 +51,17 @@ final public class MacroConfiguration {
     private MacroConfiguration() {
     }
 
-    public static Attribute initMacroConfiguration(Attribute attribute) {
+    public static Attribute<?> initMacroConfiguration(Attribute<?> attribute) {
         return initProtocolConfiguration(attribute, MacroProtocol.PROTOCOL_NAME);
     }
 
-    public static boolean isMacroConfiguration(Attribute attribute) {
+    public static boolean isMacroConfiguration(Attribute<?> attribute) {
         return getProtocolName(attribute)
             .map(MacroProtocol.PROTOCOL_NAME::equals)
             .orElse(false);
     }
 
-    public static boolean validateMacroConfiguration(Attribute attribute, AttributeValidationResult result) {
+    public static boolean validateMacroConfiguration(Attribute<?> attribute, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isMacroConfiguration(attribute)) {
@@ -102,12 +102,12 @@ final public class MacroConfiguration {
         return !failure;
     }
 
-    public static boolean isValidMacroConfiguration(Attribute attribute) {
+    public static boolean isValidMacroConfiguration(Attribute<?> attribute) {
 
         return validateMacroConfiguration(attribute, null);
     }
 
-    public static Stream<MacroAction> getMacroActionsStream(Attribute attribute) {
+    public static Stream<MacroAction> getMacroActionsStream(Attribute<?> attribute) {
         return attribute == null ? Stream.empty() :
             attribute
                 .getMetaStream()
@@ -118,12 +118,12 @@ final public class MacroConfiguration {
                 .map(Optional::get);
     }
 
-    public static List<MacroAction> getMacroActions(Attribute attribute) {
+    public static List<MacroAction> getMacroActions(Attribute<?> attribute) {
         return getMacroActionsStream(attribute)
             .collect(Collectors.toList());
     }
 
-    public static Attribute setMacroActions(Attribute attribute, MacroAction... actions) {
+    public static Attribute<?> setMacroActions(Attribute<?> attribute, MacroAction... actions) {
         return setMacroActions(attribute, Arrays.stream(actions));
     }
 
@@ -131,7 +131,7 @@ final public class MacroConfiguration {
         return attribute -> setMacroActions(attribute, actions);
     }
 
-    public static Attribute setMacroActions(Attribute attribute, Collection<MacroAction> actions) {
+    public static Attribute<?> setMacroActions(Attribute<?> attribute, Collection<MacroAction> actions) {
         return setMacroActions(attribute, actions.stream());
     }
 
@@ -139,7 +139,7 @@ final public class MacroConfiguration {
         return attribute -> setMacroActions(attribute, actions);
     }
 
-    public static Attribute setMacroActions(Attribute attribute, Stream<MacroAction> actions) {
+    public static Attribute<?> setMacroActions(Attribute<?> attribute, Stream<MacroAction> actions) {
         if (attribute == null)
             return null;
 
@@ -152,7 +152,7 @@ final public class MacroConfiguration {
         return attribute;
     }
 
-    public static Optional<Integer> getMacroActionIndex(Attribute attribute) {
+    public static Optional<Integer> getMacroActionIndex(Attribute<?> attribute) {
         return attribute == null ? Optional.empty()
             : attribute.getMetaItem(MacroProtocol.META_MACRO_ACTION_INDEX)
                 .flatMap(AbstractValueHolder::getValueAsInteger);

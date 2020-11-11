@@ -194,7 +194,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "An asset attribute changed the client is subscribed on"
-        def attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", Values.create(50))
+        def attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", 50)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "A publish event message should be sent"
@@ -203,7 +203,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "Another asset attribute changed the client is subscribed on"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", Values.create(true))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", true)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "A second publish event message should be sent"
@@ -272,7 +272,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "Another asset attribute changed without any subscriptions"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", Values.create(false))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", false)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "No publish event message should be sent"
@@ -305,7 +305,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "that attribute changed"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", Values.create(30))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", 30)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "A publish event message should be sent"
@@ -314,7 +314,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "Another asset attribute changed without any subscriptions on that attribute"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", Values.create(true))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", true)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "No publish event message should be sent"
@@ -368,7 +368,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "that attribute changed"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", Values.create(40))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "motionSensor", 40)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "A publish value message should be sent"
@@ -377,7 +377,7 @@ class MqttBrokerTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "Another asset attribute changed without any subscriptions on that attribute"
-        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", Values.create(false))
+        attributeEvent = new AttributeEvent(managerTestSetup.apartment1HallwayId, "presenceDetected", false)
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then: "No publish value message should be sent"

@@ -64,7 +64,7 @@ public class RulesDemoSetup extends AbstractManagerSetup {
             String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             Ruleset ruleset = new TenantRuleset(
                 keycloakDemoSetup.tenantCity.getRealm(), "De Kuip", Ruleset.Lang.JSON, rules
-            ).setAccessPublicRead(true).addMeta("showOnMap", Values.create(true)).addMeta("showOnList", Values.create(true));
+            ).setAccessPublicRead(true).addMeta("showOnMap", true).addMeta("showOnList", true);
             tenantSmartCityRulesetId = rulesetStorageService.merge(ruleset).getId();
         }
 
@@ -72,7 +72,7 @@ public class RulesDemoSetup extends AbstractManagerSetup {
             String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             Ruleset ruleset = new TenantRuleset(
                 keycloakDemoSetup.tenantCity.getRealm(), "Euromast", Ruleset.Lang.JSON, rules
-            ).setAccessPublicRead(true).addMeta("showOnMap", Values.create(true)).addMeta("showOnList", Values.create(true));
+            ).setAccessPublicRead(true).addMeta("showOnMap", true).addMeta("showOnList", true);
             tenantSmartCityRulesetId = rulesetStorageService.merge(ruleset).getId();
         }
 
@@ -80,7 +80,7 @@ public class RulesDemoSetup extends AbstractManagerSetup {
             String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             Ruleset ruleset = new TenantRuleset(
                 keycloakDemoSetup.tenantCity.getRealm(), "Markthal", Ruleset.Lang.JSON, rules
-            ).setAccessPublicRead(true).addMeta("showOnMap", Values.create(true)).addMeta("showOnList", Values.create(true));
+            ).setAccessPublicRead(true).addMeta("showOnMap", true).addMeta("showOnList", true);
             tenantSmartCityRulesetId = rulesetStorageService.merge(ruleset).getId();
         }
 

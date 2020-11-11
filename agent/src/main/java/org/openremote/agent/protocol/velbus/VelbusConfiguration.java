@@ -35,21 +35,21 @@ public final class VelbusConfiguration {
 
     private VelbusConfiguration() {}
 
-    public static int getTimeInjectionIntervalSeconds(Attribute protocolConfiguration) {
+    public static int getTimeInjectionIntervalSeconds(Attribute<?> protocolConfiguration) {
         return protocolConfiguration
                 .getMetaItem(META_VELBUS_TIME_INJECTION_INTERVAL_SECONDS)
                 .flatMap(AbstractValueHolder::getValueAsInteger)
                 .orElse(DEFAULT_TIME_INJECTION_INTERVAL_SECONDS);
     }
 
-    public static int getVelbusDeviceAddress(Attribute assetAttribute) {
+    public static int getVelbusDeviceAddress(Attribute<?> assetAttribute) {
         return assetAttribute
             .getMetaItem(META_VELBUS_DEVICE_ADDRESS)
             .flatMap(AbstractValueHolder::getValueAsInteger)
             .orElse(0);
     }
 
-    public static String getVelbusDevicePropertyLink(Attribute assetAttribute) {
+    public static String getVelbusDevicePropertyLink(Attribute<?> assetAttribute) {
         return assetAttribute
             .getMetaItem(META_VELBUS_DEVICE_VALUE_LINK)
             .flatMap(AbstractValueHolder::getValueAsString)
@@ -57,7 +57,7 @@ public final class VelbusConfiguration {
             .orElse("");
     }
 
-    public static boolean validateSocketConfiguration(Attribute attribute, AttributeValidationResult result) {
+    public static boolean validateSocketConfiguration(Attribute<?> attribute, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isSocketConfiguration(attribute)) {
@@ -123,7 +123,7 @@ public final class VelbusConfiguration {
         return !failure;
     }
 
-    public static boolean validateSerialConfiguration(Attribute protocolConfiguration, AttributeValidationResult result) {
+    public static boolean validateSerialConfiguration(Attribute<?> protocolConfiguration, AttributeValidationResult result) {
         boolean failure = false;
 
         if (!isSerialConfiguration(protocolConfiguration)) {
@@ -179,19 +179,19 @@ public final class VelbusConfiguration {
         return !failure;
     }
 
-    public static boolean isValidSerialConfiguration(Attribute protocolConfiguration) {
+    public static boolean isValidSerialConfiguration(Attribute<?> protocolConfiguration) {
         return validateSerialConfiguration(protocolConfiguration, null);
     }
 
-    public static boolean isValidSocketConfiguration(Attribute protocolConfiguration) {
+    public static boolean isValidSocketConfiguration(Attribute<?> protocolConfiguration) {
         return validateSocketConfiguration(protocolConfiguration, null);
     }
 
-    public static boolean isSocketConfiguration(Attribute attribute) {
+    public static boolean isSocketConfiguration(Attribute<?> attribute) {
         return attribute != null && attribute.getValueAsString().map(value -> value.equals(VelbusTcpProtocol.PROTOCOL_NAME)).orElse(false);
     }
 
-    public static boolean isSerialConfiguration(Attribute attribute) {
+    public static boolean isSerialConfiguration(Attribute<?> attribute) {
         return attribute != null && attribute.getValueAsString().map(value -> value.equals(VelbusSerialProtocol.PROTOCOL_NAME)).orElse(false);
     }
 }

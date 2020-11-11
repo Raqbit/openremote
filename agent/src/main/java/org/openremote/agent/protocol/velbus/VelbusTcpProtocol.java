@@ -85,7 +85,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             VelbusConfiguration.validateSocketConfiguration(protocolConfiguration, result);
@@ -94,16 +94,16 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
-                new MetaItem(META_VELBUS_HOST, null),
-                new MetaItem(META_VELBUS_PORT, null)
+                new MetaItem<>(META_VELBUS_HOST, null),
+                new MetaItem<>(META_VELBUS_PORT, null)
             );
     }
 
     @Override
-    protected IoClient<VelbusPacket> createIoClient(Attribute protocolConfiguration) throws RuntimeException {
+    protected IoClient<VelbusPacket> createIoClient(Attribute<?> protocolConfiguration) throws RuntimeException {
 
         // Extract IP and Host
         String host = protocolConfiguration.getMetaItem(META_VELBUS_HOST).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
@@ -123,7 +123,7 @@ public class VelbusTcpProtocol extends AbstractVelbusProtocol {
     }
 
     @Override
-    protected String getUniqueNetworkIdentifier(Attribute protocolConfiguration) {
+    protected String getUniqueNetworkIdentifier(Attribute<?> protocolConfiguration) {
         String host = protocolConfiguration.getMetaItem(META_VELBUS_HOST)
             .flatMap(AbstractValueHolder::getValueAsString)
             .orElse("");

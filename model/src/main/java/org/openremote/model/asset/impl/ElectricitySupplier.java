@@ -43,7 +43,7 @@ public class ElectricitySupplier extends Device {
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_POWER_KILOWATT)
     );
     public static final AttributeDescriptor<Integer> POWER_EDR_MIN_PERIOD = new AttributeDescriptor<>("powerEDRMinPeriod", true, ValueType.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TIME_SECONDS)
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TIME_SECOND)
     );
     public static final AttributeDescriptor<Double> TARIFF_IMPORT = new AttributeDescriptor<>("energyTariffImport", true, ValueType.POSITIVE_NUMBER, null,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_EUR_PER_KILOWATT_HOUR)

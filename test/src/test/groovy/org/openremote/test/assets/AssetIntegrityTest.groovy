@@ -54,7 +54,7 @@ class AssetIntegrityTest extends Specification implements ManagerContainerTrait 
         when: "an asset is stored with an illegal attribute name"
         testAsset = assetResource.get(null, testAsset.getId())
         testAsset.setAttributes(
-            new Attribute(testAsset.id, "illegal- Attribute:name&&&", AttributeValueType.STRING)
+            new Attribute<>(testAsset.id, "illegal- Attribute:name&&&", AttributeValueType.STRING)
         )
 
         assetResource.update(null, testAsset.getId(), testAsset)
@@ -66,7 +66,7 @@ class AssetIntegrityTest extends Specification implements ManagerContainerTrait 
         when: "an asset is stored with a non-empty attribute value"
         testAsset = assetResource.get(null, testAsset.getId())
         testAsset.setAttributes(
-                new Attribute("foo", AttributeValueType.STRING, Values.create("bar"), getClockTimeOf(container))
+                new Attribute<>("foo", AttributeValueType.STRING, "bar", getClockTimeOf(container))
         )
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, testAsset.getId())

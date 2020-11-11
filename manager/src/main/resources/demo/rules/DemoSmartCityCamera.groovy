@@ -51,7 +51,7 @@ rules.add()
         def attributesEvents = []
         totals.forEach({ k, v ->
             cameraTotals.put(k, v)
-            attributesEvents << new AttributeEvent(k, "cameraCountTotal", Values.create(v))
+            attributesEvents << new AttributeEvent(k, "cameraCountTotal", v)
         })
         assets.dispatch(attributesEvents.toArray(new AttributeEvent[attributesEvents.size()]))
 })

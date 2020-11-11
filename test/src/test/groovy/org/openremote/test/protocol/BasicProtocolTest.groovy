@@ -128,7 +128,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
 
                     if (attributeName.startsWith("lightToggle")) {
                         // Set all lights to on
-                        updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), Values.create(true)))
+                        updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), true))
                     } else if (attributeName.startsWith("tempTarget")) {
                         // Set target temps to 25.5
                         updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), Values.create(25.5d)))
@@ -176,19 +176,19 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
         mockAgent.setAttributes(
-            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig1"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mockConfig1"), mockProtocolName)
                 .addMeta(
-                    new MetaItem("MOCK_REQUIRED_META", Values.create(true))
+                    new MetaItem<>("MOCK_REQUIRED_META", true)
                 ),
-            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig2"), mockProtocolName),
-            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig3"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mockConfig2"), mockProtocolName),
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mockConfig3"), mockProtocolName)
                 .addMeta(
-                    new MetaItem("MOCK_THROW_EXCEPTION", Values.create(""))
+                    new MetaItem<>("MOCK_THROW_EXCEPTION", "")
                 ),
-            ProtocolConfiguration.initProtocolConfiguration(new Attribute("mockConfig4"), mockProtocolName)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mockConfig4"), mockProtocolName)
                 .addMeta(
-                    new MetaItem("MOCK_REQUIRED_META", Values.create(true)),
-                    new MetaItem(MetaItemType.DISABLED, Values.create(true))
+                    new MetaItem<>("MOCK_REQUIRED_META", true),
+                    new MetaItem<>(MetaItemType.DISABLED, true)
                 )
         )
         mockAgent.setRealm(MASTER_REALM)
@@ -214,124 +214,124 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         when: "a mock thing asset is created that links to the mock protocol configurations"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-            new Attribute("lightToggle1", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle1", AttributeValueType.BOOLEAN)
                 .setMeta(
-                    new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                    new MetaItem(
+                    new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                    new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute("tempTarget1", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget1", AttributeValueType.NUMBER)
                 .setMeta(
-                    new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                    new MetaItem(
+                    new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                    new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute("invalidToggle1", AttributeValueType.BOOLEAN)
+            new Attribute<>("invalidToggle1", AttributeValueType.BOOLEAN)
                 .setMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute("lightToggle2", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle2", AttributeValueType.BOOLEAN)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new Attribute("tempTarget2", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget2", AttributeValueType.NUMBER)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new Attribute("lightToggle3", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle3", AttributeValueType.BOOLEAN)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new Attribute("tempTarget3", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget3", AttributeValueType.NUMBER)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new Attribute("lightToggle4", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle4", AttributeValueType.BOOLEAN)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                 )
             ),
-            new Attribute("tempTarget4", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget4", AttributeValueType.NUMBER)
                     .setMeta(
-                    new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                    new MetaItem(
+                    new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                    new MetaItem<>(
                             MetaItemType.AGENT_LINK,
                             new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                     )
             ),
-            new Attribute("invalidToggle5", AttributeValueType.BOOLEAN, Values.create(false))
+            new Attribute<>("invalidToggle5", AttributeValueType.BOOLEAN, false)
                 .setMeta(
-                    new MetaItem(
+                    new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "INVALID CONFIG").toArrayValue()
                     )
                 ),
-            new Attribute("plainAttribute", AttributeValueType.STRING, Values.create("demo"))
+            new Attribute<>("plainAttribute", AttributeValueType.STRING, "demo")
                 .setMeta(
-                new MetaItem(
+                new MetaItem<>(
                         MetaItemType.DESCRIPTION,
-                        Values.create("A plain string attribute for storing information")
+                        "A plain string attribute for storing information"
                 ),
-                new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
+                new MetaItem<>(MetaItemType.READ_ONLY, true)
             ),
-            new Attribute("filterRegex", AttributeValueType.NUMBER)
+            new Attribute<>("filterRegex", AttributeValueType.NUMBER)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                     MetaItemType.AGENT_LINK,
                     new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_ATTRIBUTE_VALUE_FILTERS,
                     Values.createArray().add(Util.objectToValue(new RegexValueFilter("\\w(\\d+)", 1, 2)).get())
                 )
             ),
-            new Attribute("filterSubstring", AttributeValueType.STRING)
+            new Attribute<>("filterSubstring", AttributeValueType.STRING)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                     MetaItemType.AGENT_LINK,
                     new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_ATTRIBUTE_VALUE_FILTERS,
                     Values.createArray().add(Util.objectToValue(new SubStringValueFilter(10, 12)).get())
                 )
             ),
-            new Attribute("filterRegexSubstring", AttributeValueType.NUMBER)
+            new Attribute<>("filterRegexSubstring", AttributeValueType.NUMBER)
                 .setMeta(
-                new MetaItem("MOCK_ATTRIBUTE_REQUIRED_META", Values.create(true)),
-                new MetaItem(
+                new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
+                new MetaItem<>(
                     MetaItemType.AGENT_LINK,
                     new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                 ),
-                new MetaItem(
+                new MetaItem<>(
                     Protocol.META_ATTRIBUTE_VALUE_FILTERS,
                     Values.createArray()
                         .add(Util.objectToValue(new SubStringValueFilter(23)).get())
@@ -407,7 +407,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the mock protocol tries to update the plain readonly attribute"
-        mockProtocol.updateAttribute(new AttributeState(mockThing.getId(),"plainAttribute", Values.create("UPDATE")))
+        mockProtocol.updateAttribute(new AttributeState(mockThing.getId(),"plainAttribute", "UPDATE"))
 
         then: "the plain attributes value should be updated"
         conditions.eventually {
@@ -416,7 +416,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a target temp linked attribute value is updated it should reach the protocol"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(mockThing.getId(), "tempTarget1", Values.create(30d)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(mockThing.getId(), "tempTarget1", 30d))
 
         then: "the update should reach the protocol as an attribute write request"
         conditions.eventually {
@@ -437,7 +437,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a sensor value is received that links to an attribute using a regex filter"
-        state = new AttributeState(mockThing.id, "filterRegex", Values.create("s100 d56 g1212"))
+        state = new AttributeState(mockThing.id, "filterRegex", "s100 d56 g1212")
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated with the filtered result"
@@ -447,7 +447,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the same attribute receives a sensor value that doesn't match the regex filter (match index invalid)"
-        state = new AttributeState(mockThing.id, "filterRegex", Values.create("s100"))
+        state = new AttributeState(mockThing.id, "filterRegex", "s100")
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated to null"
@@ -469,7 +469,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a sensor value is received that links to an attribute using a substring filter"
-        state = new AttributeState(mockThing.id, "filterSubstring", Values.create("Substring test value"))
+        state = new AttributeState(mockThing.id, "filterSubstring", "Substring test value")
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated with the filtered result"
@@ -479,7 +479,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the same attribute receives a sensor value that doesn't match the substring filter"
-        state = new AttributeState(mockThing.id, "filterSubstring", Values.create("Substring"))
+        state = new AttributeState(mockThing.id, "filterSubstring", "Substring")
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated to null"

@@ -182,38 +182,38 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 404
 
         when: "an asset attribute is written in the authenticated realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, "Teststreet 123".toJson())
 
         then: "result should match"
         def asset
         conditions.eventually {
             asset = assetResource.get(null, managerTestSetup.smartOfficeId)
             assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().isPresent()
-            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == Values.create("Teststreet 123").toJson()
+            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == "Teststreet 123".toJson()
         }
 
         when: "an non-existent assets attribute is written in the authenticated realm"
-        assetResource.writeAttributeValue(null, "doesnotexist", AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, "doesnotexist", AttributeType.GEO_STREET.attributeName, "Teststreet 123".toJson())
 
         then: "the attribute should be not found"
         ex = thrown()
         ex.response.status == 404
 
         when: "an non-existent attribute is written in the authenticated realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, "doesnotexist", Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, "doesnotexist", "Teststreet 123".toJson())
 
         then: "the attribute should be not found"
         ex = thrown()
         ex.response.status == 404
 
         when: "an asset attribute is written in a foreign realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 456").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, "Teststreet 456".toJson())
 
         then: "result should match"
         conditions.eventually {
             asset = assetResource.get(null, managerTestSetup.smartBuildingId)
             assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().isPresent()
-            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == Values.create("Teststreet 456").toJson()
+            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == "Teststreet 456".toJson()
         }
     }
 
@@ -367,17 +367,17 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 403
 
         when: "an asset attribute is written in the authenticated realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, "Teststreet 123".toJson())
 
         then: "result should match"
         conditions.eventually {
             def asset = assetResource.get(null, managerTestSetup.smartOfficeId)
             assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().isPresent()
-            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == Values.create("Teststreet 123").toJson()
+            assert asset.getAttribute(AttributeType.GEO_STREET).get().getValue().get().toJson() == "Teststreet 123".toJson()
         }
 
         when: "an asset attribute is written in a foreign realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 456").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, "Teststreet 456".toJson())
 
         then: "access should be forbidden"
         ex = thrown()
@@ -509,14 +509,14 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 403
 
         when: "an asset attribute is written in the authenticated realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartBuildingId, AttributeType.GEO_STREET.attributeName, "Teststreet 123".toJson())
 
         then: "access should be forbidden"
         ex = thrown()
         ex.response.status == 403
 
         when: "an asset attribute is written in a foreign realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 456").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, "Teststreet 456".toJson())
 
         then: "access should be forbidden"
         ex = thrown()
@@ -739,7 +739,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 403
 
         when: "a private asset attribute is written on a user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "lightSwitch", Values.create(false).toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "lightSwitch", false.toJson())
 
         then: "the attribute should be not found"
         ex = thrown()
@@ -753,35 +753,35 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 403
 
         when: "an attribute is written on a non-existent user asset"
-        assetResource.writeAttributeValue(null, "doesnotexist", "lightSwitch", Values.create(false).toJson())
+        assetResource.writeAttributeValue(null, "doesnotexist", "lightSwitch", false.toJson())
 
         then: "the attribute should be not found"
         ex = thrown()
         ex.response.status == 404
 
         when: "an non-existent attribute is written on a user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "doesnotexist", Values.create("foo").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "doesnotexist", "foo".toJson())
 
         then: "the attribute should be not found"
         ex = thrown()
         ex.response.status == 404
 
         when: "an asset attribute is written on a non-user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment3LivingroomId, "lightSwitch", Values.create(false).toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment3LivingroomId, "lightSwitch", false.toJson())
 
         then: "access should be forbidden"
         ex = thrown()
         ex.response.status == 403
 
         when: "an asset attribute is written in a foreign realm"
-        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, Values.create("Teststreet 123").toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.smartOfficeId, AttributeType.GEO_STREET.attributeName, "Teststreet 123".toJson())
 
         then: "access should be forbidden"
         ex = thrown()
         ex.response.status == 403
 
         when: "a non-writable attribute value is written on a user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment1KitchenId, "presenceDetected", Values.create(true).toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment1KitchenId, "presenceDetected", true.toJson())
 
         then: "access should be forbidden"
         ex = thrown()
@@ -789,7 +789,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a non-writable attribute value is updated on a user asset"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("presenceDetected").get().setValue(Values.create(true))
+        testAsset.getAttribute("presenceDetected").get().setValue(true)
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
@@ -798,7 +798,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a non-writable attribute is updated on a user asset"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.replaceAttribute(new Attribute("presenceDetected", BOOLEAN, Values.create(true)))
+        testAsset.replaceAttribute(new Attribute<>("presenceDetected", BOOLEAN, true))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
@@ -807,7 +807,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a non-writable attribute's meta item value is updated"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("presenceDetected").orElse(null).getMetaItem(STORE_DATA_POINTS).orElse(null).setValue(Values.create(false))
+        testAsset.getAttribute("presenceDetected").orElse(null).getMetaItem(STORE_DATA_POINTS).orElse(null).setValue(false)
         assetResource.update(null, testAsset.id, testAsset)
 
         then: "the update should be ignored"
@@ -815,7 +815,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a non-writable attribute's meta item value is added"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("presenceDetected").orElse(null).addMeta(new MetaItem(ABOUT, Values.create("Ignored")))
+        testAsset.getAttribute("presenceDetected").orElse(null).addMeta(new MetaItem<>(ABOUT, "Ignored"))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
@@ -824,25 +824,25 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a new attribute is added on a user asset"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.addAttributes(new Attribute("myCustomAttribute", NUMBER, Values.create(123)))
+        testAsset.addAttributes(new Attribute<>("myCustomAttribute", NUMBER, 123))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
         then: "result should match"
-        assert testAsset.getAttribute("myCustomAttribute").get().getValue().get() == Values.create(123)
+        assert testAsset.getAttribute("myCustomAttribute").get().getValue().get() == 123
 
         when: "a writable attribute value is written on a user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment1KitchenId, "myCustomAttribute", Values.create(456).toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment1KitchenId, "myCustomAttribute", 456.toJson())
 
         then: "result should match"
         conditions.eventually {
             testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-            assert testAsset.getAttribute("myCustomAttribute").get().getValue().get() == Values.create(456)
+            assert testAsset.getAttribute("myCustomAttribute").get().getValue().get() == 456
         }
 
         when: "a writable attribute has a non-writable meta item"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("myCustomAttribute").get().addMeta(new MetaItem(PROTOCOL_CONFIGURATION, Values.create("Ignored")))
+        testAsset.getAttribute("myCustomAttribute").get().addMeta(new MetaItem<>(PROTOCOL_CONFIGURATION, "Ignored"))
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
         assetResource.update(null, testAsset.id, testAsset)
 
@@ -851,37 +851,37 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
 
         when: "a writable attribute has a writable meta item"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("myCustomAttribute").get().addMeta(new MetaItem(LABEL, Values.create("My label")))
+        testAsset.getAttribute("myCustomAttribute").get().addMeta(new MetaItem<>(LABEL, "My label"))
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
         then: "the result should match"
-        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().getValue().get() == Values.create("My label")
+        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().getValue().get() == "My label"
 
         when: "a writable attribute has a writable meta item value update"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
-        testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().setValue(Values.create("My label update"))
+        testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().setValue("My label update")
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
         then: "the result should match"
-        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().getValue().get() == Values.create("My label update")
+        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItem(LABEL).get().getValue().get() == "My label update"
 
         when: "a writable attribute replaces a writable meta item with several new items"
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
         testAsset.getAttribute("myCustomAttribute").get().getMeta().removeIf(isMetaNameEqualTo(LABEL))
         testAsset.getAttribute("myCustomAttribute").get().addMeta(
-                new MetaItem(LABEL, Values.create("Label1")),
-                new MetaItem(LABEL, Values.create("Label2")),
-                new MetaItem(LABEL, Values.create("Label3")),
+                new MetaItem<>(LABEL, "Label1"),
+                new MetaItem<>(LABEL, "Label2"),
+                new MetaItem<>(LABEL, "Label3"),
         )
         assetResource.update(null, testAsset.id, testAsset)
         testAsset = assetResource.get(null, managerTestSetup.apartment1KitchenId)
 
         then: "the result should match"
         assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn()).length == 3
-        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[0].getValue().get() == Values.create("Label1")
-        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[1].getValue().get() == Values.create("Label2")
-        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[2].getValue().get() == Values.create("Label3")
+        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[0].getValue().get() == "Label1"
+        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[1].getValue().get() == "Label2"
+        assert testAsset.getAttribute("myCustomAttribute").get().getMetaItems(LABEL.getUrn())[2].getValue().get() == "Label3"
     }
 }

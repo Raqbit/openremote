@@ -65,7 +65,7 @@ class ResidenceAllLightsOffTest extends Specification implements ManagerContaine
 
         when: "the ALL LIGHTS OFF push-button is pressed for an apartment"
         def lightsOffEvent = new AttributeEvent(
-                managerTestSetup.apartment2Id, "allLightsOffSwitch", Values.create(true), getClockTimeOf(container)
+                managerTestSetup.apartment2Id, "allLightsOffSwitch", true, getClockTimeOf(container)
         )
         assetProcessingService.sendAttributeEvent(lightsOffEvent)
 
@@ -84,7 +84,7 @@ class ResidenceAllLightsOffTest extends Specification implements ManagerContaine
 
         and: "we turn the light on again in a room"
         assetProcessingService.sendAttributeEvent(
-            new AttributeEvent(managerTestSetup.apartment2LivingroomId, "lightSwitch", Values.create(true))
+            new AttributeEvent(managerTestSetup.apartment2LivingroomId, "lightSwitch", true)
         )
 
         then: "the light should still be on after a few seconds (the all lights off event expires after 3 seconds)"

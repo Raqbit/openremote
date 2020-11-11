@@ -37,15 +37,15 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         when: "assets are created"
         def asset1 = new Asset("Asset 1", AssetType.THING, null, Constants.MASTER_REALM)
         asset1.setAttributes(
-            new Attribute("button", AttributeValueType.STRING, Values.create("RELEASED"), getClockTimeOf(container)),
-            new Attribute("array", AttributeValueType.ARRAY, null)
+            new Attribute<>("button", AttributeValueType.STRING, "RELEASED", getClockTimeOf(container)),
+            new Attribute<>("array", AttributeValueType.ARRAY, null)
         )
         asset1 = assetStorageService.merge(asset1)
         def asset2 = new Asset("Asset 2", AssetType.THING, null, Constants.MASTER_REALM)
         asset2.setAttributes(
-            new Attribute("lightOnOff", AttributeValueType.BOOLEAN, Values.create(false), getClockTimeOf(container)),
-            new Attribute("counter", AttributeValueType.NUMBER, Values.create(0), getClockTimeOf(container)),
-            new Attribute("item2Prop1", AttributeValueType.BOOLEAN, null)
+            new Attribute<>("lightOnOff", AttributeValueType.BOOLEAN, false, getClockTimeOf(container)),
+            new Attribute<>("counter", AttributeValueType.NUMBER, 0, getClockTimeOf(container)),
+            new Attribute<>("item2Prop1", AttributeValueType.BOOLEAN, null)
         )
         asset2 = assetStorageService.merge(asset2)
 
@@ -71,19 +71,19 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
             new JsonPathFilter("\$[1].prop1", true, false)
         ] as ValueFilter[]), Container.JSON.writer()).orElse(null)
 
-        asset1.getAttribute("button").get().addMeta(new MetaItem(MetaItemType.ATTRIBUTE_LINK, attributeLinkOnOff))
-        asset1.getAttribute("button").get().addMeta(new MetaItem(MetaItemType.ATTRIBUTE_LINK, attributeLinkCounter))
-        asset1.getAttribute("array").get().addMeta(new MetaItem(MetaItemType.ATTRIBUTE_LINK, attributeLinkProp))
+        asset1.getAttribute("button").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkOnOff))
+        asset1.getAttribute("button").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkCounter))
+        asset1.getAttribute("array").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkProp))
         asset1 = assetStorageService.merge(asset1)
 
         and: "the button is pressed for a short period"
         def buttonPressed = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("PRESSED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "PRESSED")
         )
         assetProcessingService.sendAttributeEvent(buttonPressed)
         advancePseudoClock(1, TimeUnit.SECONDS, container)
         def buttonReleased = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("RELEASED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "RELEASED")
         )
         assetProcessingService.sendAttributeEvent(buttonReleased)
 
@@ -95,12 +95,12 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
 
         when: "the button is pressed again for a short period"
         buttonPressed = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("PRESSED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "PRESSED")
         )
         assetProcessingService.sendAttributeEvent(buttonPressed)
         advancePseudoClock(1, TimeUnit.SECONDS, container)
         buttonReleased = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("RELEASED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "RELEASED")
         )
         assetProcessingService.sendAttributeEvent(buttonReleased)
 
@@ -111,12 +111,12 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         }
         when: "a long button press occurs"
         def buttonLongPressed = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("LONG_PRESSED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "LONG_PRESSED")
         )
         assetProcessingService.sendAttributeEvent(buttonLongPressed)
         advancePseudoClock(1, TimeUnit.SECONDS, container)
         buttonReleased = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("RELEASED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "RELEASED")
         )
         assetProcessingService.sendAttributeEvent(buttonReleased)
 
@@ -137,7 +137,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
 
         and: "A button press event occurs without a release event"
         buttonPressed = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("PRESSED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "PRESSED")
         )
         assetProcessingService.sendAttributeEvent(buttonPressed)
 
@@ -149,7 +149,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
 
         when: "A button release event occur"
         buttonReleased = new AttributeEvent(
-                new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("RELEASED"))
+                new AttributeState(new AttributeRef(asset1.id, "button"), "RELEASED")
         )
         assetProcessingService.sendAttributeEvent(buttonReleased)
 
@@ -167,17 +167,17 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         def attributeLinkLoop = Values.createObject()
         attributeLinkLoop.put("attributeRef", new AttributeRef(asset1.id, "button").toArrayValue())
         attributeLinkLoop.put("converter", converterLoop)
-        asset2.getAttribute("lightOnOff").get().addMeta(new MetaItem(AssetMeta.ATTRIBUTE_LINK, attributeLinkLoop))
+        asset2.getAttribute("lightOnOff").get().addMeta(new MetaItem<>(AssetMeta.ATTRIBUTE_LINK, attributeLinkLoop))
         asset2 = assetStorageService.merge(asset2)
 
         and: "the button is pressed for a short period"
         buttonPressed = new AttributeEvent(
-            new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("PRESSED"))
+            new AttributeState(new AttributeRef(asset1.id, "button"), "PRESSED")
         )
         assetProcessingService.sendAttributeEvent(buttonPressed)
         Thread.sleep(10)
         buttonReleased = new AttributeEvent(
-            new AttributeState(new AttributeRef(asset1.id, "button"), Values.create("RELEASED"))
+            new AttributeState(new AttributeRef(asset1.id, "button"), "RELEASED")
         )
         assetProcessingService.sendAttributeEvent(buttonReleased)
 

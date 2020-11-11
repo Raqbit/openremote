@@ -120,15 +120,15 @@ public class AssetsFacade<T extends Ruleset> extends Assets {
     }
 
     public AssetsFacade<T> dispatch(String assetId, String attributeName, String value) {
-        return dispatch(assetId, attributeName, Values.create(value));
+        return dispatch(assetId, attributeName, value);
     }
 
     public AssetsFacade<T> dispatch(String assetId, String attributeName, double value) {
-        return dispatch(assetId, attributeName, Values.create(value));
+        return dispatch(assetId, attributeName, value);
     }
 
     public AssetsFacade<T> dispatch(String assetId, String attributeName, boolean value) {
-        return dispatch(assetId, attributeName, Values.create(value));
+        return dispatch(assetId, attributeName, value);
     }
 
     public AssetsFacade<T> dispatch(String assetId, String attributeName, AttributeExecuteStatus status) {

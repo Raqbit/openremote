@@ -69,7 +69,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
         knxAgent.setName("KNX Agent")
         knxAgent.setType(AssetType.AGENT)
         knxAgent.setAttributes(
-            ProtocolConfiguration.initProtocolConfiguration(new Attribute("knxConfigError1"), KNXProtocol.PROTOCOL_NAME)
+            ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("knxConfigError1"), KNXProtocol.PROTOCOL_NAME)
         )
         knxAgent.setRealm(Constants.MASTER_REALM)
         knxAgent = assetStorageService.merge(knxAgent)

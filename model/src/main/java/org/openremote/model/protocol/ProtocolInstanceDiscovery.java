@@ -21,20 +21,23 @@ package org.openremote.model.protocol;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 
 import java.util.function.Consumer;
 
 /**
- * To be used by protocols that support instance discovery; these instances can be represented as {@link Agent}
- * {@link Asset}s with {@link Attribute}s that contain the necessary configuration to establish a connection to the
- * protocol instance.
+ * To be used by protocols that support {@link Protocol} instance discovery; these instances can be represented as
+ * {@link Agent} {@link Asset}s with {@link Attribute}s that contain the necessary configuration to establish a
+ * connection to the protocol instance.
  * <p>
  * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
- * discovery is requested for the associated {@link org.openremote.model.asset.agent.Protocol}. Implementations are not re-used.
+ * discovery is requested for the associated {@link org.openremote.model.asset.agent.Protocol}. Implementations are
+ * not re-used.
+ * <p>
+ *
  */
 public interface ProtocolInstanceDiscovery {
-
 
     /**
      * Start the process asynchronously; the implementation can make as many calls as it desires to the

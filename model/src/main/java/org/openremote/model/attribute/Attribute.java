@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Stores a named value with associated {@link MetaItem}s;
- *      * allows easy equality comparison of {@link Attribute}s by comparing the {@link Attribute#getTimestamp} value
+ * Stores a named value with associated {@link MetaItem}s.
  */
 public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 
@@ -53,6 +52,11 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
         if (attributeDescriptor.getMeta() != null) {
             getMeta().addAll(attributeDescriptor.getMeta());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Attribute(String name, ValueDescriptor<?> valueDescriptor) {
+        this(name, (ValueDescriptor<T>)valueDescriptor, null);
     }
 
     public Attribute(String name, ValueDescriptor<T> valueDescriptor, T value) {
@@ -136,7 +140,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setLabel(String label) {
 //        if (!isNullOrEmpty(label)) {
-//            replaceMetaByName(getMeta(), LABEL, Values.create(label));
+//            replaceMetaByName(getMeta(), LABEL, label);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(LABEL));
 //        }
@@ -152,7 +156,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setExecutable(boolean executable) {
 //        if (executable) {
-//            replaceMetaByName(getMeta(), EXECUTABLE, Values.create(true));
+//            replaceMetaByName(getMeta(), EXECUTABLE, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(EXECUTABLE));
 //        }
@@ -180,7 +184,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setShowOnDashboard(boolean show) {
 //        if (show) {
-//            replaceMetaByName(getMeta(), SHOW_ON_DASHBOARD, Values.create(true));
+//            replaceMetaByName(getMeta(), SHOW_ON_DASHBOARD, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(SHOW_ON_DASHBOARD));
 //        }
@@ -199,7 +203,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setFormat(String format) {
 //        if (!isNullOrEmpty(format)) {
-//            replaceMetaByName(getMeta(), FORMAT, Values.create(format));
+//            replaceMetaByName(getMeta(), FORMAT, format);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(FORMAT));
 //        }
@@ -218,7 +222,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setDescription(String description) {
 //        if (!isNullOrEmpty(description)) {
-//            replaceMetaByName(getMeta(), DESCRIPTION, Values.create(description));
+//            replaceMetaByName(getMeta(), DESCRIPTION, description);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(DESCRIPTION));
 //        }
@@ -258,7 +262,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setReadOnly(boolean readOnly) {
 //        if (readOnly) {
-//            replaceMetaByName(getMeta(), READ_ONLY, Values.create(true));
+//            replaceMetaByName(getMeta(), READ_ONLY, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(READ_ONLY));
 //        }
@@ -274,7 +278,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setStoreDatapoints(boolean storeDatapoints) {
 //        if (storeDatapoints) {
-//            replaceMetaByName(getMeta(), STORE_DATA_POINTS, Values.create(true));
+//            replaceMetaByName(getMeta(), STORE_DATA_POINTS, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(STORE_DATA_POINTS));
 //        }
@@ -290,7 +294,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setRuleState(boolean ruleState) {
 //        if (ruleState) {
-//            replaceMetaByName(getMeta(), RULE_STATE, Values.create(true));
+//            replaceMetaByName(getMeta(), RULE_STATE, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(RULE_STATE));
 //        }
@@ -306,7 +310,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setRuleEvent(boolean ruleEvent) {
 //        if (ruleEvent) {
-//            replaceMetaByName(getMeta(), RULE_EVENT, Values.create(true));
+//            replaceMetaByName(getMeta(), RULE_EVENT, true);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(RULE_EVENT));
 //        }
@@ -321,7 +325,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
 //
 //    public void setRuleEventExpires(String expiry) {
 //        if (!isNullOrEmpty(expiry)) {
-//            replaceMetaByName(getMeta(), RULE_EVENT_EXPIRES, Values.create(expiry));
+//            replaceMetaByName(getMeta(), RULE_EVENT_EXPIRES, expiry);
 //        } else {
 //            getMeta().removeIf(isMetaNameEqualTo(RULE_EVENT_EXPIRES));
 //        }

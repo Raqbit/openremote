@@ -34,13 +34,13 @@ public class TradfriLightAsset extends TradfriAsset {
     public void createAttributes() {
         Optional<Attribute<?>> lightDimLevelOptional = getAttribute("lightDimLevel");
         if (lightDimLevelOptional.isPresent()) {
-            Attribute lightDimLevel = lightDimLevelOptional.get();
+            Attribute<?> lightDimLevel = lightDimLevelOptional.get();
             lightDimLevel.setType(NUMBER);
             lightDimLevel.addMeta(
-                    new MetaItem(RANGE_MIN, Values.create(0)),
-                    new MetaItem(RANGE_MAX, Values.create(254)),
-                    new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                    new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
+                    new MetaItem<>(RANGE_MIN, 0),
+                    new MetaItem<>(RANGE_MAX, 254),
+                    new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                    new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
                     agentLink
             );
             lightDimLevel.setDescription("The brightness (0 - 254) of the TRÅDFRI light (Only for dimmable lights)");
@@ -49,10 +49,10 @@ public class TradfriLightAsset extends TradfriAsset {
 
         Optional<Attribute<?>> lightStatusOptional = getAttribute("lightStatus");
         if(lightStatusOptional.isPresent()){
-            Attribute lightStatus = lightStatusOptional.get();
+            Attribute<?> lightStatus = lightStatusOptional.get();
             lightStatus.addMeta(
-                    new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                    new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
+                    new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                    new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
                     agentLink
             );
             lightStatus.setDescription("The state of the TRÅDFRI light (Checked means on, unchecked means off)");
@@ -61,25 +61,25 @@ public class TradfriLightAsset extends TradfriAsset {
 
         Optional<Attribute<?>> colorGBWOptional = getAttribute("colorGBW");
         if(colorGBWOptional.isPresent()){
-            Attribute colorGBW = colorGBWOptional.get();
+            Attribute<?> colorGBW = colorGBWOptional.get();
             colorGBW.addMeta(
-                    new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                    new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
+                    new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                    new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
                     agentLink
             );
             colorGBW.setDescription("The color of the TRÅDFRI light (Only for RGB lights)");
             colorGBW.setReadOnly(false);
         }
 
-        Attribute colorTemperature = new Attribute("colorTemperature", NUMBER, Values.create(0));
+        Attribute<?> colorTemperature = new Attribute<>("colorTemperature", NUMBER, 0);
         colorTemperature.addMeta(
-                new MetaItem(RANGE_MIN, Values.create(250)),
-                new MetaItem(RANGE_MAX, Values.create(454)),
-                new MetaItem(LABEL, Values.create("Color Temperature")),
-                new MetaItem(DESCRIPTION, Values.create("The color temperature (250 - 454) of the TRÅDFRI light (Only for white spectrum lights)")),
-                new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)),
-                new MetaItem(READ_ONLY, Values.create(false)),
+                new MetaItem<>(RANGE_MIN, 250),
+                new MetaItem<>(RANGE_MAX, 454),
+                new MetaItem<>(LABEL, "Color Temperature"),
+                new MetaItem<>(DESCRIPTION, Values.create("The color temperature (250 - 454) of the TRÅDFRI light (Only for white spectrum lights)")),
+                new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
+                new MetaItem<>(READ_ONLY, false),
                 agentLink
         );
         addAttributes(colorTemperature);

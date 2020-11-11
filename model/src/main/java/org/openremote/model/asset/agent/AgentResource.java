@@ -76,7 +76,7 @@ public interface AgentResource {
     AttributeValidationResult validateProtocolConfiguration(
         @BeanParam RequestParams requestParams,
         @PathParam("agentId") String agentId,
-        Attribute protocolConfiguration
+        Attribute<?> protocolConfiguration
     );
 
     /**

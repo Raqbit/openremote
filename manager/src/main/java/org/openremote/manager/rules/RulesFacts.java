@@ -467,15 +467,15 @@ public class RulesFacts extends Facts implements RuleListener {
     }
 
     public RulesFacts updateAssetState(String assetId, String attributeName, String value) {
-        return updateAssetState(assetId, attributeName, Values.create(value));
+        return updateAssetState(assetId, attributeName, value);
     }
 
     public RulesFacts updateAssetState(String assetId, String attributeName, double value) {
-        return updateAssetState(assetId, attributeName, Values.create(value));
+        return updateAssetState(assetId, attributeName, value);
     }
 
     public RulesFacts updateAssetState(String assetId, String attributeName, boolean value) {
-        return updateAssetState(assetId, attributeName, Values.create(value));
+        return updateAssetState(assetId, attributeName, value);
     }
 
     public RulesFacts updateAssetState(String assetId, String attributeName, AttributeExecuteStatus status) {

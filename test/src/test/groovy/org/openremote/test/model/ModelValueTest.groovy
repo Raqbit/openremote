@@ -41,50 +41,50 @@ class ModelValueTest extends Specification {
 
     def "Compare scalar values"() {
         expect:
-        Values.create(true) == Values.create(true)
-        Values.create(true).hashCode() == Values.create(true).hashCode()
+        true == true
+        true.hashCode() == true.hashCode()
 
-        Values.create(false) != Values.create(true)
-        Values.create(false).hashCode() != Values.create(true).hashCode()
+        false != true
+        false.hashCode() != true.hashCode()
 
-        Values.create(true) != Values.create(false)
-        Values.create(true).hashCode() != Values.create(false).hashCode()
+        true != false
+        true.hashCode() != false.hashCode()
 
-        Values.create(123) != Values.create(false)
-        Values.create(123).hashCode() != Values.create(false).hashCode()
+        123 != false
+        123.hashCode() != false.hashCode()
 
-        Values.create(0) != Values.create(false)
-        Values.create(0).hashCode() != Values.create(false).hashCode()
+        0 != false
+        0.hashCode() != false.hashCode()
 
-        Values.create(1) != Values.create(true)
-        Values.create(1).hashCode() != Values.create(true).hashCode()
+        1 != true
+        1.hashCode() != true.hashCode()
 
-        Values.create(123) == Values.create(123)
-        Values.create(123).hashCode() == Values.create(123).hashCode()
+        123 == 123
+        123.hashCode() == 123.hashCode()
 
-        Values.create(123) != Values.create(456)
-        Values.create(123).hashCode() != Values.create(456).hashCode()
+        123 != 456
+        123.hashCode() != 456.hashCode()
 
-        Values.create(456) != Values.create(123)
-        Values.create(456).hashCode() != Values.create(123).hashCode()
+        456 != 123
+        456.hashCode() != 123.hashCode()
 
-        Values.create(0) != Values.create("")
-        Values.create(0).hashCode() != Values.create("").hashCode()
+        0 != ""
+        0.hashCode() != "".hashCode()
 
-        Values.create("abc") == Values.create("abc")
-        Values.create("abc").hashCode() == Values.create("abc").hashCode()
+        "abc" == "abc"
+        "abc".hashCode() == "abc".hashCode()
 
-        Values.create("abcd") != Values.create("abc")
-        Values.create("abcd").hashCode() != Values.create("abc").hashCode()
+        "abcd" != "abc"
+        "abcd".hashCode() != "abc".hashCode()
 
-        Values.create("abc") != Values.create("abcd")
-        Values.create("abc").hashCode() != Values.create("abcd").hashCode()
+        "abc" != "abcd"
+        "abc".hashCode() != "abcd".hashCode()
 
-        Values.create("abc") != Values.create(123)
-        Values.create("abc").hashCode() != Values.create(123).hashCode()
+        "abc" != 123
+        "abc".hashCode() != 123.hashCode()
 
-        Values.create("") != Values.create(0)
-        Values.create("").hashCode() != Values.create(0).hashCode()
+        "" != 0
+        "".hashCode() != 0.hashCode()
     }
 
     def "Compare non-scalar Json values"() {

@@ -150,7 +150,7 @@ class WebsocketClientTest extends Specification implements ManagerContainerTrait
 
         when: "when apartment 1 living room temp changes"
         receivedMessages.clear()
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature", Values.create(5)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature", 5))
 
         then: "the client receives the event"
         conditions.eventually {
@@ -168,7 +168,7 @@ class WebsocketClientTest extends Specification implements ManagerContainerTrait
 
         and: "when apartment 1 living room temp is set to the same value again"
         receivedMessages.clear()
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature", Values.create(5)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1LivingroomId, "targetTemperature", 5))
 
         then: "the client should receive the event"
         conditions.eventually {
@@ -204,7 +204,7 @@ class WebsocketClientTest extends Specification implements ManagerContainerTrait
 
         and: "when apartment 1 bathroom temp changes"
         receivedMessages.clear()
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1BathroomId, "targetTemperature", Values.create(10)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(managerTestSetup.apartment1BathroomId, "targetTemperature", 10))
 
         then: "the bathroom target temp should have changed"
         conditions.eventually {
@@ -238,7 +238,7 @@ class WebsocketClientTest extends Specification implements ManagerContainerTrait
         receivedMessages.clear()
         def agent = assetStorageService.find(managerTestSetup.agentId, true)
         agent.getAttribute(managerTestSetup.agentProtocolConfigName).get().addMeta(
-            new MetaItem(MetaItemType.DISABLED)
+            new MetaItem<>(MetaItemType.DISABLED)
         )
         agent = assetStorageService.merge(agent)
 

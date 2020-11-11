@@ -315,7 +315,7 @@ public class SimulatorProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
         if (putValue(event.getAttributeState())) {
             // Notify listener when write was successful
             if (protocolConfigurationValuesChangedHandler != null)
@@ -525,7 +525,7 @@ public class SimulatorProtocol extends AbstractProtocol {
         });
     }
 
-    protected SimulatorElement createElement(String elementType, Attribute attribute) {
+    protected SimulatorElement createElement(String elementType, Attribute<?> attribute) {
         switch (elementType.toLowerCase(Locale.ROOT)) {
             case SwitchSimulatorElement.ELEMENT_NAME:
                 return new SwitchSimulatorElement(attribute.getReferenceOrThrow());
@@ -578,7 +578,7 @@ public class SimulatorProtocol extends AbstractProtocol {
         }
     }
 
-    public static Optional<String> getElementType(Attribute attribute) {
+    public static Optional<String> getElementType(Attribute<?> attribute) {
         return
             attribute.getMetaItem(SIMULATOR_ELEMENT)
                 .flatMap(AbstractValueHolder::getValueAsString);

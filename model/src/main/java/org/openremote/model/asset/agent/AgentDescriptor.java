@@ -46,36 +46,38 @@ public class AgentDescriptor<T extends Agent, S extends Protocol<T>> extends Ass
 
     protected Class<S> protocolClass;
     @JsonSerialize(converter = DiscoveryBooleanConverter.class)
-    protected Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory;
-    @JsonSerialize(converter = DiscoveryBooleanConverter.class)
-    protected Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory;
-    @JsonSerialize(converter = DiscoveryBooleanConverter.class)
-    protected Class<? extends ProtocolAssetImport> assetImportFactory;
+    protected Class<? extends ProtocolInstanceDiscovery> instanceDiscovery;
+    protected boolean assetDiscovery;
+    protected boolean assetImport;
     protected MetaItemDescriptor<?>[] linkedAttributeDescriptors;
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
+    public AgentDescriptor(String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscovery, boolean assetDiscovery, boolean assetImport, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
         super(icon, colour, type, additionalAttributeDescriptors);
         this.protocolClass = protocolClass;
-        this.instanceDiscoveryFactory = instanceDiscoveryFactory;
-        this.assetDiscoveryFactory = assetDiscoveryFactory;
-        this.assetImportFactory = assetImportFactory;
+        this.instanceDiscovery = instanceDiscovery;
+        this.assetDiscovery = assetDiscovery;
+        this.assetImport = assetImport;
         this.linkedAttributeDescriptors = linkedAttributeDescriptors;
     }
 
-    public AgentDescriptor(String name, String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryFactory, Class<? extends ProtocolAssetDiscovery> assetDiscoveryFactory, Class<? extends ProtocolAssetImport> assetImportFactory, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
-        this(name, icon, colour, type, null, protocolClass, instanceDiscoveryFactory, assetDiscoveryFactory, assetImportFactory, linkedAttributeDescriptors);
+    public AgentDescriptor(String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscovery, boolean assetDiscovery, boolean assetImport, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
+        this(icon, colour, type, null, protocolClass, instanceDiscovery, assetDiscovery, assetImport, linkedAttributeDescriptors);
     }
 
-    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscoveryFactory() {
-        return instanceDiscoveryFactory;
+    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscovery() {
+        return instanceDiscovery;
     }
 
-    public Class<? extends ProtocolAssetDiscovery> getAssetDiscoveryFactory() {
-        return assetDiscoveryFactory;
+    public boolean isInstanceDiscovery() {
+        return instanceDiscovery != null;
     }
 
-    public Class<? extends ProtocolAssetImport> getAssetImportFactory() {
-        return assetImportFactory;
+    public boolean isAssetDiscovery() {
+        return assetDiscovery;
+    }
+
+    public boolean isAssetImport() {
+        return assetImport;
     }
 
     public MetaItemDescriptor<?>[] getLinkedAttributeDescriptors() {

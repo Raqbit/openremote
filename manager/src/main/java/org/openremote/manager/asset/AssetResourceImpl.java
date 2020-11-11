@@ -273,7 +273,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 }
 
                 // Merge updated with existing attributes
-                for (Attribute updatedAttribute : asset.getAttributes()) {
+                for (Attribute<?> updatedAttribute : asset.getAttributes()) {
 
                     // Proper validation happens on merge(), here we only need the name to continue
                     String updatedAttributeName = updatedAttribute.getName();
@@ -284,7 +284,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                     // Check if attribute is present on the asset in storage
                     Optional<Attribute<?>> serverAttribute = resultAsset.getAttribute(updatedAttributeName);
                     if (serverAttribute.isPresent()) {
-                        Attribute existingAttribute = serverAttribute.get();
+                        Attribute<?> existingAttribute = serverAttribute.get();
 
                         // If the existing attribute is not writable by restricted client, ignore it
                         if (!existingAttribute.isAccessRestrictedWrite()) {
@@ -321,12 +321,12 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
 
                         // An attribute added by a restricted user must be readable by restricted users
                         if (!updatedAttribute.isAccessRestrictedRead()) {
-                            updatedAttribute.addMeta(new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)));
+                            updatedAttribute.addMeta(new MetaItem<>(ACCESS_RESTRICTED_READ, true));
                         }
 
                         // An attribute added by a restricted user must be writable by restricted users
                         if (!updatedAttribute.isAccessRestrictedWrite()) {
-                            updatedAttribute.addMeta(new MetaItem(MetaItemType.ACCESS_RESTRICTED_WRITE, Values.create(true)));
+                            updatedAttribute.addMeta(new MetaItem<>(MetaItemType.ACCESS_RESTRICTED_WRITE, true));
                         }
 
                         // Add the new attribute
@@ -347,7 +347,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
             resultAsset .getAttributes().stream().forEach(attribute -> {
                 if (attribute.getType().map(attributeType -> attributeType == AttributeValueType.RULES_TEMPLATE_FILTER).orElse(false)
                     && !attribute.hasMetaItem(MetaItemType.RULE_STATE)) {
-                    attribute.addMeta(new MetaItem(MetaItemType.RULE_STATE, Values.create(true)));
+                    attribute.addMeta(new MetaItem<>(MetaItemType.RULE_STATE, true));
                 }
             });
 

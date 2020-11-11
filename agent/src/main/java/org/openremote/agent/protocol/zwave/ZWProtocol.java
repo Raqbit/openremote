@@ -19,68 +19,43 @@
  */
 package org.openremote.agent.protocol.zwave;
 
-import io.netty.channel.ChannelHandler;
 import org.openremote.agent.protocol.AbstractProtocol;
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
-import org.openremote.agent.protocol.io.AbstractNettyIoClient;
-import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.model.Container;
-import org.openremote.model.protocol.ProtocolInstanceDiscovery;
-import org.openremote.model.protocol.ProtocolAssetDiscovery;
-import org.openremote.model.protocol.ProtocolAssetImport;
-import org.openremote.model.AbstractValueHolder;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.*;
-import org.openremote.model.file.FileInfo;
-import org.openremote.model.util.Pair;
-import org.openremote.model.value.ArrayValue;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
-import org.openremote.model.value.Values;
-import org.openremote.protocol.zwave.port.ZWavePortConfiguration;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.AttributeEvent;
+import org.openremote.model.attribute.AttributeRef;
+import org.openremote.model.attribute.AttributeState;
+import org.openremote.model.protocol.ProtocolAssetDiscovery;
+import org.openremote.model.syslog.SyslogCategory;
+import org.openremote.protocol.zwave.model.commandclasses.channel.value.Value;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.openremote.agent.protocol.zwave.ZWConfiguration.getEndpointIdAsString;
-import static org.openremote.agent.protocol.zwave.ZWConfiguration.getZWEndpoint;
-import static org.openremote.agent.protocol.zwave.ZWConfiguration.getZWLinkName;
-import static org.openremote.agent.protocol.zwave.ZWConfiguration.getZWNodeId;
-import static org.openremote.agent.protocol.zwave.ZWConfiguration.initProtocolConfiguration;
-import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
-import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE;
-
-public class ZWProtocol extends AbstractIoClientProtocol<byte[], SerialIoClient<byte[]>, ZWAgent> implements ProtocolAssetDiscovery,
-    ProtocolInstanceDiscovery, ProtocolAssetImport {
+public class ZWProtocol extends AbstractProtocol<ZWAgent> implements ProtocolAssetDiscovery {
 
     // Constants ------------------------------------------------------------------------------------
 
     public static final String PROTOCOL_DISPLAY_NAME = "Z-Wave";
-    public static final String META_ZWAVE_DEVICE_NODE_ID = PROTOCOL_NAME + ":deviceNodeId";
-    public static final String META_ZWAVE_DEVICE_ENDPOINT = PROTOCOL_NAME + ":deviceEndpoint";
-    public static final String META_ZWAVE_DEVICE_VALUE_LINK = PROTOCOL_NAME + ":deviceValueLink";
 
     // Class Members --------------------------------------------------------------------------------
 
-    public static final Logger LOG = Logger.getLogger(ZWProtocol.class.getName());
-
+    public static final Logger LOG = SyslogCategory.getLogger(SyslogCategory.PROTOCOL, ZWProtocol.class.getName());
 
     // Protected Instance Fields --------------------------------------------------------------------
 
     protected ZWNetwork network;
-    protected Map<AttributeRef, Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value>> sensorValueConsumerMap;
+    protected Map<AttributeRef, Consumer<Value>> sensorValueConsumerMap;
+    protected Future<Void> assetDiscoveryTask;
+
+    public ZWProtocol(ZWAgent agent) {
+        super(agent);
+    }
 
     // Implements Protocol --------------------------------------------------------------------------
 
@@ -89,13 +64,17 @@ public class ZWProtocol extends AbstractIoClientProtocol<byte[], SerialIoClient<
         return PROTOCOL_DISPLAY_NAME;
     }
 
+    @Override
+    public String getProtocolInstanceUri() {
+        return network != null && network.ioClient != null ? network.ioClient.getClientUri() : "";
+    }
+
     // Implements AbstractProtocol ------------------------------------------------------------------
 
     @Override
     protected void doStart(Container container) throws Exception {
-
-        super.doStart(container);
-        ZWNetwork network = new ZWNetwork(client);
+        String serialPort = agent.getSerialPort().orElseThrow(() -> new IllegalStateException("Invalid serial port property"));
+        ZWNetwork network = new ZWNetwork(serialPort, executorService);
         network.addConnectionStatusConsumer(this::setConnectionStatus);
         network.connect();
     }
@@ -117,7 +96,7 @@ public class ZWProtocol extends AbstractIoClientProtocol<byte[], SerialIoClient<
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // TODO: Value must be compatible with the value type of the attribute...for non primitives the object types must match
-        Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> sensorValueConsumer = value ->
+        Consumer<Value> sensorValueConsumer = value ->
             updateLinkedAttribute(new AttributeState(attributeRef, value));
 
         sensorValueConsumerMap.put(attributeRef, sensorValueConsumer);
@@ -127,95 +106,51 @@ public class ZWProtocol extends AbstractIoClientProtocol<byte[], SerialIoClient<
     @Override
     protected synchronized void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
-        Consumer<org.openremote.protocol.zwave.model.commandclasses.channel.value.Value> sensorValueConsumer = sensorValueConsumerMap.remove(attributeRef);
+        Consumer<Value> sensorValueConsumer = sensorValueConsumerMap.remove(attributeRef);
         network.removeSensorValueConsumer(sensorValueConsumer);
     }
 
     @Override
-    protected byte[] createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
-        int nodeId = attribute.getMeta().getValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
-        int endpoint = attribute.getMeta().getValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
-        String linkName = attribute.getMeta().getValue(ZWAgent.DEVICE_VALUE).orElse("");
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
 
-        network.writeChannel(nodeId, endpoint, linkName, processedValue);
     }
 
+
+    // Implements ProtocolAssetDiscovery ------------------------------------------------
+
     @Override
-    protected SerialIoClient<byte[]> doCreateIoClient(ZWAgent agent) throws Exception {
+    public synchronized boolean startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
 
-        Optional<String> port = agent.getSerialPort();
-
-        if (!port.isPresent()) {
-            LOG.severe("No serial port provided for Z-Wave protocol: " + agent);
-            throw new IllegalStateException("No serial port provided for Z-Wave protocol: " + agent);
+        if (assetDiscoveryTask != null) {
+            LOG.warning("Discovery requested but it is already running, please wait or stop the running discovery process");
+            return false;
         }
 
-        return new SerialIoClient<>(port.get(), 115200, executorService);
-    }
-
-    @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(SerialIoClient<byte[]> client, ZWAgent agent) {
-        return () -> new ChannelHandler[] {
-            new ZWPacketEncoder(),
-            new ZWPacketDecoder(),
-            new AbstractNettyIoClient.MessageToMessageDecoder<>(byte[].class, client)
-        };
-    }
-
-    @Override
-    protected void onMessageReceived(byte[] message) {
-
-    }
-
-    // Implements ProtocolConfigurationDiscovery --------------------------------------------------
-
-    @Override
-    public Attribute[] discoverProtocolConfigurations() {
-        return new Attribute[] {
-            initProtocolConfiguration(new Attribute(), PROTOCOL_NAME)
-        };
-    }
-
-
-    // Implements ProtocolLinkedAttributeDiscovery ------------------------------------------------
-
-    @Override
-    public synchronized AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration) {
-        Pair<ZWNetwork, Consumer<ConnectionStatus>> zwNetworkConsumerPair = networkConfigurationMap.get(protocolConfiguration.getReferenceOrThrow());
-
-        if (zwNetworkConsumerPair == null) {
-            return new AssetTreeNode[0];
+        if (network == null || network.getConnectionStatus() != ConnectionStatus.CONNECTED) {
+            LOG.info("Network not connected so cannot perform discovery");
+            return false;
         }
 
-        ZWNetwork zwNetwork = zwNetworkConsumerPair.key;
-        try {
-            return zwNetwork.discoverDevices(protocolConfiguration);
-        } catch(Exception e) {
-            StringWriter errors = new StringWriter();
-            e.printStackTrace(new PrintWriter(errors));
-            LOG.severe(errors.toString());
-            throw e;
-        }
+        assetDiscoveryTask = executorService.submit(() -> {
+
+            try {
+                AssetTreeNode[] assetTreeNodes = network.discoverDevices(agent);
+                assetConsumer.accept(assetTreeNodes);
+            } catch(Exception e) {
+                LOG.log(Level.SEVERE, "Exception thrown during asset discovery: " + this, e);
+            } finally {
+                stoppedCallback.run();
+            }
+        }, null);
+
+        return true;
     }
-
-
-    // Implements ProtocolLinkedAttributeImport ---------------------------------------------------
 
     @Override
-    public AssetTreeNode[] discoverLinkedAttributes(Attribute protocolConfiguration, FileInfo fileInfo) throws IllegalStateException {
-        // TODO : remove the ProtocolLinkedAttributeImport interface implementation. It has only been added because
-        //        the manager GUI doesn't (currently) work at all without it.
-        return new AssetTreeNode[0];
-    }
-
-
-    // Protected Instance Methods -----------------------------------------------------------------
-
-    protected ZWControllerFactory createControllerFactory(String serialPort) {
-        ZWavePortConfiguration configuration = new ZWavePortConfiguration();
-        configuration.setCommLayer(ZWavePortConfiguration.CommLayer.NETTY);
-        configuration.setComPort(serialPort);
-        ZWControllerFactory factory = new NettyZWControllerFactory(configuration, executorService);
-        return factory;
+    public synchronized void stopAssetDiscovery() {
+        if (assetDiscoveryTask != null) {
+            assetDiscoveryTask.cancel(true);
+            assetDiscoveryTask = null;
+        }
     }
 }

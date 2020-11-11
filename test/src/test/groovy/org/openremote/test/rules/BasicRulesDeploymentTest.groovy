@@ -238,7 +238,7 @@ class BasicRulesDeploymentTest extends Specification implements ManagerContainer
             "Throw Failure Exception",
             GROOVY,
             getClass().getResource("/org/openremote/test/failure/RulesFailureActionThrowsException.groovy").text)
-            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, Values.create(true))
+            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, true)
         ruleset = rulesetStorageService.merge(ruleset)
 
         then: "the tenants A rule engine should run with one deployment as error"
@@ -257,7 +257,7 @@ class BasicRulesDeploymentTest extends Specification implements ManagerContainer
             "Looping error",
             GROOVY,
             getClass().getResource("/org/openremote/test/failure/RulesFailureLoop.groovy").text)
-            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, Values.create(true))
+            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, true)
         ruleset = rulesetStorageService.merge(ruleset)
 
         then: "the tenants A rule engine should have an error"

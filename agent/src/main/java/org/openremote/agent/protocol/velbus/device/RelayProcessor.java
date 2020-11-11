@@ -56,9 +56,9 @@ public class RelayProcessor extends OutputChannelProcessor {
                 case BOOLEAN:
                     switch (this) {
                         case ON:
-                            return Values.create(true);
+                            return true;
                         case OFF:
-                            return Values.create(false);
+                            return false;
                         case INTERMITTENT:
                             return null;
                     }

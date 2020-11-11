@@ -89,15 +89,15 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
                 .addMeta(
-                        new MetaItem(META_PROTOCOL_CONNECT_URI, null)
+                        new MetaItem<>(META_PROTOCOL_CONNECT_URI, null)
                 );
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             try {
@@ -158,7 +158,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(WebsocketIoClient<String> client, Attribute protocolConfiguration) {
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(WebsocketIoClient<String> client, Attribute<?> protocolConfiguration) {
         return getGenericStringEncodersAndDecoders(client, protocolConfiguration);
     }
 
@@ -180,7 +180,7 @@ public class WebsocketClientProtocol extends AbstractWebsocketClientProtocol<Str
     }
 
     @Override
-    protected String createWriteMessage(Attribute protocolConfiguration, Attribute attribute, AttributeEvent event, Value processedValue) {
+    protected String createWriteMessage(Attribute<?> protocolConfiguration, Attribute<?> attribute, AttributeEvent event, Value processedValue) {
         if (attribute.isReadOnly()) {
             LOG.fine("Attempt to write to an attribute that doesn't support writes: " + event.getAttributeRef());
             return null;

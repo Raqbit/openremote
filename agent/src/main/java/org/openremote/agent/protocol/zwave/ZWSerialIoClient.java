@@ -19,26 +19,24 @@
  */
 package org.openremote.agent.protocol.zwave;
 
-import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.controller.exception.ConfigurationException;
+import io.netty.channel.ChannelHandler;
+import org.openremote.agent.protocol.ProtocolExecutorService;
+import org.openremote.agent.protocol.io.AbstractNettyIoClient;
+import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.controller.protocol.zwave.ZWaveCommandBuilder;
-import org.openremote.controller.utils.Logger;
 import org.openremote.model.asset.agent.ConnectionStatus;
+import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.protocol.zwave.LoggerUtil;
-import org.openremote.protocol.zwave.port.SessionLayer;
 import org.openremote.protocol.zwave.port.TransportLayer;
 import org.openremote.protocol.zwave.port.TransportLayerListener;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * Serial port implementation based on the Netty framework.
- *
- * @see TransportLayer
- * @see TransportLayerListener
- * @see SessionLayer
- *
- * @author <a href="mailto:rainer@openremote.org">Rainer Hitz</a>
+ * Wrapper around {@link SerialIoClient} to allow compatibility with Z Wave library
  */
-public class NettyTransportLayer implements TransportLayer {
+public class ZWSerialIoClient extends SerialIoClient<byte[]> implements TransportLayer {
 
     // Constants ----------------------------------------------------------------------------------
 
@@ -50,48 +48,44 @@ public class NettyTransportLayer implements TransportLayer {
     /**
      * Z-Wave logger. Uses a common category for all Z-Wave related logging.
      */
-    private final static Logger log = Logger.getLogger(ZWaveCommandBuilder.ZWAVE_LOG_CATEGORY);
 
+    private final static Logger log = SyslogCategory.getLogger(SyslogCategory.PROTOCOL, ZWaveCommandBuilder.ZWAVE_LOG_CATEGORY);
 
     // Private Instance Fields --------------------------------------------------------------------
 
-    private final IoClient<SerialDataPacket> ioClient;
-
     private volatile TransportLayerListener listener;
-
 
     // Constructors -------------------------------------------------------------------------------
 
-    public NettyTransportLayer(IoClient<SerialDataPacket> ioClient) {
-        if (ioClient == null) {
-            throw new IllegalArgumentException("Missing I/O client.");
-        }
-        this.ioClient = ioClient;
-        this.ioClient.addMessageConsumer(this::onPacketReceived);
-        this.ioClient.addConnectionStatusConsumer(this::onConnectionStatusUpdate);
-    }
+    public ZWSerialIoClient(String port, ProtocolExecutorService executorService) {
+        super(port, 115200, executorService);
 
+        setEncoderDecoderProvider(
+            () -> new ChannelHandler[] {
+                new ZWPacketEncoder(),
+                new ZWPacketDecoder(),
+                new AbstractNettyIoClient.MessageToMessageDecoder<>(byte[].class, this)
+            }
+        );
+
+        addMessageConsumer(this::onPacketReceived);
+        addConnectionStatusConsumer(this::onConnectionStatusUpdate);
+    }
 
     // Implements TransportLayer ------------------------------------------------------------------
 
     @Override
-    public void open() throws ConfigurationException {
+    public void open() {
         try {
-            ioClient.connect();
+            connect();
         } catch (Exception e) {
-            String serialPort = "";
-            if (ioClient instanceof ZWSerialClient) {
-                serialPort = ((ZWSerialClient) ioClient).getSerialPort();
-            }
-            ConfigurationException configException = new ConfigurationException("Failed to open serial port " + serialPort, e);
-            log.warn(configException.getMessage(), configException);
-            throw configException;
+            log.log(Level.WARNING, "Failed to open serial port: " + getClientUri(), e);
         }
     }
 
     @Override
     public void close() {
-        ioClient.disconnect();
+        disconnect();
     }
 
     @Override
@@ -101,21 +95,13 @@ public class NettyTransportLayer implements TransportLayer {
 
     @Override
     public void write(byte[] data) {
-        if (ioClient.getConnectionStatus() == ConnectionStatus.CONNECTED) {
-            logDataBytes(data, true);
-            if (data.length > 0) {
-                SerialDataPacket dataPacket = new SerialDataPacket(data);
-                ioClient.sendMessage(dataPacket);
-            }
-        }
+        sendMessage(data);
     }
-
 
     // Protected Instance Methods -----------------------------------------------------------------
 
-    protected void onPacketReceived(SerialDataPacket packet) {
+    protected void onPacketReceived(byte[] data) {
         if (listener != null) {
-            byte[] data = packet.getData();
             logDataBytes(data, false);
             listener.dataReceived(data);
         }

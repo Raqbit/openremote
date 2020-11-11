@@ -170,13 +170,13 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                     "master",
                     (String[])[agentAssetIds[i-1]].toArray(new String[0]),
                     null).addAttributes(
-                    new Attribute("protocolConfig", AttributeValueType.STRING, Values.create(HttpClientProtocol.PROTOCOL_NAME))
+                    new Attribute<>("protocolConfig", AttributeValueType.STRING, Values.create(HttpClientProtocol.PROTOCOL_NAME))
                         .addMeta(
-                            new MetaItem(MetaItemType.PROTOCOL_CONFIGURATION),
-                            new MetaItem(HttpClientProtocol.META_PROTOCOL_BASE_URI, Values.create("https://google.co.uk")),
-                            new MetaItem(HttpClientProtocol.META_PROTOCOL_PING_PATH, Values.create(""))
+                            new MetaItem<>(MetaItemType.PROTOCOL_CONFIGURATION),
+                            new MetaItem<>(HttpClientProtocol.META_PROTOCOL_BASE_URI, Values.create("https://google.co.uk")),
+                            new MetaItem<>(HttpClientProtocol.META_PROTOCOL_PING_PATH, "")
                         ),
-                    new Attribute(AttributeType.SURFACE_AREA, Values.create(1000))
+                    new Attribute<>(AttributeType.SURFACE_AREA, 1000)
                 )
             )
 
@@ -200,19 +200,19 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                         "master",
                         (String[])[assetIds[(i-1)*5+j], assetIds[(i-1)*5]].toArray(new String[0]),
                         null).addAttributes(
-                        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
+                        new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
                             .addMeta(
                                 MetaItemType.ACCESS_PUBLIC_READ
                             ),
-                        new Attribute("temp", AttributeValueType.TEMPERATURE, null)
+                        new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
                             .addMeta(
-                                new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
-                                new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                                new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
+                                new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                             ),
-                        new Attribute("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+                        new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
                             .addMeta(
-                                new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
-                                new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                                new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
+                                new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                             )
                     )
                 )
@@ -232,11 +232,11 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                     "master",
                     (String[])[assetIds[(i-1)*5]].toArray(new String[0]),
                     null).addAttributes(
-                    new Attribute(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
+                    new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
                         .addMeta(
                             MetaItemType.ACCESS_PUBLIC_READ
                         ),
-                    new Attribute(AttributeType.SURFACE_AREA, Values.create(1000))
+                    new Attribute<>(AttributeType.SURFACE_AREA, 1000)
                 )
             )
         }
@@ -371,7 +371,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "an attribute event for a gateway descendant asset (building 1 room 1) is sent to the local manager"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(mapAssetId(gateway.id, assetIds[1], false), "tempSetpoint", Values.create(20d)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(mapAssetId(gateway.id, assetIds[1], false), "tempSetpoint", 20d))
 
         then: "the event should have been forwarded to the gateway"
         conditions.eventually {
@@ -381,7 +381,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the gateway handles the forwarded attribute event and sends a follow up attribute event to the local manager"
-        gatewayClient.sendMessage(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(new AttributeEvent(assetIds[1], "tempSetpoint", Values.create(20d))))
+        gatewayClient.sendMessage(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(new AttributeEvent(assetIds[1], "tempSetpoint", 20d)))
 
         then: "the descendant asset in the local manager should contain the new attribute value"
         conditions.eventually {
@@ -404,19 +404,19 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
             "master",
             (String[])[building1Room5AssetId, assetIds[0]].toArray(new String[0]),
             null).addAttributes(
-            new Attribute(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
+            new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
                 .addMeta(
                     MetaItemType.ACCESS_PUBLIC_READ
                 ),
-            new Attribute("temp", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 ),
-            new Attribute("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 )
         )
         gatewayClient.sendMessage(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(new AssetEvent(AssetEvent.Cause.CREATE, building1Room5Asset, null)))
@@ -437,10 +437,10 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         building1Room5Asset.setName("Test Building 1 Room 5 Updated")
         building1Room5Asset.setVersion(1)
         building1Room5Asset.addAttributes(
-            new Attribute("co2Level", AttributeValueType.CO2, Values.create(500))
+            new Attribute<>("co2Level", AttributeValueType.CO2, 500)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 )
         )
         gatewayClient.sendMessage(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(new AssetEvent(AssetEvent.Cause.UPDATE, building1Room5Asset, (String[]) ["name", "attributes"].toArray(new String[0]))))
@@ -546,7 +546,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "the gateway asset is marked as disabled"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(gateway.getId(), "disabled", Values.create(true)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(gateway.getId(), "disabled", true))
 
         then: "the gateway asset status should become disabled"
         conditions.eventually {
@@ -581,11 +581,11 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
             managerTestSetup.realmBuildingTenant,
             (String[])[UniqueIdentifierGenerator.generateId("Failed asset")].toArray(new String[0]),
             null).addAttributes(
-            new Attribute(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
+            new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
                 .addMeta(
                     MetaItemType.ACCESS_PUBLIC_READ
                 ),
-            new Attribute(AttributeType.SURFACE_AREA, Values.create(1000))
+            new Attribute<>(AttributeType.SURFACE_AREA, 1000)
         )
         assetStorageService.merge(failedAsset)
 
@@ -595,7 +595,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         when: "gateway assets are modified whilst the gateway is disconnected (building1Room5 re-added, building5 and descendants removed and building1 modified and building1Room1 attribute updated)"
         assets[4].setName("Test Building 1 Updated")
         assets[4].setVersion(2L)
-        assets[0].getAttribute("temp").ifPresent{it.setValue(Values.create(10))}
+        assets[0].getAttribute("temp").ifPresent{it.setValue(10)}
         assets = assets.subList(0, 20)
 
         and: "the client received messages are cleared"
@@ -605,7 +605,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "the gateway is enabled again"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(gateway.getId(), "disabled", Values.create(false)))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(gateway.getId(), "disabled", false))
 
         then: "the gateway connector should be enabled"
         conditions.eventually {
@@ -679,19 +679,19 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
             "master",
             (String[])[UniqueIdentifierGenerator.generateId("Test Building 2 Room 5"), assetIds[5]].toArray(new String[0]),
             null).addAttributes(
-            new Attribute(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
+            new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(10,11).toValue())
                 .addMeta(
                     MetaItemType.ACCESS_PUBLIC_READ
                 ),
-            new Attribute("temp", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 ),
-            new Attribute("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
                 .addMeta(
-                    new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
-                    new MetaItem(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create(""))
+                    new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 )
         )
         gatewayClient.sendMessage(SharedEvent.MESSAGE_PREFIX + Container.JSON.writeValueAsString(new AssetEvent(AssetEvent.Cause.CREATE, building2Room5Asset, null)))
@@ -837,7 +837,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         microphone1.setName("Microphone 1 Updated")
         microphone1.getAttribute("microphoneLevel").ifPresent{it.addMeta(MetaItemType.UNIT_TYPE.withInitialValue(UNITS_SOUND_DECIBELS))}
         microphone1.addAttributes(
-            new Attribute("test", AttributeValueType.DISTANCE, Values.create(100))
+            new Attribute<>("test", AttributeValueType.DISTANCE, 100)
         )
         microphone1 = assetStorageService.merge(microphone1)
 
@@ -852,7 +852,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
 
         when: "a gateway client asset is added"
         def microphone2 = new Asset("Microphone 2", AssetType.MICROPHONE, null, managerTestSetup.realmCityTenant).addAttributes(
-            new Attribute("test", AttributeValueType.STRING, Values.create("testValue"))
+            new Attribute<>("test", AttributeValueType.STRING, "testValue")
         )
         microphone2.setParentId(managerTestSetup.area1Id)
         microphone2 = assetStorageService.merge(microphone2)
@@ -886,7 +886,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "an attribute is updated on the gateway client"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(microphone2.id, "test", Values.create("newValue")))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(microphone2.id, "test", "newValue"))
 
         then: "the mirrored asset attribute should also be updated"
         conditions.eventually {
@@ -899,7 +899,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         advancePseudoClock(1, TimeUnit.SECONDS, container)
 
         and: "a mirrored asset attribute is updated"
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(mapAssetId(gateway.id, microphone2.id, false), "test", Values.create("newerValue")))
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(mapAssetId(gateway.id, microphone2.id, false), "test", "newerValue"))
 
         then: "the attribute should be updated on the gateway client and the mirrored asset"
         conditions.eventually {

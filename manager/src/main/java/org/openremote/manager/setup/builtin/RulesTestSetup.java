@@ -124,7 +124,7 @@ public class RulesTestSetup extends AbstractManagerSetup {
             String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             Ruleset ruleset = new TenantRuleset(
                     keycloakTestSetup.tenantCity.getRealm(), "Demo Geofences", Ruleset.Lang.JSON, rules
-            ).setAccessPublicRead(true).addMeta("showOnMap", Values.create(true)).addMeta("showOnList", Values.create(true));
+            ).setAccessPublicRead(true).addMeta("showOnMap", true).addMeta("showOnList", true);
             tenantSmartCityRulesetId = rulesetStorageService.merge(ruleset).getId();
         }
     }

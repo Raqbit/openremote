@@ -78,7 +78,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a trigger is disabled"
-        def disableScene = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneEnabledFRIDAY", Values.create(false))
+        def disableScene = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneEnabledFRIDAY", false)
         assetProcessingService.sendAttributeEvent(disableScene)
 
         then: "the corresponding cron job should be removed from the cron scheduler"
@@ -98,7 +98,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
         }
     
         when: "the trigger is re-enabled"
-        def enableScene = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneEnabledFRIDAY", Values.create(true))
+        def enableScene = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneEnabledFRIDAY", true)
         assetProcessingService.sendAttributeEvent(enableScene)
 
         then: "the quartz job should be recreated and have the correct time"
@@ -135,7 +135,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
 
         when: "an attribute is added that links to a timers cron expression"
         apartment1.addAttributes(
-                new Attribute("daySceneCronFRIDAY", AttributeValueType.STRING)
+                new Attribute<>("daySceneCronFRIDAY", AttributeValueType.STRING)
                     .addMeta(
                         AgentLink.asAgentLinkMetaItem(new AttributeRef(sceneAgent.id, "daySceneFRIDAY")),
                         TimerValue.CRON_EXPRESSION.asMetaItem()

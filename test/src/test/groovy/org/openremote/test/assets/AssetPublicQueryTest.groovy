@@ -53,12 +53,12 @@ class AssetPublicQueryTest extends Specification implements ManagerContainerTrai
             somePublicAsset.setParentId(managerTestSetup.smartOfficeId)
             somePublicAsset.setAccessPublicRead(true)
             somePublicAsset.setAttributes(
-                    new Attribute("somePrivateAttribute", NUMBER, Values.create(123)).addMeta(
-                            new MetaItem(LABEL, Values.create("Some Private Attribute"))
+                    new Attribute<>("somePrivateAttribute", NUMBER, 123).addMeta(
+                            new MetaItem<>(LABEL, "Some Private Attribute")
                     ),
-                    new Attribute("somePublicAttribute", NUMBER, Values.create(456)).addMeta(
-                            new MetaItem(LABEL, Values.create("Some Public Attribute")),
-                            new MetaItem(ACCESS_PUBLIC_READ, Values.create(true))
+                    new Attribute<>("somePublicAttribute", NUMBER, 456).addMeta(
+                            new MetaItem<>(LABEL, "Some Public Attribute"),
+                            new MetaItem<>(ACCESS_PUBLIC_READ, true)
                     ),
             )
 
@@ -85,7 +85,7 @@ class AssetPublicQueryTest extends Specification implements ManagerContainerTrai
         assets[0].parentId == managerTestSetup.smartOfficeId
         assets[0].realm == keycloakTestSetup.masterTenant.realm
         !assets[0].getAttribute("somePrivateAttribute").isPresent()
-        assets[0].getAttribute("somePublicAttribute").get().getValue().get() == Values.create(456)
+        assets[0].getAttribute("somePublicAttribute").get().getValue().get() == 456
         assets[0].getAttribute("somePublicAttribute").get().getMeta().size() == 1
         assets[0].getAttribute("somePublicAttribute").get().getMetaItem(LABEL).get().getValueAsString().get() == "Some Public Attribute"
 
@@ -102,7 +102,7 @@ class AssetPublicQueryTest extends Specification implements ManagerContainerTrai
         assets[0].parentId == managerTestSetup.smartOfficeId
         assets[0].realm == keycloakTestSetup.masterTenant.realm
         !assets[0].getAttribute("somePrivateAttribute").isPresent()
-        assets[0].getAttribute("somePublicAttribute").get().getValue().get() == Values.create(456)
+        assets[0].getAttribute("somePublicAttribute").get().getValue().get() == 456
         assets[0].getAttribute("somePublicAttribute").get().getMeta().size() == 1
         assets[0].getAttribute("somePublicAttribute").get().getMetaItem(LABEL).get().getValueAsString().get() == "Some Public Attribute"
     }

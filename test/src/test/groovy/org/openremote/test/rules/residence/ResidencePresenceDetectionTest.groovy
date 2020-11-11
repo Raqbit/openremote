@@ -77,11 +77,11 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
         when: "motion sensor is triggered in all rooms"
         double expectedLastPresenceDetected = getClockTimeOf(container)
         def kitchenMotionSensorEvent = new AttributeEvent(
-                managerTestSetup.apartment1KitchenId, "motionSensor", Values.create(1)
+                managerTestSetup.apartment1KitchenId, "motionSensor", 1
         )
         simulatorProtocol.putValue(kitchenMotionSensorEvent)
         def hallwayMotionSensorEvent = new AttributeEvent(
-                managerTestSetup.apartment1HallwayId, "motionSensor", Values.create(1)
+                managerTestSetup.apartment1HallwayId, "motionSensor", 1
         )
         simulatorProtocol.putValue(hallwayMotionSensorEvent)
 
@@ -108,7 +108,7 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
         and: "motion sensor is triggered a room again"
         double expectedLastPresenceDetected2 = getClockTimeOf(container)
         kitchenMotionSensorEvent = new AttributeEvent(
-                managerTestSetup.apartment1KitchenId, "motionSensor", Values.create(1)
+                managerTestSetup.apartment1KitchenId, "motionSensor", 1
         )
         simulatorProtocol.putValue(kitchenMotionSensorEvent)
 
@@ -134,7 +134,7 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
 
         and: "motion sensor is not triggered in a room"
         kitchenMotionSensorEvent = new AttributeEvent(
-                managerTestSetup.apartment1KitchenId, "motionSensor", Values.create(0)
+                managerTestSetup.apartment1KitchenId, "motionSensor", 0
         )
         simulatorProtocol.putValue(kitchenMotionSensorEvent)
 
@@ -160,7 +160,7 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
 
         and: "motion sensor is not triggered in another room"
         hallwayMotionSensorEvent = new AttributeEvent(
-                managerTestSetup.apartment1HallwayId, "motionSensor", Values.create(0)
+                managerTestSetup.apartment1HallwayId, "motionSensor", 0
         )
         simulatorProtocol.putValue(hallwayMotionSensorEvent)
 
@@ -231,7 +231,7 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
         when: "motion sensor is triggered"
         double expectedLastPresenceDetected = getClockTimeOf(container)
         def motionSensorTrigger = new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "motionSensor", Values.create(1)
+                managerTestSetup.apartment1LivingroomId, "motionSensor", 1
         )
         simulatorProtocol.putValue(motionSensorTrigger)
 
@@ -281,7 +281,7 @@ class ResidencePresenceDetectionTest extends Specification implements ManagerCon
 
         when: "motion sensor is not triggered (someone might be resting in the room)"
         def motionSensorNoTrigger = new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "motionSensor", Values.create(0)
+                managerTestSetup.apartment1LivingroomId, "motionSensor", 0
         )
         simulatorProtocol.putValue(motionSensorNoTrigger)
 

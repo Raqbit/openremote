@@ -35,11 +35,11 @@ class SerialisationTest extends Specification {
 
     def "Serialize/Deserialize Attribute"() {
         given:
-        Attribute attribute = new Attribute("testAttribute")
+        Attribute attribute = new Attribute<>("testAttribute")
         ProtocolConfiguration.initProtocolConfiguration(attribute, SimulatorProtocol.PROTOCOL_NAME)
         attribute.addMeta(
-            new MetaItem(MetaItemType.READ_ONLY, Values.create(true)),
-            new MetaItem(MetaItemType.LABEL, Values.create("Test Attribute"))
+            new MetaItem<>(MetaItemType.READ_ONLY, true),
+            new MetaItem<>(MetaItemType.LABEL, "Test Attribute")
         )
 
         String str = Container.JSON.writeValueAsString(attribute)

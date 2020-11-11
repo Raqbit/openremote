@@ -48,9 +48,9 @@ public class BlindProcessor extends OutputChannelProcessor {
                 case BOOLEAN:
                     switch (this) {
                         case DOWN:
-                            return Values.create(true);
+                            return true;
                         case UP:
-                            return Values.create(false);
+                            return false;
                         case HALT:
                             return null;
                     }

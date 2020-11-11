@@ -145,7 +145,7 @@ class RulesExecutionFailureTest extends Specification implements ManagerContaine
             "Failure Ruleset",
             Ruleset.Lang.GROOVY,
             getClass().getResource("/org/openremote/test/failure/RulesFailureLoop.groovy").text)
-            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, Values.create(true))
+            .addMeta(Ruleset.META_KEY_CONTINUE_ON_ERROR, true)
         ruleset = rulesetStorageService.merge(ruleset)
 
         expect: "the rule engine should have an error (first firing after initial asset state insert)"

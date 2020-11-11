@@ -804,7 +804,7 @@ class BasicRulesetResourceTest extends Specification implements ManagerContainer
             managerTestSetup.apartment1Id,
             "Test asset definition",
             GROOVY, "SomeRulesCode")
-        .addMeta("visible", Values.create(true))
+        .addMeta("visible", true)
         rulesetResource.createAssetRuleset(null, assetRuleset)
         def rulesetId = rulesetResource.getAssetRulesets(null, managerTestSetup.apartment1Id, null, false)[1].id
         assetRuleset = rulesetResource.getAssetRuleset(null, rulesetId)

@@ -114,7 +114,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
                                         managerTestSetup.apartment1LivingroomId,
                                         "alarmEnabled"
                                 ),
-                                Values.create(false)), null, null), null, null, null)
+                                false), null, null), null, null, null)
 
         and: "the notification resource"
         def testuser1NotificationResource = getClientApiTarget(serverUri(serverPort), MASTER_REALM, testuser1AccessToken).proxy(NotificationResource.class)
@@ -318,7 +318,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
         assert notifications.count {n -> n.deliveredOn != null} == 1
 
         when: "the admin user marks a Building console notification as delivered and requests the notifications for Building consoles"
-        adminNotificationResource.notificationAcknowledged(null, testuser2Console.id, notifications.find {n -> n.targetId == testuser2Console.id && n.deliveredOn != null}.id, Values.create("dismissed"))
+        adminNotificationResource.notificationAcknowledged(null, testuser2Console.id, notifications.find {n -> n.targetId == testuser2Console.id && n.deliveredOn != null}.id, "dismissed")
         notifications = []
             notifications.addAll(adminNotificationResource.getNotifications(null, null, null, null, null, null, null, testuser2Console.id))
             notifications.addAll(adminNotificationResource.getNotifications(null, null, null, null, null, null, null, testuser3Console1.id))
@@ -567,7 +567,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
 
         when: "an email attribute is added to an asset"
         def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId)
-        kitchen.addAttributes(new Attribute(AttributeType.EMAIL, Values.create("kitchen@openremote.local")))
+        kitchen.addAttributes(new Attribute<>(AttributeType.EMAIL, Values.create("kitchen@openremote.local")))
         kitchen = assetStorageService.merge(kitchen)
 
         and: "an email notification is sent to a parent asset"

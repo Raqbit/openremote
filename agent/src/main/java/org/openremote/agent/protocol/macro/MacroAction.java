@@ -69,12 +69,12 @@ public class MacroAction {
     public ObjectValue toObjectValue() {
         ObjectValue objectValue = Values.createObject();
         objectValue.put("attributeState", attributeState.toObjectValue());
-        objectValue.put("delay", Values.create(delayMilliseconds));
+        objectValue.put("delay", delayMilliseconds);
         return objectValue;
     }
 
     public MetaItem toMetaItem() {
-        return new MetaItem(META_MACRO_ACTION, toObjectValue());
+        return new MetaItem<>(META_MACRO_ACTION, toObjectValue());
     }
 
     @Override

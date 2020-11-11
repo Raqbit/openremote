@@ -31,11 +31,10 @@ import java.util.function.Consumer;
 /**
  * To be used by protocols that support device import from a protocol specific file. These devices can be represented as
  * {@link Asset}s with {@link Attribute}s that contain the necessary {@link org.openremote.model.attribute.MetaItem}s
- * to establish a link to the supplied {@link Agent}. These {@link Asset}s can then be structured in
+ * to establish a link to the linked {@link Agent}. These {@link Asset}s can then be structured in
  * a hierarchical representation using {@link AssetTreeNode}s.
  * <p>
- * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
- * discovery is requested for the associated {@link Protocol}. Implementations are not re-used.
+ * {@link Protocol}s that support {@link Asset} import must implement this interface.
  */
 public interface ProtocolAssetImport {
 
@@ -45,11 +44,11 @@ public interface ProtocolAssetImport {
      * call the stoppedCallback. If for some reason the process cannot be started then this method should
      * return false and log more details.
      */
-    boolean start(Agent agent, byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
+    boolean startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
 
     /**
      * Can be called by initiator to stop the process; if the implementation has already stopped then this
      * method should just return.
      */
-    void stop();
+    void stopAssetImport();
 }

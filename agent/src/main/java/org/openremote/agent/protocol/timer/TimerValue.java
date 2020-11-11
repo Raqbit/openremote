@@ -53,6 +53,6 @@ public enum TimerValue {
     }
 
     public MetaItem asMetaItem() {
-        return new MetaItem(TimerProtocol.META_TIMER_VALUE_LINK, Values.create(this.toString()));
+        return new MetaItem<>(TimerProtocol.META_TIMER_VALUE_LINK, Values.create(this.toString()));
     }
 }

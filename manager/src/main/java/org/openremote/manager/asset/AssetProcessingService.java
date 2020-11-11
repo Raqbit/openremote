@@ -245,7 +245,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                         throw new AssetProcessingException(ASSET_NOT_FOUND);
 
 
-                    Attribute oldAttribute = asset.getAttribute(event.getAttributeName()).orElse(null);
+                    Attribute<?> oldAttribute = asset.getAttribute(event.getAttributeName()).orElse(null);
                     if (oldAttribute == null)
                         throw new AssetProcessingException(ATTRIBUTE_NOT_FOUND);
 
@@ -362,7 +362,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                     );
 
                     // Create a copy of the attribute and set the new value and timestamp
-                    Attribute updatedAttribute = oldAttribute.deepCopy();
+                    Attribute<?> updatedAttribute = oldAttribute.deepCopy();
                     updatedAttribute.setValue(event.getValue().orElse(null), eventTime);
 
                     // Validate constraints of attribute
@@ -408,7 +408,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
      */
     protected boolean processAssetUpdate(EntityManager em,
                                          Asset asset,
-                                         Attribute attribute,
+                                         Attribute<?> attribute,
                                          Source source) throws AssetProcessingException {
 
         String attributeStr = attribute.toString();
@@ -484,7 +484,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         };
     }
 
-    protected void storeAttributeValue(EntityManager em, Asset asset, Attribute attribute) throws AssetProcessingException {
+    protected void storeAttributeValue(EntityManager em, Asset asset, Attribute<?> attribute) throws AssetProcessingException {
         String attributeName = attribute.getName()
             .orElseThrow(() -> new AssetProcessingException(
                 STATE_STORAGE_FAILED,
@@ -505,7 +505,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         }
     }
 
-    protected void publishClientEvent(Asset asset, Attribute attribute) {
+    protected void publishClientEvent(Asset asset, Attribute<?> attribute) {
         // TODO Catch "queue full" exception (e.g. when producing thousands of INFO messages in rules)?
         clientEventService.publishEvent(
             attribute.isAccessRestrictedRead(),

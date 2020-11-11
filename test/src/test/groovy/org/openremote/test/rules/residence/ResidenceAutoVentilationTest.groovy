@@ -69,7 +69,7 @@ class ResidenceAutoVentilationTest extends Specification implements ManagerConta
 
         when: "auto ventilation is turned on"
         assetProcessingService.sendAttributeEvent(
-                new AttributeEvent(managerTestSetup.apartment1Id, "ventilationAuto", Values.create(true))
+                new AttributeEvent(managerTestSetup.apartment1Id, "ventilationAuto", true)
         )
 
         then: "the rule engines should settle"
@@ -117,7 +117,7 @@ class ResidenceAutoVentilationTest extends Specification implements ManagerConta
 
         when: "CO2 is decreasing in a room"
         def co2LevelDecrement = new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "co2Level", Values.create(500)
+                managerTestSetup.apartment1LivingroomId, "co2Level", 500
         )
         simulatorProtocol.putValue(co2LevelDecrement)
 
@@ -176,7 +176,7 @@ class ResidenceAutoVentilationTest extends Specification implements ManagerConta
 
         when: "CO2 is decreasing in a room"
         def co2LevelDecrement2 = new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "co2Level", Values.create(800)
+                managerTestSetup.apartment1LivingroomId, "co2Level", 800
         )
         simulatorProtocol.putValue(co2LevelDecrement2)
         conditions.eventually {
@@ -202,7 +202,7 @@ class ResidenceAutoVentilationTest extends Specification implements ManagerConta
 
         when: "CO2 is decreasing in a room"
         def co2LevelDecrement3 = new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "co2Level", Values.create(500)
+                managerTestSetup.apartment1LivingroomId, "co2Level", 500
         )
         simulatorProtocol.putValue(co2LevelDecrement3)
         conditions.eventually {

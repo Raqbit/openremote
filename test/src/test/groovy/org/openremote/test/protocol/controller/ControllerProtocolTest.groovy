@@ -188,9 +188,9 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
         agent.setAttributes(
-                ProtocolConfiguration.initProtocolConfiguration(new Attribute(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME), ControllerProtocol.PROTOCOL_NAME)
+                ProtocolConfiguration.initProtocolConfiguration(new Attribute<>(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME), ControllerProtocol.PROTOCOL_NAME)
                         .addMeta(
-                        new MetaItem(
+                        new MetaItem<>(
                                 ControllerProtocol.META_PROTOCOL_BASE_URI,
                                 Values.create("http://mockapi:8688/controller")
                         )
@@ -210,18 +210,18 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
-                new Attribute("sensor", AttributeValueType.STRING)
+                new Attribute<>("sensor", AttributeValueType.STRING)
                         .addMeta(
-                        new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, Values.create("MyDevice")),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_SENSOR_NAME, Values.create("my_sensor1a")),
-                        new MetaItem(MetaItemType.READ_ONLY, Values.create(true))
+                        new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "MyDevice"),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_SENSOR_NAME, "my_sensor1a"),
+                        new MetaItem<>(MetaItemType.READ_ONLY, true)
                 ),
-                new Attribute("command", AttributeValueType.STRING)
+                new Attribute<>("command", AttributeValueType.STRING)
                         .addMeta(
-                        new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, Values.create("MyDevice")),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_COMMAND_NAME, Values.create("my_command"))
+                        new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "MyDevice"),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_COMMAND_NAME, "my_command")
                 )
         )
 
@@ -244,9 +244,9 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         }
 
         when: "another protocol is added linked to an unavailable controller"
-        agent.addAttributes(ProtocolConfiguration.initProtocolConfiguration(new Attribute(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME2), ControllerProtocol.PROTOCOL_NAME)
+        agent.addAttributes(ProtocolConfiguration.initProtocolConfiguration(new Attribute<>(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME2), ControllerProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                         ControllerProtocol.META_PROTOCOL_BASE_URI,
                         Values.create("http://disconnectedmockapi:8688/controller")
                 )
@@ -268,9 +268,9 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         when: "another protocol for command with map"
         agent.removeAttribute(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME2)
-        agent.addAttributes(ProtocolConfiguration.initProtocolConfiguration(new Attribute(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3), ControllerProtocol.PROTOCOL_NAME)
+        agent.addAttributes(ProtocolConfiguration.initProtocolConfiguration(new Attribute<>(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3), ControllerProtocol.PROTOCOL_NAME)
                 .addMeta(
-                new MetaItem(
+                new MetaItem<>(
                         ControllerProtocol.META_PROTOCOL_BASE_URI,
                         Values.create("http://mockapi:8688/controller")
                 )
@@ -294,11 +294,11 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         def asset2 = new Asset("Test Asset2", AssetType.THING, agent)
         asset2.setAttributes(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
-                new Attribute("command", AttributeValueType.STRING, Values.create("command1"))
+                new Attribute<>("command", AttributeValueType.STRING, "command1")
                         .addMeta(
-                        new MetaItem(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3).toArrayValue()),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, Values.create("DeviceName2")),
-                        new MetaItem(ControllerProtocol.META_ATTRIBUTE_COMMANDS_MAP, Values.<ObjectValue>parse(/{"command1": "my_command", "command2": "wrong"}/).get())
+                        new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3).toArrayValue()),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "DeviceName2"),
+                        new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_COMMANDS_MAP, Values.<ObjectValue>parse(/{"command1": "my_command", "command2": "wrong"}/).get())
                         )
         )
         asset2 = assetStorageService.merge(asset2)
@@ -311,7 +311,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         when: "a linked attribute value is updated"
         def attributeEvent = new AttributeEvent(asset2.id,
                 "command",
-                Values.create("command1"))
+                "command1")
         assetProcessingService.sendAttributeEvent(attributeEvent)
 
         then:
@@ -333,7 +333,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         and: "another linked attribute value is updated with a value"
         def attributeEvent3 = new AttributeEvent(asset.id,
                 "command",
-                Values.create("a_parameter"))
+                "a_parameter")
         assetProcessingService.sendAttributeEvent(attributeEvent3)
 
         then:

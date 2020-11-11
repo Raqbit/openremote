@@ -130,7 +130,7 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         when: "a simulated boolean sensor receives a new value"
         advancePseudoClock(10, SECONDS, container)
         datapoint1ExpectedTimestamp = getClockTimeOf(container)
-        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, Values.create(false))
+        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, false)
 
         then: "the attribute should be updated"
         conditions.eventually {
@@ -141,7 +141,7 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         when: "a simulated sensor receives a new value"
         advancePseudoClock(10, SECONDS, container)
         datapoint2ExpectedTimestamp = getClockTimeOf(container)
-        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, Values.create(true))
+        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, true)
 
         then: "the attribute should be updated"
         conditions.eventually {
@@ -152,7 +152,7 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         when: "a simulated sensor receives a new value"
         advancePseudoClock(10, SECONDS, container)
         datapoint3ExpectedTimestamp = getClockTimeOf(container)
-        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, Values.create(false))
+        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, false)
 
         then: "the attribute should be updated"
         conditions.eventually {
@@ -200,7 +200,7 @@ class AssetDatapointTest extends Specification implements ManagerContainerTrait 
         simulatorProtocol.putValue(managerTestSetup.thingId, "light1PowerConsumption", Values.create(17.5d))
 
         and: "the toggle sensor with a custom max age of 7 days receives a new value"
-        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, Values.create(true))
+        simulatorProtocol.putValue(managerTestSetup.thingId, thingLightToggleAttributeName, true)
 
         then: "the datapoints should be stored"
         conditions.eventually {

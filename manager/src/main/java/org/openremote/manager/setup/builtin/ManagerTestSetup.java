@@ -126,11 +126,11 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartOffice.setName("Smart Office");
         smartOffice.setType(BUILDING);
         List<Attribute<?>> smartOfficeAttributes = Arrays.asList(
-                new Attribute(AttributeType.LOCATION, locationValue),
-                new Attribute(AttributeType.GEO_STREET, Values.create("Torenallee 20")),
-                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5617")),
-                new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                new Attribute<>(AttributeType.LOCATION, locationValue),
+                new Attribute<>(AttributeType.GEO_STREET, "Torenallee 20"),
+                new Attribute<>(AttributeType.GEO_POSTAL_CODE, "5617"),
+                new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
         );
 
         smartOffice.setAttributes(smartOfficeAttributes);
@@ -138,14 +138,14 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartOfficeId = smartOffice.getId();
 
         Asset groundFloor = new Asset("Ground Floor", FLOOR, smartOffice)
-                .addAttributes(new Attribute(AttributeType.LOCATION, locationValue));
+                .addAttributes(new Attribute<>(AttributeType.LOCATION, locationValue));
         groundFloor = assetStorageService.merge(groundFloor);
         groundFloorId = groundFloor.getId();
 
         Asset lobby = new Asset("Lobby", ROOM, groundFloor)
-                .addAttributes(new Attribute(AttributeType.LOCATION, locationValue));
+                .addAttributes(new Attribute<>(AttributeType.LOCATION, locationValue));
         lobby.addAttributes(
-                new Attribute("lobbyLocations", AttributeValueType.ARRAY)
+                new Attribute<>("lobbyLocations", AttributeValueType.ARRAY)
         );
 
         lobby = assetStorageService.merge(lobby);
@@ -153,16 +153,16 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset agent = new Asset("Demo Agent", AGENT, lobby);
         agent.addAttributes(
-                new Attribute(AttributeType.LOCATION, locationValue),
-                initProtocolConfiguration(new Attribute(agentProtocolConfigName), SimulatorProtocol.PROTOCOL_NAME)
+                new Attribute<>(AttributeType.LOCATION, locationValue),
+                initProtocolConfiguration(new Attribute<>(agentProtocolConfigName), SimulatorProtocol.PROTOCOL_NAME)
                         .addMeta(
-                                new MetaItem(
+                                new MetaItem<>(
                                         SimulatorProtocol.CONFIG_MODE,
                                         Values.create(SimulatorProtocol.Mode.WRITE_THROUGH_DELAYED.toString())
                                 ),
-                                new MetaItem(
+                                new MetaItem<>(
                                         SimulatorProtocol.CONFIG_WRITE_DELAY_MILLISECONDS,
-                                        Values.create(500)
+                                        500
                                 ))
         );
 
@@ -170,91 +170,91 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         agentId = agent.getId();
 
         Asset thing = new Asset("Demo Thing", THING, agent)
-                .addAttributes(new Attribute(AttributeType.LOCATION, locationValue)
-                        .setMeta(new MetaItem(RULE_STATE, Values.create(true))));
+                .addAttributes(new Attribute<>(AttributeType.LOCATION, locationValue)
+                        .setMeta(new MetaItem<>(RULE_STATE, true)));
         thing.addAttributes(
-                new Attribute(thingLightToggleAttributeName, BOOLEAN, Values.create(true))
+                new Attribute<>(thingLightToggleAttributeName, BOOLEAN, true)
                         .setMeta(new Meta(
-                                new MetaItem(
+                                new MetaItem<>(
                                         LABEL,
-                                        Values.create("Light 1 Toggle")),
-                                new MetaItem(
+                                        "Light 1 Toggle"),
+                                new MetaItem<>(
                                         DESCRIPTION,
-                                        Values.create("Switch for living room light")),
-                                new MetaItem(
+                                        "Switch for living room light"),
+                                new MetaItem<>(
                                         STORE_DATA_POINTS,
-                                        Values.create(true)),
-                                new MetaItem(
+                                        true),
+                                new MetaItem<>(
                                         DATA_POINTS_MAX_AGE_DAYS,
                                         Values.create(DATA_POINTS_MAX_AGE_DAYS_DEFAULT*7)
                                 ),
-                                new MetaItem(
+                                new MetaItem<>(
                                         AGENT_LINK,
                                         new AttributeRef(agent.getId(), agentProtocolConfigName).toArrayValue()),
-                                new MetaItem(
+                                new MetaItem<>(
                                         SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(SwitchSimulatorElement.ELEMENT_NAME)
                                 ))
                         ),
-                new Attribute("light1Dimmer", PERCENTAGE) // No initial value!
+                new Attribute<>("light1Dimmer", PERCENTAGE) // No initial value!
                         .setMeta(new Meta(
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 LABEL,
-                                                Values.create("Light 1 Dimmer")),
-                                        new MetaItem(
+                                                "Light 1 Dimmer"),
+                                        new MetaItem<>(
                                                 DESCRIPTION,
-                                                Values.create("Dimmer for living room light")),
-                                        new MetaItem(
+                                                "Dimmer for living room light"),
+                                        new MetaItem<>(
                                                 RANGE_MIN,
-                                                Values.create(0)),
-                                        new MetaItem(
+                                                0),
+                                        new MetaItem<>(
                                                 RANGE_MAX,
-                                                Values.create(100)),
-                                        new MetaItem(
+                                                100),
+                                        new MetaItem<>(
                                                 AGENT_LINK,
                                                 new AttributeRef(agent.getId(), agentProtocolConfigName).toArrayValue()),
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME_RANGE)),
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 SimulatorProtocol.CONFIG_MODE,
                                                 Values.create(SimulatorProtocol.Mode.WRITE_THROUGH_DELAYED.toString()))
                                 )
                         ),
-                new Attribute("light1Color", COLOR_RGB, new ColorRGB(88, 123, 88).asArrayValue())
+                new Attribute<>("light1Color", COLOR_RGB, new ColorRGB(88, 123, 88).asArrayValue())
                         .setMeta(new Meta(
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 LABEL,
-                                                Values.create("Light 1 Color")),
-                                        new MetaItem(
+                                                "Light 1 Color"),
+                                        new MetaItem<>(
                                                 DESCRIPTION,
-                                                Values.create("Color of living room light")),
-                                        new MetaItem(
+                                                "Color of living room light"),
+                                        new MetaItem<>(
                                                 AGENT_LINK,
                                                 new AttributeRef(agent.getId(), agentProtocolConfigName).toArrayValue()),
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ColorSimulatorElement.ELEMENT_NAME))
                                 )
                         ),
-                new Attribute("light1PowerConsumption", ENERGY, Values.create(12.345))
+                new Attribute<>("light1PowerConsumption", ENERGY, Values.create(12.345))
                         .setMeta(new Meta(
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 LABEL,
-                                                Values.create("Light 1 Usage")),
-                                        new MetaItem(
+                                                "Light 1 Usage"),
+                                        new MetaItem<>(
                                                 DESCRIPTION,
-                                                Values.create("Total energy consumption of living room light")),
-                                        new MetaItem(
+                                                "Total energy consumption of living room light"),
+                                        new MetaItem<>(
                                                 READ_ONLY,
-                                                Values.create(true)),
-                                        new MetaItem(
+                                                true),
+                                        new MetaItem<>(
                                                 FORMAT,
                                                 Values.create("%3d kWh")),
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 AGENT_LINK,
                                                 new AttributeRef(agent.getId(), agentProtocolConfigName).toArrayValue()),
-                                        new MetaItem(
+                                        new MetaItem<>(
                                                 SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME)),
-                                        new MetaItem(
-                                                STORE_DATA_POINTS, Values.create(true))
+                                        new MetaItem<>(
+                                                STORE_DATA_POINTS, true)
                                 )
                         )
         );
@@ -268,11 +268,11 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartBuilding.setName("Smart Building");
         smartBuilding.setType(BUILDING);
         smartBuilding.setAttributes(
-                new Attribute(AttributeType.LOCATION, SMART_BUILDING_LOCATION.toValue()),
-                new Attribute(AttributeType.GEO_STREET, Values.create("Kastanjelaan 500")),
-                new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5616")),
-                new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                new Attribute<>(AttributeType.LOCATION, SMART_BUILDING_LOCATION.toValue()),
+                new Attribute<>(AttributeType.GEO_STREET, "Kastanjelaan 500"),
+                new Attribute<>(AttributeType.GEO_POSTAL_CODE, "5616"),
+                new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
         );
         smartBuilding = assetStorageService.merge(smartBuilding);
         smartBuildingId = smartBuilding.getId();
@@ -284,9 +284,9 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1ServiceAgent = new Asset("Service Agent (Simulator)", AGENT, apartment1);
         apartment1ServiceAgent.addAttributes(
-                initProtocolConfiguration(new Attribute("apartmentSimulator"), SimulatorProtocol.PROTOCOL_NAME)
+                initProtocolConfiguration(new Attribute<>("apartmentSimulator"), SimulatorProtocol.PROTOCOL_NAME)
                         .addMeta(
-                                new MetaItem(
+                                new MetaItem<>(
                                         SimulatorProtocol.CONFIG_MODE,
                                         Values.create(SimulatorProtocol.Mode.WRITE_THROUGH_IMMEDIATE.toString())
                                 ))
@@ -298,41 +298,41 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1Livingroom = createDemoApartmentRoom(apartment1, "Living Room 1")
                 .addAttributes(
-                        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454213, 51.446884).toValue()),
-                        new Attribute("lightsCeiling", NUMBER, Values.create(0))
+                        new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454213, 51.446884).toValue()),
+                        new Attribute<>("lightsCeiling", NUMBER, 0)
                                 .setMeta(
-                                        new MetaItem(RANGE_MIN, Values.create(0)),
-                                        new MetaItem(RANGE_MAX, Values.create(100)),
-                                        new MetaItem(LABEL, Values.create("Ceiling lights (range)")),
-                                        new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                                        new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true))
+                                        new MetaItem<>(RANGE_MIN, 0),
+                                        new MetaItem<>(RANGE_MAX, 100),
+                                        new MetaItem<>(LABEL, Values.create("Ceiling lights (range)")),
+                                        new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                                        new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
                                 ),
-                        new Attribute("lightsStand", AttributeValueType.BOOLEAN, Values.create(true))
+                        new Attribute<>("lightsStand", AttributeValueType.BOOLEAN, true)
                                 .setMeta(
-                                        new MetaItem(LABEL, Values.create("Floor stand lights (on/off)")),
-                                        new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                                        new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true))
+                                        new MetaItem<>(LABEL, Values.create("Floor stand lights (on/off)")),
+                                        new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                                        new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
                                 )
                 );
         addDemoApartmentRoomMotionSensor(apartment1Livingroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentRoomCO2Sensor(apartment1Livingroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentRoomHumiditySensor(apartment1Livingroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentRoomThermometer(apartment1Livingroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentTemperatureControl(apartment1Livingroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
 
         apartment1Livingroom.setId(apartment1LivingroomId);
@@ -341,14 +341,14 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1Kitchen = createDemoApartmentRoom(apartment1, "Kitchen 1")
                 .addAttributes(
-                        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454122, 51.446800).toValue()),
-                        new Attribute("lights", AttributeValueType.BOOLEAN, Values.create(true))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)))
+                        new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454122, 51.446800).toValue()),
+                        new Attribute<>("lights", AttributeValueType.BOOLEAN, true)
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_READ, true))
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_WRITE, true))
                 );
         addDemoApartmentRoomMotionSensor(apartment1Kitchen, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
 
         for (String switchName : new String[]{"A", "B", "C"}) {
@@ -356,26 +356,26 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                 switch (attributeIndex) {
                     case 2:
                         return new MetaItem[]{
-                                new MetaItem(MetaItemType.AGENT_LINK,
+                                new MetaItem<>(MetaItemType.AGENT_LINK,
                                         new AttributeRef(apartment1ServiceAgentId,
                                                 "apartmentSimulator").toArrayValue()),
-                                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT,
+                                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT,
                                         Values.create(NumberSimulatorElement.ELEMENT_NAME))
                         };
                     case 3:
                         return new MetaItem[]{
-                                new MetaItem(MetaItemType.AGENT_LINK,
+                                new MetaItem<>(MetaItemType.AGENT_LINK,
                                         new AttributeRef(apartment1ServiceAgentId,
                                                 "apartmentSimulator").toArrayValue()),
-                                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT,
+                                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT,
                                         Values.create(NumberSimulatorElement.ELEMENT_NAME))
                         };
                     case 4:
                         return new MetaItem[]{
-                                new MetaItem(MetaItemType.AGENT_LINK,
+                                new MetaItem<>(MetaItemType.AGENT_LINK,
                                         new AttributeRef(apartment1ServiceAgentId,
                                                 "apartmentSimulator").toArrayValue()),
-                                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT,
+                                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT,
                                         Values.create(NumberSimulatorElement.ELEMENT_NAME))
                         };
                 }
@@ -388,14 +388,14 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1Hallway = createDemoApartmentRoom(apartment1, "Hallway 1")
                 .addAttributes(
-                        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454342, 51.446762).toValue()),
-                        new Attribute("lights", AttributeValueType.BOOLEAN, Values.create(true))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)))
+                        new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454342, 51.446762).toValue()),
+                        new Attribute<>("lights", AttributeValueType.BOOLEAN, true)
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_READ, true))
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_WRITE, true))
                 );
         addDemoApartmentRoomMotionSensor(apartment1Hallway, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
 
         apartment1Hallway = assetStorageService.merge(apartment1Hallway);
@@ -403,26 +403,26 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1Bedroom1 = createDemoApartmentRoom(apartment1, "Bedroom 1")
                 .addAttributes(
-                        new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454332, 51.446830).toValue()),
-                        new Attribute("lights", AttributeValueType.BOOLEAN, Values.create(true))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)))
-                                .addMeta(new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true)))
+                        new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454332, 51.446830).toValue()),
+                        new Attribute<>("lights", AttributeValueType.BOOLEAN, true)
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_READ, true))
+                                .addMeta(new MetaItem<>(ACCESS_RESTRICTED_WRITE, true))
                 );
         addDemoApartmentRoomCO2Sensor(apartment1Bedroom1, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentRoomHumiditySensor(apartment1Bedroom1, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentRoomThermometer(apartment1Bedroom1, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentTemperatureControl(apartment1Bedroom1, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
 
         apartment1Bedroom1 = assetStorageService.merge(apartment1Bedroom1);
@@ -430,29 +430,29 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment1Bathroom = new Asset("Bathroom 1", ROOM, apartment1);
         apartment1Bathroom.addAttributes(
-                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454227,51.446753).toValue()),
-                new Attribute("lights", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454227,51.446753).toValue()),
+                new Attribute<>("lights", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                                new MetaItem(RULE_STATE, Values.create(true)),
-                                new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true)),
-                                new MetaItem(ACCESS_RESTRICTED_WRITE, Values.create(true))
+                                new MetaItem<>(RULE_STATE, true),
+                                new MetaItem<>(ACCESS_RESTRICTED_READ, true),
+                                new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
                         )
         );
         addDemoApartmentRoomThermometer(apartment1Bathroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         addDemoApartmentTemperatureControl(apartment1Bathroom, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         apartment1Bathroom = assetStorageService.merge(apartment1Bathroom);
         apartment1BathroomId = apartment1Bathroom.getId();
 
 
         addDemoApartmentVentilation(apartment1, true, () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(apartment1ServiceAgentId, "apartmentSimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
 
         apartment1 = assetStorageService.merge(apartment1);
@@ -466,13 +466,13 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment2 = new Asset("Apartment 2", RESIDENCE, smartBuilding);
         apartment2.addAttributes(
-                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454053, 51.446603).toValue()),
-                new Attribute("allLightsOffSwitch", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454053, 51.446603).toValue()),
+                new Attribute<>("allLightsOffSwitch", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("All Lights Off Switch")),
-                                new MetaItem(DESCRIPTION, Values.create("When triggered, turns all lights in the apartment off")),
-                                new MetaItem(RULE_EVENT, Values.create(true)),
-                                new MetaItem(RULE_EVENT_EXPIRES, Values.create("3s"))
+                                new MetaItem<>(LABEL, "All Lights Off Switch"),
+                                new MetaItem<>(DESCRIPTION, Values.create("When triggered, turns all lights in the apartment off")),
+                                new MetaItem<>(RULE_EVENT, true),
+                                new MetaItem<>(RULE_EVENT_EXPIRES, "3s")
                         )
         );
         apartment2 = assetStorageService.merge(apartment2);
@@ -480,55 +480,55 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment2Livingroom = new Asset("Living Room 2", ROOM, apartment2);
         apartment2Livingroom.addAttributes(
-                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454109, 51.446631).toValue()),
-                new Attribute("motionSensor", AttributeValueType.BOOLEAN, Values.create(false))
+                new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454109, 51.446631).toValue()),
+                new Attribute<>("motionSensor", AttributeValueType.BOOLEAN, false)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Motion Sensor")),
-                                new MetaItem(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
-                                new MetaItem(RULE_STATE, Values.create(true)),
-                                new MetaItem(RULE_EVENT, Values.create(true))
+                                new MetaItem<>(LABEL, "Motion Sensor"),
+                                new MetaItem<>(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
+                                new MetaItem<>(RULE_STATE, true),
+                                new MetaItem<>(RULE_EVENT, true)
                         ),
-                new Attribute("presenceDetected", AttributeValueType.BOOLEAN, Values.create(false))
+                new Attribute<>("presenceDetected", AttributeValueType.BOOLEAN, false)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Presence Detected")),
-                                new MetaItem(DESCRIPTION, Values.create("Someone is currently present in the room")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Presence Detected"),
+                                new MetaItem<>(DESCRIPTION, "Someone is currently present in the room"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("firstPresenceDetected", AttributeValueType.TIMESTAMP)
+                new Attribute<>("firstPresenceDetected", AttributeValueType.TIMESTAMP)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("First Presence Timestamp")),
-                                new MetaItem(DESCRIPTION, Values.create("Timestamp of the first detected presence")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "First Presence Timestamp"),
+                                new MetaItem<>(DESCRIPTION, "Timestamp of the first detected presence"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("lastPresenceDetected", AttributeValueType.TIMESTAMP)
+                new Attribute<>("lastPresenceDetected", AttributeValueType.TIMESTAMP)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Last Presence Timestamp")),
-                                new MetaItem(DESCRIPTION, Values.create("Timestamp of last detected presence")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Last Presence Timestamp"),
+                                new MetaItem<>(DESCRIPTION, "Timestamp of last detected presence"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("co2Level", AttributeValueType.CO2, Values.create(350))
+                new Attribute<>("co2Level", AttributeValueType.CO2, 350)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("CO2 Level")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "CO2 Level"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("lightSwitch", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>("lightSwitch", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Light Switch")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Light Switch"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("windowOpen", AttributeValueType.BOOLEAN, Values.create(false))
+                new Attribute<>("windowOpen", AttributeValueType.BOOLEAN, false)
                         .setMeta(
-                                new MetaItem(ACCESS_RESTRICTED_READ, Values.create(true))
+                                new MetaItem<>(ACCESS_RESTRICTED_READ, true)
                         ),
-                new Attribute("lightSwitchTriggerTimes", ARRAY, Values.createArray().add(Values.create("1800")).add(Values.create("0830")))
+                new Attribute<>("lightSwitchTriggerTimes", ARRAY, Values.createArray().add("1800").add("0830"))
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Lightswitch Trigger Times")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Lightswitch Trigger Times"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("plantsWaterLevels", OBJECT, Values.createObject().put("cactus", 0.8))
+                new Attribute<>("plantsWaterLevels", OBJECT, Values.createObject().put("cactus", 0.8))
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Water levels of the plants")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Water levels of the plants"),
+                                new MetaItem<>(RULE_STATE, true)
                         )
         );
         apartment2Livingroom = assetStorageService.merge(apartment2Livingroom);
@@ -536,50 +536,50 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset apartment2Bathroom = new Asset("Bathroom 2", ROOM, apartment2);
         apartment2Bathroom.addAttributes(
-                new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.454015, 51.446665).toValue()),
-                new Attribute("motionSensor", AttributeValueType.BOOLEAN, Values.create(false))
+                new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454015, 51.446665).toValue()),
+                new Attribute<>("motionSensor", AttributeValueType.BOOLEAN, false)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Motion Sensor")),
-                                new MetaItem(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
-                                new MetaItem(RULE_STATE, Values.create(true)),
-                                new MetaItem(RULE_EVENT, Values.create(true))
+                                new MetaItem<>(LABEL, "Motion Sensor"),
+                                new MetaItem<>(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
+                                new MetaItem<>(RULE_STATE, true),
+                                new MetaItem<>(RULE_EVENT, true)
                         ),
-                new Attribute("presenceDetected", AttributeValueType.BOOLEAN, Values.create(false))
+                new Attribute<>("presenceDetected", AttributeValueType.BOOLEAN, false)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Presence Detected")),
-                                new MetaItem(DESCRIPTION, Values.create("Someone is currently present in the room")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Presence Detected"),
+                                new MetaItem<>(DESCRIPTION, "Someone is currently present in the room"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("firstPresenceDetected", AttributeValueType.TIMESTAMP)
+                new Attribute<>("firstPresenceDetected", AttributeValueType.TIMESTAMP)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("First Presence Timestamp")),
-                                new MetaItem(DESCRIPTION, Values.create("Timestamp of the first detected presence")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "First Presence Timestamp"),
+                                new MetaItem<>(DESCRIPTION, "Timestamp of the first detected presence"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("lastPresenceDetected", AttributeValueType.TIMESTAMP)
+                new Attribute<>("lastPresenceDetected", AttributeValueType.TIMESTAMP)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Last Presence Timestamp")),
-                                new MetaItem(DESCRIPTION, Values.create("Timestamp of last detected presence")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Last Presence Timestamp"),
+                                new MetaItem<>(DESCRIPTION, "Timestamp of last detected presence"),
+                                new MetaItem<>(RULE_STATE, true)
                         ),
-                new Attribute("lightSwitch", AttributeValueType.BOOLEAN, Values.create(true))
+                new Attribute<>("lightSwitch", AttributeValueType.BOOLEAN, true)
                         .setMeta(
-                                new MetaItem(LABEL, Values.create("Light Switch")),
-                                new MetaItem(RULE_STATE, Values.create(true))
+                                new MetaItem<>(LABEL, "Light Switch"),
+                                new MetaItem<>(RULE_STATE, true)
                         )
         );
         apartment2Bathroom = assetStorageService.merge(apartment2Bathroom);
         apartment2BathroomId = apartment2Bathroom.getId();
 
         Asset apartment3 = new Asset("Apartment 3", RESIDENCE, smartBuilding)
-                .addAttributes(new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.453859, 51.446379).toValue()));
+                .addAttributes(new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.453859, 51.446379).toValue()));
         apartment3 = assetStorageService.merge(apartment3);
         apartment3Id = apartment3.getId();
 
         Asset apartment3Livingroom = new Asset("Living Room 3", ROOM, apartment3)
-                .addAttributes(new Attribute(AttributeType.LOCATION, new GeoJSONPoint(5.453932, 51.446422).toValue()));
+                .addAttributes(new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.453932, 51.446422).toValue()));
         apartment3Livingroom.addAttributes(
-                new Attribute("lightSwitch", AttributeValueType.BOOLEAN)
+                new Attribute<>("lightSwitch", AttributeValueType.BOOLEAN)
         );
 
         apartment3Livingroom = assetStorageService.merge(apartment3Livingroom);
@@ -644,17 +644,17 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartCity.setName("Smart City");
         smartCity.setType(CITY);
         smartCity.setAttributes(
-                new Attribute(AttributeType.LOCATION, smartCityLocation),
-                new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                new Attribute<>(AttributeType.LOCATION, smartCityLocation),
+                new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
         );
         smartCity = assetStorageService.merge(smartCity);
 
         Asset smartCityServiceAgent = new Asset("Service Agent (Simulator)", AGENT, smartCity);
         smartCityServiceAgent.addAttributes(
-                initProtocolConfiguration(new Attribute("citySimulator"), SimulatorProtocol.PROTOCOL_NAME)
+                initProtocolConfiguration(new Attribute<>("citySimulator"), SimulatorProtocol.PROTOCOL_NAME)
                         .addMeta(
-                                new MetaItem(
+                                new MetaItem<>(
                                         SimulatorProtocol.CONFIG_MODE,
                                         Values.create(SimulatorProtocol.Mode.WRITE_THROUGH_IMMEDIATE.toString())
                                 ))
@@ -666,30 +666,30 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset assetArea1 = new Asset("Area 1", AREA, smartCity)
                 .setAttributes(
-                        new Attribute(AttributeType.LOCATION, AREA_1_LOCATION.toValue()),
-                        new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5616")),
-                        new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                        new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                        new Attribute<>(AttributeType.LOCATION, AREA_1_LOCATION.toValue()),
+                        new Attribute<>(AttributeType.GEO_POSTAL_CODE, "5616"),
+                        new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                        new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
                 );
         assetArea1 = assetStorageService.merge(assetArea1);
         area1Id = assetArea1.getId();
 
         Asset peopleCounter1Asset = createDemoPeopleCounterAsset("PeopleCounter 1", assetArea1, new GeoJSONPoint(5.477126, 51.439137), () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         peopleCounter1Asset = assetStorageService.merge(peopleCounter1Asset);
 
         Asset microphone1Asset = createDemoMicrophoneAsset("Microphone 1", assetArea1, new GeoJSONPoint(5.478092, 51.438655), () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         microphone1Asset = assetStorageService.merge(microphone1Asset);
         microphone1Id = microphone1Asset.getId();
 
         Asset enviroment1Asset = createDemoEnvironmentAsset("Environment 1", assetArea1, new GeoJSONPoint(5.478907, 51.438943),() -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         enviroment1Asset = assetStorageService.merge(enviroment1Asset);
 
@@ -703,22 +703,22 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset assetArea2 = new Asset("Area 2", AREA, smartCity)
                 .setAttributes(
-                        new Attribute(AttributeType.LOCATION, AREA_2_LOCATION.toValue()),
-                        new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5651")),
-                        new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                        new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                        new Attribute<>(AttributeType.LOCATION, AREA_2_LOCATION.toValue()),
+                        new Attribute<>(AttributeType.GEO_POSTAL_CODE, "5651"),
+                        new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                        new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
                 );
         assetArea2 = assetStorageService.merge(assetArea2);
 
         Asset peopleCounter2Asset = createDemoPeopleCounterAsset("PeopleCounter 2", assetArea2, new GeoJSONPoint(5.473686, 51.438603), () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         peopleCounter2Asset = assetStorageService.merge(peopleCounter2Asset);
 
         Asset environment2Asset = createDemoEnvironmentAsset("Environment 2", assetArea2, new GeoJSONPoint(5.473552, 51.438412), () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         environment2Asset = assetStorageService.merge(environment2Asset);
 
@@ -727,16 +727,16 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset assetArea3 = new Asset("Area 3", AREA, smartCity)
                 .setAttributes(
-                        new Attribute(AttributeType.LOCATION, AREA_3_LOCATION.toValue()),
-                        new Attribute(AttributeType.GEO_POSTAL_CODE, Values.create("5617")),
-                        new Attribute(AttributeType.GEO_CITY, Values.create("Eindhoven")),
-                        new Attribute(AttributeType.GEO_COUNTRY, Values.create("Netherlands"))
+                        new Attribute<>(AttributeType.LOCATION, AREA_3_LOCATION.toValue()),
+                        new Attribute<>(AttributeType.GEO_POSTAL_CODE, "5617"),
+                        new Attribute<>(AttributeType.GEO_CITY, "Eindhoven"),
+                        new Attribute<>(AttributeType.GEO_COUNTRY, "Netherlands")
                 );
         assetArea3 = assetStorageService.merge(assetArea3);
 
         Asset peopleCounter3Asset = createDemoPeopleCounterAsset("PeopleCounter 3", assetArea3, new GeoJSONPoint(5.487234, 51.447065), () -> new MetaItem[]{
-                new MetaItem(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
-                new MetaItem(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
+                new MetaItem<>(AGENT_LINK, new AttributeRef(smartCityServiceAgentId, "citySimulator").toArrayValue()),
+                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
         });
         peopleCounter3Asset = assetStorageService.merge(peopleCounter3Asset);
         peopleCounter3AssetId = peopleCounter3Asset.getId();

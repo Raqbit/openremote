@@ -75,7 +75,7 @@ public class AssetDatapointResourceImpl extends ManagerWebResource implements As
                 throw new WebApplicationException(Response.Status.FORBIDDEN);
             }
 
-            Attribute attribute = asset.getAttribute(attributeName).orElseThrow(() ->
+            Attribute<?> attribute = asset.getAttribute(attributeName).orElseThrow(() ->
                 new WebApplicationException(Response.Status.NOT_FOUND)
             );
 

@@ -114,7 +114,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
     @Override
     public boolean processAssetUpdate(EntityManager em,
                                       Asset asset,
-                                      Attribute attribute,
+                                      Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
         if (source == ATTRIBUTE_LINKING_SERVICE) {
             LOG.fine("Attribute update came from this service so ignoring to avoid infinite loops: " + attribute);
@@ -284,7 +284,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
                 .select(new Select().attributes(attributeRef.getAttributeName()))
         );
 
-        Attribute attribute = asset != null ? asset.getAttribute(attributeRef.getAttributeName()).orElse(null) : null;
+        Attribute<?> attribute = asset != null ? asset.getAttribute(attributeRef.getAttributeName()).orElse(null) : null;
 
         if (attribute == null) {
             LOG.warning("Attribute or asset could not be found: " + attributeRef);

@@ -320,7 +320,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
     @Override
     public boolean processAssetUpdate(EntityManager em,
                                       Asset asset,
-                                      Attribute attribute,
+                                      Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
         // We might process two facts for a single attribute update, if that is what the user wants
 

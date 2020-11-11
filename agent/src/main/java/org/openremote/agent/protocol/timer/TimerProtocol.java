@@ -134,16 +134,16 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    public Attribute getProtocolConfigurationTemplate() {
+    public Attribute<?> getProtocolConfigurationTemplate() {
         return super.getProtocolConfigurationTemplate()
             .addMeta(
-                new MetaItem(META_TIMER_CRON_EXPRESSION, null),
-                new MetaItem(META_TIMER_ACTION, null)
+                new MetaItem<>(META_TIMER_CRON_EXPRESSION, null),
+                new MetaItem<>(META_TIMER_ACTION, null)
             );
     }
 
     @Override
-    public AttributeValidationResult validateProtocolConfiguration(Attribute protocolConfiguration) {
+    public AttributeValidationResult validateProtocolConfiguration(Attribute<?> protocolConfiguration) {
         AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
         if (result.isValid()) {
             TimerConfiguration.validateTimerConfiguration(protocolConfiguration, result);
@@ -216,8 +216,8 @@ public class TimerProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute protocolConfiguration) {
-        Attribute attribute = getLinkedAttribute(event.getAttributeRef());
+    protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, Attribute<?> protocolConfiguration) {
+        Attribute<?> attribute = getLinkedAttribute(event.getAttributeRef());
 
         TimerValue timerValue = TimerConfiguration.getValue(attribute).orElse(null);
 
@@ -337,7 +337,7 @@ public class TimerProtocol extends AbstractProtocol {
     /**
      * Sends the trigger's attribute state into the processing chain
      */
-    protected void doTriggerAction(Attribute triggerConfiguration) {
+    protected void doTriggerAction(Attribute<?> triggerConfiguration) {
         if (triggerConfiguration == null) {
             LOG.fine("Cannot execute timer action as timer configuration cannot be found");
             return;
@@ -390,7 +390,7 @@ public class TimerProtocol extends AbstractProtocol {
         return cronExpression;
     }
 
-    protected static boolean isTimerDisabled(Attribute protocolConfiguration) {
+    protected static boolean isTimerDisabled(Attribute<?> protocolConfiguration) {
         return protocolConfiguration.getMetaItem(META_TIMER_DISABLED).isPresent();
     }
 }
