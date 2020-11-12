@@ -40,6 +40,6 @@ public class LightColored extends Light {
     }
 
     public Optional<ColorRGB> getColorRGB() {
-        return getAttributes().getValueOrDefault(COLOR_RGB);
+        return getAttributes().getValue(COLOR_RGB);
     }
 }

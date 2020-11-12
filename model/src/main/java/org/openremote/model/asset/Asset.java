@@ -449,7 +449,7 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Optional<GeoJSONPoint> getLocation() {
-        return getAttributes().getValueOrDefault(LOCATION);
+        return getAttributes().getValue(LOCATION);
     }
 
     public Asset setLocation(GeoJSONPoint location) {
@@ -458,7 +458,7 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Optional<String[]> getTags() {
-        return getAttributes().getValueOrDefault(TAGS);
+        return getAttributes().getValue(TAGS);
     }
 
     public Asset setTags(String[] tags) {
@@ -467,7 +467,7 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Optional<String> getEmail() {
-        return getAttributes().getValueOrDefault(EMAIL);
+        return getAttributes().getValue(EMAIL);
     }
 
     public Asset setEmail(String email) {
@@ -476,7 +476,7 @@ public class Asset implements IdentifiableEntity {
     }
 
     public Optional<String> getNotes() {
-        return getAttributes().getValueOrDefault(NOTES);
+        return getAttributes().getValue(NOTES);
     }
 
     public Asset setNotes(String notes) {

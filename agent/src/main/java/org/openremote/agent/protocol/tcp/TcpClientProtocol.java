@@ -20,7 +20,6 @@
 package org.openremote.agent.protocol.tcp;
 
 import io.netty.channel.ChannelHandler;
-import org.openremote.model.Container;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
@@ -79,7 +78,7 @@ public class TcpClientProtocol extends AbstractTcpClientProtocol<String, TcpClie
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(TcpIoClient<String> client, TcpClientAgent agent) {
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider() {
         return getGenericStringEncodersAndDecoders(client, agent);
     }
 

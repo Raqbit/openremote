@@ -108,86 +108,86 @@ public class ElectricitySupplier extends Device {
     }
 
     public Optional<String> getStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<Double> getPowerCapacity() {
-        return getAttributes().getValueOrDefault(POWER_CAPACITY);
+        return getAttributes().getValue(POWER_CAPACITY);
     }
 
     public Optional<Double> getPowerEDRSetpoint() {
-        return getAttributes().getValueOrDefault(POWER_EDR_SETPOINT);
+        return getAttributes().getValue(POWER_EDR_SETPOINT);
     }
 
     public Optional<Double> getPowerEDRReserve() {
-        return getAttributes().getValueOrDefault(POWER_EDR_RESERVE);
+        return getAttributes().getValue(POWER_EDR_RESERVE);
     }
 
     public Optional<Integer> getPowerEDRMinPeriod() {
-        return getAttributes().getValueOrDefault(POWER_EDR_MIN_PERIOD);
+        return getAttributes().getValue(POWER_EDR_MIN_PERIOD);
     }
 
     public Optional<Double> getTariffImport() {
-        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
+        return getAttributes().getValue(TARIFF_IMPORT);
     }
 
     public Optional<Double> getTariffExport() {
-        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
+        return getAttributes().getValue(TARIFF_EXPORT);
     }
 
     public Optional<Double> getEnergyTariffImportForecastDeviation() {
-        return getAttributes().getValueOrDefault(ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION);
+        return getAttributes().getValue(ENERGY_TARIFF_IMPORT_FORECAST_DEVIATION);
     }
 
     public Optional<Double> getEnergyTariffExportForecastDeviation() {
-        return getAttributes().getValueOrDefault(ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION);
+        return getAttributes().getValue(ENERGY_TARIFF_EXPORT_FORECAST_DEVIATION);
     }
 
     public Optional<Double> getEnergyTax() {
-        return getAttributes().getValueOrDefault(ENERGY_TAX);
+        return getAttributes().getValue(ENERGY_TAX);
     }
 
     public Optional<Double> getGridCost() {
-        return getAttributes().getValueOrDefault(GRID_COST);
+        return getAttributes().getValue(GRID_COST);
     }
 
     public Optional<Double> getGridConnectionCost() {
-        return getAttributes().getValueOrDefault(GRID_CONNECTION_COST);
+        return getAttributes().getValue(GRID_CONNECTION_COST);
     }
 
     public Optional<Double> getCarbonImport() {
-        return getAttributes().getValueOrDefault(CARBON_IMPORT);
+        return getAttributes().getValue(CARBON_IMPORT);
     }
 
     public Optional<Double> getCarbonExport() {
-        return getAttributes().getValueOrDefault(CARBON_EXPORT);
+        return getAttributes().getValue(CARBON_EXPORT);
     }
 
     public Optional<Double> getPowerTotal() {
-        return getAttributes().getValueOrDefault(POWER_TOTAL);
+        return getAttributes().getValue(POWER_TOTAL);
     }
 
     public Optional<Double> getPowerForecastDeviation() {
-        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
+        return getAttributes().getValue(POWER_FORECAST_DEVIATION);
     }
 
     public Optional<Double> getEnergyTotalImport() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT);
+        return getAttributes().getValue(ENERGY_TOTAL_IMPORT);
     }
 
     public Optional<Double> getEnergyTotalExport() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT);
+        return getAttributes().getValue(ENERGY_TOTAL_EXPORT);
     }
 
     public Optional<Double> getEnergyTotalImportCost() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT_COST);
+        return getAttributes().getValue(ENERGY_TOTAL_IMPORT_COST);
     }
 
     public Optional<Double> getEnergyTotalExportIncome() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT_INCOME);
+        return getAttributes().getValue(ENERGY_TOTAL_EXPORT_INCOME);
     }
 
     public Optional<Integer> getCarbonTotal() {
-        return getAttributes().getValueOrDefault(CARBON_TOTAL);
+        return getAttributes().getValue(CARBON_TOTAL);
     }
 }

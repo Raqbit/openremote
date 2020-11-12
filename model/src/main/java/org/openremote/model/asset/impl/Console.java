@@ -43,7 +43,7 @@ public class Console extends Asset {
     }
 
     public Optional<String> getConsoleName() {
-        return getAttributes().getValueOrDefault(CONSOLE_NAME);
+        return getAttributes().getValue(CONSOLE_NAME);
     }
 
     public Console setConsoleName(String name) {
@@ -53,7 +53,7 @@ public class Console extends Asset {
     }
 
     public Optional<String> getConsoleVersion() {
-        return getAttributes().getValueOrDefault(CONSOLE_VERSION);
+        return getAttributes().getValue(CONSOLE_VERSION);
     }
 
     public Console setConsoleVersion(String version) {
@@ -63,7 +63,7 @@ public class Console extends Asset {
     }
 
     public Optional<String> getConsolePlatform() {
-        return getAttributes().getValueOrDefault(CONSOLE_PLATFORM);
+        return getAttributes().getValue(CONSOLE_PLATFORM);
     }
 
     public Console setConsolePlatform(String platform) {
@@ -73,7 +73,7 @@ public class Console extends Asset {
     }
 
     public Optional<ConsoleProviders> getConsoleProviders() {
-        return getAttributes().getValueOrDefault(CONSOLE_PROVIDERS);
+        return getAttributes().getValue(CONSOLE_PROVIDERS);
     }
 
     public Console setConsoleProviders(ConsoleProviders providers) {

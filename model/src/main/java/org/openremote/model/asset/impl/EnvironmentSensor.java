@@ -69,30 +69,30 @@ public class EnvironmentSensor extends Device {
     }
 
     public Optional<Double> getTemperature() {
-        return getAttributes().getValueOrDefault(TEMPERATURE);
+        return getAttributes().getValue(TEMPERATURE);
     }
 
     public Optional<Double> getRelativeHumidity() {
-        return getAttributes().getValueOrDefault(RELATIVE_HUMIDITY);
+        return getAttributes().getValue(RELATIVE_HUMIDITY);
     }
 
     public Optional<Integer> getOzone() {
-        return getAttributes().getValueOrDefault(OZONE);
+        return getAttributes().getValue(OZONE);
     }
 
     public Optional<Integer> getNO2() {
-        return getAttributes().getValueOrDefault(NO2);
+        return getAttributes().getValue(NO2);
     }
 
     public Optional<Integer> getParticlesPM1() {
-        return getAttributes().getValueOrDefault(PM1);
+        return getAttributes().getValue(PM1);
     }
 
     public Optional<Integer> getParticlesPM2_5() {
-        return getAttributes().getValueOrDefault(PM2_5);
+        return getAttributes().getValue(PM2_5);
     }
 
     public Optional<Integer> getParticlesPM10() {
-        return getAttributes().getValueOrDefault(PM10);
+        return getAttributes().getValue(PM10);
     }
 }

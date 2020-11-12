@@ -40,18 +40,18 @@ public class Building extends Asset {
     }
 
     public Optional<String> getStreet() {
-        return getAttributes().getValueOrDefault(STREET);
+        return getAttributes().getValue(STREET);
     }
 
     public Optional<String> getCity() {
-        return getAttributes().getValueOrDefault(CITY);
+        return getAttributes().getValue(CITY);
     }
 
     public Optional<String> getCountry() {
-        return getAttributes().getValueOrDefault(COUNTRY);
+        return getAttributes().getValue(COUNTRY);
     }
 
     public Optional<String> getPostalCode() {
-        return getAttributes().getValueOrDefault(POSTAL_CODE);
+        return getAttributes().getValue(POSTAL_CODE);
     }
 }

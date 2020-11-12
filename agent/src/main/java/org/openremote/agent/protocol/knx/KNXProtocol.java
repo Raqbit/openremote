@@ -515,7 +515,7 @@ public class KNXProtocol extends AbstractProtocol implements ProtocolAssetImport
         String attrName = assetName.replaceAll(" ", "");
         AttributeValueType type = TypeMapper.toAttributeType(datapoint);
 
-        Attribute<> attr = asset.getAttribute(attrName).orElse(new Attribute<>(attrName, type).setMeta(
+        Attribute<> attr = asset.getAttribute(attrName).orElse(new Attribute<>(attrName, type).addMeta(
                         new MetaItem<>(MetaItemType.LABEL, name),
                         new MetaItem<>(KNXProtocol.META_KNX_DPT, Values.create(datapoint.getDPT())),
                         agentLink

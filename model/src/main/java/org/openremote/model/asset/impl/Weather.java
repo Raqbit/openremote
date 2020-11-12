@@ -73,34 +73,34 @@ public class Weather extends Asset {
     }
 
     public Optional<Double> getTemperature() {
-        return getAttributes().getValueOrDefault(TEMPERATURE);
+        return getAttributes().getValue(TEMPERATURE);
     }
 
     public Optional<Integer> getUVIndex() {
-        return getAttributes().getValueOrDefault(UV_INDEX);
+        return getAttributes().getValue(UV_INDEX);
     }
 
     public Optional<Double> getSunIrradiance() {
-        return getAttributes().getValueOrDefault(SUN_IRRADIANCE);
+        return getAttributes().getValue(SUN_IRRADIANCE);
     }
 
     public Optional<Integer> getSunAzimuth() {
-        return getAttributes().getValueOrDefault(SUN_AZIMUTH);
+        return getAttributes().getValue(SUN_AZIMUTH);
     }
 
     public Optional<Integer> getSunZenith() {
-        return getAttributes().getValueOrDefault(SUN_ZENITH);
+        return getAttributes().getValue(SUN_ZENITH);
     }
 
     public Optional<Integer> getSunAltitude() {
-        return getAttributes().getValueOrDefault(SUN_ALTITUDE);
+        return getAttributes().getValue(SUN_ALTITUDE);
     }
 
     public Optional<Double> getRainfall() {
-        return getAttributes().getValueOrDefault(RAINFALL);
+        return getAttributes().getValue(RAINFALL);
     }
 
     public Optional<Integer> getHumidity() {
-        return getAttributes().getValueOrDefault(HUMIDITY);
+        return getAttributes().getValue(HUMIDITY);
     }
 }

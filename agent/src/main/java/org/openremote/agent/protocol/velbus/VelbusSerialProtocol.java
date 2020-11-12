@@ -37,9 +37,8 @@ import java.util.List;
 
 import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration;
 
-public class VelbusSerialProtocol extends AbstractVelbusProtocol implements ProtocolInstanceDiscovery {
+public class VelbusSerialProtocol extends AbstractVelbusProtocol<VelbusSerialAgent> implements ProtocolInstanceDiscovery {
 
-    public static final String PROTOCOL_NAME = PROTOCOL_BASE_NAME + "Serial";
     public static final String PROTOCOL_DISPLAY_NAME = "VELBUS Serial";
     public static final String META_VELBUS_SERIAL_PORT = PROTOCOL_NAME + ":port";
     public static final String META_VELBUS_SERIAL_BAUDRATE = PROTOCOL_NAME + ":baudRate";
@@ -82,7 +81,7 @@ public class VelbusSerialProtocol extends AbstractVelbusProtocol implements Prot
     }
 
     @Override
-    protected IoClient<VelbusPacket> createIoClient(Attribute<?> protocolConfiguration) throws RuntimeException {
+    protected IoClient<VelbusPacket> createIoClient(Velbus) throws RuntimeException {
 
         // Extract port and baud rate
         String port = protocolConfiguration.getMetaItem(META_VELBUS_SERIAL_PORT).flatMap(AbstractValueHolder::getValueAsString).orElse(null);

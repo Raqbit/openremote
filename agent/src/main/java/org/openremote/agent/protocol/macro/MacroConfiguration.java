@@ -143,7 +143,7 @@ final public class MacroConfiguration {
         if (attribute == null)
             return null;
 
-        attribute.getMeta().addAll(
+        attribute.addMeta(
             actions
                 .map(MacroAction::toMetaItem)
                 .collect(Collectors.toList())

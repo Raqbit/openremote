@@ -206,8 +206,8 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
         return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue);
     }
 
-    public <S> Optional<S> getValueOrDefault(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
-        return Optional.ofNullable(getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(nameValueDescriptorProvider.getDefaultValue()));
+    public <S> S getValueOrDefault(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+        return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(nameValueDescriptorProvider.getDefaultValue());
     }
 
     @SafeVarargs

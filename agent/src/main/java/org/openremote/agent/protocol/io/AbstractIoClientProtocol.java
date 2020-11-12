@@ -59,7 +59,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
 
         boolean hexMode = agent.getAttributes().getValue(Agent.MESSAGE_CONVERT_HEX).orElse(false);
         boolean binaryMode = agent.getAttributes().getValue(Agent.MESSAGE_CONVERT_BINARY).orElse(false);
-        Charset charset = agent.getAttributes().getValueOrDefault(Agent.MESSAGE_CHARSET).map(Charset::forName).orElse(CharsetUtil.UTF_8);
+        Charset charset = agent.getAttributes().getValue(Agent.MESSAGE_CHARSET).map(Charset::forName).orElse(CharsetUtil.UTF_8);
         int maxLength = agent.getAttributes().getValue(Agent.MESSAGE_MAX_LENGTH).orElse(Integer.MAX_VALUE);
         String[] delimiters = agent.getAttributes().getValue(Agent.MESSAGE_DELIMITERS).orElse(new String[0]);
         boolean stripDelimiter = agent.getAttributes().getValue(Agent.MESSAGE_STRIP_DELIMITER).orElse(false);
@@ -169,7 +169,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
 
     protected ProtocolIoClient<T, U> createIoClient(V agent) throws Exception {
         U client = doCreateIoClient(agent);
-        Supplier<ChannelHandler[]> encoderDecoderProvider = getEncoderDecoderProvider(client, agent);
+        Supplier<ChannelHandler[]> encoderDecoderProvider = getEncoderDecoderProvider();
         client.setEncoderDecoderProvider(encoderDecoderProvider);
         return new ProtocolIoClient<>(client, this::onConnectionStatusChanged, this::onMessageReceived);
     }
@@ -187,7 +187,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
      */
     protected abstract U doCreateIoClient(V agent) throws Exception;
 
-    protected abstract Supplier<ChannelHandler[]> getEncoderDecoderProvider(U client, V agent);
+    protected abstract Supplier<ChannelHandler[]> getEncoderDecoderProvider();
 
     /**
      * Called when the {@link IoClient} receives a message from the server

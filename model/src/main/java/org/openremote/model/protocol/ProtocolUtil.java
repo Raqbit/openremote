@@ -84,7 +84,7 @@ public final class ProtocolUtil {
      */
     public static Pair<Boolean, Object> doOutboundValueProcessing(String assetId, Attribute<?> attribute, Object value, boolean containsDynamicPlaceholder) {
 
-        String writeValue = attribute.getMeta().getValue(Agent.META_WRITE_VALUE).orElse(null);
+        String writeValue = attribute.getMetaValue(Agent.META_WRITE_VALUE).orElse(null);
         Pair<Boolean, Object> ignoreAndConvertedValue;
         final AtomicReference<Object> valRef = new AtomicReference<>(value);
 
@@ -104,7 +104,7 @@ public final class ProtocolUtil {
         }
 
         // value conversion
-        ignoreAndConvertedValue = attribute.getMeta().getValue(Agent.META_WRITE_VALUE_CONVERTER).map(converter -> {
+        ignoreAndConvertedValue = attribute.getMetaValue(Agent.META_WRITE_VALUE_CONVERTER).map(converter -> {
             Protocol.LOG.fine("Applying attribute write value converter to attribute: assetId=" + assetId + ", attribute=" + attribute.getName());
             return applyValueConverter(valRef.get(), converter);
         }).orElse(new Pair<>(false, valRef.get()));
@@ -119,7 +119,7 @@ public final class ProtocolUtil {
 
         // dynamic value insertion
 
-        boolean hasWriteValue = attribute.getMeta().has(Agent.META_WRITE_VALUE);
+        boolean hasWriteValue = attribute.hasMeta(Agent.META_WRITE_VALUE);
 
         if (hasWriteValue) {
             if (writeValue == null) {
@@ -149,7 +149,7 @@ public final class ProtocolUtil {
 
         // value filtering
         valRef.set(
-            attribute.getMeta().getValue(Agent.META_VALUE_FILTERS).map(valueFilters -> {
+            attribute.getMetaValue(Agent.META_VALUE_FILTERS).map(valueFilters -> {
                 Protocol.LOG.fine("Applying attribute value filters to attribute: assetId=" + assetId + ", attribute=" + attribute.getName());
                 Object o = Values.applyValueFilters(value, valueFilters);
                 if (o == null) {
@@ -160,7 +160,7 @@ public final class ProtocolUtil {
         );
 
         // value conversion
-        ignoreAndConvertedValue = attribute.getMeta().getValue(Agent.META_VALUE_CONVERTER).map(converter -> {
+        ignoreAndConvertedValue = attribute.getMetaValue(Agent.META_VALUE_CONVERTER).map(converter -> {
             Protocol.LOG.fine("Applying attribute value converter to attribute: assetId=" + assetId + ", attribute=" + attribute.getName());
             return applyValueConverter(valRef.get(), converter);
         }).orElse(new Pair<>(false, valRef.get()));
@@ -218,8 +218,8 @@ public final class ProtocolUtil {
 
     public static Consumer<String> createGenericAttributeMessageConsumer(String assetId, Attribute<?> attribute, Supplier<Long> currentMillisSupplier, Consumer<AttributeState> stateConsumer) {
 
-        ValueFilter[] matchFilters = attribute.getMeta().getValue(Agent.META_MESSAGE_MATCH_FILTERS).orElse(null);
-        ValuePredicate matchPredicate = attribute.getMeta().getValue(Agent.META_MESSAGE_MATCH_PREDICATE).orElse(null);
+        ValueFilter[] matchFilters = attribute.getMetaValue(Agent.META_MESSAGE_MATCH_FILTERS).orElse(null);
+        ValuePredicate matchPredicate = attribute.getMetaValue(Agent.META_MESSAGE_MATCH_PREDICATE).orElse(null);
 
         if (matchPredicate == null) {
             return null;

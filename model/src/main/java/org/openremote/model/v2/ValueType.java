@@ -36,8 +36,11 @@ import org.openremote.model.util.TimeUtil;
 import org.openremote.model.value.ColorRGB;
 
 import javax.validation.constraints.*;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 public final class ValueType {
+
+    public static class MultivaluedStringMap extends MultivaluedHashMap<String, String> {}
 
     public static final ValueDescriptor<Boolean> BOOLEAN = new ValueDescriptor<>("Boolean", Boolean.class);
 
@@ -49,6 +52,8 @@ public final class ValueType {
 
     @Min(1)
     public static final ValueDescriptor<String> STRING = new ValueDescriptor<>("String", String.class);
+
+    public static final ValueDescriptor<MultivaluedStringMap> MULTIVALUED_STRING_MAP = new ValueDescriptor<>("Multivalued string map", MultivaluedStringMap.class);
 
     public static final ValueDescriptor<ArrayNode> ARRAY = new ValueDescriptor<>("Array", ArrayNode.class);
 

@@ -48,26 +48,26 @@ public class Parking extends Device {
     }
 
     public Optional<Integer> getSpacesTotal() {
-        return getAttributes().getValueOrDefault(SPACES_TOTAL);
+        return getAttributes().getValue(SPACES_TOTAL);
     }
 
     public Optional<Integer> getSpacesOccupied() {
-        return getAttributes().getValueOrDefault(SPACES_OCCUPIED);
+        return getAttributes().getValue(SPACES_OCCUPIED);
     }
 
     public Optional<Integer> getSpacesOpen() {
-        return getAttributes().getValueOrDefault(SPACES_OPEN);
+        return getAttributes().getValue(SPACES_OPEN);
     }
 
     public Optional<Integer> getSpacesBuffer() {
-        return getAttributes().getValueOrDefault(SPACES_BUFFER);
+        return getAttributes().getValue(SPACES_BUFFER);
     }
 
     public Optional<Double> getPriceHourly() {
-        return getAttributes().getValueOrDefault(PRICE_HOURLY);
+        return getAttributes().getValue(PRICE_HOURLY);
     }
 
     public Optional<Double> getPriceDaily() {
-        return getAttributes().getValueOrDefault(PRICE_DAILY);
+        return getAttributes().getValue(PRICE_DAILY);
     }
 }

@@ -38,10 +38,10 @@ public abstract class TcpServerAgent extends Agent {
     }
 
     public Optional<Integer> getBindPort() {
-        return getAttributes().getValueOrDefault(BIND_PORT);
+        return getAttributes().getValue(BIND_PORT);
     }
 
     public Optional<String> getBindAddress() {
-        return getAttributes().getValueOrDefault(BIND_ADDRESS);
+        return getAttributes().getValue(BIND_ADDRESS);
     }
 }

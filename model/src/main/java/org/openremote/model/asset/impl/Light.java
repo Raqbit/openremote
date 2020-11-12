@@ -46,10 +46,10 @@ public class Light extends Device {
     }
 
     public Optional<Boolean> getOnOff() {
-        return getAttributes().getValueOrDefault(ON_OFF);
+        return getAttributes().getValue(ON_OFF);
     }
 
     public Optional<Integer> getBrightness() {
-        return getAttributes().getValueOrDefault(BRIGHTNESS);
+        return getAttributes().getValue(BRIGHTNESS);
     }
 }

@@ -114,7 +114,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
                                     LOG.info("Attempt to write to attribute that is not actually linked to this protocol '" + AbstractProtocol.this + "': " + linkedAttribute);
                                     return;
                                 }
-                                if (linkedAttribute.getMeta().getValue(MetaItemType.READ_ONLY).orElse(false)) {
+                                if (linkedAttribute.getMetaValue(MetaItemType.READ_ONLY).orElse(false)) {
                                     LOG.info("Attempt to write to readonly attribute: " + linkedAttribute);
                                     return;
                                 }
@@ -169,7 +169,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
             linkedAttributes.put(attributeRef, attribute);
 
             // Check for dynamic value placeholder
-            final String writeValue = attribute.getMeta().getValue(Agent.META_WRITE_VALUE).orElse(null);
+            final String writeValue = attribute.getMetaValue(Agent.META_WRITE_VALUE).orElse(null);
 
             if (!TextUtil.isNullOrEmpty(writeValue) && writeValue.contains(DYNAMIC_VALUE_PLACEHOLDER)) {
                 dynamicAttributes.add(attributeRef);

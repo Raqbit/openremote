@@ -53,26 +53,26 @@ public class Ship extends Asset {
     }
 
     public Optional<Integer> getMSSINumber() {
-        return getAttributes().getValueOrDefault(MSSI_NUMBER);
+        return getAttributes().getValue(MSSI_NUMBER);
     }
 
     public Optional<Integer> getIMONumber() {
-        return getAttributes().getValueOrDefault(IMO_NUMBER);
+        return getAttributes().getValue(IMO_NUMBER);
     }
 
     public Optional<Integer> getDirection() {
-        return getAttributes().getValueOrDefault(DIRECTION);
+        return getAttributes().getValue(DIRECTION);
     }
 
     public Optional<Integer> getLength() {
-        return getAttributes().getValueOrDefault(LENGTH);
+        return getAttributes().getValue(LENGTH);
     }
 
     public Optional<Double> getSpeed() {
-        return getAttributes().getValueOrDefault(SPEED);
+        return getAttributes().getValue(SPEED);
     }
 
     public Optional<String> getShipType() {
-        return getAttributes().getValueOrDefault(SHIP_TYPE);
+        return getAttributes().getValue(SHIP_TYPE);
     }
 }

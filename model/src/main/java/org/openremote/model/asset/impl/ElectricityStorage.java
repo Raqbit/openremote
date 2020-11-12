@@ -88,62 +88,62 @@ public class ElectricityStorage extends Device {
     }
 
     public Optional<String> getStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<Double> getLevelisedCostOfStorage() {
-        return getAttributes().getValueOrDefault(LEVELISED_COST_OF_STORAGE);
+        return getAttributes().getValue(LEVELISED_COST_OF_STORAGE);
     }
 
     public Optional<Double> getEnergyCapacity() {
-        return getAttributes().getValueOrDefault(ENERGY_CAPACITY);
+        return getAttributes().getValue(ENERGY_CAPACITY);
     }
 
     public Optional<Integer> getEnergyAvailablePercentage() {
-        return getAttributes().getValueOrDefault(ENERGY_AVAILABLE_PERCENTAGE);
+        return getAttributes().getValue(ENERGY_AVAILABLE_PERCENTAGE);
     }
 
     public Optional<Double> getEnergyAvailable() {
-        return getAttributes().getValueOrDefault(ENERGY_AVAILABLE);
+        return getAttributes().getValue(ENERGY_AVAILABLE);
     }
 
     public Optional<Double> getEnergyCapacityRemaining() {
-        return getAttributes().getValueOrDefault(ENERGY_CAPACITY_REMAINING);
+        return getAttributes().getValue(ENERGY_CAPACITY_REMAINING);
     }
 
     public Optional<Double> getEnergyTotalImport() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_IMPORT);
+        return getAttributes().getValue(ENERGY_TOTAL_IMPORT);
     }
 
     public Optional<Double> getEnergyTotalExport() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL_EXPORT);
+        return getAttributes().getValue(ENERGY_TOTAL_EXPORT);
     }
 
     public Optional<Double> getPowerCapacityImport() {
-        return getAttributes().getValueOrDefault(POWER_CAPACITY_IMPORT);
+        return getAttributes().getValue(POWER_CAPACITY_IMPORT);
     }
 
     public Optional<Double> getPowerCapacityExport() {
-        return getAttributes().getValueOrDefault(POWER_CAPACITY_EXPORT);
+        return getAttributes().getValue(POWER_CAPACITY_EXPORT);
     }
 
     public Optional<Double> getPowerTotal() {
-        return getAttributes().getValueOrDefault(POWER_TOTAL);
+        return getAttributes().getValue(POWER_TOTAL);
     }
 
     public Optional<Double> getPowerSetpoint() {
-        return getAttributes().getValueOrDefault(POWER_SETPOINT);
+        return getAttributes().getValue(POWER_SETPOINT);
     }
 
     public Optional<Integer> getChargeCycles() {
-        return getAttributes().getValueOrDefault(CHARGE_CYCLES);
+        return getAttributes().getValue(CHARGE_CYCLES);
     }
 
     public Optional<Double> getFinancialWallet() {
-        return getAttributes().getValueOrDefault(FINANCIAL_WALLET);
+        return getAttributes().getValue(FINANCIAL_WALLET);
     }
 
     public Optional<Integer> getCarbonWallet() {
-        return getAttributes().getValueOrDefault(CARBON_WALLET);
+        return getAttributes().getValue(CARBON_WALLET);
     }
 }

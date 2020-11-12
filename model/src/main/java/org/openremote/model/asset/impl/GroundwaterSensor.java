@@ -45,10 +45,10 @@ public class GroundwaterSensor extends Device {
     }
 
     public Optional<Double> getTemperature() {
-        return getAttributes().getValueOrDefault(TEMPERATURE);
+        return getAttributes().getValue(TEMPERATURE);
     }
 
     public Optional<Integer> getWaterLevel() {
-        return getAttributes().getValueOrDefault(WATER_LEVEL);
+        return getAttributes().getValue(WATER_LEVEL);
     }
 }

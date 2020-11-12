@@ -22,6 +22,7 @@ package org.openremote.model.attribute;
 import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.v2.AbstractNameValueHolderImpl;
 import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
 import javax.validation.constraints.NotNull;
@@ -76,18 +77,45 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
         return meta;
     }
 
-    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaList meta) {
+    public Attribute<T> addMeta(@NotNull MetaList meta) {
         getMeta().addAll(meta);
         return this;
     }
 
-    public Attribute<T> addOrReplaceMetaItems(@NotNull MetaItem<?>...meta) {
-        return addOrReplaceMetaItems(Arrays.asList(meta));
-    }
-
-    public Attribute<T> addOrReplaceMetaItems(@NotNull Collection<MetaItem<?>> meta) {
+    public Attribute<T> addMeta(@NotNull MetaItem<?>...meta) {
         getMeta().addAll(meta);
         return this;
+    }
+
+    public Attribute<T> addMeta(@NotNull Collection<MetaItem<?>> meta) {
+        getMeta().addAll(meta);
+        return this;
+    }
+
+    public Attribute<T> addOrReplaceMeta(@NotNull MetaList meta) {
+        getMeta().addAll(meta);
+        return this;
+    }
+
+    public Attribute<T> addOrReplaceMeta(@NotNull MetaItem<?>...meta) {
+        return addOrReplaceMeta(Arrays.asList(meta));
+    }
+
+    public Attribute<T> addOrReplaceMeta(@NotNull Collection<MetaItem<?>> meta) {
+        getMeta().addAll(meta);
+        return this;
+    }
+
+    public <U> Optional<U> getMetaValue(MetaItemDescriptor<U> metaItemDescriptor) {
+        return getMeta().getValue(metaItemDescriptor);
+    }
+
+    public <U> U getMetaValueOrDefault(MetaItemDescriptor<U> metaItemDescriptor) {
+        return getMeta().getValueOrDefault(metaItemDescriptor);
+    }
+
+    public boolean hasMeta(MetaItemDescriptor<?> metaItemDescriptor) {
+        return getMeta().has(metaItemDescriptor);
     }
 
     @Override

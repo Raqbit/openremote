@@ -90,9 +90,9 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent> implements ProtocolAss
     @Override
     protected synchronized void doLinkAttribute(String assetId, Attribute<?> attribute) {
 
-        int nodeId = attribute.getMeta().getValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
-        int endpoint = attribute.getMeta().getValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
-        String linkName = attribute.getMeta().getValue(ZWAgent.DEVICE_VALUE).orElse("");
+        int nodeId = attribute.getMetaValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
+        int endpoint = attribute.getMetaValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
+        String linkName = attribute.getMetaValue(ZWAgent.DEVICE_VALUE).orElse("");
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // TODO: Value must be compatible with the value type of the attribute...for non primitives the object types must match

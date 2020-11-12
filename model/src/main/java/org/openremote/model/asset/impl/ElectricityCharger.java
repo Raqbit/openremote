@@ -58,30 +58,30 @@ public class ElectricityCharger extends Device {
     }
 
     public Optional<String> getStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<String> getChargerType() {
-        return getAttributes().getValueOrDefault(CHARGER_TYPE);
+        return getAttributes().getValue(CHARGER_TYPE);
     }
 
     public Optional<Double> getPowerCapacity() {
-        return getAttributes().getValueOrDefault(POWER_CAPACITY);
+        return getAttributes().getValue(POWER_CAPACITY);
     }
 
     public Optional<Double> getPowerConsumption() {
-        return getAttributes().getValueOrDefault(POWER_CONSUMPTION);
+        return getAttributes().getValue(POWER_CONSUMPTION);
     }
 
     public Optional<Double> getTariffImport() {
-        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
+        return getAttributes().getValue(TARIFF_IMPORT);
     }
 
     public Optional<Double> getTariffExport() {
-        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
+        return getAttributes().getValue(TARIFF_EXPORT);
     }
 
     public Optional<Double> getTariffStart() {
-        return getAttributes().getValueOrDefault(TARIFF_START);
+        return getAttributes().getValue(TARIFF_START);
     }
 }

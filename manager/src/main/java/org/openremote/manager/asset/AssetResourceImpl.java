@@ -303,7 +303,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                         updatedMetaItems.stream().filter(AssetModelUtil::isMetaItemRestrictedWrite).forEach(existingMetaItems::add);
 
                         // Replace existing with updated attribute
-                        updatedAttribute.setMeta(existingMetaItems);
+                        updatedAttribute.addMeta(existingMetaItems);
                         resultAsset.replaceAttribute(updatedAttribute);
 
                     } else {

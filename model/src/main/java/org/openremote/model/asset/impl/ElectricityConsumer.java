@@ -78,50 +78,50 @@ public class ElectricityConsumer extends Device {
     }
 
     public Optional<String> getStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<String> getDemandResponseType() {
-        return getAttributes().getValueOrDefault(DEMAND_RESPONSE_TYPE);
+        return getAttributes().getValue(DEMAND_RESPONSE_TYPE);
     }
 
     public Optional<Double> getTariffImport() {
-        return getAttributes().getValueOrDefault(TARIFF_IMPORT);
+        return getAttributes().getValue(TARIFF_IMPORT);
     }
 
     public Optional<Double> getTariffExport() {
-        return getAttributes().getValueOrDefault(TARIFF_EXPORT);
+        return getAttributes().getValue(TARIFF_EXPORT);
     }
 
     public Optional<Integer> getCarbonImport() {
-        return getAttributes().getValueOrDefault(CARBON_IMPORT);
+        return getAttributes().getValue(CARBON_IMPORT);
     }
 
     public Optional<Integer> getCarbonExport() {
-        return getAttributes().getValueOrDefault(CARBON_EXPORT);
+        return getAttributes().getValue(CARBON_EXPORT);
     }
 
     public Optional<Double> getPowerTotal() {
-        return getAttributes().getValueOrDefault(POWER_TOTAL);
+        return getAttributes().getValue(POWER_TOTAL);
     }
 
     public Optional<Double> getPowerForecastDeviation() {
-        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
+        return getAttributes().getValue(POWER_FORECAST_DEVIATION);
     }
 
     public Optional<Double> getPowerSetpoint() {
-        return getAttributes().getValueOrDefault(POWER_SETPOINT);
+        return getAttributes().getValue(POWER_SETPOINT);
     }
 
     public Optional<Double> getPowerAvailableMax() {
-        return getAttributes().getValueOrDefault(POWER_AVAILABLE_MAX);
+        return getAttributes().getValue(POWER_AVAILABLE_MAX);
     }
 
     public Optional<Double> getPowerAvailableMin() {
-        return getAttributes().getValueOrDefault(POWER_AVAILABLE_MIN);
+        return getAttributes().getValue(POWER_AVAILABLE_MIN);
     }
 
     public Optional<Double> getEnergyTotal() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL);
+        return getAttributes().getValue(ENERGY_TOTAL);
     }
 }

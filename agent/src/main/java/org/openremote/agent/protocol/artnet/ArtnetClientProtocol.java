@@ -430,11 +430,11 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
                                 for(String key : updatedLight.getRequiredValues())
                                     values.put(key, 0);
                                 List<Attribute<?>> artNetLightAttributes = Arrays.asList(
-                                        new Attribute<>("Id", NUMBER, Values.create(updatedLight.getLightId())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                                        new Attribute<>("GroupId", NUMBER, Values.create(updatedLight.getGroupId())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                                        new Attribute<>("Universe", NUMBER, Values.create(updatedLight.getUniverse())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                                        new Attribute<>("AmountOfLeds", NUMBER, Values.create(updatedLight.getAmountOfLeds())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                                        new Attribute<>("RequiredValues", STRING, Values.create(String.join(",", updatedLight.getRequiredValues()))).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                                        new Attribute<>("Id", NUMBER, Values.create(updatedLight.getLightId())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                                        new Attribute<>("GroupId", NUMBER, Values.create(updatedLight.getGroupId())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                                        new Attribute<>("Universe", NUMBER, Values.create(updatedLight.getUniverse())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                                        new Attribute<>("AmountOfLeds", NUMBER, Values.create(updatedLight.getAmountOfLeds())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                                        new Attribute<>("RequiredValues", STRING, Values.create(String.join(",", updatedLight.getRequiredValues()))).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
                                         new Attribute<>("Values", OBJECT, Values.parseOrNull(Values.JSON.writeValueAsString(values))).addMeta(
                                                 new MetaItem<>(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                                         ),
@@ -498,11 +498,11 @@ public class ArtnetClientProtocol extends AbstractIoClientProtocol<ArtnetPacket,
         for(String key : light.getRequiredValues())
             values.put(key, 0);
         List<Attribute<?>> artNetLightAttributes = Arrays.asList(
-                new Attribute<>("Id", NUMBER, Values.create(light.getLightId())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                new Attribute<>("GroupId", NUMBER, Values.create(light.getGroupId())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                new Attribute<>("Universe", NUMBER, Values.create(light.getUniverse())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                new Attribute<>("AmountOfLeds", NUMBER, Values.create(light.getAmountOfLeds())).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
-                new Attribute<>("RequiredValues", STRING, Values.create(String.join(",", light.getRequiredValues()))).setMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                new Attribute<>("Id", NUMBER, Values.create(light.getLightId())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                new Attribute<>("GroupId", NUMBER, Values.create(light.getGroupId())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                new Attribute<>("Universe", NUMBER, Values.create(light.getUniverse())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                new Attribute<>("AmountOfLeds", NUMBER, Values.create(light.getAmountOfLeds())).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
+                new Attribute<>("RequiredValues", STRING, Values.create(String.join(",", light.getRequiredValues()))).addMeta(new Meta(new MetaItem<>(READ_ONLY, true))),
                 new Attribute<>("Values", OBJECT, Values.parseOrNull(Values.JSON.writeValueAsString(values))).addMeta(
                         new MetaItem<>(AGENT_LINK, new AttributeRef(parentAgent.getId(), agentProtocolConfigName).toArrayValue())
                 ),

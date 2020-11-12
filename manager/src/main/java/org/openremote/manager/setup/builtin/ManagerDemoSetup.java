@@ -836,7 +836,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         weather.setId(UniqueIdentifierGenerator.generateId(weather.getName()));
         weather.addAttributes(
                 new Attribute<>("currentWeather", OBJECT)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(
                                         AGENT_LINK,
                                         new AttributeRef(weatherHttpApiAgentId, "weatherApiClient").toArrayValue()),

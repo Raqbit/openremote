@@ -41,26 +41,26 @@ public class PeopleCounter extends Device {
     }
 
     public Optional<Integer> getCountIn() {
-        return getAttributes().getValueOrDefault(COUNT_IN);
+        return getAttributes().getValue(COUNT_IN);
     }
 
     public Optional<Integer> getCountOut() {
-        return getAttributes().getValueOrDefault(COUNT_OUT);
+        return getAttributes().getValue(COUNT_OUT);
     }
 
     public Optional<Integer> getCountInMinute() {
-        return getAttributes().getValueOrDefault(COUNT_IN_PER_MINUTE);
+        return getAttributes().getValue(COUNT_IN_PER_MINUTE);
     }
 
     public Optional<Integer> getCountOutMinute() {
-        return getAttributes().getValueOrDefault(COUNT_OUT_PER_MINUTE);
+        return getAttributes().getValue(COUNT_OUT_PER_MINUTE);
     }
 
     public Optional<Integer> getCountTotal() {
-        return getAttributes().getValueOrDefault(COUNT_TOTAL);
+        return getAttributes().getValue(COUNT_TOTAL);
     }
 
     public Optional<Double> getCountGrowthMinute() {
-        return getAttributes().getValueOrDefault(COUNT_GROWTH_PER_MINUTE);
+        return getAttributes().getValue(COUNT_GROWTH_PER_MINUTE);
     }
 }

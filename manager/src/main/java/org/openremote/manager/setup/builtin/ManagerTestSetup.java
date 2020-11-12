@@ -171,10 +171,10 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         Asset thing = new Asset("Demo Thing", THING, agent)
                 .addAttributes(new Attribute<>(AttributeType.LOCATION, locationValue)
-                        .setMeta(new MetaItem<>(RULE_STATE, true)));
+                        .addMeta(new MetaItem<>(RULE_STATE, true)));
         thing.addAttributes(
                 new Attribute<>(thingLightToggleAttributeName, BOOLEAN, true)
-                        .setMeta(new Meta(
+                        .addMeta(new Meta(
                                 new MetaItem<>(
                                         LABEL,
                                         "Light 1 Toggle"),
@@ -196,7 +196,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                                 ))
                         ),
                 new Attribute<>("light1Dimmer", PERCENTAGE) // No initial value!
-                        .setMeta(new Meta(
+                        .addMeta(new Meta(
                                         new MetaItem<>(
                                                 LABEL,
                                                 "Light 1 Dimmer"),
@@ -220,7 +220,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                                 )
                         ),
                 new Attribute<>("light1Color", COLOR_RGB, new ColorRGB(88, 123, 88).asArrayValue())
-                        .setMeta(new Meta(
+                        .addMeta(new Meta(
                                         new MetaItem<>(
                                                 LABEL,
                                                 "Light 1 Color"),
@@ -235,7 +235,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                                 )
                         ),
                 new Attribute<>("light1PowerConsumption", ENERGY, Values.create(12.345))
-                        .setMeta(new Meta(
+                        .addMeta(new Meta(
                                         new MetaItem<>(
                                                 LABEL,
                                                 "Light 1 Usage"),
@@ -300,7 +300,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                 .addAttributes(
                         new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454213, 51.446884).toValue()),
                         new Attribute<>("lightsCeiling", NUMBER, 0)
-                                .setMeta(
+                                .addMeta(
                                         new MetaItem<>(RANGE_MIN, 0),
                                         new MetaItem<>(RANGE_MAX, 100),
                                         new MetaItem<>(LABEL, Values.create("Ceiling lights (range)")),
@@ -308,7 +308,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                                         new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
                                 ),
                         new Attribute<>("lightsStand", AttributeValueType.BOOLEAN, true)
-                                .setMeta(
+                                .addMeta(
                                         new MetaItem<>(LABEL, Values.create("Floor stand lights (on/off)")),
                                         new MetaItem<>(ACCESS_RESTRICTED_READ, true),
                                         new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
@@ -432,7 +432,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         apartment1Bathroom.addAttributes(
                 new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454227,51.446753).toValue()),
                 new Attribute<>("lights", AttributeValueType.BOOLEAN, true)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(RULE_STATE, true),
                                 new MetaItem<>(ACCESS_RESTRICTED_READ, true),
                                 new MetaItem<>(ACCESS_RESTRICTED_WRITE, true)
@@ -468,7 +468,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         apartment2.addAttributes(
                 new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454053, 51.446603).toValue()),
                 new Attribute<>("allLightsOffSwitch", AttributeValueType.BOOLEAN, true)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "All Lights Off Switch"),
                                 new MetaItem<>(DESCRIPTION, Values.create("When triggered, turns all lights in the apartment off")),
                                 new MetaItem<>(RULE_EVENT, true),
@@ -482,51 +482,51 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         apartment2Livingroom.addAttributes(
                 new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454109, 51.446631).toValue()),
                 new Attribute<>("motionSensor", AttributeValueType.BOOLEAN, false)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Motion Sensor"),
                                 new MetaItem<>(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
                                 new MetaItem<>(RULE_STATE, true),
                                 new MetaItem<>(RULE_EVENT, true)
                         ),
                 new Attribute<>("presenceDetected", AttributeValueType.BOOLEAN, false)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Presence Detected"),
                                 new MetaItem<>(DESCRIPTION, "Someone is currently present in the room"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("firstPresenceDetected", AttributeValueType.TIMESTAMP)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "First Presence Timestamp"),
                                 new MetaItem<>(DESCRIPTION, "Timestamp of the first detected presence"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("lastPresenceDetected", AttributeValueType.TIMESTAMP)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Last Presence Timestamp"),
                                 new MetaItem<>(DESCRIPTION, "Timestamp of last detected presence"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("co2Level", AttributeValueType.CO2, 350)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "CO2 Level"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("lightSwitch", AttributeValueType.BOOLEAN, true)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Light Switch"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("windowOpen", AttributeValueType.BOOLEAN, false)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(ACCESS_RESTRICTED_READ, true)
                         ),
                 new Attribute<>("lightSwitchTriggerTimes", ARRAY, Values.createArray().add("1800").add("0830"))
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Lightswitch Trigger Times"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("plantsWaterLevels", OBJECT, Values.createObject().put("cactus", 0.8))
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Water levels of the plants"),
                                 new MetaItem<>(RULE_STATE, true)
                         )
@@ -538,32 +538,32 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         apartment2Bathroom.addAttributes(
                 new Attribute<>(AttributeType.LOCATION, new GeoJSONPoint(5.454015, 51.446665).toValue()),
                 new Attribute<>("motionSensor", AttributeValueType.BOOLEAN, false)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Motion Sensor"),
                                 new MetaItem<>(DESCRIPTION, Values.create("PIR sensor that sends 'true' when motion is sensed")),
                                 new MetaItem<>(RULE_STATE, true),
                                 new MetaItem<>(RULE_EVENT, true)
                         ),
                 new Attribute<>("presenceDetected", AttributeValueType.BOOLEAN, false)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Presence Detected"),
                                 new MetaItem<>(DESCRIPTION, "Someone is currently present in the room"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("firstPresenceDetected", AttributeValueType.TIMESTAMP)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "First Presence Timestamp"),
                                 new MetaItem<>(DESCRIPTION, "Timestamp of the first detected presence"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("lastPresenceDetected", AttributeValueType.TIMESTAMP)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Last Presence Timestamp"),
                                 new MetaItem<>(DESCRIPTION, "Timestamp of last detected presence"),
                                 new MetaItem<>(RULE_STATE, true)
                         ),
                 new Attribute<>("lightSwitch", AttributeValueType.BOOLEAN, true)
-                        .setMeta(
+                        .addMeta(
                                 new MetaItem<>(LABEL, "Light Switch"),
                                 new MetaItem<>(RULE_STATE, true)
                         )

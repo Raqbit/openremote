@@ -63,7 +63,7 @@ public abstract class Agent extends Asset {
      * Charset to use when converting byte[] to a string (should default to UTF8 if not specified); values must be
      * string that matches a charset as defined in {@link java.nio.charset.Charset}
      */
-    public static final AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueType.STRING, "UTF8");
+    public static final AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueType.STRING, "UTF-8");
 
     /**
      * Max length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
@@ -211,7 +211,7 @@ public abstract class Agent extends Asset {
     public abstract Protocol getProtocolInstance();
 
     public Optional<Boolean> isDisabled() {
-        return getAttributes().getValueOrDefault(DISABLED);
+        return getAttributes().getValue(DISABLED);
     }
 
     public Agent setDisabled(boolean disabled) {
@@ -220,62 +220,62 @@ public abstract class Agent extends Asset {
     }
 
     public Optional<ConnectionStatus> getAgentStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<Boolean> getMessageConvertHex() {
-        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_HEX);
+        return getAttributes().getValue(MESSAGE_CONVERT_HEX);
     }
 
     public Optional<Boolean> getMessageConvertBinary() {
-        return getAttributes().getValueOrDefault(MESSAGE_CONVERT_BINARY);
+        return getAttributes().getValue(MESSAGE_CONVERT_BINARY);
     }
 
     public Optional<String> getMessageCharset() {
-        return getAttributes().getValueOrDefault(MESSAGE_CHARSET);
+        return getAttributes().getValue(MESSAGE_CHARSET);
     }
 
     public Optional<Integer> getMessageMaxLength() {
-        return getAttributes().getValueOrDefault(MESSAGE_MAX_LENGTH);
+        return getAttributes().getValue(MESSAGE_MAX_LENGTH);
     }
 
     public Optional<String[]> getMessageDelimiters() {
-        return getAttributes().getValueOrDefault(MESSAGE_DELIMITERS);
+        return getAttributes().getValue(MESSAGE_DELIMITERS);
     }
 
     public Optional<Boolean> getMessageStripDelimiter() {
-        return getAttributes().getValueOrDefault(MESSAGE_STRIP_DELIMITER);
+        return getAttributes().getValue(MESSAGE_STRIP_DELIMITER);
     }
 
     public Optional<OAuthGrant> getOAuthGrant() {
-        return getAttributes().getValueOrDefault(OAUTH_GRANT);
+        return getAttributes().getValue(OAUTH_GRANT);
     }
 
     public Optional<UsernamePassword> getUsernamePassword() {
-        return getAttributes().getValueOrDefault(USERNAME_AND_PASSWORD);
+        return getAttributes().getValue(USERNAME_AND_PASSWORD);
     }
 
     public Optional<String> getHost() {
-        return getAttributes().getValueOrDefault(HOST);
+        return getAttributes().getValue(HOST);
     }
 
     public Optional<Integer> getPort() {
-        return getAttributes().getValueOrDefault(PORT);
+        return getAttributes().getValue(PORT);
     }
 
     public Optional<Integer> getBindPort() {
-        return getAttributes().getValueOrDefault(BIND_PORT);
+        return getAttributes().getValue(BIND_PORT);
     }
 
     public Optional<String> getSerialPort() {
-        return getAttributes().getValueOrDefault(SERIAL_PORT);
+        return getAttributes().getValue(SERIAL_PORT);
     }
 
     public Optional<Integer> getSerialBaudrate() {
-        return getAttributes().getValueOrDefault(SERIAL_BAUDRATE);
+        return getAttributes().getValue(SERIAL_BAUDRATE);
     }
 
     public Optional<Integer> getPollingMillis() {
-        return getAttributes().getValueOrDefault(POLLING_MILLIS);
+        return getAttributes().getValue(POLLING_MILLIS);
     }
 }

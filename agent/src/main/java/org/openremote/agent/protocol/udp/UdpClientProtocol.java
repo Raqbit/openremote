@@ -76,8 +76,8 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String, UdpClie
     }
 
     @Override
-    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider(UdpIoClient<String> client, UdpClientAgent agent) {
-        return getGenericStringEncodersAndDecoders(client, agent);
+    protected Supplier<ChannelHandler[]> getEncoderDecoderProvider() {
+        return getGenericStringEncodersAndDecoders(client.ioClient, agent);
     }
 
     @Override

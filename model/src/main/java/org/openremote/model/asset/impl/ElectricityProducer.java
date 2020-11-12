@@ -58,30 +58,30 @@ public class ElectricityProducer extends Device {
     }
 
     public Optional<String> getStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<Double> getPowerTotal() {
-        return getAttributes().getValueOrDefault(POWER_TOTAL);
+        return getAttributes().getValue(POWER_TOTAL);
     }
 
     public Optional<Double> getPowerForecastDeviation() {
-        return getAttributes().getValueOrDefault(POWER_FORECAST_DEVIATION);
+        return getAttributes().getValue(POWER_FORECAST_DEVIATION);
     }
 
     public Optional<Double> getPowerCapacity() {
-        return getAttributes().getValueOrDefault(POWER_CAPACITY);
+        return getAttributes().getValue(POWER_CAPACITY);
     }
 
     public Optional<Integer> getEfficiency() {
-        return getAttributes().getValueOrDefault(EFFICIENCY);
+        return getAttributes().getValue(EFFICIENCY);
     }
 
     public Optional<Double> getEnergyTotal() {
-        return getAttributes().getValueOrDefault(ENERGY_TOTAL);
+        return getAttributes().getValue(ENERGY_TOTAL);
     }
 
     public Optional<Integer> getPanelOrientation() {
-        return getAttributes().getValueOrDefault(PANEL_ORIENTATION);
+        return getAttributes().getValue(PANEL_ORIENTATION);
     }
 }

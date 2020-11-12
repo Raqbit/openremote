@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol.velbus.device;
+package org.openremote.agent.protocol.velbus;
 
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
+public class VelbusTcpAgent extends VelbusAgent {
 
-/**
- * Simple interface for converting device property values into attribute values
- */
-public interface DevicePropertyValue<T> {
-    <U> U toValue(ValueType valueType);
+    protected VelbusTcpAgent(String name) {
+        super(name, DESCRIPTOR);
+    }
 
-    T getPropertyValue();
+    @Override
+    public VelbusTcpProtocol getProtocolInstance() {
+        return new VelbusTcpProtocol(this);
+    }
 }

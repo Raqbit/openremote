@@ -41,6 +41,6 @@ public class Microphone extends Device {
     }
 
     public Optional<Double> getSoundLevel() {
-        return getAttributes().getValueOrDefault(SOUND_LEVEL);
+        return getAttributes().getValue(SOUND_LEVEL);
     }
 }

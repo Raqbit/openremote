@@ -41,18 +41,18 @@ public class Gateway extends Asset {
     }
 
     public Optional<String> getClientId() {
-        return getAttributes().getValueOrDefault(CLIENT_ID);
+        return getAttributes().getValue(CLIENT_ID);
     }
 
     public Optional<String> getClientSecret() {
-        return getAttributes().getValueOrDefault(CLIENT_SECRET);
+        return getAttributes().getValue(CLIENT_SECRET);
     }
 
     public Optional<ConnectionStatus> getGatewayStatus() {
-        return getAttributes().getValueOrDefault(STATUS);
+        return getAttributes().getValue(STATUS);
     }
 
     public Optional<Boolean> getDisabled() {
-        return getAttributes().getValueOrDefault(DISABLED);
+        return getAttributes().getValue(DISABLED);
     }
 }

@@ -42,10 +42,10 @@ public class Device extends Asset {
     }
 
     public Optional<String> getManufacturer() {
-        return getAttributes().getValueOrDefault(MANUFACTURER);
+        return getAttributes().getValue(MANUFACTURER);
     }
 
     public Optional<String> getModel() {
-        return getAttributes().getValueOrDefault(MODEL);
+        return getAttributes().getValue(MODEL);
     }
 }
