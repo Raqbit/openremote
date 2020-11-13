@@ -19,10 +19,17 @@
  */
 package org.openremote.agent.protocol.velbus;
 
+import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.Protocol;
+
 public class VelbusTcpAgent extends VelbusAgent {
 
-    protected VelbusTcpAgent(String name) {
-        super(name, DESCRIPTOR);
+    public VelbusTcpAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
+
+    protected <T extends VelbusTcpAgent, S extends Protocol<T>> VelbusTcpAgent(String name, AgentDescriptor<T, S> descriptor) {
+        super(name, descriptor);
     }
 
     @Override

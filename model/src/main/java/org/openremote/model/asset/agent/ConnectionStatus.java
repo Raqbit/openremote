@@ -73,5 +73,7 @@ public enum ConnectionStatus {
     /**
      * A general error has occurred that prevents normal operation.
      */
-    ERROR
+    ERROR,
+
+    STOPPED
 }

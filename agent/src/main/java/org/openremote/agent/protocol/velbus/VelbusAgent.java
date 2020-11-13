@@ -21,7 +21,6 @@ package org.openremote.agent.protocol.velbus;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueType;

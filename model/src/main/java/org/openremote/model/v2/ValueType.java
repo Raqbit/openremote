@@ -23,10 +23,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.agent.ConnectionStatus;
-import org.openremote.model.attribute.AttributeExecuteStatus;
-import org.openremote.model.attribute.AttributeLink;
-import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.MetaItem;
+import org.openremote.model.attribute.*;
 import org.openremote.model.auth.OAuthGrant;
 import org.openremote.model.auth.UsernamePassword;
 import org.openremote.model.calendar.CalendarEvent;
@@ -122,6 +119,8 @@ public final class ValueType {
     public static final ValueDescriptor<AttributeLink> ATTRIBUTE_LINK = new ValueDescriptor<>("Attribute link", AttributeLink.class);
 
     public static final ValueDescriptor<AttributeRef> ATTRIBUTE_REF = new ValueDescriptor<>("Attribute reference", AttributeRef.class);
+
+    public static final ValueDescriptor<AttributeState> ATTRIBUTE_STATE = new ValueDescriptor<>("Attribute state", AttributeState.class);
 
     public static final ValueDescriptor<GeoJSONPoint> GEO_JSON_POINT = new ValueDescriptor<>("GeoJSON point", GeoJSONPoint.class);
 

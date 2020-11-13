@@ -39,6 +39,7 @@ import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE;
 
+// TODO: Remove this once attribute linking and flow integration is done
 /**
  * This protocol is responsible for executing macros.
  * <p>

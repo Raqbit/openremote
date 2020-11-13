@@ -21,7 +21,8 @@ package org.openremote.agent.protocol.websocket;
 
 import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
-import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
@@ -60,8 +61,12 @@ public class WebsocketClientAgent extends IoAgent<String, WebsocketIoClient<Stri
      */
     public static final MetaItemDescriptor<WebsocketSubscription[]> META_SUBSCRIPTIONS = new MetaItemDescriptor<>("websocketSubscriptions", WEBSOCKET_SUBSCRIPTION_VALUE_DESCRIPTOR.asArray(), null);
 
-    protected <T extends Agent> WebsocketClientAgent(String name) {
-        super(name, DESCRIPTOR);
+    public WebsocketClientAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
+
+    protected <T extends WebsocketClientAgent, S extends Protocol<T>> WebsocketClientAgent(String name, AgentDescriptor<T, S> descriptor) {
+        super(name, descriptor);
     }
 
     public Optional<String> getConnectUri() {

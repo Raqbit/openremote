@@ -45,90 +45,10 @@ final public class TimerConfiguration {
     private TimerConfiguration() {
     }
 
-    public static Attribute<?> initTimerConfiguration(Attribute<?> attribute, String cronExpression, AttributeState action) {
-        initProtocolConfiguration(attribute, TimerProtocol.PROTOCOL_NAME);
-        setCronExpression(attribute, cronExpression);
-        setAction(attribute, action);
-        return attribute;
-    }
-
-    public static boolean isTimerConfiguration(Attribute<?> attribute) {
-        return getProtocolName(attribute)
-            .map(TimerProtocol.PROTOCOL_NAME::equals)
-            .orElse(false);
-    }
-
-    public static boolean validateTimerConfiguration(Attribute<?> attribute, AttributeValidationResult result) {
-        boolean failure = false;
-
-        if (!isTimerConfiguration(attribute)) {
-            failure = true;
-            if (result != null) {
-                result.addAttributeFailure(new AttributeValidationFailure(ValueHolder.ValueFailureReason.VALUE_MISMATCH, PROTOCOL_NAME));
-            }
-        }
-
-        boolean actionFound = false;
-        boolean cronFound = false;
-
-        if (attribute.getMeta() != null && !attribute.getMeta().isEmpty()) {
-            for (int i = 0; i < attribute.getMeta().size(); i++) {
-                MetaItem metaItem = attribute.getMeta().get(i);
-                if (isMetaNameEqualTo(metaItem, META_TIMER_ACTION)) {
-                    actionFound = true;
-                    if (!getAction(metaItem).isPresent()) {
-                        failure = true;
-                        if (result == null) {
-                            break;
-                        }
-                        result.addMetaFailure(
-                            i, new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Action")
-                        );
-                    }
-                } else if (isMetaNameEqualTo(metaItem, META_TIMER_CRON_EXPRESSION)) {
-                    cronFound = true;
-                    if (!metaItem.getValueAsString().map(TimerProtocol::createCronExpression).isPresent()) {
-                        failure = true;
-                        if (result == null) {
-                            break;
-                        }
-                        result.addMetaFailure(
-                            i, new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_MISMATCH, "Timer Cron Expression")
-                        );
-                    }
-                }
-            }
-        }
-
-        if (!cronFound) {
-            failure = true;
-            if (result != null) {
-                result.addMetaFailure(
-                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_CRON_EXPRESSION)
-                );
-            }
-        }
-
-        if (!actionFound) {
-            failure = true;
-            if (result != null) {
-                result.addMetaFailure(
-                    new AttributeValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_MISSING, META_TIMER_ACTION)
-                );
-            }
-        }
-
-        return !failure;
-    }
-
     public static boolean isValidTimerConfiguration(Attribute<?> attribute) {
         return isTimerConfiguration(attribute)
             && isActionValid(attribute)
             && isCronExpressionValid(attribute);
-    }
-
-    public static boolean hasCronExpression(Attribute<?> attribute) {
-        return attribute != null && attribute.hasMetaItem(META_TIMER_CRON_EXPRESSION);
     }
 
     public static boolean isCronExpressionValid(Attribute<?> attribute) {
@@ -137,23 +57,6 @@ final public class TimerConfiguration {
             .flatMap(AbstractValueHolder::getValueAsString)
             .map(TimerConfiguration::isCronExpressionValid)
             .orElse(false);
-    }
-
-    public static boolean isCronExpressionValid(String cronExpression) {
-        return !isNullOrEmpty(cronExpression) && createCronExpression(cronExpression) != null;
-    }
-
-    public static Optional<String> getCronExpression(Attribute<?> attribute) {
-        return attribute == null ? Optional.empty() : attribute
-            .getMetaItem(META_TIMER_CRON_EXPRESSION)
-            .flatMap(AbstractValueHolder::getValueAsString);
-    }
-
-    public static void setCronExpression(Attribute<?> attribute, String cronExpression) {
-        if (attribute == null)
-            return;
-
-        replaceMetaByName(attribute.getMeta(), META_TIMER_CRON_EXPRESSION, cronExpression);
     }
 
     public static boolean hasAction(Attribute<?> attribute) {

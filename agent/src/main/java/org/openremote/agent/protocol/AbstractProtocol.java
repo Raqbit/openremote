@@ -275,7 +275,21 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
         }
 
         AttributeEvent attributeEvent = new AttributeEvent(new AttributeState(state.getAttributeRef(), ignoreAndConverted.value), timestamp);
-        LOG.fine("Sending on sensor queue: " + attributeEvent);
+        LOG.fine("Sending linked attribute update on sensor queue: " + attributeEvent);
+        producerTemplate.sendBodyAndHeader(SENSOR_QUEUE, attributeEvent, Protocol.SENSOR_QUEUE_SOURCE_PROTOCOL, getProtocolName());
+    }
+
+    /**
+     * Update the value of one of this {@link Protocol}s linked {@link Agent}'s {@link Attribute}s.
+     */
+    final protected void updateAgentAttribute(final AttributeState state) {
+        if (!agent.getAttributes().has(state.getAttributeRef().getAttributeName()) || !agent.getId().equals(state.getAttributeRef().getAssetId())) {
+            LOG.warning("Attempt to update non existent agent attribute or agent ID is incorrect: " + state);
+            return;
+        }
+
+        AttributeEvent attributeEvent = new AttributeEvent(state, timerService.getCurrentTimeMillis());
+        LOG.fine("Sending agent attribute update  on sensor queue: " + attributeEvent);
         producerTemplate.sendBodyAndHeader(SENSOR_QUEUE, attributeEvent, Protocol.SENSOR_QUEUE_SOURCE_PROTOCOL, getProtocolName());
     }
 
@@ -305,7 +319,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
     /**
      * Link an {@link Attribute} to its linked {@link Agent}.
      */
-    abstract protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws Exception;
+    abstract protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException;
 
     /**
      * Unlink an {@link Attribute} from its linked {@link Agent}.

@@ -36,8 +36,12 @@ public class ZWAgent extends Agent {
 
     );
 
-    protected <T extends Agent, S extends Protocol<T>> ZWAgent(String name) {
-        super(name, DESCRIPTOR);
+    public <T extends Agent, S extends Protocol<T>> ZWAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
+
+    protected <T extends ZWAgent, S extends Protocol<T>> ZWAgent(String name, AgentDescriptor<T, S> descriptor) {
+        super(name, descriptor);
     }
 
     @Override

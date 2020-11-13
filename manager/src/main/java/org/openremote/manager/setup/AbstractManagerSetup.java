@@ -490,7 +490,7 @@ public abstract class AbstractManagerSetup implements Setup {
                             new MetaItem<>(LABEL, Values.create(scene.attributeLabel + " enabled " + dayOfWeekLabel)),
                             new MetaItem<>(ACCESS_RESTRICTED_READ, true),
                             new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
-                            new MetaItem<>(META_TIMER_VALUE_LINK, Values.create(TimerValue.ENABLED.toString())),
+                            new MetaItem<>(META_TIMER_VALUE_LINK, Values.create(TimerValue.ACTIVE.toString())),
                             new MetaItem<>(AGENT_LINK, new AttributeRef(agent.getId(), scene.attributeName + dayOfWeek.name()).toArrayValue())
                         )
                 );
