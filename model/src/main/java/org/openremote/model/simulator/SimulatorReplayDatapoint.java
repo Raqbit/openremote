@@ -17,19 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol.io;
+package org.openremote.model.simulator;
 
-import org.openremote.agent.protocol.zwave.ZWAgent;
-import org.openremote.model.asset.agent.Agent;
-import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
+/**
+ * Represents a value at a point in time defined as the number of seconds of the day.
+ */
+public class SimulatorReplayDatapoint {
 
-public abstract class IoAgent<T, U extends IoClient<T>> extends Agent {
-
-    protected <V extends IoAgent<T, U>, W extends AbstractIoClientProtocol<T, U, V>> IoAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
-    }
-
-    @Override
-    abstract public AbstractIoClientProtocol<T, U, ? extends IoAgent<T, U>> getProtocolInstance();
+    /**
+     * Seconds of the day
+     */
+    public long timestamp;
+    public Object value;
 }

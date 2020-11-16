@@ -22,6 +22,7 @@ package org.openremote.agent.protocol.timer;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.Container;
 import org.openremote.model.asset.agent.ConnectionStatus;
+import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
@@ -42,16 +43,8 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 /**
  * This protocol can be used to trigger an {@link AttributeEvent} using a cron based timer.
  * <p>
- * A timer is defined by creating a {@link TimerConfiguration} attribute on an agent. A timer configuration consists of
- * the following Meta Items:
- * <ul>
- * <li>{@link #META_TIMER_CRON_EXPRESSION}: The cron expression of the timer</li>
- * <li>{@link #META_TIMER_ACTION}: The {@link AttributeState} that should be sent when the timer is triggered</li>
- * </ul>
- * <p>
- * {@link Attribute}s can be linked to time triggers to read/write the trigger time and/or enable/disable the
- * trigger. A linked attribute must have a valid {@link MetaItemType#AGENT_LINK} Meta Item and
- * also a {@link #META_TIMER_VALUE_LINK} Meta Item to indicate what value of timer to link to {@link TimerValue}
+ * It is also possible to link {@link Attribute}s to this {@link Protocol} to allow reading information about the
+ * timer instance and also to allow altering the timer instance (e.g. altering what time a daily timer triggers).
  */
 public class TimerProtocol extends AbstractProtocol<TimerAgent> {
 
@@ -63,9 +56,18 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
     protected CronExpressionParser expressionParser;
     protected CronScheduler cronScheduler;
 
+    public TimerProtocol(TimerAgent agent) {
+        super(agent);
+    }
+
     @Override
     public String getProtocolName() {
         return PROTOCOL_DISPLAY_NAME;
+    }
+
+    @Override
+    public String getProtocolInstanceUri() {
+        return expressionParser != null ? expressionParser.buildCronExpression() : "";
     }
 
     @Override

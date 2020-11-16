@@ -32,6 +32,7 @@ import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;

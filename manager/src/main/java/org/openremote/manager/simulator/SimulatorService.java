@@ -105,7 +105,7 @@ public class SimulatorService extends RouteBuilder implements ContainerService {
 
                 // TODO Should realm admins be able to work with simulators in their tenant?
 
-                for (AttributeRef protocolConfiguration : event.getConfigurations()) {
+                for (String agentId : event.getAgentId()) {
                     publishSimulatorState(sessionKey, protocolConfiguration);
                 }
             });

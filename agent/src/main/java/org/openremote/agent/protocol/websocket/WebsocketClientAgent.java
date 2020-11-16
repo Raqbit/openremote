@@ -20,7 +20,9 @@
 package org.openremote.agent.protocol.websocket;
 
 import org.openremote.agent.protocol.http.HttpClientProtocol;
+import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.agent.protocol.tcp.TcpIoClient;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.v2.AttributeDescriptor;
@@ -65,7 +67,7 @@ public class WebsocketClientAgent extends IoAgent<String, WebsocketIoClient<Stri
         this(name, DESCRIPTOR);
     }
 
-    protected <T extends WebsocketClientAgent, S extends Protocol<T>> WebsocketClientAgent(String name, AgentDescriptor<T, S> descriptor) {
+    protected <V extends IoAgent<String, WebsocketIoClient<String>>, W extends AbstractIoClientProtocol<String, WebsocketIoClient<String>, V>> WebsocketClientAgent(String name, AgentDescriptor<V, W> descriptor) {
         super(name, descriptor);
     }
 

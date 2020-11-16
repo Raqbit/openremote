@@ -17,20 +17,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.simulator.element;
+package org.openremote.model.simulator;
 
-import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.attribute.Attribute;
 
-public class ColorSimulatorElement extends SimulatorElement {
+public class SimulatorAttributeInfo {
 
-    public static final String ELEMENT_NAME = "color";
+    public String assetName;
+    public String assetId;
+    public boolean replay; // Indicates if the attribute is configured with replay values
+    public Attribute<?> attribute;
 
-    protected ColorSimulatorElement() {
+    public SimulatorAttributeInfo(String assetName, String assetId, Attribute<?> attribute, boolean replay) {
+        this.assetName = assetName;
+        this.assetId = assetId;
+        this.attribute = attribute;
+        this.replay = replay;
     }
 
-    public ColorSimulatorElement(AttributeRef attributeRef) {
-        super(attributeRef, ValueType.COLOUR_RGB);
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public Attribute<?> getAttribute() {
+        return attribute;
+    }
+
+    public boolean isReplay() {
+        return replay;
     }
 }

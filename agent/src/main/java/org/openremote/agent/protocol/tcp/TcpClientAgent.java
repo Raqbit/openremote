@@ -36,7 +36,12 @@ public class TcpClientAgent extends IoAgent<String, TcpIoClient<String>> {
 //
 //    );
 
-    protected <T extends TcpClientAgent> TcpClientAgent(String name, AssetDescriptor<T> descriptor) {
+
+    public TcpClientAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
+
+    protected <V extends IoAgent<String, TcpIoClient<String>>, W extends AbstractIoClientProtocol<String, TcpIoClient<String>, V>> TcpClientAgent(String name, AgentDescriptor<V, W> descriptor) {
         super(name, descriptor);
     }
 

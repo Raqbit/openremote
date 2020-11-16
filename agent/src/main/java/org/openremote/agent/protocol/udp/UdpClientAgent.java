@@ -23,7 +23,10 @@ import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.agent.protocol.tcp.TcpClientProtocol;
 import org.openremote.agent.protocol.tcp.TcpIoClient;
+import org.openremote.agent.protocol.velbus.AbstractVelbusProtocol;
+import org.openremote.agent.protocol.velbus.VelbusAgent;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.asset.agent.AgentDescriptor;
 
 public class UdpClientAgent extends IoAgent<String, UdpIoClient<String>> {
 
@@ -31,7 +34,12 @@ public class UdpClientAgent extends IoAgent<String, UdpIoClient<String>> {
 //
 //    );
 
-    protected <T extends UdpClientAgent> UdpClientAgent(String name, AssetDescriptor<T> descriptor) {
+
+    public UdpClientAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
+
+    protected <V extends IoAgent<String, UdpIoClient<String>>, W extends AbstractIoClientProtocol<String, UdpIoClient<String>, V>> UdpClientAgent(String name, AgentDescriptor<V, W> descriptor) {
         super(name, descriptor);
     }
 

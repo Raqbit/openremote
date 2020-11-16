@@ -20,67 +20,24 @@
 package org.openremote.agent.protocol.serial;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
+import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.agent.protocol.io.IoClient;
-import org.openremote.model.attribute.Attribute;
-import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.attribute.MetaItemDescriptor;
-import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.Values;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Logger;
-
-import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
-import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
  * This is an abstract TCP client protocol for communicating with TCP servers; concrete implementations must provide
  * an {@link IoClient<T> for handling over the wire communication}.
  */
-public abstract class AbstractSerialClientProtocol<T> extends AbstractIoClientProtocol<T, SerialIoClient<T>> {
+public abstract class AbstractSerialClientProtocol<T, U extends IoAgent<T, SerialIoClient<T>>> extends AbstractIoClientProtocol<T, SerialIoClient<T>, U> {
 
-    private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, AbstractSerialClientProtocol.class);
-    public static final String PROTOCOL_NAME = PROTOCOL_NAMESPACE + ":serialClient";
-
-    public static final List<MetaItemDescriptor> PROTOCOL_META_ITEM_DESCRIPTORS = Arrays.asList(
-        META_PROTOCOL_SERIAL_PORT,
-        META_PROTOCOL_SERIAL_BAUDRATE
-    );
-
-    @Override
-    public Attribute<?> getProtocolConfigurationTemplate() {
-        return super.getProtocolConfigurationTemplate()
-            .addMeta(
-                new MetaItem<>(META_PROTOCOL_SERIAL_PORT, null)
-            );
+    protected AbstractSerialClientProtocol(U agent) {
+        super(agent);
     }
 
     @Override
-    protected SerialIoClient<T> doCreateIoClient(Attribute<?> protocolConfiguration) throws Exception {
+    protected SerialIoClient<T> doCreateIoClient(U agent) throws Exception {
 
-        String port = Values.getMetaItemValueOrThrow(
-            protocolConfiguration,
-            META_PROTOCOL_SERIAL_PORT,
-            true,
-            true
-        ).flatMap(Values::getString).orElse(null);
-
-        Integer baudrate = Values.getMetaItemValueOrThrow(
-            protocolConfiguration,
-            META_PROTOCOL_SERIAL_BAUDRATE,
-            false,
-            true
-        ).flatMap(Values::getIntegerCoerced).orElse(null);
-
-        if (baudrate != null && baudrate < 1) {
-            throw new IllegalArgumentException("Baudrate must be in greater than 0");
-        }
-
-        if (TextUtil.isNullOrEmpty(port)) {
-            throw new IllegalArgumentException("Serial port cannot be empty");
-        }
+        String port = agent.getSerialPort().orElse(null);
+        Integer baudrate = agent.getSerialBaudrate().orElse(null);
 
         return new SerialIoClient<>(port, baudrate, executorService);
     }

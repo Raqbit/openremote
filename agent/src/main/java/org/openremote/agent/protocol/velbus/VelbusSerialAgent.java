@@ -28,7 +28,7 @@ public class VelbusSerialAgent extends VelbusAgent {
         this(name, DESCRIPTOR);
     }
 
-    protected <T extends VelbusSerialAgent, S extends Protocol<T>> VelbusSerialAgent(String name, AgentDescriptor<T, S> descriptor) {
+    protected <T extends VelbusSerialAgent, S extends AbstractVelbusProtocol<T>> VelbusSerialAgent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);
     }
 

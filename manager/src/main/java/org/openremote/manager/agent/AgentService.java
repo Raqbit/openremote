@@ -87,7 +87,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     protected ClientEventService clientEventService;
     protected GatewayService gatewayService;
     protected Map<String, Agent> agentMap = new HashMap<>();
-    protected final Map<String, Protocol> protocolInstanceMap = new HashMap<>();
+    protected final Map<String, Protocol<?>> protocolInstanceMap = new HashMap<>();
     protected final Map<String, List<Consumer<PersistenceEvent<Asset>>>> childAssetSubscriptions = new HashMap<>();
     protected boolean initDone;
     protected Container container;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,20 +17,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.simulator.element;
+package org.openremote.agent.protocol.serial;
 
-import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.simulator.SimulatorElement;
-import org.openremote.model.v2.ValueType;
+import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
+import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.model.asset.agent.AgentDescriptor;
 
-public class SwitchSimulatorElement extends SimulatorElement {
+public class SerialAgent extends IoAgent<String, SerialIoClient<String>> {
 
-    public static final String ELEMENT_NAME = "switch";
-
-    protected SwitchSimulatorElement() {
+    public SerialAgent(String name) {
+        this(name, DESCRIPTOR);
     }
 
-    public SwitchSimulatorElement(AttributeRef attributeRef) {
-        super(attributeRef, ValueType.BOOLEAN);
+    protected <V extends IoAgent<String, SerialIoClient<String>>, W extends AbstractIoClientProtocol<String, SerialIoClient<String>, V>> SerialAgent(String name, AgentDescriptor<V, W> descriptor) {
+        super(name, descriptor);
+    }
+
+    @Override
+    public SerialClientProtocol getProtocolInstance() {
+        return new SerialClientProtocol(this);
     }
 }
