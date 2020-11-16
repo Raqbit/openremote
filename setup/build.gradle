@@ -1,0 +1,17 @@
+apply plugin: "java"
+apply plugin: "groovy"
+
+dependencies {
+    compile project(":manager")
+
+    testCompile project(":test")
+}
+
+test {
+    workingDir = findProject(":openremote") != null ? resolveProject("").projectDir : rootProject.projectDir
+}
+
+task installDist(type: Copy) {
+    from jar.outputs
+    into "${project(':deployment').buildDir}/manager/extensions"
+}
