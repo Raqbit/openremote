@@ -117,7 +117,7 @@ public interface ProtocolAssetService extends ContainerService {
      *
      * @return <code>false</code> if the delete could not be performed (asset may have children?)
      */
-    boolean deleteAsset(String assetId);
+    boolean deleteAssets(String...assetIds);
 
     /**
      * Get asset of specified type from the store by ID.

@@ -10,12 +10,15 @@ import org.openremote.agent.protocol.ProtocolExecutorService;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.syslog.SyslogCategory;
+import org.openremote.model.value.ColorRGB;
+import org.openremote.model.value.Values;
 
 import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.openremote.agent.protocol.tradfri.TradfriLightAsset.convertBrightness;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -94,7 +97,7 @@ public class TradfriConnection {
             }
         }
         catch (Exception exception) {
-            LOG.warning("An exception occured when connecting to Tradfri gateway: " + exception);
+            LOG.warning("An exception occurred when connecting to Tradfri gateway: " + exception);
         }
         return null;
     }
@@ -152,29 +155,22 @@ public class TradfriConnection {
             if (this.connectionStatus == ConnectionStatus.CONNECTED && event.getValue().isPresent()) {
                 if (device.isLight()){
                     Light light = device.toLight();
-                    switch (event.getAttributeName()) {
-                        case "lightDimLevel":
-                            light.setBrightness((int) Float.parseFloat(event.getValue().get().toString()));
-                            break;
-                        case "lightStatus":
-                            light.setOn(Boolean.parseBoolean(event.getValue().get().toString()));
-                            break;
-                        case "colorGBW":
-                            String digits = event.getValue().get().toString().replaceAll("[^0-9.,]+","");
-                            String[] numbers = digits.split(",");
-                            light.setColourRGB(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]), Integer.parseInt(numbers[2]));
-                            break;
-                        case "colorTemperature":
-                            light.setColourTemperature((int) Float.parseFloat(event.getValue().get().toString()));
-                            break;
+
+                    if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.BRIGHTNESS.getName())) {
+                        int value = Values.getInteger(event.getValue()).orElse(0);
+                        light.setBrightness(convertBrightness(value, false));
+                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.ON_OFF.getName())) {
+                        light.setOn(Values.getBooleanCoerced(event.getValue()).orElse(false));
+                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.COLOR.getName())) {
+                        light.setColour(Values.convert(ColorRGB.class, event.getValue()));
+                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.TEMPERATURE.getName())) {
+                        light.setColourTemperature(Values.getInteger(event.getValue()).orElse(0));
                     }
                 }
                 else if (device.isPlug()) {
                     Plug plug = device.toPlug();
-                    switch (event.getAttributeName()){
-                        case "plugStatus":
-                            plug.setOn(Boolean.parseBoolean(event.getValue().get().toString()));
-                            break;
+                    if (event.getAttributeName().equals(org.openremote.model.asset.impl.Plug.ON_OFF.getName())) {
+                        plug.setOn(Values.getBooleanCoerced(event.getValue()).orElse(false));
                     }
                 }
             }

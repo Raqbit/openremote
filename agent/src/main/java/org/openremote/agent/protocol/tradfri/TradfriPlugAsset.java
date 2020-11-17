@@ -1,77 +1,49 @@
 package org.openremote.agent.protocol.tradfri;
 
-import org.openremote.agent.protocol.ProtocolAssetService;
+import org.openremote.agent.protocol.tradfri.device.Device;
 import org.openremote.agent.protocol.tradfri.device.Plug;
 import org.openremote.agent.protocol.tradfri.device.event.EventHandler;
 import org.openremote.agent.protocol.tradfri.device.event.PlugChangeOnEvent;
-import org.openremote.model.asset.Asset;
-import org.openremote.model.attribute.Attribute;
-import org.openremote.model.asset.AssetType;
-import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.value.Values;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.attribute.AttributeEvent;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 
-import static org.openremote.model.attribute.AttributeValueType.BOOLEAN;
-import static org.openremote.model.attribute.MetaItemType.*;
+public class TradfriPlugAsset extends org.openremote.model.asset.impl.Plug implements TradfriAsset {
 
-public class TradfriPlugAsset extends TradfriAsset {
-
-    /**
-     * Construct the TradfriPlugAsset class
-     * @param parentId the parent id.
-     * @param agentLink the agent link.
-     * @param plug the plug.
-     * @param assetService the asset service.
-     */
-    public TradfriPlugAsset(String parentId, MetaItem agentLink, Plug plug, ProtocolAssetService assetService) {
-        super(parentId, plug, AssetType.THING, assetService, agentLink);
+    public TradfriPlugAsset(String name) {
+        this(name, DESCRIPTOR);
     }
 
-    /**
-     * Method to create the asset attributes
-     */
-    @Override
-    public void createAttributes() {
-        Attribute<?> plugStatus = new Attribute<>("plugStatus", BOOLEAN, false);
-        plugStatus.addMeta(
-                new MetaItem<>(LABEL, "Plug Status"),
-                new MetaItem<>(DESCRIPTION, Values.create("The state of the TRÅDFRI plug (Checked means on, unchecked means off)")),
-                new MetaItem<>(ACCESS_RESTRICTED_READ, true),
-                new MetaItem<>(ACCESS_RESTRICTED_WRITE, true),
-                new MetaItem<>(READ_ONLY, false),
-                new MetaItem<>(RULE_STATE, true),
-                new MetaItem<>(STORE_DATA_POINTS, true),
-                agentLink
-        );
-        setAttributes(plugStatus);
+    protected <T extends TradfriPlugAsset> TradfriPlugAsset(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
     }
 
-    /**
-     * Method to create the event handlers
-     */
     @Override
-    public void createEventHandlers() {
-        Asset asset = this;
+    public void addEventHandlers(Device device, Consumer<AttributeEvent> attributeEventConsumer) {
+        Plug plug = device.toPlug();
+        if (plug == null) {
+            return;
+        }
+
         EventHandler<PlugChangeOnEvent> plugOnOffEventHandler = new EventHandler<PlugChangeOnEvent>() {
             @Override
             public void handle(PlugChangeOnEvent event) {
-                Optional<Attribute<?>> plugStatus = getAttribute("plugStatus");
-                Plug plug = device.toPlug();
-                if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
-                assetService.mergeAsset(asset);
+                attributeEventConsumer.accept(new AttributeEvent(getId(), ON_OFF.getName(), plug.getOn()));
             }
         };
         device.addEventHandler(plugOnOffEventHandler);
     }
 
-    /**
-     * Method to set the initial values
-     */
     @Override
-    public void setInitialValues() {
+    public void initialiseAttributes(Device device) {
         Plug plug = device.toPlug();
-        Optional<Attribute<?>> plugStatus = getAttribute("plugStatus");
-        if(plugStatus.isPresent() && plug.getOn() != null) plugStatus.get().setValue(Values.create(plug.getOn()));
+        if (plug == null) {
+            return;
+        }
+
+        getAttributes().get(ON_OFF).ifPresent(attribute -> {
+            attribute.setValue(plug.getOn());
+        });
     }
 }

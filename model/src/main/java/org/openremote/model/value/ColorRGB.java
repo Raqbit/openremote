@@ -22,6 +22,7 @@ package org.openremote.model.value;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.awt.*;
 import java.util.Objects;
 
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
@@ -87,5 +88,13 @@ public class ColorRGB {
             ", green=" + green +
             ", blue=" + blue +
             '}';
+    }
+
+    public static ColorRGB fromHS(int hue, int saturation) {
+        float hueNormalised = hue/65535f;
+        float saturationNormalised = saturation/65535f;
+        int rgb = Color.HSBtoRGB(hueNormalised, saturationNormalised, 1);
+        Color colour = new Color(rgb);
+        return new ColorRGB(colour.getRed(), colour.getGreen(), colour.getBlue());
     }
 }

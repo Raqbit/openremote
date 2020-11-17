@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -39,6 +40,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -96,9 +98,18 @@ public class Values {
         return parse(jsonString, JSON.constructType(type));
     }
 
+    @SuppressWarnings("rawtypes")
     protected static <T> Optional<T> getValue(Object value, Class<T> type, boolean coerce) {
         if (value == null) {
             return Optional.empty();
+        }
+
+        if (value instanceof Optional) {
+            Optional opt = (Optional)value;
+            if (!opt.isPresent()) {
+                return opt;
+            }
+            value = opt.get();
         }
 
         if (type.isAssignableFrom(value.getClass())) {
@@ -417,5 +428,18 @@ public class Values {
         }
 
         return value;
+    }
+
+    public static <T> T clone(T object) {
+        if (object == null) {
+            return null;
+        }
+        try {
+            String str = JSON.writeValueAsString(object);
+            return (T)JSON.readValue(str, object.getClass());
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Failed to clone object of type: " + object.getClass(), e);
+            return null;
+        }
     }
 }

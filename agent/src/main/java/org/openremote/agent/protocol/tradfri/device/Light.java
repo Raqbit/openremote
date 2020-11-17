@@ -3,8 +3,8 @@ package org.openremote.agent.protocol.tradfri.device;
 import org.openremote.agent.protocol.tradfri.payload.DeviceRequest;
 import org.openremote.agent.protocol.tradfri.util.ApiEndpoint;
 import org.openremote.agent.protocol.tradfri.util.CoapClient;
-import org.openremote.agent.protocol.tradfri.util.ColourRGB;
 import org.openremote.agent.protocol.tradfri.util.ColourXY;
+import org.openremote.model.value.ColorRGB;
 
 /**
  * The class that represents an IKEA TRÅDFRI light
@@ -122,8 +122,8 @@ public class Light extends Device {
      * Get the RGB values of the colour of the light
      * @return The RGB values of the colour of the light
      */
-    public ColourRGB getColourRGB() {
-        return ColourRGB.fromHS(properties.getHue() != null ? properties.getHue() : 0, properties.getSaturation() != null ? properties.getSaturation() : 0);
+    public ColorRGB getColourRGB() {
+        return ColorRGB.fromHS(properties.getHue() != null ? properties.getHue() : 0, properties.getSaturation() != null ? properties.getSaturation() : 0);
     }
 
     /**
@@ -151,12 +151,7 @@ public class Light extends Device {
     }
 
     /**
-     * Update the colour of the light in the update queue to a predefined hexadecimal colour<br>
-     * Available colours:<br>
-     * <ul>
-     *     <li>RGB: {@link org.openremote.agent.protocol.tradfri.util.ColourHex}</li>
-     *     <li>Colour temperatures: {@link org.openremote.agent.protocol.tradfri.util.ColourTemperatureHex}</li>
-     * </ul>
+     * Update the colour of the light in the update queue to a predefined hexadecimal colour
      * @param colourHex The new colour for the light
      */
     public void updateColourHex(String colourHex) {
@@ -223,7 +218,7 @@ public class Light extends Device {
      * Update the colour of the light in the update queue
      * @param colourRGB The new colour for the light
      */
-    public void updateColour(ColourRGB colourRGB) {
+    public void updateColour(ColorRGB colourRGB) {
         updateColour(ColourXY.fromRGB(colourRGB));
     }
 
@@ -234,7 +229,7 @@ public class Light extends Device {
      * @param colourBlue The blue value of the new colour for the light
      */
     public void updateColourRGB(int colourRed, int colourGreen, int colourBlue) {
-        updateColour(new ColourRGB(colourRed, colourGreen, colourBlue));
+        updateColour(new ColorRGB(colourRed, colourGreen, colourBlue));
     }
 
     /**
@@ -303,12 +298,7 @@ public class Light extends Device {
     }
 
     /**
-     * Set the colour of the light to a predefined hexadecimal colour<br>
-     * Available colours:<br>
-     * <ul>
-     *     <li>RGB: {@link org.openremote.agent.protocol.tradfri.util.ColourHex}</li>
-     *     <li>Colour temperatures: {@link org.openremote.agent.protocol.tradfri.util.ColourTemperatureHex}</li>
-     * </ul>
+     * Set the colour of the light to a predefined hexadecimal colour
      * @param colourHex The new colour for the light
      * @param transitionTime The transition time for updating the light
      * @return True if successfully updated the colour of the light, false if not
@@ -321,12 +311,7 @@ public class Light extends Device {
     }
 
     /**
-     * Set the colour of the light to a predefined hexadecimal colour<br>
-     * Available colours:<br>
-     * <ul>
-     *     <li>RGB: {@link org.openremote.agent.protocol.tradfri.util.ColourHex}</li>
-     *     <li>Colour temperatures: {@link org.openremote.agent.protocol.tradfri.util.ColourTemperatureHex}</li>
-     * </ul>
+     * Set the colour of the light to a predefined hexadecimal colour
      * @param colourHex The new colour for the light
      * @return True if successfully updated the colour of the light, false if not
      */
@@ -428,7 +413,7 @@ public class Light extends Device {
      * @param transitionTime The transition time for updating the light
      * @return True if successfully updated the colour of the light, false if not
      */
-    public boolean setColour(ColourRGB colourRGB, Integer transitionTime) {
+    public boolean setColour(ColorRGB colourRGB, Integer transitionTime) {
         return setColour(ColourXY.fromRGB(colourRGB), transitionTime);
     }
 
@@ -437,7 +422,7 @@ public class Light extends Device {
      * @param colourRGB The new colour for the light
      * @return True if successfully updated the colour of the light, false if not
      */
-    public boolean setColour(ColourRGB colourRGB){
+    public boolean setColour(ColorRGB colourRGB){
         return setColour(colourRGB, null);
     }
 
@@ -450,7 +435,7 @@ public class Light extends Device {
      * @return True if successfully updated the colour of the light, false if not
      */
     public boolean setColourRGB(int colourRed, int colourGreen, int colourBlue, Integer transitionTime) {
-        return setColour(new ColourRGB(colourRed, colourGreen, colourBlue), transitionTime);
+        return setColour(new ColorRGB(colourRed, colourGreen, colourBlue), transitionTime);
     }
 
     /**
@@ -461,7 +446,7 @@ public class Light extends Device {
      * @return True if successfully updated the colour of the light, false if not
      */
     public boolean setColourRGB(int colourRed, int colourGreen, int colourBlue){
-        return setColour(new ColourRGB(colourRed, colourGreen, colourBlue));
+        return setColour(new ColorRGB(colourRed, colourGreen, colourBlue));
     }
 
     /**

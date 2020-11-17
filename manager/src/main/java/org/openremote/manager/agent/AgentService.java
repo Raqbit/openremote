@@ -185,9 +185,9 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public boolean deleteAsset(String assetId) {
-        LOG.fine("Deleting protocol-provided: " + assetId);
-        return assetStorageService.delete(Collections.singletonList(assetId), false);
+    public boolean deleteAssets(String...assetIds) {
+        LOG.fine("Deleting protocol-provided: " + Arrays.toString(assetIds));
+        return assetStorageService.delete(Arrays.asList(assetIds), false);
     }
 
     @Override
@@ -204,8 +204,12 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
     @Override
     public List<Asset> findAssets(String assetId, AssetQuery assetQuery) {
-        if (TextUtil.isNullOrEmpty(assetId) || assetQuery == null) {
+        if (TextUtil.isNullOrEmpty(assetId)) {
             return Collections.emptyList();
+        }
+
+        if (assetQuery == null) {
+            assetQuery = new AssetQuery();
         }
 
         // Ensure agent ID is injected into each path predicate

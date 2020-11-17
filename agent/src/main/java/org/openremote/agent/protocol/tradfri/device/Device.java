@@ -224,5 +224,4 @@ public class Device {
         if(isPlug()) return (Plug) this;
         return null;
     }
-
 }
