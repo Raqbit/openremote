@@ -29,19 +29,7 @@ import java.util.Optional;
 
 public abstract class TcpServerAgent extends Agent {
 
-    @NotNull
-    public static final AttributeDescriptor<Integer> BIND_PORT = new AttributeDescriptor<>("bindPort", true, ValueType.PORT, null);
-    public static final AttributeDescriptor<String> BIND_ADDRESS = new AttributeDescriptor<>("bindAddress", true, ValueType.HOSTNAME_OR_IP_ADDRESS, null);
-
     protected <T extends TcpServerAgent> TcpServerAgent(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);
-    }
-
-    public Optional<Integer> getBindPort() {
-        return getAttributes().getValue(BIND_PORT);
-    }
-
-    public Optional<String> getBindAddress() {
-        return getAttributes().getValue(BIND_ADDRESS);
     }
 }

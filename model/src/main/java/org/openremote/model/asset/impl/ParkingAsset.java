@@ -28,22 +28,22 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Parking extends Device {
+public class ParkingAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Integer> SPACES_TOTAL = new AttributeDescriptor<>("spacesTotal", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> SPACES_OCCUPIED = new AttributeDescriptor<>("spacesOccupied", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> SPACES_OPEN = new AttributeDescriptor<>("spacesOpen", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> SPACES_BUFFER = new AttributeDescriptor<>("spacesBuffer", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Double> PRICE_HOURLY = new AttributeDescriptor<>("priceHourly", true, ValueType.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Integer> SPACES_TOTAL = new AttributeDescriptor<>("spacesTotal", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_OCCUPIED = new AttributeDescriptor<>("spacesOccupied", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_OPEN = new AttributeDescriptor<>("spacesOpen", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_BUFFER = new AttributeDescriptor<>("spacesBuffer", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Double> PRICE_HOURLY = new AttributeDescriptor<>("priceHourly", true, ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
-    public static final AttributeDescriptor<Double> PRICE_DAILY = new AttributeDescriptor<>("priceDaily", true, ValueType.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> PRICE_DAILY = new AttributeDescriptor<>("priceDaily", true, ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
 
-    public static final AssetDescriptor<Parking> DESCRIPTOR = new AssetDescriptor<>("parking", "0260ae", Parking.class);
+    public static final AssetDescriptor<ParkingAsset> DESCRIPTOR = new AssetDescriptor<>("parking", "0260ae", ParkingAsset.class);
 
-    public Parking(String name) {
+    public ParkingAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

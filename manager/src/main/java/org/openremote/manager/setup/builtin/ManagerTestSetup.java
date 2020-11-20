@@ -34,7 +34,7 @@ import org.openremote.model.security.Tenant;
 import org.openremote.model.simulator.element.ColorSimulatorElement;
 import org.openremote.model.simulator.element.NumberSimulatorElement;
 import org.openremote.model.simulator.element.SwitchSimulatorElement;
-import org.openremote.model.value.ColorRGB;
+import org.openremote.model.value.ColourRGB;
 import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
@@ -219,7 +219,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
                                                 Values.create(SimulatorProtocol.Mode.WRITE_THROUGH_DELAYED.toString()))
                                 )
                         ),
-                new Attribute<>("light1Color", COLOR_RGB, new ColorRGB(88, 123, 88).asArrayValue())
+                new Attribute<>("light1Color", COLOR_RGB, new ColourRGB(88, 123, 88).asArrayValue())
                         .addMeta(new Meta(
                                         new MetaItem<>(
                                                 LABEL,

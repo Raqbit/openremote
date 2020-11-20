@@ -43,7 +43,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
     }
 
     public Attribute(AttributeDescriptor<T> attributeDescriptor) {
-        this(attributeDescriptor, attributeDescriptor.getDefaultValue());
+        this(attributeDescriptor, null);
     }
 
     public Attribute(AttributeDescriptor<T> attributeDescriptor, T value) {

@@ -17,26 +17,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.asset.impl;
+package org.openremote.agent.protocol.http;
 
-import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
-
-import java.util.Optional;
-
-public class Group extends Asset {
-
-    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", false, ValueType.STRING, null);
-public static final String t = Group.class.getSimpleName();
-    public static final AssetDescriptor<Group> DESCRIPTOR = new AssetDescriptor<>("folder", "B3B3B3", Group.class);
-
-    public Group(String name) {
-        super(name, DESCRIPTOR);
-    }
-
-    public Optional<String> getChildAssetType() {
-        return getAttributes().getValue(CHILD_ASSET_TYPE);
-    }
+public enum HttpMethod {
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    OPTIONS,
+    PATCH
 }

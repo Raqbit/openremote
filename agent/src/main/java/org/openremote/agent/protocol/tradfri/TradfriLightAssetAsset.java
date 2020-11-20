@@ -4,17 +4,18 @@ import org.openremote.agent.protocol.tradfri.device.Device;
 import org.openremote.agent.protocol.tradfri.device.Light;
 import org.openremote.agent.protocol.tradfri.device.event.*;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.asset.impl.LightAsset;
 import org.openremote.model.attribute.AttributeEvent;
 
 import java.util.function.Consumer;
 
-public class TradfriLightAsset extends org.openremote.model.asset.impl.Light implements TradfriAsset {
+public class TradfriLightAssetAsset extends LightAsset implements TradfriAsset {
 
-    public TradfriLightAsset(String name) {
+    public TradfriLightAssetAsset(String name) {
         this(name, DESCRIPTOR);
     }
 
-    protected TradfriLightAsset(String name, AssetDescriptor<? extends TradfriLightAsset> descriptor) {
+    protected TradfriLightAssetAsset(String name, AssetDescriptor<? extends TradfriLightAssetAsset> descriptor) {
         super(name, descriptor);
     }
 
@@ -41,7 +42,7 @@ public class TradfriLightAsset extends org.openremote.model.asset.impl.Light imp
         EventHandler<LightChangeColourEvent> lightColourChangeEventHandler = new EventHandler<LightChangeColourEvent>() {
             @Override
             public void handle(LightChangeColourEvent event) {
-                attributeEventConsumer.accept(new AttributeEvent(getId(), COLOR.getName(), light.getColourRGB()));
+                attributeEventConsumer.accept(new AttributeEvent(getId(), COLOUR.getName(), light.getColourRGB()));
             }
         };
 
@@ -69,7 +70,7 @@ public class TradfriLightAsset extends org.openremote.model.asset.impl.Light imp
         getAttributes().get(BRIGHTNESS).ifPresent(attribute ->
             attribute.setValue(convertBrightness(light.getBrightness(), true)));
 
-        getAttributes().get(COLOR).ifPresent(attribute -> attribute.setValue(light.getColourRGB()));
+        getAttributes().get(COLOUR).ifPresent(attribute -> attribute.setValue(light.getColourRGB()));
 
         getAttributes().get(TEMPERATURE).ifPresent(attribute -> attribute.setValue(light.getColourTemperature()));
     }

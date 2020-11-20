@@ -309,15 +309,13 @@ public class AssetModelUtil {
      * Validates the {@link Attribute}s of the specified {@link Asset} by comparing to the {@link AssetDescriptor} for
      * the asset type; if the specific {@link AssetDescriptor} is not available then
      */
-    // TODO: Implement validation using javax bean validation
+    // TODO: Implement validation using javax bean validation JSR-380
     public static AttributeValidationFailure[] validateAsset(Asset asset) {
         AssetDescriptor<?> descriptor = getAssetDescriptor(asset.getType()).orElse(Asset.DESCRIPTOR);
 
         Arrays.stream(descriptor.getAttributeDescriptors()).forEach(
             attributeDescriptor -> {
-                if (!attributeDescriptor.isOptional()) {
 
-                }
             }
         );
 

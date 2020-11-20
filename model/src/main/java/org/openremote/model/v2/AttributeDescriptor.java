@@ -19,41 +19,38 @@
  */
 package org.openremote.model.v2;
 
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaList;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * Describes an {@link Attribute} in terms of what the value type will be and also optionally provides default
+ * {@link MetaItem}s that will be added to new instances of the {@link Attribute}.
+ */
 public class AttributeDescriptor<T> implements MetaHolder, NameValueDescriptorProvider<T> {
     protected String name;
-    protected boolean optional;
     protected ValueDescriptor<T> valueDescriptor;
-    protected T defaultValue;
     protected MetaList meta;
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue) {
-        this(name, optional, valueDescriptor, defaultValue, (MetaList)null);
+    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
+        this(name, valueDescriptor, (MetaList)null);
     }
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaItem<?>...meta) {
-        this(name, optional, valueDescriptor, defaultValue, Arrays.asList(meta));
+    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor, MetaItem<?>... meta) {
+        this(name, valueDescriptor, Arrays.asList(meta));
     }
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, Collection<MetaItem<?>> meta) {
-        this(name, optional, valueDescriptor, defaultValue, meta instanceof MetaList ? (MetaList)meta : new MetaList(meta));
+    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor, Collection<MetaItem<?>> meta) {
+        this(name, valueDescriptor, meta instanceof MetaList ? (MetaList)meta : new MetaList(meta));
     }
 
-    public AttributeDescriptor(String name, boolean optional, ValueDescriptor<T> valueDescriptor, T defaultValue, MetaList meta) {
+    public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor, MetaList meta) {
         this.name = name;
-        this.optional = optional;
         this.valueDescriptor = valueDescriptor;
-        this.defaultValue = defaultValue;
         this.meta = meta;
-    }
-
-    public boolean isOptional() {
-        return optional;
     }
 
     public String getName() {
@@ -63,11 +60,6 @@ public class AttributeDescriptor<T> implements MetaHolder, NameValueDescriptorPr
     @Override
     public ValueDescriptor<T> getValueDescriptor() {
         return valueDescriptor;
-    }
-
-    @Override
-    public T getDefaultValue() {
-        return defaultValue;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.openremote.agent.protocol.tradfri.util;
 
-import org.openremote.model.value.ColorRGB;
+import org.openremote.model.value.ColourRGB;
 
 /**
  * The class that contains XY values that make up a colour
@@ -70,7 +70,7 @@ public class ColourXY {
      * @param colourRGB The {@link ColourRGB} class
      * @return The ColourXY class
      */
-    public static ColourXY fromRGB(ColorRGB colourRGB) {
+    public static ColourXY fromRGB(ColourRGB colourRGB) {
         double red = Math.max(Math.min(colourRGB.getRed(), 255), 0);
         double green = Math.max(Math.min(colourRGB.getGreen(), 255), 0);
         double blue = Math.max(Math.min(colourRGB.getBlue(), 255), 0);

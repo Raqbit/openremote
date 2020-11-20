@@ -21,11 +21,6 @@ package org.openremote.agent.protocol.udp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
-import org.openremote.agent.protocol.tcp.TcpClientProtocol;
-import org.openremote.agent.protocol.tcp.TcpIoClient;
-import org.openremote.agent.protocol.velbus.AbstractVelbusProtocol;
-import org.openremote.agent.protocol.velbus.VelbusAgent;
-import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.agent.AgentDescriptor;
 
 public class UdpClientAgent extends IoAgent<String, UdpIoClient<String>> {

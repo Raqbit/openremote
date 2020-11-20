@@ -34,7 +34,7 @@ public abstract class AbstractSerialClientProtocol<T, U extends IoAgent<T, Seria
     }
 
     @Override
-    protected SerialIoClient<T> doCreateIoClient(U agent) throws Exception {
+    protected SerialIoClient<T> doCreateIoClient() throws Exception {
 
         String port = agent.getSerialPort().orElse(null);
         Integer baudrate = agent.getSerialBaudrate().orElse(null);

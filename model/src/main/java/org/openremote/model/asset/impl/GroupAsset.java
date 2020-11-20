@@ -19,27 +19,29 @@
  */
 package org.openremote.model.asset.impl;
 
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.ValueType;
-import org.openremote.model.value.ColorRGB;
 
 import java.util.Optional;
 
-public class LightColored extends Light {
+/**
+ * An asset for grouping other assets together; if the {@link #CHILD_ASSET_TYPE} {@link Attribute} is specified then
+ * all children must be of the specified type.
+ */
+public class GroupAsset extends Asset {
 
-    public static final AttributeDescriptor<ColorRGB> COLOR_RGB = new AttributeDescriptor<>("colorRGB", true, ValueType.COLOUR_RGB, null);
-    // TODO: Re-evaluate the following these seem like protocol related attributes
-    public static final AttributeDescriptor<Integer> GROUP_NUMBER = new AttributeDescriptor<>("groupNumber", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<String> SCENARIO = new AttributeDescriptor<>("scenario", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", true, ValueType.STRING);
+public static final String t = GroupAsset.class.getSimpleName();
+    public static final AssetDescriptor<GroupAsset> DESCRIPTOR = new AssetDescriptor<>("folder", "B3B3B3", GroupAsset.class);
 
-    public static final AssetDescriptor<LightColored> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "706CE6", LightColored.class);
-
-    public LightColored(String name) {
+    public GroupAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
-    public Optional<ColorRGB> getColorRGB() {
-        return getAttributes().getValue(COLOR_RGB);
+    public Optional<String> getChildAssetType() {
+        return getAttributes().getValue(CHILD_ASSET_TYPE);
     }
 }

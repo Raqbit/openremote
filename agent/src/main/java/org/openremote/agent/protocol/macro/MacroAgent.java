@@ -22,6 +22,7 @@ package org.openremote.agent.protocol.macro;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.attribute.AttributeExecuteStatus;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
@@ -33,9 +34,11 @@ public class MacroAgent extends Agent {
 
     public static final ValueDescriptor<MacroAction> MACRO_ACTION_VALUE = new ValueDescriptor<>("Macro action", MacroAction.class);
 
-    public static final AttributeDescriptor<MacroAction[]> MACRO_ACTIONS = new AttributeDescriptor<>("macroActions", false, MACRO_ACTION_VALUE.asArray(), null);
+    public static final AttributeDescriptor<MacroAction[]> MACRO_ACTIONS = new AttributeDescriptor<>("macroActions", false, MACRO_ACTION_VALUE.asArray());
 
-    public static final AttributeDescriptor<Boolean> MACRO_ACTIVE = new AttributeDescriptor<>("macroActive", false, ValueType.BOOLEAN, null);
+    public static final AttributeDescriptor<Boolean> MACRO_DISABLED = new AttributeDescriptor<>("macroDisabled", false, ValueType.BOOLEAN);
+
+    public static final AttributeDescriptor<AttributeExecuteStatus> MACRO_STATUS = new AttributeDescriptor<>("macroStatus", false, ValueType.EXECUTION_STATUS);
 
     public static final MetaItemDescriptor<Integer> MACRO_ACTION_INDEX = new MetaItemDescriptor<>("macroActionIndex", ValueType.POSITIVE_INTEGER, null);
 
@@ -56,7 +59,11 @@ public class MacroAgent extends Agent {
         return getAttributes().getValue(MACRO_ACTIONS);
     }
 
-    public Optional<Boolean> isMacroActive() {
-        return getAttributes().getValue(MACRO_ACTIVE);
+    public Optional<Boolean> isMacroDisabled() {
+        return getAttributes().getValue(MACRO_DISABLED);
+    }
+
+    public Optional<AttributeExecuteStatus> getMacroStatus() {
+        return getAttributes().getValue(MACRO_STATUS);
     }
 }

@@ -23,12 +23,6 @@ import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.agent.protocol.io.IoClient;
 import org.openremote.model.asset.agent.Agent;
-import org.openremote.model.syslog.SyslogCategory;
-
-import java.util.logging.Logger;
-
-import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
-import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
  * This is an abstract TCP client protocol for communicating with TCP servers; concrete implementations must provide
@@ -41,7 +35,7 @@ public abstract class AbstractTcpClientProtocol<T, U extends IoAgent<T, TcpIoCli
     }
 
     @Override
-    protected TcpIoClient<T> doCreateIoClient(U agent) throws Exception {
+    protected TcpIoClient<T> doCreateIoClient() throws Exception {
 
         String host = agent.getAttributes().getValue(Agent.HOST).orElse(null);
         int port = agent.getAttributes().getValue(Agent.PORT).orElse(0);

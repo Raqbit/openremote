@@ -28,15 +28,15 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Microphone extends Device {
+public class MicrophoneAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Double> SOUND_LEVEL = new AttributeDescriptor<>("soundLevel", true, ValueType.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> SOUND_LEVEL = new AttributeDescriptor<>("soundLevel", true, ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_SOUND_DECIBELS)
     );
 
-    public static final AssetDescriptor<Microphone> DESCRIPTOR = new AssetDescriptor<>("microphone", "47A5FF", Microphone.class);
+    public static final AssetDescriptor<MicrophoneAsset> DESCRIPTOR = new AssetDescriptor<>("microphone", "47A5FF", MicrophoneAsset.class);
 
-    public Microphone(String name) {
+    public MicrophoneAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

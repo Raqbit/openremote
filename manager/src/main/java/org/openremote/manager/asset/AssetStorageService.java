@@ -39,7 +39,7 @@ import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.Constants;
 import org.openremote.model.attribute.*;
 import org.openremote.model.asset.*;
-import org.openremote.model.asset.impl.Group;
+import org.openremote.model.asset.impl.GroupAsset;
 import org.openremote.model.event.TriggeredEventSubscription;
 import org.openremote.model.event.shared.*;
 import org.openremote.model.query.AssetQuery;
@@ -50,7 +50,6 @@ import org.openremote.model.security.User;
 import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.AbstractNameValueHolderImpl;
 import org.openremote.model.value.Values;
 import org.postgresql.util.PGobject;
 
@@ -633,8 +632,8 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 }
 
                 // if parent is of type group then this child asset must have the correct type
-                if (parent instanceof Group) {
-                    String childAssetType = parent.getAttributes().getValue(Group.CHILD_ASSET_TYPE)
+                if (parent instanceof GroupAsset) {
+                    String childAssetType = parent.getAttributes().getValue(GroupAsset.CHILD_ASSET_TYPE)
                         .orElseThrow(() -> {
                             String msg = "Asset parent is of type GROUP but the childAssetType attribute is invalid: asset=" + asset;
                             LOG.info(msg);
@@ -667,8 +666,8 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             }
 
             // Validate group child asset type attribute
-            if (asset instanceof Group) {
-                String childAssetType = ((Group)asset).getChildAssetType()
+            if (asset instanceof GroupAsset) {
+                String childAssetType = ((GroupAsset)asset).getChildAssetType()
                     .map(childAssetTypeString -> TextUtil.isNullOrEmpty(childAssetTypeString) ? null : childAssetTypeString)
                     .orElseThrow(() -> {
                         String msg = "Asset of type GROUP childAssetType attribute must be a valid string: asset=" + asset;
@@ -676,7 +675,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                         return new IllegalStateException(msg);
                     });
 
-                String existingChildAssetType = existingAsset != null ? ((Group)existingAsset)
+                String existingChildAssetType = existingAsset != null ? ((GroupAsset)existingAsset)
                     .getChildAssetType()
                     .orElseThrow(() -> {
                         String msg = "Asset of type GROUP childAssetType attribute must be a valid string: asset=" + asset;

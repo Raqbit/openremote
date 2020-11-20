@@ -25,45 +25,26 @@ import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
-import org.openremote.model.value.ColorRGB;
 
 import java.util.Optional;
 
-public class Light extends Device {
+public class PlugAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN, null,
+    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_ON_OFF)
     );
 
-    public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueType.PERCENTAGE_INTEGER_0_100, null);
+    public static final AssetDescriptor<PlugAsset> DESCRIPTOR = new AssetDescriptor<>("plug", "e6688a", PlugAsset.class);
 
-    public static final AttributeDescriptor<ColorRGB> COLOR = new AttributeDescriptor<>("color", true, ValueType.COLOUR_RGB, null);
-
-    public static final AttributeDescriptor<Integer> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.POSITIVE_INTEGER, null);
-
-    public static final AssetDescriptor<Light> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "e6688a", Light.class);
-
-    public <T extends Light> Light(String name, AssetDescriptor<T> descriptor) {
+    public <T extends PlugAsset> PlugAsset(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);
     }
 
-    public Light(String name) {
+    public PlugAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
     public Optional<Boolean> getOnOff() {
         return getAttributes().getValue(ON_OFF);
-    }
-
-    public Optional<Integer> getBrightness() {
-        return getAttributes().getValue(BRIGHTNESS);
-    }
-
-    public Optional<ColorRGB> getColor() {
-        return getAttributes().getValue(COLOR);
-    }
-
-    public Optional<Integer> getTemperature() {
-        return getAttributes().getValue(TEMPERATURE);
     }
 }

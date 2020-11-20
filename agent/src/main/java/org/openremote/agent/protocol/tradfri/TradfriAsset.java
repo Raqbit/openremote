@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public interface TradfriAsset {
 
-    AttributeDescriptor<Integer> DEVICE_ID = new AttributeDescriptor<>("deviceId", false, ValueType.INTEGER, null);
+    AttributeDescriptor<Integer> DEVICE_ID = new AttributeDescriptor<>("deviceId", false, ValueType.INTEGER);
 
     default Optional<Integer> getDeviceId() {
         return getAttributes().getValue(DEVICE_ID);

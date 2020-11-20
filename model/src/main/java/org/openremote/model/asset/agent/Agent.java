@@ -21,7 +21,6 @@ package org.openremote.model.asset.agent;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.auth.OAuthGrant;
@@ -40,10 +39,10 @@ import java.util.Optional;
 public abstract class Agent extends Asset {
 
     @ModelDescriptor
-    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", true, ValueType.BOOLEAN, null);
+    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", true, ValueType.BOOLEAN);
 
     @ModelDescriptor
-    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueType.CONNECTION_STATUS, null,
+    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("agentStatus", true, ValueType.CONNECTION_STATUS,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
 
@@ -51,78 +50,83 @@ public abstract class Agent extends Asset {
      * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
      * HEX string representation (e.g. 34FD87)
      */
-    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_HEX = new AttributeDescriptor<>("messageConvertHex", true, ValueType.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_HEX = new AttributeDescriptor<>("messageConvertHex", true, ValueType.BOOLEAN);
 
     /**
      * Can be used by protocols that support it to indicate that string values should be converted to/from bytes from/to
      * binary string representation (e.g. 1001010111)
      */
-    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_BINARY = new AttributeDescriptor<>("messageConvertBinary", true, ValueType.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_CONVERT_BINARY = new AttributeDescriptor<>("messageConvertBinary", true, ValueType.BOOLEAN);
 
     /**
      * Charset to use when converting byte[] to a string (should default to UTF8 if not specified); values must be
      * string that matches a charset as defined in {@link java.nio.charset.Charset}
      */
-    public static final AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueType.STRING, "UTF-8");
+    public static final AttributeDescriptor<String> MESSAGE_CHARSET = new AttributeDescriptor<>("messageCharset", true, ValueType.STRING);
 
     /**
      * Max length of messages received by a {@link Protocol}; what this actually means will be protocol specific i.e.
      * for {@link String} protocols it could be the number of characters but for {@link Byte} protocols it could be the
      * number of bytes. This is typically used for I/O based {@link Protocol}s.
      */
-    public static final AttributeDescriptor<Integer> MESSAGE_MAX_LENGTH = new AttributeDescriptor<>("messageMaxLength", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> MESSAGE_MAX_LENGTH = new AttributeDescriptor<>("messageMaxLength", true, ValueType.POSITIVE_INTEGER);
 
     /**
      * Defines a set of delimiters for messages received by a {@link Protocol}; the first matched delimiter should be
      * used to generate the shortest possible match(This is typically used for I/O based {@link Protocol}s.
      */
-    public static final AttributeDescriptor<String[]> MESSAGE_DELIMITERS = new AttributeDescriptor<>("messageDelimiters", true, ValueType.STRING.asArray(), null);
+    public static final AttributeDescriptor<String[]> MESSAGE_DELIMITERS = new AttributeDescriptor<>("messageDelimiters", true, ValueType.STRING.asArray());
 
     /**
      * For protocols that use {@link #MESSAGE_DELIMITERS}, this indicates whether or not the matched delimiter
      * should be stripped from the message.
      */
-    public static final AttributeDescriptor<Boolean> MESSAGE_STRIP_DELIMITER = new AttributeDescriptor<>("messageStripDelimiter", true, ValueType.BOOLEAN, true);
+    public static final AttributeDescriptor<Boolean> MESSAGE_STRIP_DELIMITER = new AttributeDescriptor<>("messageStripDelimiter", true, ValueType.BOOLEAN);
 
     /**
      * {@link OAuthGrant} for connecting to services that require OAuth authentication
      */
-    public static final AttributeDescriptor<OAuthGrant> OAUTH_GRANT = new AttributeDescriptor<>("oAuthGrant", true, ValueType.OAUTH_GRANT, null);
+    public static final AttributeDescriptor<OAuthGrant> OAUTH_GRANT = new AttributeDescriptor<>("oAuthGrant", true, ValueType.OAUTH_GRANT);
 
     /**
      * Basic authentication username and password
      */
-    public static final AttributeDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new AttributeDescriptor<>("usernamePassword", true, ValueType.USERNAME_AND_PASSWORD, null);
+    public static final AttributeDescriptor<UsernamePassword> USERNAME_AND_PASSWORD = new AttributeDescriptor<>("usernamePassword", true, ValueType.USERNAME_AND_PASSWORD);
 
     /**
      * TCP/IP network host name/IP address
      */
-    public static final AttributeDescriptor<String> HOST = new AttributeDescriptor<>("host", true, ValueType.HOSTNAME_OR_IP_ADDRESS, null);
+    public static final AttributeDescriptor<String> HOST = new AttributeDescriptor<>("host", true, ValueType.HOSTNAME_OR_IP_ADDRESS);
 
     /**
      * TCP/IP network port number
      */
-    public static final AttributeDescriptor<Integer> PORT = new AttributeDescriptor<>("port", true, ValueType.PORT, null);
+    public static final AttributeDescriptor<Integer> PORT = new AttributeDescriptor<>("port", true, ValueType.PORT);
 
     /**
-     * TCP/IP network port number
+     * Local TCP/IP network port number to bind to
      */
-    public static final AttributeDescriptor<Integer> BIND_PORT = new AttributeDescriptor<>("bindPort", true, ValueType.PORT, null);
+    public static final AttributeDescriptor<Integer> BIND_PORT = new AttributeDescriptor<>("bindPort", true, ValueType.PORT);
+
+    /**
+     * Local TCP/IP network host name/IP address to bind to
+     */
+    public static final AttributeDescriptor<String> BIND_HOST = new AttributeDescriptor<>("bindHost", true, ValueType.HOSTNAME_OR_IP_ADDRESS);
 
     /**
      * Serial port name/address
      */
-    public static final AttributeDescriptor<String> SERIAL_PORT = new AttributeDescriptor<>("serialPort", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> SERIAL_PORT = new AttributeDescriptor<>("serialPort", true, ValueType.STRING);
 
     /**
      * Serial baudrate to use for connection
      */
-    public static final AttributeDescriptor<Integer> SERIAL_BAUDRATE = new AttributeDescriptor<>("serialBaudrate", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> SERIAL_BAUDRATE = new AttributeDescriptor<>("serialBaudrate", true, ValueType.POSITIVE_INTEGER);
 
     /**
      * Default polling frequency (milliseconds)
      */
-    public static final AttributeDescriptor<Integer> POLLING_MILLIS = new AttributeDescriptor<>("pollingMillis", true, ValueType.POSITIVE_INTEGER, null);
+    public static final AttributeDescriptor<Integer> POLLING_MILLIS = new AttributeDescriptor<>("pollingMillis", true, ValueType.POSITIVE_INTEGER);
 
     @ModelDescriptor
     protected static final ValueDescriptor<ValueFilter> VALUE_FILTER = new ValueDescriptor<>("Value filter", ValueFilter.class);
@@ -144,12 +148,12 @@ public abstract class Agent extends Asset {
      * attribute. An example use case is an API that returns "ACTIVE"/"DISABLED" strings but you want to connect this to
      * a {@link ValueType#BOOLEAN} attribute.
      */
-    public static final MetaItemDescriptor<ObjectNode> META_VALUE_CONVERTER = new MetaItemDescriptor<>("valueConverter", ValueType.OBJECT, null);
+    public static final MetaItemDescriptor<ObjectNode> META_VALUE_CONVERTER = new MetaItemDescriptor<>("valueConverter", ValueType.JSON_OBJECT, null);
 
     /**
      * Similar to {@link #META_VALUE_CONVERTER} but will applied to outgoing values allowing for the opposite conversion.
      */
-    public static final MetaItemDescriptor<ObjectNode> META_WRITE_VALUE_CONVERTER = new MetaItemDescriptor<>("writeValueConverter", ValueType.OBJECT, null);
+    public static final MetaItemDescriptor<ObjectNode> META_WRITE_VALUE_CONVERTER = new MetaItemDescriptor<>("writeValueConverter", ValueType.JSON_OBJECT, null);
 
     /**
      * JSON string to be used for attribute writes and can contain {@link Protocol#DYNAMIC_VALUE_PLACEHOLDER}s; this allows the
@@ -265,6 +269,10 @@ public abstract class Agent extends Asset {
 
     public Optional<Integer> getBindPort() {
         return getAttributes().getValue(BIND_PORT);
+    }
+
+    public Optional<String> getBindHost() {
+        return getAttributes().getValue(BIND_HOST);
     }
 
     public Optional<String> getSerialPort() {

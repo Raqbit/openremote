@@ -19,10 +19,8 @@
  */
 package org.openremote.agent.protocol.io;
 
-import org.openremote.agent.protocol.zwave.ZWAgent;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
 
 public abstract class IoAgent<T, U extends IoClient<T>> extends Agent {
 

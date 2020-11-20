@@ -33,7 +33,7 @@ public abstract class AbstractUdpClientProtocol<T, U extends IoAgent<T, UdpIoCli
     }
 
     @Override
-    protected UdpIoClient<T> doCreateIoClient(U agent) throws Exception {
+    protected UdpIoClient<T> doCreateIoClient() throws Exception {
 
         String host = agent.getHost().orElse(null);
         Integer port = agent.getPort().orElse(null);

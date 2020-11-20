@@ -128,7 +128,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, We
     }
 
     @Override
-    protected WebsocketIoClient<String> doCreateIoClient(WebsocketClientAgent agent) throws Exception {
+    protected WebsocketIoClient<String> doCreateIoClient() throws Exception {
 
         String uriStr = agent.getConnectUri().orElseThrow(() ->
             new IllegalArgumentException("Missing or invalid connectUri: " + agent));

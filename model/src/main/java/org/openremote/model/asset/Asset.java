@@ -225,13 +225,13 @@ public class Asset implements IdentifiableEntity {
      * WILL INHERIT THESE DESCRIPTORS ALSO; IT IS REQUIRED THAT EACH DESCRIPTOR HAS CORRESPONDING GETTER WITH OPTIONAL
      * SETTER, THIS ENSURES BASIC COMPILE TIME CHECKING OF CONFLICTS BUT JUST MAKES GOOD SENSE FOR CONSUMERS
     */
-    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueType.GEO_JSON_POINT, null);
+    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueType.GEO_JSON_POINT);
 
-    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueType.EMAIL, null);
+    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueType.EMAIL);
 
-    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueType.STRING.asArray(), null);
+    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueType.STRING.asArray());
 
-    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueType.STRING);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")

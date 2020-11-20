@@ -26,25 +26,17 @@ import java.awt.*;
 import java.util.Objects;
 
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
-@JsonPropertyOrder({"red", "green", "blue", "amberWhite"})
-public class ColorRGB {
+@JsonPropertyOrder({"red", "green", "blue"})
+public class ColourRGB {
 
     protected int red;
     protected int green;
     protected int blue;
-    protected Integer amberWhite = null;
 
-    public ColorRGB(int red, int green, int blue) {
+    public ColourRGB(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
-    }
-
-    public ColorRGB(int red, int green, int blue, int amberWhite) {
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.amberWhite = amberWhite;
     }
 
     public int getRed() {
@@ -59,26 +51,21 @@ public class ColorRGB {
         return blue;
     }
 
-    public Integer getAmberWhite() {
-        return amberWhite;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ColorRGB other = (ColorRGB) o;
+        ColourRGB other = (ColourRGB) o;
 
         if (red != other.red) return false;
         if (green != other.green) return false;
-        if (blue != other.blue) return false;
-        return Objects.equals(amberWhite, other.amberWhite);
+        return blue == other.blue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(red, green, blue, amberWhite);
+        return Objects.hash(red, green, blue);
     }
 
     @Override
@@ -90,11 +77,11 @@ public class ColorRGB {
             '}';
     }
 
-    public static ColorRGB fromHS(int hue, int saturation) {
+    public static ColourRGB fromHS(int hue, int saturation) {
         float hueNormalised = hue/65535f;
         float saturationNormalised = saturation/65535f;
         int rgb = Color.HSBtoRGB(hueNormalised, saturationNormalised, 1);
         Color colour = new Color(rgb);
-        return new ColorRGB(colour.getRed(), colour.getGreen(), colour.getBlue());
+        return new ColourRGB(colour.getRed(), colour.getGreen(), colour.getBlue());
     }
 }

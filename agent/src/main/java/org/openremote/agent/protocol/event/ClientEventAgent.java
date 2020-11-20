@@ -17,37 +17,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.agent.protocol.tradfri;
+package org.openremote.agent.protocol.event;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.security.ClientRole;
 import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.v2.ValueDescriptor;
 import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class TradfriAgent extends Agent {
+public class ClientEventAgent extends Agent {
 
-    /**
-     * The security code for the IKEA TRÅDFRI gateway.
-     */
-    public static final AttributeDescriptor<String> SECURITY_CODE = new AttributeDescriptor<>("securityCode", false, ValueType.STRING);
+    public static final ValueDescriptor<ClientRole> VALUE_CLIENT_ROLE = new ValueDescriptor<>("Client role", ClientRole.class);
 
-    public TradfriAgent(String name) {
-        super(name, DESCRIPTOR);
+    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientSecret", true, ValueType.STRING);
+    public static final AttributeDescriptor<ClientRole[]> CLIENT_ROLES = new AttributeDescriptor<>("clientRoles", true, VALUE_CLIENT_ROLE.asArray());
+
+    public ClientEventAgent(String name) {
+        this(name, DESCRIPTOR);
     }
 
-    protected <T extends TradfriAgent, S extends Protocol<T>> TradfriAgent(String name, AgentDescriptor<T, S> descriptor) {
+    protected <T extends ClientEventAgent, S extends Protocol<T>> ClientEventAgent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);
     }
 
-    public Optional<String> getSecurityCode() {
-        return getAttributes().getValue(SECURITY_CODE);
+    @Override
+    public ClientEventProtocol getProtocolInstance() {
+        return new ClientEventProtocol(this);
     }
 
-    @Override
-    public Protocol<TradfriAgent> getProtocolInstance() {
-        return new TradfriProtocol(this);
+    public Optional<String> getClientSecret() {
+        return getAttributes().getValue(CLIENT_SECRET);
+    }
+
+    public Optional<ClientRole[]> getClientRoles() {
+        return getAttributes().getValue(CLIENT_ROLES);
     }
 }

@@ -25,18 +25,18 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class PeopleCounter extends Device {
+public class PeopleCounterAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Integer> COUNT_IN = new AttributeDescriptor<>("countIn", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_OUT = new AttributeDescriptor<>("countOut", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_TOTAL = new AttributeDescriptor<>("countTotal", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_IN_PER_MINUTE = new AttributeDescriptor<>("countInMinute", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> COUNT_OUT_PER_MINUTE = new AttributeDescriptor<>("countOutMinute", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Double> COUNT_GROWTH_PER_MINUTE = new AttributeDescriptor<>("countGrowthMinute", true, ValueType.NUMBER, null);
+    public static final AttributeDescriptor<Integer> COUNT_IN = new AttributeDescriptor<>("countIn", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> COUNT_OUT = new AttributeDescriptor<>("countOut", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> COUNT_TOTAL = new AttributeDescriptor<>("countTotal", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> COUNT_IN_PER_MINUTE = new AttributeDescriptor<>("countInMinute", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> COUNT_OUT_PER_MINUTE = new AttributeDescriptor<>("countOutMinute", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Double> COUNT_GROWTH_PER_MINUTE = new AttributeDescriptor<>("countGrowthMinute", true, ValueType.NUMBER);
 
-    public static final AssetDescriptor<PeopleCounter> DESCRIPTOR = new AssetDescriptor<>("account-multiple", "4b5966", PeopleCounter.class);
+    public static final AssetDescriptor<PeopleCounterAsset> DESCRIPTOR = new AssetDescriptor<>("account-multiple", "4b5966", PeopleCounterAsset.class);
 
-    public PeopleCounter(String name) {
+    public PeopleCounterAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

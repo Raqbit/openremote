@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
-import static org.openremote.model.asset.impl.Light.BRIGHTNESS;
+import static org.openremote.model.asset.impl.LightAsset.BRIGHTNESS;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -241,7 +241,7 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent> {
             asset = new TradfriPlugAsset(name);
 
         } else if (device.isLight()) {
-            TradfriLightAsset lightAsset = new TradfriLightAsset(name);
+            TradfriLightAssetAsset lightAsset = new TradfriLightAssetAsset(name);
 
             // Add agent links
             lightAsset.getAttributes().get(BRIGHTNESS).ifPresent(attribute -> attribute.addOrReplaceMeta(

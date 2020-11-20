@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 
-abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends AbstractProtocol<T> implements
+public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends AbstractProtocol<T> implements
     ProtocolAssetImport {
 
     public static final int DEFAULT_TIME_INJECTION_INTERVAL_SECONDS = 3600 * 6;
@@ -166,7 +166,7 @@ abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends AbstractPro
     @Override
     public boolean startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
         if (assetImportTask != null) {
-            LOG.info("Asset import already running");
+            LOG.info("Asset import already running: " + this);
             return false;
         }
 

@@ -29,12 +29,10 @@ import org.openremote.model.attribute.MetaItem;
 public class MetaItemDescriptor<T> implements NameValueDescriptorProvider<T> {
     protected String name;
     protected ValueDescriptor<T> valueDescriptor;
-    protected T defaultValue;
 
-    public MetaItemDescriptor(String name, ValueDescriptor<T> valueDescriptor, T defaultValue) {
+    public MetaItemDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
         this.name = name;
         this.valueDescriptor = valueDescriptor;
-        this.defaultValue = defaultValue;
     }
 
     public String getName() {
@@ -45,10 +43,4 @@ public class MetaItemDescriptor<T> implements NameValueDescriptorProvider<T> {
     public ValueDescriptor<T> getValueDescriptor() {
         return valueDescriptor;
     }
-
-    @Override
-    public T getDefaultValue() {
-        return defaultValue;
-    }
-
 }

@@ -33,7 +33,7 @@ import java.util.Collection;
  */
 public class ValueDescriptor<T> implements NameHolder, MetaHolder {
 
-    protected static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
+    public static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
         public ValueArrayDescriptor(String name, Class<T> type, MetaList meta) {
             super(name, type, meta);
         }

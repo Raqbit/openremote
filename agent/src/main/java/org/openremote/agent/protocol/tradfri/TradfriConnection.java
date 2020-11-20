@@ -8,9 +8,11 @@ import org.openremote.agent.protocol.tradfri.util.Credentials;
 
 import org.openremote.agent.protocol.ProtocolExecutorService;
 import org.openremote.model.asset.agent.ConnectionStatus;
+import org.openremote.model.asset.impl.LightAsset;
+import org.openremote.model.asset.impl.PlugAsset;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.value.ColorRGB;
+import org.openremote.model.value.ColourRGB;
 import org.openremote.model.value.Values;
 
 import java.util.function.Consumer;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.openremote.agent.protocol.tradfri.TradfriLightAsset.convertBrightness;
+import static org.openremote.agent.protocol.tradfri.TradfriLightAssetAsset.convertBrightness;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -156,20 +158,20 @@ public class TradfriConnection {
                 if (device.isLight()){
                     Light light = device.toLight();
 
-                    if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.BRIGHTNESS.getName())) {
+                    if (event.getAttributeName().equals(LightAsset.BRIGHTNESS.getName())) {
                         int value = Values.getInteger(event.getValue()).orElse(0);
                         light.setBrightness(convertBrightness(value, false));
-                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.ON_OFF.getName())) {
+                    } else if (event.getAttributeName().equals(LightAsset.ON_OFF.getName())) {
                         light.setOn(Values.getBooleanCoerced(event.getValue()).orElse(false));
-                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.COLOR.getName())) {
-                        light.setColour(Values.convert(ColorRGB.class, event.getValue()));
-                    } else if (event.getAttributeName().equals(org.openremote.model.asset.impl.Light.TEMPERATURE.getName())) {
+                    } else if (event.getAttributeName().equals(LightAsset.COLOUR.getName())) {
+                        light.setColour(Values.convert(ColourRGB.class, event.getValue()));
+                    } else if (event.getAttributeName().equals(LightAsset.TEMPERATURE.getName())) {
                         light.setColourTemperature(Values.getInteger(event.getValue()).orElse(0));
                     }
                 }
                 else if (device.isPlug()) {
                     Plug plug = device.toPlug();
-                    if (event.getAttributeName().equals(org.openremote.model.asset.impl.Plug.ON_OFF.getName())) {
+                    if (event.getAttributeName().equals(PlugAsset.ON_OFF.getName())) {
                         plug.setOn(Values.getBooleanCoerced(event.getValue()).orElse(false));
                     }
                 }

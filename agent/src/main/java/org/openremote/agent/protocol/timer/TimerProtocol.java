@@ -86,7 +86,6 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
 
     @Override
     protected void doStop(Container container) throws Exception {
-
         if (expressionParser != null) {
             expressionParser = null;
             getCronScheduler().removeJob(getTimerId(agent));
@@ -95,7 +94,7 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
 
     @Override
     protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException {
-        TimerValue timerValue = TimerConfiguration.getValue(attribute).orElse(null);
+        TimerValue timerValue = attribute.getMetaValue(TimerAgent.META_TIMER_VALUE).orElse(null);
 
         if (timerValue == null) {
             String msg = "Attribute doesn't have a valid timer value so ignoring write request: " + attribute;
@@ -117,7 +116,7 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
     protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
 
         // Should never be null as attribute would've only been linked if it has a valid timer value
-        TimerValue timerValue = TimerConfiguration.getValue(attribute).orElseThrow(() -> new IllegalStateException("Linked attribute timer value is invalid but this should not happen: " + attribute));
+        TimerValue timerValue = attribute.getMetaValue(TimerAgent.META_TIMER_VALUE).orElseThrow(() -> new IllegalStateException("Linked attribute timer value is invalid but this should not happen: " + attribute));
 
         switch (timerValue) {
             case ACTIVE:

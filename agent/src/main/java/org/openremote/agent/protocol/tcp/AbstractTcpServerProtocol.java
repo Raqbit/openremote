@@ -48,7 +48,7 @@ public abstract class AbstractTcpServerProtocol<T extends AbstractTcpServer<U>, 
         int port = getAgent().getBindPort().orElseThrow(() ->
              new IllegalArgumentException("Missing or invalid attribute: " + TcpServerAgent.BIND_PORT));
 
-        String bindAddress = getAgent().getBindAddress().orElse(null);
+        String bindAddress = getAgent().getBindHost().orElse(null);
 
         LOG.info("Creating TCP server instance");
         tcpServer = createTcpServer(port, bindAddress, agent);

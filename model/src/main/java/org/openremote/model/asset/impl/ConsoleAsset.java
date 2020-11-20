@@ -29,16 +29,16 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Console extends Asset {
+public class ConsoleAsset extends Asset {
 
-    public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", false, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", false, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", false, ValueType.STRING, null);
-    public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", false, ValueType.CONSOLE_PROVIDERS, null);
+    public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", false, ValueType.STRING);
+    public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", false, ValueType.CONSOLE_PROVIDERS);
 
-    public static final AssetDescriptor<Console> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, Console.class);
+    public static final AssetDescriptor<ConsoleAsset> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, ConsoleAsset.class);
 
-    protected <T extends Console> Console(String name) {
+    protected <T extends ConsoleAsset> ConsoleAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
@@ -46,7 +46,7 @@ public class Console extends Asset {
         return getAttributes().getValue(CONSOLE_NAME);
     }
 
-    public Console setConsoleName(String name) {
+    public ConsoleAsset setConsoleName(String name) {
         TextUtil.requireNonNullAndNonEmpty(name);
         getAttributes().getOrCreate(CONSOLE_NAME).setValue(name);
         return this;
@@ -56,7 +56,7 @@ public class Console extends Asset {
         return getAttributes().getValue(CONSOLE_VERSION);
     }
 
-    public Console setConsoleVersion(String version) {
+    public ConsoleAsset setConsoleVersion(String version) {
         TextUtil.requireNonNullAndNonEmpty(version);
         getAttributes().getOrCreate(CONSOLE_VERSION).setValue(version);
         return this;
@@ -66,7 +66,7 @@ public class Console extends Asset {
         return getAttributes().getValue(CONSOLE_PLATFORM);
     }
 
-    public Console setConsolePlatform(String platform) {
+    public ConsoleAsset setConsolePlatform(String platform) {
         TextUtil.requireNonNullAndNonEmpty(platform);
         getAttributes().getOrCreate(CONSOLE_PLATFORM).setValue(platform);
         return this;
@@ -76,12 +76,12 @@ public class Console extends Asset {
         return getAttributes().getValue(CONSOLE_PROVIDERS);
     }
 
-    public Console setConsoleProviders(ConsoleProviders providers) {
+    public ConsoleAsset setConsoleProviders(ConsoleProviders providers) {
         getAttributes().getOrCreate(CONSOLE_PROVIDERS).setValue(providers);
         return this;
     }
 
-    public Console setConsoleProvider(String name, ConsoleProvider consoleProvider) {
+    public ConsoleAsset setConsoleProvider(String name, ConsoleProvider consoleProvider) {
         ConsoleProviders providers = getAttributes().getValue(CONSOLE_PROVIDERS).orElse(new ConsoleProviders());
         providers.put(name, consoleProvider);
         setConsoleProviders(providers);

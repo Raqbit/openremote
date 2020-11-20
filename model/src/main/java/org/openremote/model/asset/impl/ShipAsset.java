@@ -29,26 +29,26 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Ship extends Asset {
+public class ShipAsset extends Asset {
 
-    public static final AttributeDescriptor<Integer> MSSI_NUMBER = new AttributeDescriptor<>("mSSINumber", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> IMO_NUMBER = new AttributeDescriptor<>("iMONumber", true, ValueType.POSITIVE_INTEGER, null);
-    public static final AttributeDescriptor<Integer> DIRECTION = new AttributeDescriptor<>("direction", true, ValueType.DIRECTION, null);
-    public static final AttributeDescriptor<Integer> LENGTH = new AttributeDescriptor<>("length", true, ValueType.POSITIVE_INTEGER, null,
+    public static final AttributeDescriptor<Integer> MSSI_NUMBER = new AttributeDescriptor<>("mSSINumber", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> IMO_NUMBER = new AttributeDescriptor<>("iMONumber", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> DIRECTION = new AttributeDescriptor<>("direction", true, ValueType.DIRECTION);
+    public static final AttributeDescriptor<Integer> LENGTH = new AttributeDescriptor<>("length", true, ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DISTANCE_METRE)
     );
-    public static final AttributeDescriptor<Double> SPEED = new AttributeDescriptor<>("speed", true, ValueType.POSITIVE_NUMBER, null,
+    public static final AttributeDescriptor<Double> SPEED = new AttributeDescriptor<>("speed", true, ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_SPEED_KNOT)
     );
-    public static final AttributeDescriptor<String> SHIP_TYPE = new AttributeDescriptor<>("shipType", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> SHIP_TYPE = new AttributeDescriptor<>("shipType", true, ValueType.STRING);
 
-    public static final AssetDescriptor<Ship> DESCRIPTOR = new AssetDescriptor<>("ferry", "000080", Ship.class);
+    public static final AssetDescriptor<ShipAsset> DESCRIPTOR = new AssetDescriptor<>("ferry", "000080", ShipAsset.class);
 
-    public <T extends Ship> Ship(String name, AssetDescriptor<T> descriptor) {
+    public <T extends ShipAsset> ShipAsset(String name, AssetDescriptor<T> descriptor) {
         super(name, descriptor);
     }
 
-    public Ship(String name) {
+    public ShipAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

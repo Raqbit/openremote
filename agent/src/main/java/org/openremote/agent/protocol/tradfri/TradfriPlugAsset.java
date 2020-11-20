@@ -5,11 +5,12 @@ import org.openremote.agent.protocol.tradfri.device.Plug;
 import org.openremote.agent.protocol.tradfri.device.event.EventHandler;
 import org.openremote.agent.protocol.tradfri.device.event.PlugChangeOnEvent;
 import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.asset.impl.PlugAsset;
 import org.openremote.model.attribute.AttributeEvent;
 
 import java.util.function.Consumer;
 
-public class TradfriPlugAsset extends org.openremote.model.asset.impl.Plug implements TradfriAsset {
+public class TradfriPlugAsset extends PlugAsset implements TradfriAsset {
 
     public TradfriPlugAsset(String name) {
         this(name, DESCRIPTOR);

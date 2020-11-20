@@ -26,16 +26,16 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Building extends Asset {
+public class BuildingAsset extends Asset {
 
-    public static final AttributeDescriptor<String> STREET = new AttributeDescriptor<>("street", true, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", true, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", true, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", true, ValueType.STRING, null);
+    public static final AttributeDescriptor<String> STREET = new AttributeDescriptor<>("street", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", true, ValueType.STRING);
 
-    public static final AssetDescriptor<Building> DESCRIPTOR = new AssetDescriptor<>("office-building", "4b5966", Building.class);
+    public static final AssetDescriptor<BuildingAsset> DESCRIPTOR = new AssetDescriptor<>("office-building", "4b5966", BuildingAsset.class);
 
-    public Building(String name) {
+    public BuildingAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

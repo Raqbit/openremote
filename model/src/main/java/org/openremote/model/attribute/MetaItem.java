@@ -36,7 +36,7 @@ public class MetaItem<T> extends AbstractNameValueHolderImpl<T> {
     }
 
     public MetaItem(MetaItemDescriptor<T> metaDescriptor) {
-        this(metaDescriptor, metaDescriptor.getDefaultValue());
+        this(metaDescriptor, null);
     }
 
     public MetaItem(MetaItemDescriptor<T> metaDescriptor, T value) {

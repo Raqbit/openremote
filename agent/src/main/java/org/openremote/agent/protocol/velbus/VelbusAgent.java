@@ -25,14 +25,12 @@ import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueType;
 
-import static org.openremote.agent.protocol.velbus.AbstractVelbusProtocol.DEFAULT_TIME_INJECTION_INTERVAL_SECONDS;
-
 abstract class VelbusAgent extends Agent {
 
-    public static final AttributeDescriptor<Integer> TIME_INJECTION_INTERVAL_SECONDS = new AttributeDescriptor<>("timeInjectionInterval", true, ValueType.POSITIVE_INTEGER, DEFAULT_TIME_INJECTION_INTERVAL_SECONDS);
+    public static final AttributeDescriptor<Integer> TIME_INJECTION_INTERVAL_SECONDS = new AttributeDescriptor<>("timeInjectionInterval", true, ValueType.POSITIVE_INTEGER);
 
     public static final MetaItemDescriptor<String> META_DEVICE_VALUE_LINK = new MetaItemDescriptor<>("deviceValueLink", ValueType.STRING, null);
-    public static final MetaItemDescriptor<Integer> META_DEVICE_ADDRESS = new MetaItemDescriptor<>("deviceAddress", ValueType.BYTE, null);
+    public static final MetaItemDescriptor<Integer> META_DEVICE_ADDRESS = new MetaItemDescriptor<>("deviceAddress", ValueType.INT_BYTE, null);
 
     protected <T extends VelbusAgent, S extends AbstractVelbusProtocol<T>> VelbusAgent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);

@@ -48,7 +48,7 @@ public class TypeMapper {
         typeMap.put(ChannelType.NUMBER, new Pair<>(ValueType.NUMBER, null));
         typeMap.put(ChannelType.STRING, new Pair<>(ValueType.STRING, null));
         typeMap.put(ChannelType.BOOLEAN, new Pair<>(ValueType.BOOLEAN, null));
-        typeMap.put(ChannelType.ARRAY, new Pair<>(ValueType.ARRAY, null));
+        typeMap.put(ChannelType.ARRAY, new Pair<>(ValueType.JSON_ARRAY, null));
 
         // COMMAND_CLASS_SENSOR_MULTILEVEL
 
@@ -179,14 +179,14 @@ public class TypeMapper {
 
         // COMMAND_CLASS_COLOR_CONTROL
 
-        typeMap.put(ChannelType.COLOR_WARM_WHITE, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_COLD_WHITE, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_RED, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_GREEN, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_BLUE, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_AMBER, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_CYAN, new Pair<>(ValueType.BYTE, null));
-        typeMap.put(ChannelType.COLOR_PURPLE, new Pair<>(ValueType.BYTE, null));
+        typeMap.put(ChannelType.COLOR_WARM_WHITE, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_COLD_WHITE, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_RED, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_GREEN, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_BLUE, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_AMBER, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_CYAN, new Pair<>(ValueType.INT_BYTE, null));
+        typeMap.put(ChannelType.COLOR_PURPLE, new Pair<>(ValueType.INT_BYTE, null));
         typeMap.put(ChannelType.COLOR_INDEXED, new Pair<>(ValueType.NUMBER, null));
         typeMap.put(ChannelType.COLOR_RGB, new Pair<>(ValueType.COLOUR_RGB, Collections.singletonList(new MetaItem<>(MetaItemType.UNIT_TYPE, UNITS_COLOR_RGB))));
         typeMap.put(ChannelType.COLOR_ARGB, new Pair<>(ValueType.COLOUR_RGB, Collections.singletonList(new MetaItem<>(MetaItemType.UNIT_TYPE, UNITS_COLOR_ARGB))));
@@ -234,7 +234,7 @@ public class TypeMapper {
                     valueType = ValueType.STRING;
                     break;
                 case ARRAY:
-                    valueType = ValueType.ARRAY;
+                    valueType = ValueType.JSON_ARRAY;
                     break;
             }
         }

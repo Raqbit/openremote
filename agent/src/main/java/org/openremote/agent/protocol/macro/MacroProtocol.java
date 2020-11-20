@@ -21,24 +21,18 @@ package org.openremote.agent.protocol.macro;
 
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.Container;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
 
-import static org.openremote.agent.protocol.macro.MacroConfiguration.getMacroActionIndex;
-import static org.openremote.agent.protocol.macro.MacroConfiguration.isValidMacroConfiguration;
-import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
-import static org.openremote.model.util.TextUtil.REGEXP_PATTERN_INTEGER_POSITIVE;
 
 // TODO: Remove this protocol once attribute linking and flow integration is done
 /**
@@ -58,22 +52,19 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
 
     class MacroExecutionTask {
 
-        AttributeRef attributeRef;
         List<MacroAction> actions;
         boolean repeat;
         boolean cancelled;
         ScheduledFuture<?> scheduledFuture;
-        int iteration = -1;
+        int step = -1;
 
-        public MacroExecutionTask(AttributeRef attributeRef, List<MacroAction> actions, boolean repeat) {
-            this.attributeRef = attributeRef;
+        public MacroExecutionTask(List<MacroAction> actions, boolean repeat) {
             this.actions = actions;
             this.repeat = repeat;
         }
 
         void start() {
-            executions.put(attributeRef, this);
-            updateLinkedAttribute(new AttributeState(attributeRef, AttributeExecuteStatus.RUNNING.asValue()));
+            updateAgentAttribute(new AttributeState(agent.getId(), MacroAgent.MACRO_STATUS.getName(), AttributeExecuteStatus.RUNNING));
             run();
         }
 
@@ -81,8 +72,8 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
             LOG.fine("Macro Execution cancel");
             scheduledFuture.cancel(false);
             cancelled = true;
-            executions.remove(attributeRef);
-            updateLinkedAttribute(new AttributeState(attributeRef, AttributeExecuteStatus.CANCELLED.asValue()));
+            execution = null;
+            updateAgentAttribute(new AttributeState(agent.getId(), MacroAgent.MACRO_STATUS.getName(), AttributeExecuteStatus.CANCELLED));
         }
 
         private void run() {
@@ -90,41 +81,51 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
                 return;
             }
 
-            if (iteration >= 0) {
-                // Process the execution of the next action
-                MacroAction action = actions.get(iteration);
-                AttributeState actionState = action.getAttributeState();
+            boolean finished = false;
 
-                // send attribute event
-                sendAttributeEvent(actionState);
+            try {
+                if (step >= 0) {
+                    // Process the execution of the next action
+                    MacroAction action = actions.get(step);
+                    AttributeState actionState = action.getAttributeState();
+
+                    // send attribute event
+                    sendAttributeEvent(actionState);
+                }
+
+                boolean isLast = step == actions.size() - 1;
+                boolean restart = isLast && repeat;
+
+                if (restart) {
+                    step = 0;
+                } else {
+                    step++;
+                }
+
+                finished = isLast && !restart;
+            } finally {
+                if (finished) {
+                    execution = null;
+                    // Update the command Status of this attribute
+                    updateAgentAttribute(new AttributeState(agent.getId(), MacroAgent.MACRO_STATUS.getName(), AttributeExecuteStatus.COMPLETED));
+                } else {
+
+                    // Get next execution delay
+                    int delayMillis = actions.get(step).getDelayMilliseconds();
+
+                    // Schedule the next iteration
+                    scheduledFuture = executorService.schedule(this::run, Math.max(delayMillis, 0));
+                }
             }
-
-            boolean isLast = iteration == actions.size() - 1;
-            boolean restart = isLast && repeat;
-
-            if (restart) {
-                iteration = 0;
-            } else {
-                iteration++;
-            }
-
-            if ((isLast && !restart)) {
-                executions.remove(attributeRef);
-                // Update the command Status of this attribute
-                updateLinkedAttribute(new AttributeState(attributeRef, AttributeExecuteStatus.COMPLETED.asValue()));
-                return;
-            }
-
-            // Get next execution delay
-            int delayMillis = actions.get(iteration).getDelayMilliseconds();
-
-            // Schedule the next iteration
-            scheduledFuture = executorService.schedule(this::run, Math.max(delayMillis, 0));
         }
     }
 
-    protected List<MacroAction> actions = new ArrayList<>();
-    protected final Map<AttributeRef, MacroExecutionTask> executions = new ConcurrentHashMap<>();
+    protected final List<MacroAction> actions = new ArrayList<>();
+    protected MacroExecutionTask execution;
+
+    public MacroProtocol(MacroAgent agent) {
+        super(agent);
+    }
 
     @Override
     public String getProtocolName() {
@@ -139,16 +140,20 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
     @Override
     protected void doStart(Container container) throws Exception {
 
-        actions = Arrays.asList(agent.getMacroActions().orElseThrow(() -> {
+        actions.addAll(Arrays.asList(agent.getMacroActions().orElseThrow(() -> {
             String msg = "Macro actions attribute missing or invalid: " + this;
             LOG.warning(msg);
             throw new IllegalArgumentException(msg);
-        }));
+        })));
+
         setConnectionStatus(ConnectionStatus.CONNECTED);
     }
 
     @Override
     protected void doStop(Container container) throws Exception {
+        if (execution != null) {
+            execution.cancel();
+        }
     }
 
     @Override
@@ -162,7 +167,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
             updateLinkedAttribute(
                 new AttributeState(
                     attributeRef,
-                    agent.isMacroActive().orElse(true)
+                    agent.isMacroDisabled().orElse(true)
                         ? AttributeExecuteStatus.READY
                         : AttributeExecuteStatus.DISABLED
                 )
@@ -202,17 +207,20 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
                 .flatMap(Values::getString)
                 .flatMap(AttributeExecuteStatus::fromString)
                 .orElse(null);
-            AttributeRef attributeRef = event.getAttributeRef();
+
+            if (status == null || !status.isWrite()) {
+                LOG.info("Linked attribute write value is either null or not a valid execution status");
+                return;
+            }
 
             // Check if it's a cancellation request
             if (status == AttributeExecuteStatus.REQUEST_CANCEL) {
+                if (execution == null) {
+                    return;
+                }
+
                 LOG.fine("Request received to cancel macro execution: " + event);
-                executions.computeIfPresent(attributeRef,
-                    (attributeRef1, macroExecutionTask) -> {
-                        macroExecutionTask.cancel();
-                        return macroExecutionTask;
-                    }
-                );
+                execution.cancel();
                 return;
             }
 
@@ -221,7 +229,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
                 return;
             }
 
-            executeMacro(attributeRef, actions, status == AttributeExecuteStatus.REQUEST_REPEATING);
+            executeMacro(status == AttributeExecuteStatus.REQUEST_REPEATING);
             return;
         }
 
@@ -243,8 +251,8 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
         }
     }
 
-    protected void executeMacro(AttributeRef attributeRef, List<MacroAction> actions, boolean repeat) {
-        MacroExecutionTask task = new MacroExecutionTask(attributeRef, actions, repeat);
+    protected void executeMacro(boolean repeat) {
+        MacroExecutionTask task = new MacroExecutionTask(actions, repeat);
         task.start();
     }
 }

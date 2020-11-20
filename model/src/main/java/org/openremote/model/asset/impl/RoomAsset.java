@@ -22,11 +22,11 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 
-public class Floor extends Asset {
+public class RoomAsset extends Asset {
 
-    public static final AssetDescriptor<Floor> DESCRIPTOR = new AssetDescriptor<>("stairs", null, Floor.class);
+    public static final AssetDescriptor<RoomAsset> DESCRIPTOR = new AssetDescriptor<>("door", "2eaaa2", RoomAsset.class);
 
-    public Floor(String name) {
+    public RoomAsset(String name) {
         super(name, DESCRIPTOR);
     }
 }

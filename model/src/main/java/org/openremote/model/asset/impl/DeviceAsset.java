@@ -19,36 +19,33 @@
  */
 package org.openremote.model.asset.impl;
 
-import org.openremote.model.Constants;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class GroundwaterSensor extends Device {
+public class DeviceAsset extends Asset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER, null,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
-        new MetaItem<>(MetaItemType.READ_ONLY)
-    );
-    public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", true, ValueType.POSITIVE_INTEGER, null,
-        new MetaItem<>(MetaItemType.READ_ONLY)
-    );
+    public static final AttributeDescriptor<String> MANUFACTURER = new AttributeDescriptor<>("manufacturer", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> MODEL = new AttributeDescriptor<>("model", true, ValueType.STRING);
 
-    public static final AssetDescriptor<GroundwaterSensor> DESCRIPTOR = new AssetDescriptor<>("water-outline", "95d0df", GroundwaterSensor.class);
+    public static final AssetDescriptor<DeviceAsset> DESCRIPTOR = new AssetDescriptor<>("cube-outline", null, DeviceAsset.class);
 
-    public GroundwaterSensor(String name) {
+    public <T extends DeviceAsset> DeviceAsset(String name, AssetDescriptor<T> descriptor) {
+        super(name, descriptor);
+    }
+
+    public DeviceAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
-    public Optional<Double> getTemperature() {
-        return getAttributes().getValue(TEMPERATURE);
+    public Optional<String> getManufacturer() {
+        return getAttributes().getValue(MANUFACTURER);
     }
 
-    public Optional<Integer> getWaterLevel() {
-        return getAttributes().getValue(WATER_LEVEL);
+    public Optional<String> getModel() {
+        return getAttributes().getValue(MODEL);
     }
 }

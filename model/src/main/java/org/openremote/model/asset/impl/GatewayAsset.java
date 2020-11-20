@@ -27,16 +27,16 @@ import org.openremote.model.v2.ValueType;
 
 import java.util.Optional;
 
-public class Gateway extends Asset {
+public class GatewayAsset extends Asset {
 
-    public static final AttributeDescriptor<String> CLIENT_ID = new AttributeDescriptor<>("clientId", false, ValueType.STRING, null);
-    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientId", false, ValueType.UUID, null);
-    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("gatewayStatus", false, ValueType.CONNECTION_STATUS, null);
-    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", false, ValueType.BOOLEAN, null);
+    public static final AttributeDescriptor<String> CLIENT_ID = new AttributeDescriptor<>("clientId", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientId", false, ValueType.UUID);
+    public static final AttributeDescriptor<ConnectionStatus> STATUS = new AttributeDescriptor<>("gatewayStatus", false, ValueType.CONNECTION_STATUS);
+    public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("disabled", false, ValueType.BOOLEAN);
 
-    public static final AssetDescriptor<Gateway> DESCRIPTOR = new AssetDescriptor<>("router-wireless", null, Gateway.class);
+    public static final AssetDescriptor<GatewayAsset> DESCRIPTOR = new AssetDescriptor<>("router-wireless", null, GatewayAsset.class);
 
-    public Gateway(String name) {
+    public GatewayAsset(String name) {
         super(name, DESCRIPTOR);
     }
 

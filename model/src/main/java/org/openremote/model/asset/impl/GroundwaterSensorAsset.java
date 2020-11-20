@@ -25,27 +25,30 @@ import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemType;
 import org.openremote.model.v2.ValueType;
-import org.openremote.model.value.ColorRGB;
 
 import java.util.Optional;
 
-public class Plug extends Device {
+public class GroundwaterSensorAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN, null,
-        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_ON_OFF)
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER,
+        new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
+        new MetaItem<>(MetaItemType.READ_ONLY)
+    );
+    public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", true, ValueType.POSITIVE_INTEGER,
+        new MetaItem<>(MetaItemType.READ_ONLY)
     );
 
-    public static final AssetDescriptor<Plug> DESCRIPTOR = new AssetDescriptor<>("plug", "e6688a", Plug.class);
+    public static final AssetDescriptor<GroundwaterSensorAsset> DESCRIPTOR = new AssetDescriptor<>("water-outline", "95d0df", GroundwaterSensorAsset.class);
 
-    public <T extends Plug> Plug(String name, AssetDescriptor<T> descriptor) {
-        super(name, descriptor);
-    }
-
-    public Plug(String name) {
+    public GroundwaterSensorAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
-    public Optional<Boolean> getOnOff() {
-        return getAttributes().getValue(ON_OFF);
+    public Optional<Double> getTemperature() {
+        return getAttributes().getValue(TEMPERATURE);
+    }
+
+    public Optional<Integer> getWaterLevel() {
+        return getAttributes().getValue(WATER_LEVEL);
     }
 }

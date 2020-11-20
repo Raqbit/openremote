@@ -17,16 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.asset.impl;
+package org.openremote.agent.protocol.artnet;
 
-import org.openremote.model.asset.Asset;
-import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
+import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.agent.protocol.udp.UdpIoClient;
+import org.openremote.model.asset.agent.AgentDescriptor;
 
-public class Room extends Asset {
+public class ArtnetAgent extends IoAgent<ArtnetPacket, UdpIoClient<ArtnetPacket>> {
 
-    public static final AssetDescriptor<Room> DESCRIPTOR = new AssetDescriptor<>("door", "2eaaa2", Room.class);
+    public ArtnetAgent(String name) {
+        this(name, DESCRIPTOR);
+    }
 
-    public Room(String name) {
-        super(name, DESCRIPTOR);
+    protected <V extends IoAgent<ArtnetPacket, UdpIoClient<ArtnetPacket>>, W extends AbstractIoClientProtocol<ArtnetPacket, UdpIoClient<ArtnetPacket>, V>> ArtnetAgent(String name, AgentDescriptor<V, W> descriptor) {
+        super(name, descriptor);
+    }
+
+    @Override
+    public ArtnetProtocol getProtocolInstance() {
+        return new ArtnetProtocol(this);
     }
 }
