@@ -30,9 +30,8 @@ import java.util.Collection;
  * Describes an {@link Attribute} in terms of what the value type will be and also optionally provides default
  * {@link MetaItem}s that will be added to new instances of the {@link Attribute}.
  */
-public class AttributeDescriptor<T> implements MetaHolder, NameValueDescriptorProvider<T> {
-    protected String name;
-    protected ValueDescriptor<T> valueDescriptor;
+public class AttributeDescriptor<T> extends AbstractNameValueDescriptorHolder<T> implements MetaHolder {
+
     protected MetaList meta;
 
     public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
@@ -48,18 +47,8 @@ public class AttributeDescriptor<T> implements MetaHolder, NameValueDescriptorPr
     }
 
     public AttributeDescriptor(String name, ValueDescriptor<T> valueDescriptor, MetaList meta) {
-        this.name = name;
-        this.valueDescriptor = valueDescriptor;
+        super(name, valueDescriptor);
         this.meta = meta;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public ValueDescriptor<T> getValueDescriptor() {
-        return valueDescriptor;
     }
 
     @Override

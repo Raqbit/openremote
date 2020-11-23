@@ -20,7 +20,6 @@
 package org.openremote.model.attribute;
 
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.NameValueDescriptorProvider;
 
 import java.util.Collection;
 import java.util.Optional;

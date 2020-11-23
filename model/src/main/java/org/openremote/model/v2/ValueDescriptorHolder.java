@@ -19,7 +19,10 @@
  */
 package org.openremote.model.v2;
 
-public interface NameValueDescriptorProvider<T> extends NameHolder {
+/**
+ * Identifies an item that holds a {@link ValueDescriptor}.
+ */
+public interface ValueDescriptorHolder<T> {
 
-    ValueDescriptor<T> getValueDescriptor();
+    ValueDescriptor<T> getValueType();
 }

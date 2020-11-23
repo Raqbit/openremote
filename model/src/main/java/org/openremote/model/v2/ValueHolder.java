@@ -19,8 +19,6 @@
  */
 package org.openremote.model.v2;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Optional;
 
 /**

@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.openremote.model.v2.NameHolder;
-import org.openremote.model.v2.NameValueDescriptorProvider;
+import org.openremote.model.v2.AbstractNameValueDescriptorHolder;
 import org.openremote.model.v2.ValueHolder;
 
 import java.io.IOException;
@@ -190,11 +190,11 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
     }
 
     @SuppressWarnings("unchecked")
-    protected <S, U extends ValueHolder<S>> Optional<U> getInternal(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    protected <S, U extends ValueHolder<S>> Optional<U> getInternal(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
         Optional<T> valueProvider = get(nameValueDescriptorProvider);
         return valueProvider.map(item -> {
             Class<?> itemType = item.getValueType().getType();
-            Class<S> expectedType = nameValueDescriptorProvider.getValueDescriptor().getType();
+            Class<S> expectedType = nameValueDescriptorProvider.getValueType().getType();
             if (itemType == expectedType) {
                 return (U)item;
             }
@@ -202,11 +202,11 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
         });
     }
 
-    public <S> Optional<S> getValue(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    public <S> Optional<S> getValue(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
         return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue);
     }
 
-    public <S> S getValueOrDefault(NameValueDescriptorProvider<S> nameValueDescriptorProvider) {
+    public <S> S getValueOrDefault(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
         return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(null);
     }
 

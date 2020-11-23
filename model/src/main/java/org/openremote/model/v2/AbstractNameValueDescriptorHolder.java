@@ -19,9 +19,23 @@
  */
 package org.openremote.model.v2;
 
-public interface AttributeDescriptorProvider {
+public abstract class AbstractNameValueDescriptorHolder<T> implements ValueDescriptorHolder<T>, NameHolder {
 
-    AttributeDescriptor<?>[] EMPTY_ATTRIBUTES = new AttributeDescriptor<?>[0];
+    protected String name;
+    protected ValueDescriptor<T> valueDescriptor;
 
-    AttributeDescriptor<?>[] getAttributeDescriptors();
+    public AbstractNameValueDescriptorHolder(String name, ValueDescriptor<T> valueDescriptor) {
+        this.name = name;
+        this.valueDescriptor = valueDescriptor;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public ValueDescriptor<T> getValueType() {
+        return valueDescriptor;
+    }
 }

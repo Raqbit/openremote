@@ -63,7 +63,7 @@ class AssetModelResourceTest extends Specification implements ManagerContainerTr
 
         then: "the default asset types should be present"
         assetDescriptors.size() == AssetType.values().length
-        assetDescriptors.any{it.name == BUILDING.name && it.attributeDescriptors.length == 5 && it.attributeDescriptors.find {it.attributeName == AttributeType.SURFACE_AREA.attributeName}.valueDescriptor.valueType == ValueType.NUMBER}
+        assetDescriptors.any{it.name == BUILDING.name && it.attributeDescriptors.length == 5 && it.attributeDescriptors.find {it.attributeName == AttributeType.SURFACE_AREA.attributeName}.valueType.valueType == ValueType.NUMBER}
         assetDescriptors.any{it.name == CITY.name}
         assetDescriptors.any{it.name == AREA.name}
         assetDescriptors.any{it.name == FLOOR.name}

@@ -20,7 +20,7 @@
 package org.openremote.model.attribute;
 
 import org.openremote.model.util.AssetModelUtil;
-import org.openremote.model.v2.AbstractNameValueHolderImpl;
+import org.openremote.model.v2.AbstractNameValueHolder;
 import org.openremote.model.v2.AttributeDescriptor;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 /**
  * Stores a named value with associated {@link MetaItem}s.
  */
-public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
+public class Attribute<T> extends AbstractNameValueHolder<T> {
 
     protected MetaList meta;
     protected long timestamp;
@@ -47,7 +47,7 @@ public class Attribute<T> extends AbstractNameValueHolderImpl<T> {
     }
 
     public Attribute(AttributeDescriptor<T> attributeDescriptor, T value) {
-        this(attributeDescriptor.getName(), attributeDescriptor.getValueDescriptor(), value);
+        this(attributeDescriptor.getName(), attributeDescriptor.getValueType(), value);
 
         // Auto merge meta from attribute descriptor
         if (attributeDescriptor.getMeta() != null) {

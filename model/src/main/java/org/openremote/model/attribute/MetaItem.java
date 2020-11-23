@@ -20,7 +20,7 @@
 package org.openremote.model.attribute;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.openremote.model.v2.AbstractNameValueHolderImpl;
+import org.openremote.model.v2.AbstractNameValueHolder;
 import org.openremote.model.v2.MetaItemDescriptor;
 import org.openremote.model.v2.ValueDescriptor;
 
@@ -30,7 +30,7 @@ import java.util.Objects;
  * A named value whose name must match the name of a {@link MetaItemDescriptor} and whose value must match the value type of
  * the {@link MetaItemDescriptor}.
  */
-public class MetaItem<T> extends AbstractNameValueHolderImpl<T> {
+public class MetaItem<T> extends AbstractNameValueHolder<T> {
 
     protected MetaItem() {
     }
@@ -40,7 +40,7 @@ public class MetaItem<T> extends AbstractNameValueHolderImpl<T> {
     }
 
     public MetaItem(MetaItemDescriptor<T> metaDescriptor, T value) {
-        super(metaDescriptor.getName(), metaDescriptor.getValueDescriptor(), value);
+        super(metaDescriptor.getName(), metaDescriptor.getValueType(), value);
     }
 
     // Don't serialise type info for meta items as the name is the meta descriptor name

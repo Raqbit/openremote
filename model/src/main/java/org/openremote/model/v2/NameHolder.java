@@ -22,7 +22,7 @@ package org.openremote.model.v2;
 import javax.validation.constraints.Pattern;
 
 /**
- * Identifies an item that holds a name property, the name should be very simple, as we use them in SQL path
+ * Identifies an item that holds a named property, the name should be very simple, as we use them in SQL path
  * expressions, etc. and must manually escape. The name should be immutable to aid in tracking.
  */
 public interface NameHolder {

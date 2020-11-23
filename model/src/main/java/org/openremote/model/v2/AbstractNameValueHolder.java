@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, NameHolder {
+public abstract class AbstractNameValueHolder<T> implements ValueHolder<T>, NameHolder {
 
     @JsonSerialize(converter = ValueDescriptor.ValueDescriptorStringConverter.class)
     protected ValueDescriptor<T> type;
@@ -35,10 +35,10 @@ public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     protected String name;
 
-    protected AbstractNameValueHolderImpl() {
+    protected AbstractNameValueHolder() {
     }
 
-    public AbstractNameValueHolderImpl(@NotNull String name, @NotNull ValueDescriptor<T> type, T value) {
+    public AbstractNameValueHolder(@NotNull String name, @NotNull ValueDescriptor<T> type, T value) {
         if (TextUtil.isNullOrEmpty(name)) {
             throw new IllegalArgumentException("name cannot be null or empty");
         }
@@ -83,7 +83,7 @@ public abstract class AbstractNameValueHolderImpl<T> implements ValueHolder<T>, 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AbstractNameValueHolderImpl<?> that = (AbstractNameValueHolderImpl<?>) o;
+        AbstractNameValueHolder<?> that = (AbstractNameValueHolder<?>) o;
         return name.equals(that.name) && Objects.equals(value, that.value);
     }
 

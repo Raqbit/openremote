@@ -19,11 +19,13 @@
  */
 package org.openremote.model.query.filter;
 
+import org.openremote.model.v2.AbstractNameValueHolder;
+
 /**
  * There is an implicit AND condition between the name and the value; the name is required and {@link #mustExist} or
- * {@link #mustNotExist} can be set to control whether the {@link org.openremote.model.v2.AbstractNameValueHolderImpl}
+ * {@link #mustNotExist} can be set to control whether the {@link AbstractNameValueHolder}
  * exists or doesn't; if neither are specified then it is assumed to be optional and then the {@link #value} can be
- * used to predicate on the value of the {@link org.openremote.model.v2.AbstractNameValueHolderImpl} if it is present.
+ * used to predicate on the value of the {@link AbstractNameValueHolder} if it is present.
  */
 public class NameValuePredicate {
 

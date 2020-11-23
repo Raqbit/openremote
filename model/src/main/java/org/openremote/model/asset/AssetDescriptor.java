@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
 import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.AttributeDescriptorProvider;
 import org.openremote.model.v2.ModelDescriptor;
 import org.openremote.model.v2.NameHolder;
 
@@ -52,7 +51,7 @@ import static java.lang.reflect.Modifier.isStatic;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "descriptorType")
 @JsonTypeName("asset")
-public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDescriptorProvider {
+public class AssetDescriptor<T extends Asset> implements NameHolder {
 
     protected String name;
     protected Class<T> type;
@@ -88,7 +87,6 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
      * specified type and working up to the {@link Asset} base type; {@link AttributeDescriptor}s must be specified
      * as public static fields to be recognised.
      */
-    @Override
     public AttributeDescriptor<?>[] getAttributeDescriptors() {
         return attributeDescriptors;
     }
@@ -123,7 +121,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder, AttributeDe
                         String pascalCaseName = StringUtils.capitalize(descriptor.getName());
                         Map<String, Method> getterMap = Arrays.stream(type.getDeclaredMethods()).filter(AssetDescriptor::isGetter).collect(Collectors.toMap(Method::getName, Function.identity()));
                         Method method = getterMap.containsKey("get" + pascalCaseName) ? getterMap.get("get" + pascalCaseName) : getterMap.get("is" + pascalCaseName);
-                        if (method == null || method.getReturnType() != descriptor.getValueDescriptor().getType()) {
+                        if (method == null || method.getReturnType() != descriptor.getValueType().getType()) {
                             throw new IllegalArgumentException("Attribute descriptor '" + descriptor.getName() + "' doesn't have a corresponding getter in asset class: " + type.getName());
                         }
                         return descriptor;

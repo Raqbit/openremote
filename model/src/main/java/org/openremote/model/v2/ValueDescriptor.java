@@ -27,18 +27,28 @@ import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
- * Describes a value that can be used by {@link Attribute}s and {@link MetaItem}s.
+ * A simple wrapper around a {@link Class} that describes a value that can be used by {@link Attribute}s and
+ * {@link MetaItem}s; it also conveniently stores {@link MetaItem}s that will be added to new {@link Attribute}
+ * instances that use the {@link ValueDescriptor} (useful for adding units information etc.).
  */
 public class ValueDescriptor<T> implements NameHolder, MetaHolder {
 
-    public static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
+    /**
+     * A class that represents an array {@link ValueDescriptor} which avoids the need to explicitly define
+     * {@link ValueDescriptor}s for every value type in array form (e.g. string and string[])
+     */
+    static class ValueArrayDescriptor<T> extends ValueDescriptor<T> {
         public ValueArrayDescriptor(String name, Class<T> type, MetaList meta) {
             super(name, type, meta);
         }
     }
 
+    /**
+     * This class handles serialising {@link ValueDescriptor}s as strings with support for array representation
+     */
     public static class ValueDescriptorStringConverter extends StdConverter<ValueDescriptor<?>, String> {
 
         @Override
@@ -82,6 +92,29 @@ public class ValueDescriptor<T> implements NameHolder, MetaHolder {
         return meta;
     }
 
+    public boolean isArray() {
+        return this instanceof ValueArrayDescriptor;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
+     * Only interested in type equality as this is the critical part of a {@link ValueDescriptor}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ValueDescriptor<?> that = (ValueDescriptor<?>)obj;
+        return Objects.equals(type, that.type);
+    }
+
+    /**
+     * Returns an instance of this {@link ValueDescriptor} where the value type is an array of the current value type
+     */
     @SuppressWarnings("unchecked")
     public ValueArrayDescriptor<T[]> asArray() {
         try {
@@ -92,5 +125,19 @@ public class ValueDescriptor<T> implements NameHolder, MetaHolder {
         }
 
         return null;
+    }
+
+    public ValueDescriptor<T> withMeta(MetaItem<?>...meta) {
+        return withMeta(Arrays.asList(meta));
+    }
+
+    public ValueDescriptor<T> withMeta(Collection<MetaItem<?>> meta) {
+        MetaList metaList = new MetaList(this.meta);
+        metaList.addOrReplace(meta);
+        return new ValueDescriptor<>(name, type, metaList);
+    }
+
+    public ValueDescriptor<T> withMeta(MetaList meta) {
+        return withMeta((Collection<MetaItem<?>>)meta);
     }
 }
