@@ -27,8 +27,8 @@ import org.openremote.model.IdentifiableEntity;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.geo.GeoJSONPoint;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -225,13 +225,13 @@ public class Asset implements IdentifiableEntity {
      * WILL INHERIT THESE DESCRIPTORS ALSO; IT IS REQUIRED THAT EACH DESCRIPTOR HAS CORRESPONDING GETTER WITH OPTIONAL
      * SETTER, THIS ENSURES BASIC COMPILE TIME CHECKING OF CONFLICTS BUT JUST MAKES GOOD SENSE FOR CONSUMERS
     */
-    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", true, ValueType.GEO_JSON_POINT);
+    public static final AttributeDescriptor<GeoJSONPoint> LOCATION = new AttributeDescriptor<>("location", ValueType.GEO_JSON_POINT);
 
-    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", false, ValueType.EMAIL);
+    public static final AttributeDescriptor<String> EMAIL = new AttributeDescriptor<>("email", ValueType.EMAIL);
 
-    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", false, ValueType.STRING.asArray());
+    public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", ValueType.STRING.asArray());
 
-    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", ValueType.STRING);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")

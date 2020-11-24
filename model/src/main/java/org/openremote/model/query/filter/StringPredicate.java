@@ -20,7 +20,7 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.v2.NameHolder;
+import org.openremote.model.value.NameHolder;
 import org.openremote.model.value.Values;
 
 import java.util.Locale;

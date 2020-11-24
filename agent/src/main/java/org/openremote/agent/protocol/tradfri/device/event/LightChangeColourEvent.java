@@ -3,7 +3,7 @@ package org.openremote.agent.protocol.tradfri.device.event;
 import org.openremote.agent.protocol.tradfri.device.Light;
 import org.openremote.agent.protocol.tradfri.device.LightProperties;
 import org.openremote.agent.protocol.tradfri.util.ColourXY;
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.impl.ColourRGB;
 
 /**
  * The class that represents a light colour changed event that occurred to an IKEA TRÅDFRI light

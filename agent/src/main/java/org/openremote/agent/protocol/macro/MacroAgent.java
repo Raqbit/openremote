@@ -23,10 +23,10 @@ import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.AttributeExecuteStatus;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
@@ -34,13 +34,13 @@ public class MacroAgent extends Agent {
 
     public static final ValueDescriptor<MacroAction> MACRO_ACTION_VALUE = new ValueDescriptor<>("Macro action", MacroAction.class);
 
-    public static final AttributeDescriptor<MacroAction[]> MACRO_ACTIONS = new AttributeDescriptor<>("macroActions", false, MACRO_ACTION_VALUE.asArray());
+    public static final AttributeDescriptor<MacroAction[]> MACRO_ACTIONS = new AttributeDescriptor<>("macroActions", MACRO_ACTION_VALUE.asArray());
 
-    public static final AttributeDescriptor<Boolean> MACRO_DISABLED = new AttributeDescriptor<>("macroDisabled", false, ValueType.BOOLEAN);
+    public static final AttributeDescriptor<Boolean> MACRO_DISABLED = new AttributeDescriptor<>("macroDisabled", ValueType.BOOLEAN);
 
-    public static final AttributeDescriptor<AttributeExecuteStatus> MACRO_STATUS = new AttributeDescriptor<>("macroStatus", false, ValueType.EXECUTION_STATUS);
+    public static final AttributeDescriptor<AttributeExecuteStatus> MACRO_STATUS = new AttributeDescriptor<>("macroStatus", ValueType.EXECUTION_STATUS);
 
-    public static final MetaItemDescriptor<Integer> MACRO_ACTION_INDEX = new MetaItemDescriptor<>("macroActionIndex", ValueType.POSITIVE_INTEGER, null);
+    public static final MetaItemDescriptor<Integer> MACRO_ACTION_INDEX = new MetaItemDescriptor<>("macroActionIndex", ValueType.POSITIVE_INTEGER);
 
     public MacroAgent(String name) {
         this(name, DESCRIPTOR);

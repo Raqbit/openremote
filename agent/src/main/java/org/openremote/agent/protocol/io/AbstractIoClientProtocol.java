@@ -30,6 +30,7 @@ import io.netty.util.CharsetUtil;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.Container;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
@@ -50,19 +51,19 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 /**
  * This is an abstract {@link Protocol} for protocols that require an {@link IoClient}.
  */
-public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V extends IoAgent<T, U>> extends AbstractProtocol<V> {
+public abstract class AbstractIoClientProtocol<T extends AbstractIoClientProtocol<T, U, V, W, X>, U extends IoAgent<U, T, X>, V, W extends IoClient<V>, X extends AgentLink> extends AbstractProtocol<U, X> {
 
     /**
      * Supplies a set of encoders/decoders that convert from/to {@link String} to/from {@link ByteBuf} based on the generic protocol {@link Attribute}s
      */
-    public static Supplier<ChannelHandler[]> getGenericStringEncodersAndDecoders(AbstractNettyIoClient<String, ?> client, Agent agent) {
+    public static Supplier<ChannelHandler[]> getGenericStringEncodersAndDecoders(AbstractNettyIoClient<String, ?> client, IoAgent<?, ?, ?> agent) {
 
-        boolean hexMode = agent.getAttributes().getValue(Agent.MESSAGE_CONVERT_HEX).orElse(false);
-        boolean binaryMode = agent.getAttributes().getValue(Agent.MESSAGE_CONVERT_BINARY).orElse(false);
-        Charset charset = agent.getAttributes().getValue(Agent.MESSAGE_CHARSET).map(Charset::forName).orElse(CharsetUtil.UTF_8);
-        int maxLength = agent.getAttributes().getValue(Agent.MESSAGE_MAX_LENGTH).orElse(Integer.MAX_VALUE);
-        String[] delimiters = agent.getAttributes().getValue(Agent.MESSAGE_DELIMITERS).orElse(new String[0]);
-        boolean stripDelimiter = agent.getAttributes().getValue(Agent.MESSAGE_STRIP_DELIMITER).orElse(false);
+        boolean hexMode = agent.getMessageConvertHex().orElse(false);
+        boolean binaryMode = agent.getMessageConvertBinary().orElse(false);
+        Charset charset = agent.getMessageCharset().map(Charset::forName).orElse(CharsetUtil.UTF_8);
+        int maxLength = agent.getMessageMaxLength().orElse(Integer.MAX_VALUE);
+        String[] delimiters = agent.getMessageDelimiters().orElse(new String[0]);
+        boolean stripDelimiter = agent.getMessageStripDelimiter().orElse(false);
 
         return () -> {
             List<ChannelHandler> encodersDecoders = new ArrayList<>();
@@ -118,9 +119,9 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
     }
 
     public static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, AbstractIoClientProtocol.class);
-    protected ProtocolIoClient<T, U> client;
+    protected ProtocolIoClient<V, W> client;
 
-    protected AbstractIoClientProtocol(V agent) {
+    protected AbstractIoClientProtocol(U agent) {
         super(agent);
     }
 
@@ -141,7 +142,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
     @Override
     protected void doStart(Container container) throws Exception {
         try {
-            client = createIoClient(getAgent());
+            client = createIoClient();
             LOG.fine("Created IO client '" + client.ioClient.getClientUri() + "' for protocol: " + this);
             client.connect();
         } catch (Exception e) {
@@ -157,7 +158,7 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
             return;
         }
 
-        T message = createWriteMessage(attribute, event, processedValue);
+        V message = createWriteMessage(attribute, event, processedValue);
 
         if (message == null) {
             LOG.fine("No message produced for attribute event so not sending to IO client '" + client.ioClient.getClientUri() + "': " + event);
@@ -167,8 +168,8 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
         client.send(message);
     }
 
-    protected ProtocolIoClient<T, U> createIoClient(V agent) throws Exception {
-        U client = doCreateIoClient();
+    protected ProtocolIoClient<V, W> createIoClient() throws Exception {
+        W client = doCreateIoClient();
         Supplier<ChannelHandler[]> encoderDecoderProvider = getEncoderDecoderProvider();
         client.setEncoderDecoderProvider(encoderDecoderProvider);
         return new ProtocolIoClient<>(client, this::onConnectionStatusChanged, this::onMessageReceived);
@@ -185,17 +186,17 @@ public abstract class AbstractIoClientProtocol<T, U extends IoClient<T>, V exten
      * Should return an instance of {@link IoClient} for the linked {@link Agent}; the configuration of
      * encoders/decoders is handled by the separate call to {@link #getEncoderDecoderProvider}
      */
-    protected abstract U doCreateIoClient() throws Exception;
+    protected abstract W doCreateIoClient() throws Exception;
 
     protected abstract Supplier<ChannelHandler[]> getEncoderDecoderProvider();
 
     /**
      * Called when the {@link IoClient} receives a message from the server
      */
-    protected abstract void onMessageReceived(T message);
+    protected abstract void onMessageReceived(V message);
 
     /**
      * Generate the actual message to send to the {@link IoClient} for this {@link AttributeEvent}
      */
-    protected abstract T createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue);
+    protected abstract V createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue);
 }

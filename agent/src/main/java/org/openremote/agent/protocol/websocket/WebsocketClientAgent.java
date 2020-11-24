@@ -19,18 +19,56 @@
  */
 package org.openremote.agent.protocol.websocket;
 
-import org.openremote.agent.protocol.http.HttpClientProtocol;
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.asset.agent.AgentLink;
+import org.openremote.model.asset.agent.GenericAgentLink;
+import org.openremote.model.query.filter.ValuePredicate;
+import org.openremote.model.value.*;
 
 import java.util.Optional;
 
-public class WebsocketClientAgent extends IoAgent<String, WebsocketIoClient<String>> {
+public class WebsocketClientAgent extends IoAgent<WebsocketClientAgent, WebsocketClientProtocol, WebsocketClientAgent.WebsocketClientAgentLink> {
+
+    public static class WebsocketClientAgentLink extends AgentLink {
+
+        protected WebsocketSubscription[] websocketSubscriptions;
+        protected ValuePredicate messageMatchPredicate;
+        protected ValueFilter[] messageMatchFilters;
+
+        public WebsocketClientAgentLink(String id) {
+            super(id);
+        }
+
+        @JsonPropertyDescription("Array of WebsocketSubscriptions that should be executed when the linked attribute is linked; the subscriptions are executed in the order specified in the array.")
+        public WebsocketSubscription[] getWebsocketSubscriptions() {
+            return websocketSubscriptions;
+        }
+
+        @JsonPropertyDescription("The predicate to apply to incoming messages to determine if the message is intended for the" +
+            " linked attribute")
+        Optional<ValuePredicate> getMessageMatchPredicate() {
+            return Optional.ofNullable(messageMatchPredicate);
+        }
+
+        @JsonPropertyDescription("ValueFilters to apply to incoming messages prior to comparison with the messageMatchPredicate")
+        Optional<ValueFilter[]> getMessageMatchFilters() {
+            return Optional.ofNullable(messageMatchFilters);
+        }
+
+        public void setWebsocketSubscriptions(WebsocketSubscription[] websocketSubscriptions) {
+            this.websocketSubscriptions = websocketSubscriptions;
+        }
+
+        public void setMessageMatchPredicate(ValuePredicate messageMatchPredicate) {
+            this.messageMatchPredicate = messageMatchPredicate;
+        }
+
+        public void setMessageMatchFilters(ValueFilter[] messageMatchFilters) {
+            this.messageMatchFilters = messageMatchFilters;
+        }
+    }
 
 
     /*--------------- META ITEMS TO BE USED ON PROTOCOL CONFIGURATIONS ---------------*/
@@ -40,33 +78,27 @@ public class WebsocketClientAgent extends IoAgent<String, WebsocketIoClient<Stri
     /**
      * Websocket connect endpoint URI
      */
-    public static final AttributeDescriptor<String> CONNECT_URI = new AttributeDescriptor<>("connectUri", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> CONNECT_URI = new AttributeDescriptor<>("connectUri", ValueType.STRING);
 
     /**
-     * Headers for websocket connect call (see {@link HttpClientProtocol#META_HEADERS} for details)
+     * Headers for websocket connect call
      */
-    public static final AttributeDescriptor<ValueType.MultivaluedStringMap> CONNECT_HEADERS = new AttributeDescriptor<>("connectHeaders", true, ValueType.MULTIVALUED_STRING_MAP);
+    public static final AttributeDescriptor<ValueType.MultivaluedStringMap> CONNECT_HEADERS = new AttributeDescriptor<>("connectHeaders", ValueType.MULTIVALUED_STRING_MAP);
 
     /**
      * Array of {@link WebsocketSubscription}s that should be executed once the websocket connection is established; the
      * subscriptions are executed in the order specified in the array.
      */
-    public static final AttributeDescriptor<WebsocketSubscription[]> CONNECT_SUBSCRIPTIONS = new AttributeDescriptor<>("connectSubscriptions", true, WEBSOCKET_SUBSCRIPTION_VALUE_DESCRIPTOR.asArray());
+    public static final AttributeDescriptor<WebsocketSubscription[]> CONNECT_SUBSCRIPTIONS = new AttributeDescriptor<>("connectSubscriptions", WEBSOCKET_SUBSCRIPTION_VALUE_DESCRIPTOR.asArray());
 
     /*--------------- META ITEMS TO BE USED ON LINKED ATTRIBUTES ---------------*/
 
-    /**
-     * Array of {@link WebsocketSubscription}s that should be executed when the linked attribute is linked; the
-     * subscriptions are executed in the order specified in the array.
-     */
-    public static final MetaItemDescriptor<WebsocketSubscription[]> META_SUBSCRIPTIONS = new MetaItemDescriptor<>("websocketSubscriptions", WEBSOCKET_SUBSCRIPTION_VALUE_DESCRIPTOR.asArray(), null);
+    public static final AgentDescriptor<WebsocketClientAgent, WebsocketClientProtocol, WebsocketClientAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        WebsocketClientAgent.class, WebsocketClientProtocol.class, WebsocketClientAgentLink.class, null
+    );
 
     public WebsocketClientAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <V extends IoAgent<String, WebsocketIoClient<String>>, W extends AbstractIoClientProtocol<String, WebsocketIoClient<String>, V>> WebsocketClientAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     public Optional<String> getConnectUri() {

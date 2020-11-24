@@ -1,9 +1,9 @@
 package org.openremote.agent.protocol.knx;
 
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
+import org.openremote.model.value.impl.ColourRGB;
 import org.openremote.model.value.Values;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.dptxlator.*;

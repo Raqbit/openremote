@@ -23,8 +23,8 @@ import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.simulator.SimulatorReplayDatapoint;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 public class SimulatorAgent extends Agent {
 
@@ -34,7 +34,7 @@ public class SimulatorAgent extends Agent {
      * Used to store 24h dataset of values that should be replayed (i.e. written to the linked attribute) in a continuous
      * loop.
      */
-    public static final MetaItemDescriptor<SimulatorReplayDatapoint[]> SIMULATOR_REPLAY_DATA = new MetaItemDescriptor<>("simulatorReplayData", REPLAY_DATAPOINT_VALUE.asArray(), null);
+    public static final MetaItemDescriptor<SimulatorReplayDatapoint[]> SIMULATOR_REPLAY_DATA = new MetaItemDescriptor<>("simulatorReplayData", REPLAY_DATAPOINT_VALUE.asArray());
 
     public SimulatorAgent(String name) {
         super(name, DESCRIPTOR);

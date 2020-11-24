@@ -22,41 +22,41 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class EnvironmentSensorAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER,
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> RELATIVE_HUMIDITY = new AttributeDescriptor<>("relativeHumidity", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> RELATIVE_HUMIDITY = new AttributeDescriptor<>("relativeHumidity", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> NO2 = new AttributeDescriptor<>("nO2Level", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> NO2 = new AttributeDescriptor<>("nO2Level", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.LABEL, "NO2 level"),
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAM_CUBIC_M),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> OZONE = new AttributeDescriptor<>("ozoneLevel", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> OZONE = new AttributeDescriptor<>("ozoneLevel", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAM_CUBIC_M),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> PM1 = new AttributeDescriptor<>("particlesPM1", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> PM1 = new AttributeDescriptor<>("particlesPM1", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.LABEL, "Particles PM1"),
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAM_CUBIC_M),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> PM2_5 = new AttributeDescriptor<>("particlesPM2_5", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> PM2_5 = new AttributeDescriptor<>("particlesPM2_5", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.LABEL, "Particles PM2.5"),
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAM_CUBIC_M),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> PM10 = new AttributeDescriptor<>("particlesPM10", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> PM10 = new AttributeDescriptor<>("particlesPM10", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.LABEL, "Particles PM10"),
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DENSITY_MICROGRAM_CUBIC_M),
         new MetaItem<>(MetaItemType.READ_ONLY)

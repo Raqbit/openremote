@@ -23,24 +23,24 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class ShipAsset extends Asset {
 
-    public static final AttributeDescriptor<Integer> MSSI_NUMBER = new AttributeDescriptor<>("mSSINumber", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> IMO_NUMBER = new AttributeDescriptor<>("iMONumber", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> DIRECTION = new AttributeDescriptor<>("direction", true, ValueType.DIRECTION);
-    public static final AttributeDescriptor<Integer> LENGTH = new AttributeDescriptor<>("length", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> MSSI_NUMBER = new AttributeDescriptor<>("mSSINumber", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> IMO_NUMBER = new AttributeDescriptor<>("iMONumber", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> DIRECTION = new AttributeDescriptor<>("direction", ValueType.DIRECTION);
+    public static final AttributeDescriptor<Integer> LENGTH = new AttributeDescriptor<>("length", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DISTANCE_METRE)
     );
-    public static final AttributeDescriptor<Double> SPEED = new AttributeDescriptor<>("speed", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> SPEED = new AttributeDescriptor<>("speed", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_SPEED_KNOT)
     );
-    public static final AttributeDescriptor<String> SHIP_TYPE = new AttributeDescriptor<>("shipType", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> SHIP_TYPE = new AttributeDescriptor<>("shipType", ValueType.STRING);
 
     public static final AssetDescriptor<ShipAsset> DESCRIPTOR = new AssetDescriptor<>("ferry", "000080", ShipAsset.class);
 

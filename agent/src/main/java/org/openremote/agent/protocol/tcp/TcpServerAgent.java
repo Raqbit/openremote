@@ -21,11 +21,6 @@ package org.openremote.agent.protocol.tcp;
 
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.agent.Agent;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
-
-import javax.validation.constraints.NotNull;
-import java.util.Optional;
 
 public abstract class TcpServerAgent extends Agent {
 

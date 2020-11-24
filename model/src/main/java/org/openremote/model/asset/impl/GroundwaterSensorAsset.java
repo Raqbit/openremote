@@ -22,19 +22,19 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class GroundwaterSensorAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER,
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> WATER_LEVEL = new AttributeDescriptor<>("waterLevel", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
 

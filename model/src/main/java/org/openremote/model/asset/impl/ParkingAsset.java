@@ -22,22 +22,22 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class ParkingAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Integer> SPACES_TOTAL = new AttributeDescriptor<>("spacesTotal", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> SPACES_OCCUPIED = new AttributeDescriptor<>("spacesOccupied", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> SPACES_OPEN = new AttributeDescriptor<>("spacesOpen", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> SPACES_BUFFER = new AttributeDescriptor<>("spacesBuffer", true, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Double> PRICE_HOURLY = new AttributeDescriptor<>("priceHourly", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Integer> SPACES_TOTAL = new AttributeDescriptor<>("spacesTotal", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_OCCUPIED = new AttributeDescriptor<>("spacesOccupied", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_OPEN = new AttributeDescriptor<>("spacesOpen", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> SPACES_BUFFER = new AttributeDescriptor<>("spacesBuffer", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Double> PRICE_HOURLY = new AttributeDescriptor<>("priceHourly", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
-    public static final AttributeDescriptor<Double> PRICE_DAILY = new AttributeDescriptor<>("priceDaily", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> PRICE_DAILY = new AttributeDescriptor<>("priceDaily", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_CURRENCY_EUR)
     );
 

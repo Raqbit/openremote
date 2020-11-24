@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.util.Pair;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
 import java.util.Date;

@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ZWProtocol extends AbstractProtocol<ZWAgent> implements ProtocolAssetDiscovery {
+public class ZWProtocol extends AbstractProtocol<ZWAgent, ZWAgent.ZWAgentLink> implements ProtocolAssetDiscovery {
 
     // Constants ------------------------------------------------------------------------------------
 
@@ -88,11 +88,11 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent> implements ProtocolAss
     }
 
     @Override
-    protected synchronized void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected synchronized void doLinkAttribute(String assetId, Attribute<?> attribute, ZWAgent.ZWAgentLink agentLink) {
 
-        int nodeId = attribute.getMetaValue(ZWAgent.DEVICE_NODE_ID).orElse(0);
-        int endpoint = attribute.getMetaValue(ZWAgent.DEVICE_ENDPOINT).orElse(0);
-        String linkName = attribute.getMetaValue(ZWAgent.DEVICE_VALUE).orElse("");
+        int nodeId = agentLink.getDeviceNodeId().orElse(0);
+        int endpoint = agentLink.getDeviceEndpoint().orElse(0);
+        String linkName = agentLink.getDeviceValue().orElse("");
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // TODO: Value must be compatible with the value type of the attribute...for non primitives the object types must match
@@ -104,7 +104,7 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent> implements ProtocolAss
     }
 
     @Override
-    protected synchronized void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected synchronized void doUnlinkAttribute(String assetId, Attribute<?> attribute, ZWAgent.ZWAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         Consumer<Value> sensorValueConsumer = sensorValueConsumerMap.remove(attributeRef);
         network.removeSensorValueConsumer(sensorValueConsumer);

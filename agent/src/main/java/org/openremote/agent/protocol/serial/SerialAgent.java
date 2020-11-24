@@ -19,18 +19,20 @@
  */
 package org.openremote.agent.protocol.serial;
 
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
-import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-public class SerialAgent extends IoAgent<String, SerialIoClient<String>> {
+public class SerialAgent extends IoAgent<String, SerialIoClient<String>, SerialAgent, SerialClientProtocol, SerialAgent.SerialAgentLink> {
+
+    public static class SerialAgentLink extends AgentLink<SerialAgent, SerialClientProtocol, SerialAgentLink> {
+
+        public SerialAgentLink(String id, Class<SerialAgent> type) {
+            super(id, type);
+        }
+    }
 
     public SerialAgent(String name) {
         this(name, DESCRIPTOR);
-    }
-
-    protected <V extends IoAgent<String, SerialIoClient<String>>, W extends AbstractIoClientProtocol<String, SerialIoClient<String>, V>> SerialAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
     }
 
     @Override

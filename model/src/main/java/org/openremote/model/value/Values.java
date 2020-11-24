@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.*;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -77,12 +76,16 @@ public class Values {
     public static Optional<JsonNode> parse(String jsonString) {
         try {
             return Optional.of(JSON.readTree(jsonString));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOG.log(Level.INFO, "Failed to parse JSON string: " + jsonString, e);
         }
         return Optional.empty();
     }
 
     public static <T> Optional<T> parse(String jsonString, Type type) {
+        if (NULL_LITERAL.equals(jsonString)) {
+            return Optional.empty();
+        }
         try {
             return Optional.of(JSON.readValue(jsonString, JSON.constructType(type)));
         } catch (Exception ignored) {

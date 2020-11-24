@@ -20,8 +20,8 @@
 package org.openremote.model.asset;
 
 import org.openremote.model.util.AssetModelUtil;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import java.util.ServiceLoader;
 

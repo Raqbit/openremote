@@ -4,15 +4,15 @@ import org.openremote.agent.protocol.tradfri.device.Device;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeList;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface TradfriAsset {
 
-    AttributeDescriptor<Integer> DEVICE_ID = new AttributeDescriptor<>("deviceId", false, ValueType.INTEGER);
+    AttributeDescriptor<Integer> DEVICE_ID = new AttributeDescriptor<>("deviceId", ValueType.INTEGER);
 
     default Optional<Integer> getDeviceId() {
         return getAttributes().getValue(DEVICE_ID);

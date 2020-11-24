@@ -20,7 +20,7 @@
 package org.openremote.agent.protocol.velbus.device;
 
 import org.openremote.agent.protocol.velbus.VelbusPacket;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import java.util.Collections;
 import java.util.List;

@@ -3,19 +3,19 @@ package org.openremote.agent.protocol.artnet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.impl.LightAsset;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Map;
 import java.util.Optional;
 
 public class ArtnetLightAsset extends LightAsset {
 
-    public static final AttributeDescriptor<Integer> LED_COUNT = new AttributeDescriptor<>("lEDCount", false, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> LIGHT_ID = new AttributeDescriptor<>("lightId", false, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> GROUP_ID = new AttributeDescriptor<>("groupId", false, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<Integer> UNIVERSE = new AttributeDescriptor<>("universe", false, ValueType.POSITIVE_INTEGER);
-    public static final AttributeDescriptor<String[]> REQUIRED_VALUES = new AttributeDescriptor<>("requiredValues", false, ValueType.STRING.asArray());
+    public static final AttributeDescriptor<Integer> LED_COUNT = new AttributeDescriptor<>("lEDCount", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> LIGHT_ID = new AttributeDescriptor<>("lightId", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> GROUP_ID = new AttributeDescriptor<>("groupId", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> UNIVERSE = new AttributeDescriptor<>("universe", ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<String[]> REQUIRED_VALUES = new AttributeDescriptor<>("requiredValues", ValueType.STRING.asArray());
 
     @JsonIgnore
     private Map<String, Integer> receivedValues;

@@ -34,7 +34,7 @@ import org.openremote.model.security.Tenant;
 import org.openremote.model.simulator.element.ColorSimulatorElement;
 import org.openremote.model.simulator.element.NumberSimulatorElement;
 import org.openremote.model.simulator.element.SwitchSimulatorElement;
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.impl.ColourRGB;
 import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 

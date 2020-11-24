@@ -22,8 +22,8 @@ package org.openremote.model.query;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.query.filter.*;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.NameHolder;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.NameHolder;
 
 import java.util.Arrays;
 import java.util.Comparator;

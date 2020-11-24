@@ -19,7 +19,7 @@
  */
 package org.openremote.model.attribute;
 
-import org.openremote.model.v2.MetaItemDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
 
 import java.util.Collection;
 import java.util.Optional;

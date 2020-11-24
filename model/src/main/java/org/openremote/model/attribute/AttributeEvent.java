@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.event.shared.AssetInfo;
 import org.openremote.model.event.shared.SharedEvent;
-import org.openremote.model.v2.AttributeDescriptor;
+import org.openremote.model.value.AttributeDescriptor;
 
 import java.util.Objects;
 import java.util.Optional;

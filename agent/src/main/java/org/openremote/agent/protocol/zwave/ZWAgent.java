@@ -21,31 +21,50 @@ package org.openremote.agent.protocol.zwave;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.asset.agent.AgentLink;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueType;
 
-public class ZWAgent extends Agent {
+import java.util.Optional;
 
-    public static MetaItemDescriptor<Integer> DEVICE_NODE_ID = new MetaItemDescriptor<>("deviceNodeId", ValueType.POSITIVE_INTEGER, 0);
-    public static MetaItemDescriptor<Integer> DEVICE_ENDPOINT = new MetaItemDescriptor<>("deviceEndpoint", ValueType.POSITIVE_INTEGER, 0);
-    public static MetaItemDescriptor<String> DEVICE_VALUE = new MetaItemDescriptor<>("deviceValue", ValueType.STRING, "");
+public class ZWAgent extends Agent<ZWAgent, ZWProtocol, ZWAgent.ZWAgentLink> {
 
+    public static class ZWAgentLink extends AgentLink {
 
-    public static AgentDescriptor<ZWAgent, ZWProtocol> DESCRIPTOR = new AgentDescriptor(
+        protected Integer deviceNodeId;
+        protected Integer deviceEndpoint;
+        protected String deviceValue;
 
-    );
+        public ZWAgentLink(String id, Integer deviceNodeId, Integer deviceEndpoint, String deviceValue) {
+            super(id);
+            this.deviceNodeId = deviceNodeId;
+            this.deviceEndpoint = deviceEndpoint;
+            this.deviceValue = deviceValue;
+        }
 
-    public <T extends Agent, S extends Protocol<T>> ZWAgent(String name) {
-        this(name, DESCRIPTOR);
+        public Optional<Integer> getDeviceNodeId() {
+            return Optional.ofNullable(deviceNodeId);
+        }
+
+        public Optional<Integer> getDeviceEndpoint() {
+            return Optional.ofNullable(deviceEndpoint);
+        }
+
+        public Optional<String> getDeviceValue() {
+            return Optional.ofNullable(deviceValue);
+        }
     }
 
-    protected <T extends ZWAgent, S extends Protocol<T>> ZWAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+    public static AgentDescriptor<ZWAgent, ZWProtocol, ZWAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        ZWAgent.class, ZWProtocol.class, ZWAgentLink.class, null
+    );
+
+    public ZWAgent(String name) {
+        super(name, DESCRIPTOR);
     }
 
     @Override
-    public Protocol<ZWAgent> getProtocolInstance() {
+    public ZWProtocol getProtocolInstance() {
         return new ZWProtocol(this);
     }
 }

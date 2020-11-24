@@ -37,8 +37,8 @@ import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
 import javax.ws.rs.ProcessingException;

@@ -30,9 +30,9 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.openremote.model.v2.NameHolder;
-import org.openremote.model.v2.AbstractNameValueDescriptorHolder;
-import org.openremote.model.v2.ValueHolder;
+import org.openremote.model.value.NameHolder;
+import org.openremote.model.value.AbstractNameValueDescriptorHolder;
+import org.openremote.model.value.ValueHolder;
 
 import java.io.IOException;
 import java.util.*;

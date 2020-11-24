@@ -26,6 +26,7 @@ import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.jboss.resteasy.specimpl.ResponseBuilderImpl;
 import org.openremote.agent.protocol.AbstractProtocol;
+import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.container.web.HeaderInjectorFilter;
 import org.openremote.container.web.QueryParameterInjectorFilter;
 import org.openremote.container.web.WebTargetBuilder;
@@ -38,7 +39,7 @@ import org.openremote.model.auth.OAuthGrant;
 import org.openremote.model.auth.UsernamePassword;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.ValueType;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
@@ -274,9 +275,8 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
     public static final String PROTOCOL_DISPLAY_NAME = "HTTP Client";
     public static final String DEFAULT_HTTP_METHOD = HttpMethod.GET;
     public static final String DEFAULT_CONTENT_TYPE = MediaType.TEXT_PLAIN;
-    protected static final String HEADER_LINK = "Link";
     protected static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, HttpClientProtocol.class);
-    protected static int MIN_POLLING_MILLIS = 1000;
+    protected static int MIN_POLLING_MILLIS = 5000;
 
     protected ResteasyWebTarget webTarget;
     protected final Map<AttributeRef, HttpClientRequest> requestMap = new HashMap<>();
@@ -367,7 +367,7 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
 
         ValueType.MultivaluedStringMap headers = attribute.getMetaValue(META_REQUEST_HEADERS).orElse(null);
         ValueType.MultivaluedStringMap queryParams = attribute.getMetaValue(META_REQUEST_QUERY_PARAMETERS).orElse(null);
-        Integer pollingMillis = attribute.getMetaValue(META_REQUEST_POLLING_MILLIS).orElse(null);
+        Integer pollingMillis = attribute.getMetaValue(META_REQUEST_POLLING_MILLIS).map(millis -> Math.max(millis, MIN_POLLING_MILLIS)).orElse(null);
         boolean pagingEnabled = attribute.getMetaValue(META_REQUEST_PAGING_MODE).orElse(false);
         String pollingAttribute = attribute.getMetaValue(META_POLLING_ATTRIBUTE).orElse(null);
 
@@ -385,11 +385,13 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
             }
         }
 
+        String body = attribute.getMetaValue(IoAgent.META_WRITE_VALUE).orElse(null);
+
         addHttpClientRequest(
-            assetId,
-            attribute,
+            attributeRef,
             path,
             method,
+
             headers,
             queryParams,
             pagingEnabled,
@@ -438,17 +440,15 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
         return webTarget.getUri().toString();
     }
 
-    protected void addHttpClientRequest(String assetId,
-                                        Attribute<?> attribute,
+    protected void addHttpClientRequest(AttributeRef attributeRef,
                                         String path,
                                         String method,
+                                        String body,
                                         MultivaluedMap<String, String> headers,
                                         MultivaluedMap<String, String> queryParams,
                                         boolean pagingEnabled,
                                         String contentType,
                                         Integer pollingMillis) {
-
-        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         if (client == null) {
             LOG.warning("Client is undefined: " + this);
@@ -468,8 +468,6 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
         requestMap.put(attributeRef, clientRequest);
 
         Optional.ofNullable(pollingMillis).ifPresent(seconds -> {
-            String body = attribute.getMetaValue(Agent.META_WRITE_VALUE).orElse(null);
-
             pollingMap.put(attributeRef, schedulePollingRequest(
                 attributeRef,
                 clientRequest,

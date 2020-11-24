@@ -31,6 +31,8 @@ import java.util.Optional;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonTypeName("attribute")
+@Deprecated
+// TODO: Replace with JSR-380 constraint violations
 public class AttributeValidationFailure {
 
     public interface ReasonString {

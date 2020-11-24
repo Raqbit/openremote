@@ -19,6 +19,7 @@
  */
 package org.openremote.model.asset.agent;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
@@ -27,14 +28,14 @@ import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.protocol.ProtocolAssetDiscovery;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.protocol.ProtocolInstanceDiscovery;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
 
 /**
  * Special type of {@link AssetDescriptor} that describes an agent {@link Asset}.
  */
 @JsonTypeName("agent")
-public class AgentDescriptor<T extends Agent, S extends Protocol<T>> extends AssetDescriptor<T> {
+public class AgentDescriptor<T extends Agent<T, U, V>, U extends Protocol<T>, V extends AgentLink> extends AssetDescriptor<T> {
 
     public static class DiscoveryBooleanConverter extends StdConverter<Class<?>, Boolean> {
 
@@ -44,47 +45,43 @@ public class AgentDescriptor<T extends Agent, S extends Protocol<T>> extends Ass
         }
     }
 
-    protected Class<S> protocolClass;
+    public static final String ICON = "cogs";
+    public static final String ICON_COLOUR = "000000";
+    protected Class<U> protocolClass;
+    protected Class<V> agentLinkClass;
     @JsonSerialize(converter = DiscoveryBooleanConverter.class)
-    protected Class<? extends ProtocolInstanceDiscovery> instanceDiscovery;
-    protected boolean assetDiscovery;
-    protected boolean assetImport;
-    protected MetaItemDescriptor<?>[] linkedAttributeDescriptors;
+    protected Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProvider;
 
-    public AgentDescriptor(String icon, String colour, Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscovery, boolean assetDiscovery, boolean assetImport, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
-        super(icon, colour, type, additionalAttributeDescriptors);
+    public AgentDescriptor(Class<T> type, Class<U> protocolClass, Class<V> agentLinkClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProvider) {
+        super(ICON, ICON_COLOUR, type);
         this.protocolClass = protocolClass;
-        this.instanceDiscovery = instanceDiscovery;
-        this.assetDiscovery = assetDiscovery;
-        this.assetImport = assetImport;
-        this.linkedAttributeDescriptors = linkedAttributeDescriptors;
+        this.agentLinkClass = agentLinkClass;
+        this.instanceDiscoveryProvider = instanceDiscoveryProvider;
     }
 
-    public AgentDescriptor(String icon, String colour, Class<T> type, Class<S> protocolClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscovery, boolean assetDiscovery, boolean assetImport, MetaItemDescriptor<?>...linkedAttributeDescriptors) {
-        this(icon, colour, type, null, protocolClass, instanceDiscovery, assetDiscovery, assetImport, linkedAttributeDescriptors);
-    }
-
-    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscovery() {
-        return instanceDiscovery;
+    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscoveryProvider() {
+        return instanceDiscoveryProvider;
     }
 
     public boolean isInstanceDiscovery() {
-        return instanceDiscovery != null;
+        return instanceDiscoveryProvider != null;
     }
 
+    @JsonProperty
     public boolean isAssetDiscovery() {
-        return assetDiscovery;
+        return ProtocolAssetDiscovery.class.isAssignableFrom(protocolClass);
     }
 
+    @JsonProperty
     public boolean isAssetImport() {
-        return assetImport;
+        return ProtocolAssetImport.class.isAssignableFrom(protocolClass);
     }
 
-    public MetaItemDescriptor<?>[] getLinkedAttributeDescriptors() {
-        return linkedAttributeDescriptors;
-    }
-
-    public Class<S> getProtocolClass() {
+    public Class<U> getProtocolClass() {
         return protocolClass;
+    }
+
+    public Class<V> getAgentLinkClass() {
+        return agentLinkClass;
     }
 }

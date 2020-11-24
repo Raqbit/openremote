@@ -27,12 +27,11 @@ import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.ValueFilter;
 import org.openremote.model.value.Values;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
@@ -150,7 +149,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <li>{@link #unlinkAttribute}</li>
  * </ol>
  */
-public interface Protocol<T extends Agent> {
+public interface Protocol<T extends Agent<T, ?, ?>> {
 
     Logger LOG = SyslogCategory.getLogger(PROTOCOL, Protocol.class);
     String ACTUATOR_TOPIC_TARGET_PROTOCOL = "Protocol";

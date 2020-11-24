@@ -20,9 +20,9 @@
 package org.openremote.model.attribute;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.openremote.model.v2.AbstractNameValueHolder;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.AbstractNameValueHolder;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import java.util.Objects;
 

@@ -24,17 +24,17 @@ import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.console.ConsoleProvider;
 import org.openremote.model.console.ConsoleProviders;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class ConsoleAsset extends Asset {
 
-    public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", false, ValueType.STRING);
-    public static final AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", false, ValueType.STRING);
-    public static final AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", false, ValueType.STRING);
-    public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", false, ValueType.CONSOLE_PROVIDERS);
+    public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", ValueType.STRING);
+    public static final AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", ValueType.STRING);
+    public static final AttributeDescriptor<String> CONSOLE_PLATFORM = new AttributeDescriptor<>("consolePlatform", ValueType.STRING);
+    public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", ValueType.CONSOLE_PROVIDERS);
 
     public static final AssetDescriptor<ConsoleAsset> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, ConsoleAsset.class);
 

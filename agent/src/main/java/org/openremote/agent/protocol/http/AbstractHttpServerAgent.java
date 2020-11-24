@@ -21,8 +21,8 @@ package org.openremote.agent.protocol.http;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
@@ -30,11 +30,11 @@ import static org.openremote.agent.protocol.http.HttpClientAgent.VALUE_HTTP_METH
 
 public abstract class AbstractHttpServerAgent extends Agent {
 
-    public static final AttributeDescriptor<String> DEPLOYMENT_PATH = new AttributeDescriptor<>("deploymentPath", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> DEPLOYMENT_PATH = new AttributeDescriptor<>("deploymentPath", ValueType.STRING);
 
-    public static final AttributeDescriptor<HttpMethod[]> ALLOWED_HTTP_METHODS = new AttributeDescriptor<>("allowedHTTPMethods", false, VALUE_HTTP_METHOD.asArray());
-    public static final AttributeDescriptor<String[]> ALLOWED_ORIGINS = new AttributeDescriptor<>("allowedOrigins", false, ValueType.STRING.asArray());
-    public static final AttributeDescriptor<Boolean> ROLE_BASED_SECURITY = new AttributeDescriptor<>("roleBasedSecurity", false, ValueType.BOOLEAN);
+    public static final AttributeDescriptor<HttpMethod[]> ALLOWED_HTTP_METHODS = new AttributeDescriptor<>("allowedHTTPMethods", VALUE_HTTP_METHOD.asArray());
+    public static final AttributeDescriptor<String[]> ALLOWED_ORIGINS = new AttributeDescriptor<>("allowedOrigins", ValueType.STRING.asArray());
+    public static final AttributeDescriptor<Boolean> ROLE_BASED_SECURITY = new AttributeDescriptor<>("roleBasedSecurity", ValueType.BOOLEAN);
 
     protected <T extends AbstractHttpServerAgent, S extends AbstractHttpServerProtocol<T>> AbstractHttpServerAgent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);

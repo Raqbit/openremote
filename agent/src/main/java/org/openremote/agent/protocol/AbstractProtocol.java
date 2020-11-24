@@ -27,20 +27,27 @@ import org.openremote.container.message.MessageBrokerService;
 import org.openremote.container.timer.TimerService;
 import org.openremote.model.Container;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.attribute.*;
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.AttributeEvent;
+import org.openremote.model.attribute.AttributeRef;
+import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.Pair;
-import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static org.openremote.container.concurrent.GlobalLock.withLock;
+import static org.openremote.model.protocol.ProtocolUtil.hasDynamicWriteValue;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -64,7 +71,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * and safely modify internal, protocol-specific shared state. However, if a protocol implementation schedules
  * an asynchronous task, this task must obtain the lock to call any protocol operations.
  */
-public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
+public abstract class AbstractProtocol<T extends Agent<T, ?, U>, U extends AgentLink> implements Protocol<T> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, AbstractProtocol.class);
     protected final Map<AttributeRef, Attribute<?>> linkedAttributes = new HashMap<>();
@@ -166,14 +173,13 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
             linkedAttributes.put(attributeRef, attribute);
 
             // Check for dynamic value placeholder
-            final String writeValue = attribute.getMetaValue(Agent.META_WRITE_VALUE).orElse(null);
 
-            if (!TextUtil.isNullOrEmpty(writeValue) && writeValue.contains(DYNAMIC_VALUE_PLACEHOLDER)) {
+            if (hasDynamicWriteValue(agent.getAgentLink(attribute))) {
                 dynamicAttributes.add(attributeRef);
             }
 
             try {
-                doLinkAttribute(assetId, attribute);
+                doLinkAttribute(assetId, attribute, agent.getAgentLink(attribute));
             } catch (Exception e) {
                 linkedAttributes.remove(attributeRef);
                 throw new RuntimeException(e);
@@ -188,7 +194,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
 
             if (linkedAttributes.remove(attributeRef) != null) {
                 dynamicAttributes.remove(attributeRef);
-                doUnlinkAttribute(assetId, attribute);
+                doUnlinkAttribute(assetId, attribute, agent.getAgentLink(attribute));
             }
         });
     }
@@ -215,6 +221,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
                 Pair<Boolean, Object> ignoreAndConverted = ProtocolUtil.doOutboundValueProcessing(
                     event.getAssetId(),
                     attribute,
+                    agent.getAgentLink(attribute),
                     event.getValue().orElse(null),
                     dynamicAttributes.contains(event.getAttributeRef()));
 
@@ -264,7 +271,7 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
             return;
         }
 
-        Pair<Boolean, Object> ignoreAndConverted = ProtocolUtil.doInboundValueProcessing(state.getAttributeRef().getAssetId(), attribute, state.getValue().orElse(null));
+        Pair<Boolean, Object> ignoreAndConverted = ProtocolUtil.doInboundValueProcessing(state.getAttributeRef().getAssetId(), attribute, agent.getAgentLink(attribute), state.getValue().orElse(null));
 
         if (ignoreAndConverted.key) {
             LOG.fine("Value conversion returned ignore so attribute will not be updated: " + state.getAttributeRef());
@@ -316,20 +323,18 @@ public abstract class AbstractProtocol<T extends Agent> implements Protocol<T> {
     /**
      * Link an {@link Attribute} to its linked {@link Agent}.
      */
-    abstract protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException;
+    abstract protected void doLinkAttribute(String assetId, Attribute<?> attribute, U agentLink) throws RuntimeException;
 
     /**
      * Unlink an {@link Attribute} from its linked {@link Agent}.
      */
-    abstract protected void doUnlinkAttribute(String assetId, Attribute<?> attribute);
+    abstract protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, U agentLink);
 
     /**
      * An Attribute event (write) has been requested for an attribute linked to this protocol. The
-     * processedValue is the resulting value after applying any {@link Agent#META_WRITE_VALUE} and/or
-     * {@link Agent#META_WRITE_VALUE_CONVERTER} {@link MetaItem}s that are defined on the {@link Attribute}; if
-     * neither are defined then the processedValue will be the same as {@link AttributeEvent#getValue}. Protocol
-     * implementations should generally use the processedValue but may also choose to use the original value for some
-     * purpose if required (e.g. {@link org.openremote.agent.protocol.http.HttpClientProtocol#META_QUERY_PARAMETERS}).
+     * processedValue is the resulting value after applying standard outbound value processing
+     * (see {@link ProtocolUtil#doOutboundValueProcessing}). Protocol implementations should generally use the
+     * processedValue but may also choose to use the original value for some purpose if required.
      */
     abstract protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue);
 }

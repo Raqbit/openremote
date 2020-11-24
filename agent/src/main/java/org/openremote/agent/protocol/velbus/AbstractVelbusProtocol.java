@@ -27,12 +27,11 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
-import org.openremote.model.protocol.ProtocolAssetDiscovery;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.EnumUtil;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -247,7 +246,7 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
                                             )
                                         );
 
-                                    if (descriptor.isReadOnly()) {
+                                    if (descriptor.hasMeta(MetaItemType.READ_ONLY)) {
                                         attribute.addMeta(new MetaItem<>(MetaItemType.READ_ONLY, true));
                                     }
                                     return attribute;

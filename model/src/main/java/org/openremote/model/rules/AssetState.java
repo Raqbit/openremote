@@ -23,7 +23,7 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.MetaList;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import java.util.Date;
 import java.util.Objects;

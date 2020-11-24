@@ -1,6 +1,6 @@
 package org.openremote.agent.protocol.tradfri.util;
 
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.impl.ColourRGB;
 
 /**
  * The class that contains XY values that make up a colour

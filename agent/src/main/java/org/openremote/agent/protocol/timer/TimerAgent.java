@@ -23,10 +23,10 @@ import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.AttributeState;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
@@ -36,13 +36,13 @@ public class TimerAgent extends Agent {
 
     public static final ValueDescriptor<CronExpressionParser> TIMER_CRON_EXPRESSION_DESCRIPTOR = new ValueDescriptor<>("Timer cron expression", CronExpressionParser.class);
 
-    public static final AttributeDescriptor<AttributeState> TIMER_ACTION = new AttributeDescriptor<>("timerAction", false, ValueType.ATTRIBUTE_STATE);
+    public static final AttributeDescriptor<AttributeState> TIMER_ACTION = new AttributeDescriptor<>("timerAction", ValueType.ATTRIBUTE_STATE);
 
-    public static final AttributeDescriptor<CronExpressionParser> TIMER_CRON_EXPRESSION = new AttributeDescriptor<>("timerCronExpression", false, TIMER_CRON_EXPRESSION_DESCRIPTOR);
+    public static final AttributeDescriptor<CronExpressionParser> TIMER_CRON_EXPRESSION = new AttributeDescriptor<>("timerCronExpression", TIMER_CRON_EXPRESSION_DESCRIPTOR);
 
-    public static final AttributeDescriptor<Boolean> TIMER_ACTIVE = new AttributeDescriptor<>("timerActive", false, ValueType.BOOLEAN);
+    public static final AttributeDescriptor<Boolean> TIMER_ACTIVE = new AttributeDescriptor<>("timerActive", ValueType.BOOLEAN);
 
-    public static final MetaItemDescriptor<TimerValue> META_TIMER_VALUE = new MetaItemDescriptor<>("timerValue", TIMER_VALUE_DESCRIPTOR, null);
+    public static final MetaItemDescriptor<TimerValue> META_TIMER_VALUE = new MetaItemDescriptor<>("timerValue", TIMER_VALUE_DESCRIPTOR);
 
     public TimerAgent(String name) {
         this(name, DESCRIPTOR);

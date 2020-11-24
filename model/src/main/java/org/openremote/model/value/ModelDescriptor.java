@@ -17,16 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.value;
 
-import javax.validation.constraints.Pattern;
+import org.openremote.model.asset.AssetDescriptor;
+import org.openremote.model.util.AssetModelUtil;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Identifies an item that holds a named property, the name should be very simple, as we use them in SQL path
- * expressions, etc. and must manually escape. The name should be immutable to aid in tracking.
+ * To be used on {@link AssetDescriptor}s, {@link AttributeDescriptor}s, {@link MetaItemDescriptor}s and
+ * {@link ValueDescriptor}s that should be discovered by the {@link AssetModelUtil.StandardModelProvider}.
  */
-public interface NameHolder {
-
-    @Pattern(regexp =  "^\\w+$")
-    String getName();
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ModelDescriptor {
 }

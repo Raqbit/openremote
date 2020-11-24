@@ -21,15 +21,15 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class DeviceAsset extends Asset {
 
-    public static final AttributeDescriptor<String> MANUFACTURER = new AttributeDescriptor<>("manufacturer", true, ValueType.STRING);
-    public static final AttributeDescriptor<String> MODEL = new AttributeDescriptor<>("model", true, ValueType.STRING);
+    public static final AttributeDescriptor<String> MANUFACTURER = new AttributeDescriptor<>("manufacturer", ValueType.STRING);
+    public static final AttributeDescriptor<String> MODEL = new AttributeDescriptor<>("model", ValueType.STRING);
 
     public static final AssetDescriptor<DeviceAsset> DESCRIPTOR = new AssetDescriptor<>("cube-outline", null, DeviceAsset.class);
 

@@ -23,46 +23,46 @@ import org.openremote.model.Constants;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class WeatherAsset extends Asset {
 
-    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.NUMBER,
+    public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> UV_INDEX = new AttributeDescriptor<>("uVIndex", false, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> UV_INDEX = new AttributeDescriptor<>("uVIndex", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.LABEL, "UV index"),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> SUN_IRRADIANCE = new AttributeDescriptor<>("sunIrradiance", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> SUN_IRRADIANCE = new AttributeDescriptor<>("sunIrradiance", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_AZIMUTH = new AttributeDescriptor<>("sunAzimuth", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> SUN_AZIMUTH = new AttributeDescriptor<>("sunAzimuth", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_ZENITH = new AttributeDescriptor<>("sunZenith", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> SUN_ZENITH = new AttributeDescriptor<>("sunZenith", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> SUN_ALTITUDE = new AttributeDescriptor<>("sunAltitude", true, ValueType.POSITIVE_INTEGER,
+    public static final AttributeDescriptor<Integer> SUN_ALTITUDE = new AttributeDescriptor<>("sunAltitude", ValueType.POSITIVE_INTEGER,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> WIND_SPEED = new AttributeDescriptor<>("windSpeed", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> WIND_SPEED = new AttributeDescriptor<>("windSpeed", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_SPEED_KILOMETERS_HOUR),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> WIND_DIRECTION = new AttributeDescriptor<>("sunAltitude", true, ValueType.DIRECTION,
+    public static final AttributeDescriptor<Integer> WIND_DIRECTION = new AttributeDescriptor<>("sunAltitude", ValueType.DIRECTION,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Double> RAINFALL = new AttributeDescriptor<>("rainfall", true, ValueType.POSITIVE_NUMBER,
+    public static final AttributeDescriptor<Double> RAINFALL = new AttributeDescriptor<>("rainfall", ValueType.POSITIVE_NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_DISTANCE_MILLIMETRE),
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
-    public static final AttributeDescriptor<Integer> HUMIDITY = new AttributeDescriptor<>("humidity", true, ValueType.PERCENTAGE_INTEGER_0_100,
+    public static final AttributeDescriptor<Integer> HUMIDITY = new AttributeDescriptor<>("humidity", ValueType.PERCENTAGE_INTEGER_0_100,
         new MetaItem<>(MetaItemType.READ_ONLY)
     );
 

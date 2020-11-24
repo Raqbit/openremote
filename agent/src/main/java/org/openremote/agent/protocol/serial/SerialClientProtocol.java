@@ -27,7 +27,7 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.Pair;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
 import java.util.ArrayList;

@@ -36,6 +36,7 @@ import org.openremote.model.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
@@ -47,7 +48,7 @@ import org.openremote.model.query.LogicGroup;
 import org.openremote.model.query.filter.*;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 
 import javax.persistence.EntityManager;
 import java.util.*;
@@ -231,10 +232,10 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         assetProcessingService.sendAttributeEvent(attributeEvent);
     }
 
-    protected void processAgentChange(Agent agent, PersistenceEvent<?> persistenceEvent) {
+    protected void processAgentChange(Agent<?, ?, ?> agent, PersistenceEvent<?> persistenceEvent) {
 
         LOG.finest("Processing agent persistence event: " + persistenceEvent.getCause());
-        Agent oldAgent = (Agent)persistenceEvent.getEntity();
+        Agent<?, ?, ?> oldAgent = (Agent<?, ?, ?>)persistenceEvent.getEntity();
 
         switch (persistenceEvent.getCause()) {
             case CREATE:
@@ -499,14 +500,14 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
         Boolean result = withLockReturning(getClass().getSimpleName() + "::processAssetUpdate", () ->
             attribute.getMetaValue(MetaItemType.AGENT_LINK)
-                .map(agentId -> {
-                    LOG.fine("Attribute write for agent linked attribute: agent=" + agentId + ", asset=" + asset.getId() + ", attribute=" + attribute.getName());
+                .map(agentLink -> {
+                    LOG.fine("Attribute write for agent linked attribute: agent=" + agentLink.getId() + ", asset=" + asset.getId() + ", attribute=" + attribute.getName());
                     AttributeEvent attributeEvent = new AttributeEvent(new AttributeState(asset.getId(), attribute));
                     messageBrokerService.getProducerTemplate().sendBodyAndHeader(
                         ACTUATOR_TOPIC,
                         attributeEvent,
                         Protocol.ACTUATOR_TOPIC_TARGET_PROTOCOL,
-                        getProtocolInstance(agentId)
+                        getProtocolInstance(agentLink.getId())
                     );
                     return true; // Processing complete, skip other processors
                 }).orElse(false) // This is a regular attribute so allow the processing to continue
@@ -523,8 +524,8 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
             .filter(attribute ->
                 // Exclude attributes without agent link or with agent link to not recognised agents (could be gateway agents)
                 attribute.getMetaValue(MetaItemType.AGENT_LINK)
-                    .map(agentLinkId -> {
-                        if (!getAgents().containsKey(agentLinkId)) {
+                    .map(agentLink -> {
+                        if (!getAgents().containsKey(agentLink.getId())) {
                             LOG.fine("Agent linked attribute, agent not found or this is a gateway asset: " + attribute);
                             return false;
                         }
@@ -532,7 +533,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                     })
                     .orElse(false))
             .filter(filter)
-            .map(attribute -> new Pair<String, Attribute<?>>(attribute.getMetaValue(MetaItemType.AGENT_LINK).orElse(null), attribute))
+            .map(attribute -> new Pair<String, Attribute<?>>(attribute.getMetaValue(MetaItemType.AGENT_LINK).map(AgentLink::getId).orElse(null), attribute))
             .collect(Collectors.groupingBy(
                 agentIdAttribute -> getAgents().get(agentIdAttribute.key),
                 mapping(agentIdAttribute -> agentIdAttribute.value, toList())
@@ -543,9 +544,9 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         return getClass().getSimpleName() + "{" + "}";
     }
 
-    protected boolean addReplaceAgent(Agent agent) {
+    protected boolean addReplaceAgent(Agent<?, ?, ?> agent) {
         // Fully load agent asset
-        final Agent loadedAgent = assetStorageService.find(agent.getId(), true, Agent.class);
+        final Agent<?, ?, ?> loadedAgent = assetStorageService.find(agent.getId(), true, Agent.class);
         if (gatewayService.getLocallyRegisteredGatewayId(agent.getId(), agent.getParentId()) != null) {
             return false;
         }
@@ -554,7 +555,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @SuppressWarnings("ConstantConditions")
-    protected boolean removeAgent(Agent agent) {
+    protected boolean removeAgent(Agent<?, ?, ?> agent) {
         return withLockReturning(getClass().getSimpleName() + "::removeAgent", () -> getAgents().remove(agent.getId()) != null);
     }
 
@@ -573,17 +574,17 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                     )
                     .stream()
                     .filter(asset -> gatewayService.getLocallyRegisteredGatewayId(asset.getId(), null) == null)
-                    .collect(Collectors.toMap(Asset::getId, agent -> (Agent)agent));
+                    .collect(Collectors.toMap(Asset::getId, agent -> (Agent<?, ?, ?>)agent));
             }
             return agentMap;
         });
     }
 
-    public Protocol getProtocolInstance(Agent agent) {
+    public Protocol<?> getProtocolInstance(Agent<?, ?, ?> agent) {
         return getProtocolInstance(agent.getId());
     }
 
-    public Protocol getProtocolInstance(String agentId) {
+    public Protocol<?> getProtocolInstance(String agentId) {
         return protocolInstanceMap.get(agentId);
     }
 

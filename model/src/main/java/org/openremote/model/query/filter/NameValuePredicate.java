@@ -19,7 +19,7 @@
  */
 package org.openremote.model.query.filter;
 
-import org.openremote.model.v2.AbstractNameValueHolder;
+import org.openremote.model.value.AbstractNameValueHolder;
 
 /**
  * There is an implicit AND condition between the name and the value; the name is required and {@link #mustExist} or

@@ -17,13 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.value;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.attribute.MetaList;
-import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -127,17 +126,17 @@ public class ValueDescriptor<T> implements NameHolder, MetaHolder {
         return null;
     }
 
-    public ValueDescriptor<T> withMeta(MetaItem<?>...meta) {
-        return withMeta(Arrays.asList(meta));
+    public ValueDescriptor<T> addOrReplaceMeta(MetaItem<?>...meta) {
+        return addOrReplaceMeta(Arrays.asList(meta));
     }
 
-    public ValueDescriptor<T> withMeta(Collection<MetaItem<?>> meta) {
+    public ValueDescriptor<T> addOrReplaceMeta(Collection<MetaItem<?>> meta) {
         MetaList metaList = new MetaList(this.meta);
         metaList.addOrReplace(meta);
         return new ValueDescriptor<>(name, type, metaList);
     }
 
-    public ValueDescriptor<T> withMeta(MetaList meta) {
-        return withMeta((Collection<MetaItem<?>>)meta);
+    public ValueDescriptor<T> addOrReplaceMeta(MetaList meta) {
+        return addOrReplaceMeta((Collection<MetaItem<?>>)meta);
     }
 }

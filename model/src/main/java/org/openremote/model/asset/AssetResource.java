@@ -24,7 +24,7 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;

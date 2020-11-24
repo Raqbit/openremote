@@ -22,10 +22,10 @@ package org.openremote.agent.protocol.knx;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 
 import javax.validation.constraints.Pattern;
 import java.util.Optional;
@@ -41,14 +41,14 @@ public class KNXAgent extends Agent {
     @Pattern(regexp = "^\\d{1,3}\\.\\d{1,3}$")
     public static final ValueDescriptor<String> DPT_VALUE = new ValueDescriptor<>("KNX datapoint type", String.class);
 
-    public static final AttributeDescriptor<Boolean> NAT_MODE = new AttributeDescriptor<>("nATMode", true, ValueType.BOOLEAN);
-    public static final AttributeDescriptor<Boolean> ROUTING_MODE = new AttributeDescriptor<>("routingMode", true, ValueType.BOOLEAN);
-    public static final AttributeDescriptor<String> MESSAGE_SOURCE_ADDRESS = new AttributeDescriptor<>("messageSourceAddress", true, SOURCE_ADDRESS_VALUE);
+    public static final AttributeDescriptor<Boolean> NAT_MODE = new AttributeDescriptor<>("nATMode", ValueType.BOOLEAN);
+    public static final AttributeDescriptor<Boolean> ROUTING_MODE = new AttributeDescriptor<>("routingMode", ValueType.BOOLEAN);
+    public static final AttributeDescriptor<String> MESSAGE_SOURCE_ADDRESS = new AttributeDescriptor<>("messageSourceAddress", SOURCE_ADDRESS_VALUE);
 
 
-    public static final MetaItemDescriptor<String> META_DPT = new MetaItemDescriptor<>("dpt", DPT_VALUE, null);
-    public static final MetaItemDescriptor<String> META_STATUS_GROUP_ADDRESS = new MetaItemDescriptor<>("statusGA", GROUP_ADDRESS_VALUE, null);
-    public static final MetaItemDescriptor<String> META_ACTION_GROUP_ADDRESS = new MetaItemDescriptor<>("actionGA", GROUP_ADDRESS_VALUE, null);
+    public static final MetaItemDescriptor<String> META_DPT = new MetaItemDescriptor<>("dpt", DPT_VALUE);
+    public static final MetaItemDescriptor<String> META_STATUS_GROUP_ADDRESS = new MetaItemDescriptor<>("statusGA", GROUP_ADDRESS_VALUE);
+    public static final MetaItemDescriptor<String> META_ACTION_GROUP_ADDRESS = new MetaItemDescriptor<>("actionGA", GROUP_ADDRESS_VALUE);
 
     public KNXAgent(String name) {
         this(name, DESCRIPTOR);

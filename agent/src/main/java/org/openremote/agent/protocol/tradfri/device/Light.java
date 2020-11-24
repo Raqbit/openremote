@@ -4,7 +4,7 @@ import org.openremote.agent.protocol.tradfri.payload.DeviceRequest;
 import org.openremote.agent.protocol.tradfri.util.ApiEndpoint;
 import org.openremote.agent.protocol.tradfri.util.CoapClient;
 import org.openremote.agent.protocol.tradfri.util.ColourXY;
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.impl.ColourRGB;
 
 /**
  * The class that represents an IKEA TRÅDFRI light

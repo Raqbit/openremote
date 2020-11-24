@@ -38,7 +38,7 @@ import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.ValueType;
 import org.openremote.model.value.Values;
 
 import javax.ws.rs.client.Entity;
@@ -66,7 +66,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * {@link WebsocketClientAgent#META_SUBSCRIPTIONS} on linked {@link Attribute}s; a subscription can be a message
  * sent over the websocket or a HTTP REST API call.
  */
-public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, WebsocketIoClient<String>, WebsocketClientAgent> {
+public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketClientProtocol, WebsocketClientAgent, String, WebsocketIoClient<String>, WebsocketClientAgent.WebsocketClientAgentLink> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "Websocket Client";
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, WebsocketClientProtocol.class);
@@ -83,7 +83,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, We
 
     @Override
     public String getProtocolName() {
-        return PROTOCOL_NAME;
+        return PROTOCOL_DISPLAY_NAME;
     }
 
     @Override
@@ -176,7 +176,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, We
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, WebsocketClientAgent.WebsocketClientAgentLink agentLink) {
         @SuppressWarnings("unchecked")
         Optional<WebsocketSubscription<String>[]> subscriptions = attribute.getMetaValue(WebsocketClientAgent.META_SUBSCRIPTIONS).map(s -> s);
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
@@ -189,7 +189,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, We
             }
         });
 
-        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
+        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, agent.getAgentLink(attribute), timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
 
         if (messageConsumer != null) {
             protocolMessageConsumers.add(new Pair<>(attributeRef, messageConsumer));
@@ -197,7 +197,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<String, We
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, WebsocketClientAgent.WebsocketClientAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         protocolMessageConsumers.removeIf((attrRefConsumer) -> attrRefConsumer.key.equals(attributeRef));
         attributeConnectedTasks.remove(attributeRef);

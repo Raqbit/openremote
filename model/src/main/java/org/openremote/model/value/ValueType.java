@@ -17,12 +17,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.value;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.Constants;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.*;
 import org.openremote.model.auth.OAuthGrant;
@@ -31,15 +32,14 @@ import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.console.ConsoleProviders;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.util.TimeUtil;
-import org.openremote.model.value.ColourRGB;
-import org.openremote.model.value.ColourRGBA;
-import org.openremote.model.value.ColourRGBAW;
-import org.openremote.model.value.ColourRGBW;
+import org.openremote.model.value.impl.ColourRGB;
+import org.openremote.model.value.impl.ColourRGBA;
+import org.openremote.model.value.impl.ColourRGBAW;
+import org.openremote.model.value.impl.ColourRGBW;
 
 import javax.validation.constraints.*;
 import javax.ws.rs.core.MultivaluedHashMap;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 
 public final class ValueType {

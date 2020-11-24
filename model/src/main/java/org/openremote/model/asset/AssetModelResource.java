@@ -21,8 +21,8 @@ package org.openremote.model.asset;
 
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.http.SuccessStatusCode;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;

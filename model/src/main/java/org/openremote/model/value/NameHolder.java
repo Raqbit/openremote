@@ -17,13 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.value;
 
-import org.openremote.model.attribute.MetaItem;
+import javax.validation.constraints.Pattern;
 
-import java.util.Collection;
+/**
+ * Identifies an item that holds a named property, the name should be very simple, as we use them in SQL path
+ * expressions, etc. and must manually escape. The name should be immutable to aid in tracking.
+ */
+public interface NameHolder {
 
-public interface MetaHolder {
-
-    Collection<MetaItem<?>> getMeta();
+    @Pattern(regexp =  "^\\w+$")
+    String getName();
 }

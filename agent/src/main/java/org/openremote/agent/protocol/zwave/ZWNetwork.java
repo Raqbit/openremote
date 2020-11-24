@@ -26,7 +26,7 @@ import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.Values;
 import org.openremote.protocol.zwave.ConnectionException;
 import org.openremote.protocol.zwave.model.Controller;
@@ -227,7 +227,7 @@ public class ZWNetwork {
             new MetaItem<>(MetaItemType.LABEL, channel.getDisplayName())
         );
 
-        if (channel.isReadOnly()) {
+        if (channel.hasMeta(MetaItemType.READ_ONLY)) {
             attribute.getMeta().add(new MetaItem<>(MetaItemType.READ_ONLY, true));
         }
     }
@@ -327,7 +327,7 @@ public class ZWNetwork {
 
                             if (description != null && description.length() > 0) {
                                 Attribute<String> descriptionAttribute = new Attribute<>(
-                                    "description", org.openremote.model.v2.ValueType.STRING, description
+                                    "description", org.openremote.model.value.ValueType.STRING, description
                                 );
                                 descriptionAttribute.addMeta(
                                     new MetaItem<>(MetaItemType.LABEL, "Description"),
@@ -399,7 +399,7 @@ public class ZWNetwork {
     private static List<Attribute<?>> createNodeInfoAttributes(String agentId, ZWaveNode node) {
         List<Attribute<?>> attributes = new ArrayList<>();
 
-        Attribute<?> nodeIdAttrib = new Attribute<>("nodeId", org.openremote.model.v2.ValueType.INTEGER, node.getNodeID())
+        Attribute<?> nodeIdAttrib = new Attribute<>("nodeId", org.openremote.model.value.ValueType.INTEGER, node.getNodeID())
             .addMeta(
                 new MetaItem<>(MetaItemType.LABEL, "Node ID"),
                 new MetaItem<>(MetaItemType.READ_ONLY, true)
@@ -408,7 +408,7 @@ public class ZWNetwork {
 
         Attribute<?> manufacturerIdAttrib = new Attribute<>(
             "manufacturerId",
-            org.openremote.model.v2.ValueType.STRING,
+            org.openremote.model.value.ValueType.STRING,
             String.format("0x%04X",node.getManufacturerId()));
         manufacturerIdAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Manufacturer ID"),
@@ -418,7 +418,7 @@ public class ZWNetwork {
 
         Attribute<?> manufacturerAttrib = new Attribute<>(
             "manufacturerName",
-            org.openremote.model.v2.ValueType.STRING,
+            org.openremote.model.value.ValueType.STRING,
             ZWManufacturerID.fromRaw(node.getManufacturerId()).getName());
         manufacturerAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Manufacturer"),
@@ -428,7 +428,7 @@ public class ZWNetwork {
 
         Attribute<?> flirsAttrib = new Attribute<>(
             "isFlirs",
-            org.openremote.model.v2.ValueType.BOOLEAN,
+            org.openremote.model.value.ValueType.BOOLEAN,
             node.getNodeInfo().isFLIRS());
         flirsAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "FLIRS"),
@@ -438,7 +438,7 @@ public class ZWNetwork {
 
         Attribute<?> routingAttrib = new Attribute<>(
             "isRouting",
-            org.openremote.model.v2.ValueType.BOOLEAN,
+            org.openremote.model.value.ValueType.BOOLEAN,
             node.getNodeInfo().isRouting());
         routingAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Routing"),
@@ -448,7 +448,7 @@ public class ZWNetwork {
 
         Attribute<?> listeningAttrib = new Attribute<>(
             "isListening",
-            org.openremote.model.v2.ValueType.BOOLEAN,
+            org.openremote.model.value.ValueType.BOOLEAN,
             node.getNodeInfo().isListening());
         listeningAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Listening"),
@@ -458,7 +458,7 @@ public class ZWNetwork {
 
         Attribute<?> productTypeIdAttrib = new Attribute<>(
             "productTypeId",
-            org.openremote.model.v2.ValueType.STRING,
+            org.openremote.model.value.ValueType.STRING,
             String.format("0x%04X", node.getProductTypeID()));
         productTypeIdAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Product Type ID"),
@@ -468,7 +468,7 @@ public class ZWNetwork {
 
         Attribute<?> productIdAttrib = new Attribute<>(
             "productId",
-            org.openremote.model.v2.ValueType.STRING,
+            org.openremote.model.value.ValueType.STRING,
             String.format("0x%04X", node.getProductID()));
         productIdAttrib.addMeta(
             new MetaItem<>(MetaItemType.LABEL, "Product ID"),
@@ -480,7 +480,7 @@ public class ZWNetwork {
         if (modelName != null) {
             Attribute<?> modelNameAttrib = new Attribute<>(
                 "modelName",
-                org.openremote.model.v2.ValueType.STRING,
+                org.openremote.model.value.ValueType.STRING,
                 modelName);
             modelNameAttrib.addMeta(
                 new MetaItem<>(MetaItemType.LABEL, "Model"),

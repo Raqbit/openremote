@@ -12,7 +12,7 @@ import org.openremote.model.asset.impl.LightAsset;
 import org.openremote.model.asset.impl.PlugAsset;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.value.ColourRGB;
+import org.openremote.model.value.impl.ColourRGB;
 import org.openremote.model.value.Values;
 
 import java.util.function.Consumer;

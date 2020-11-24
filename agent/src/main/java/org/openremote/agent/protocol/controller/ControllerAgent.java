@@ -22,21 +22,21 @@ package org.openremote.agent.protocol.controller;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
 public class ControllerAgent extends Agent {
 
-    public static final AttributeDescriptor<String> CONTROLLER_URI = new AttributeDescriptor<>("controllerURI", false, ValueType.STRING);
+    public static final AttributeDescriptor<String> CONTROLLER_URI = new AttributeDescriptor<>("controllerURI", ValueType.STRING);
 
-    public static final MetaItemDescriptor<String> META_DEVICE_NAME = new MetaItemDescriptor<>("deviceName", ValueType.STRING, null);
-    public static final MetaItemDescriptor<String> META_SENSOR_NAME = new MetaItemDescriptor<>("sensorName", ValueType.STRING, null);
-    public static final MetaItemDescriptor<String> META_COMMAND_DEVICE_NAME = new MetaItemDescriptor<>("commandDeviceName", ValueType.STRING, null);
-    public static final MetaItemDescriptor<String> META_COMMAND_NAME = new MetaItemDescriptor<>("commandName", ValueType.STRING, null);
-    public static final MetaItemDescriptor<ValueType.MultivaluedStringMap> META_COMMANDS_MAP = new MetaItemDescriptor<>("commandsMap", ValueType.MULTIVALUED_STRING_MAP, null);
+    public static final MetaItemDescriptor<String> META_DEVICE_NAME = new MetaItemDescriptor<>("deviceName", ValueType.STRING);
+    public static final MetaItemDescriptor<String> META_SENSOR_NAME = new MetaItemDescriptor<>("sensorName", ValueType.STRING);
+    public static final MetaItemDescriptor<String> META_COMMAND_DEVICE_NAME = new MetaItemDescriptor<>("commandDeviceName", ValueType.STRING);
+    public static final MetaItemDescriptor<String> META_COMMAND_NAME = new MetaItemDescriptor<>("commandName", ValueType.STRING);
+    public static final MetaItemDescriptor<ValueType.MultivaluedStringMap> META_COMMANDS_MAP = new MetaItemDescriptor<>("commandsMap", ValueType.MULTIVALUED_STRING_MAP);
 
     public ControllerAgent(String name) {
         this(name, DESCRIPTOR);

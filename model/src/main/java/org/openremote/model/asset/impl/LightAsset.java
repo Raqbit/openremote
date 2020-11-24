@@ -22,30 +22,30 @@ package org.openremote.model.asset.impl;
 import org.openremote.model.Constants;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemType;
-import org.openremote.model.v2.ValueType;
-import org.openremote.model.value.ColourRGB;
-import org.openremote.model.value.ColourRGBA;
-import org.openremote.model.value.ColourRGBAW;
-import org.openremote.model.value.ColourRGBW;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.ValueType;
+import org.openremote.model.value.impl.ColourRGB;
+import org.openremote.model.value.impl.ColourRGBA;
+import org.openremote.model.value.impl.ColourRGBAW;
+import org.openremote.model.value.impl.ColourRGBW;
 
 import java.util.Optional;
 
 public class LightAsset extends DeviceAsset {
 
-    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", false, ValueType.BOOLEAN,
+    public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", ValueType.BOOLEAN,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_ON_OFF)
     );
 
-    public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", true, ValueType.PERCENTAGE_INTEGER_0_100);
+    public static final AttributeDescriptor<Integer> BRIGHTNESS = new AttributeDescriptor<>("brightness", ValueType.PERCENTAGE_INTEGER_0_100);
 
-    public static final AttributeDescriptor<ColourRGB> COLOUR_RGB = new AttributeDescriptor<>("colourRGB", true, ValueType.COLOUR_RGB);
-    public static final AttributeDescriptor<ColourRGBA> COLOUR_RGBA = new AttributeDescriptor<>("colourRGBA", true, ValueType.COLOUR_RGBA);
-    public static final AttributeDescriptor<ColourRGBW> COLOUR_RGBW = new AttributeDescriptor<>("colourRGBW", true, ValueType.COLOUR_RGBW);
-    public static final AttributeDescriptor<ColourRGBAW> COLOUR_RGBAW = new AttributeDescriptor<>("colourRGBAW", true, ValueType.COLOUR_RGBAW);
+    public static final AttributeDescriptor<ColourRGB> COLOUR_RGB = new AttributeDescriptor<>("colourRGB", ValueType.COLOUR_RGB);
+    public static final AttributeDescriptor<ColourRGBA> COLOUR_RGBA = new AttributeDescriptor<>("colourRGBA", ValueType.COLOUR_RGBA);
+    public static final AttributeDescriptor<ColourRGBW> COLOUR_RGBW = new AttributeDescriptor<>("colourRGBW", ValueType.COLOUR_RGBW);
+    public static final AttributeDescriptor<ColourRGBAW> COLOUR_RGBAW = new AttributeDescriptor<>("colourRGBAW", ValueType.COLOUR_RGBAW);
 
-    public static final AttributeDescriptor<Integer> TEMPERATURE = new AttributeDescriptor<>("temperature", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.POSITIVE_INTEGER);
 
     public static final AssetDescriptor<LightAsset> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "e6688a", LightAsset.class);
 

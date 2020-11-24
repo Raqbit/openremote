@@ -21,14 +21,7 @@ package org.openremote.agent.protocol.tcp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
-import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueType;
-
-import javax.validation.constraints.NotNull;
-import java.util.Optional;
 
 public class TcpClientAgent extends IoAgent<String, TcpIoClient<String>> {
 

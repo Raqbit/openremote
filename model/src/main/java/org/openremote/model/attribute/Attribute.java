@@ -20,10 +20,10 @@
 package org.openremote.model.attribute;
 
 import org.openremote.model.util.AssetModelUtil;
-import org.openremote.model.v2.AbstractNameValueHolder;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
+import org.openremote.model.value.AbstractNameValueHolder;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;

@@ -21,13 +21,37 @@ package org.openremote.agent.protocol.io;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-public abstract class IoAgent<T, U extends IoClient<T>> extends Agent {
+import java.util.Optional;
 
-    protected <V extends IoAgent<T, U>, W extends AbstractIoClientProtocol<T, U, V>> IoAgent(String name, AgentDescriptor<V, W> descriptor) {
+public abstract class IoAgent<T extends IoAgent<T, U, V>, U extends AbstractIoClientProtocol<U, T, ?, ?, V>, V extends AgentLink> extends Agent<T, U, V> {
+
+    protected IoAgent(String name, AgentDescriptor<T, U, V> descriptor) {
         super(name, descriptor);
     }
 
-    @Override
-    abstract public AbstractIoClientProtocol<T, U, ? extends IoAgent<T, U>> getProtocolInstance();
+    public Optional<Boolean> getMessageConvertHex() {
+        return getAttributes().getValue(MESSAGE_CONVERT_HEX);
+    }
+
+    public Optional<Boolean> getMessageConvertBinary() {
+        return getAttributes().getValue(MESSAGE_CONVERT_BINARY);
+    }
+
+    public Optional<String> getMessageCharset() {
+        return getAttributes().getValue(MESSAGE_CHARSET);
+    }
+
+    public Optional<Integer> getMessageMaxLength() {
+        return getAttributes().getValue(MESSAGE_MAX_LENGTH);
+    }
+
+    public Optional<String[]> getMessageDelimiters() {
+        return getAttributes().getValue(MESSAGE_DELIMITERS);
+    }
+
+    public Optional<Boolean> getMessageStripDelimiter() {
+        return getAttributes().getValue(MESSAGE_STRIP_DELIMITER);
+    }
 }

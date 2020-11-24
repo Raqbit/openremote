@@ -22,9 +22,9 @@ package org.openremote.model.asset;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.apache.commons.lang3.StringUtils;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ModelDescriptor;
-import org.openremote.model.v2.NameHolder;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ModelDescriptor;
+import org.openremote.model.value.NameHolder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -55,7 +55,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder {
 
     protected String name;
     protected Class<T> type;
-    protected org.openremote.model.v2.AttributeDescriptor<?>[] attributeDescriptors;
+    protected AttributeDescriptor<?>[] attributeDescriptors;
     protected String icon;
     protected String colour;
 

@@ -23,9 +23,9 @@ import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.security.ClientRole;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.ValueDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
@@ -33,8 +33,8 @@ public class ClientEventAgent extends Agent {
 
     public static final ValueDescriptor<ClientRole> VALUE_CLIENT_ROLE = new ValueDescriptor<>("Client role", ClientRole.class);
 
-    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientSecret", true, ValueType.STRING);
-    public static final AttributeDescriptor<ClientRole[]> CLIENT_ROLES = new AttributeDescriptor<>("clientRoles", true, VALUE_CLIENT_ROLE.asArray());
+    public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientSecret", ValueType.STRING);
+    public static final AttributeDescriptor<ClientRole[]> CLIENT_ROLES = new AttributeDescriptor<>("clientRoles", VALUE_CLIENT_ROLE.asArray());
 
     public ClientEventAgent(String name) {
         this(name, DESCRIPTOR);

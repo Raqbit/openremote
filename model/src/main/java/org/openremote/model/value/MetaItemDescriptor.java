@@ -17,12 +17,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.v2;
+package org.openremote.model.value;
+
+import org.openremote.model.attribute.Attribute;
+import org.openremote.model.attribute.MetaItem;
 
 /**
- * Identifies an item that holds a {@link ValueDescriptor}.
+ * Describes a {@link MetaItem} that can be added to an {@link Attribute}; the {@link #getName()} must match the
+ * {@link MetaItem#getName()}.
  */
-public interface ValueDescriptorHolder<T> {
+public class MetaItemDescriptor<T> extends AbstractNameValueDescriptorHolder<T> {
 
-    ValueDescriptor<T> getValueType();
+    public MetaItemDescriptor(String name, ValueDescriptor<T> valueDescriptor) {
+        super(name, valueDescriptor);
+    }
 }

@@ -21,16 +21,16 @@ package org.openremote.agent.protocol.velbus;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.v2.AttributeDescriptor;
-import org.openremote.model.v2.MetaItemDescriptor;
-import org.openremote.model.v2.ValueType;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueType;
 
 abstract class VelbusAgent extends Agent {
 
-    public static final AttributeDescriptor<Integer> TIME_INJECTION_INTERVAL_SECONDS = new AttributeDescriptor<>("timeInjectionInterval", true, ValueType.POSITIVE_INTEGER);
+    public static final AttributeDescriptor<Integer> TIME_INJECTION_INTERVAL_SECONDS = new AttributeDescriptor<>("timeInjectionInterval", ValueType.POSITIVE_INTEGER);
 
-    public static final MetaItemDescriptor<String> META_DEVICE_VALUE_LINK = new MetaItemDescriptor<>("deviceValueLink", ValueType.STRING, null);
-    public static final MetaItemDescriptor<Integer> META_DEVICE_ADDRESS = new MetaItemDescriptor<>("deviceAddress", ValueType.INT_BYTE, null);
+    public static final MetaItemDescriptor<String> META_DEVICE_VALUE_LINK = new MetaItemDescriptor<>("deviceValueLink", ValueType.STRING);
+    public static final MetaItemDescriptor<Integer> META_DEVICE_ADDRESS = new MetaItemDescriptor<>("deviceAddress", ValueType.INT_BYTE);
 
     protected <T extends VelbusAgent, S extends AbstractVelbusProtocol<T>> VelbusAgent(String name, AgentDescriptor<T, S> descriptor) {
         super(name, descriptor);

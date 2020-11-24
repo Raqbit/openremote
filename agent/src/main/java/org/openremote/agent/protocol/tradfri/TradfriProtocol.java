@@ -16,7 +16,7 @@ import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 
 import java.util.*;
 import java.util.logging.Logger;

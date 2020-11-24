@@ -17,25 +17,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.value;
+package org.openremote.model.value.impl;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.awt.*;
 import java.util.Objects;
 
-@JsonPropertyOrder({"red", "green", "blue", "amber"})
-public class ColourRGBA extends ColourRGB {
+@JsonPropertyOrder({"red", "green", "blue", "amber", "white"})
+public class ColourRGBAW extends ColourRGB {
 
     protected int amber;
+    protected int white;
 
-    public ColourRGBA(int red, int green, int blue, int amber) {
+    public ColourRGBAW(int red, int green, int blue, int amber, int white) {
         super(red, green, blue);
         this.amber = amber;
+        this.white = white;
     }
 
     public int getAmber() {
         return amber;
+    }
+
+    public int getWhite() {
+        return white;
     }
 
     @Override
@@ -43,14 +48,14 @@ public class ColourRGBA extends ColourRGB {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ColourRGBA other = (ColourRGBA) o;
+        ColourRGBAW other = (ColourRGBAW) o;
 
-        return super.equals(other) && amber == other.amber;
+        return super.equals(other) && amber == other.amber && white == other.white;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode() + Objects.hash(amber);
+        return super.hashCode() + Objects.hash(amber, white);
     }
 
     @Override
@@ -60,6 +65,7 @@ public class ColourRGBA extends ColourRGB {
             ", green=" + green +
             ", blue=" + blue +
             ", amber=" + amber +
+            ", white=" + white +
             '}';
     }
 }

@@ -29,7 +29,7 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.v2.MetaItemType;
+import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.Values;
 import org.quartz.CronExpression;
 
