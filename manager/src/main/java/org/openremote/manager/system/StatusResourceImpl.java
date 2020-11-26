@@ -22,7 +22,6 @@ package org.openremote.manager.system;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.system.HealthStatusProvider;
 import org.openremote.model.system.StatusResource;
-import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
 import java.io.IOException;

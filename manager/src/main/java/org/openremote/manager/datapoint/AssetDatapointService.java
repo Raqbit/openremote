@@ -16,13 +16,15 @@ import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent.Source;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.datapoint.AssetDatapoint;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
 import org.openremote.model.query.AssetQuery;
-import org.openremote.model.query.filter.MetaPredicate;
+import org.openremote.model.query.filter.AttributePredicate;
+import org.openremote.model.query.filter.NameValuePredicate;
 import org.openremote.model.util.Pair;
+import org.openremote.model.value.AbstractNameValueHolder;
+import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.Values;
 import org.postgresql.util.PGInterval;
 import org.postgresql.util.PGobject;
@@ -36,6 +38,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +48,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.openremote.container.util.MapAccess.getInteger;
+import static org.openremote.model.value.MetaItemType.STORE_DATA_POINTS;
 
 /**
  * Store and retrieve datapoints for asset attributes and periodically purge data points based on
@@ -63,7 +67,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
     protected TimerService timerService;
     protected ManagerExecutorService managerExecutorService;
     protected int maxDatapointAgeDays;
-    protected ScheduledFuture dataPointsPurgeScheduledFuture;
+    protected ScheduledFuture<?> dataPointsPurgeScheduledFuture;
 
     @Override
     public int getPriority() {
@@ -117,7 +121,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                       Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
 
-        if (attribute.isStoreDatapoints()
+        if (attribute.getMetaValue(STORE_DATA_POINTS).orElse(false)
                 && attribute.getValue().isPresent()) { // Don't store datapoints with null value
 
             // Perform upsert on datapoint (datapoint isn't immutable then really and tied to postgresql but prevents entire attribute event from failing)
@@ -126,7 +130,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
             PGobject pgJsonValue = new PGobject();
             pgJsonValue.setType("jsonb");
             try {
-                pgJsonValue.setValue(attribute.getValue().map(Value::toJson).orElse(null));
+                pgJsonValue.setValue(Values.asJSON(attribute.getValue().orElse(null)).orElse("null"));
             } catch (SQLException e) {
                 throw new AssetProcessingException(AssetProcessingException.Reason.STATE_STORAGE_FAILED, "Failed to insert or update asset data point for attribute: " + attribute);
             }
@@ -138,7 +142,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                     "  SET value = excluded.value");
 
                 st.setString(1, asset.getId());
-                st.setString(2, attribute.name);
+                st.setString(2, attribute.getName());
                 st.setObject(3, pgJsonValue);
                 st.setTimestamp(4, attribute.getTimestamp().map(java.sql.Timestamp::new).orElse(null));
                 st.executeUpdate();
@@ -186,7 +190,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         });
     }
 
-    public ValueDatapoint[] getValueDatapoints(AttributeRef attributeRef,
+    public ValueDatapoint<?>[] getValueDatapoints(AttributeRef attributeRef,
                                                DatapointInterval datapointInterval,
                                                long fromTimestamp,
                                                long toTimestamp) {
@@ -195,6 +199,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         if (asset == null) {
             throw new IllegalStateException("Asset not found: " + attributeRef.getAssetId());
         }
+
         Attribute<?> assetAttribute = asset.getAttribute(attributeRef.getAttributeName())
             .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeRef.getAttributeName()));
 
@@ -207,14 +212,13 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                                long toTimestamp) {
 
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
-        ValueType attributeValueType = attribute.getTypeOrThrow().getValueType();
 
         LOG.fine("Getting datapoints for: " + attributeRef);
 
         return persistenceService.doReturningTransaction(entityManager ->
-                entityManager.unwrap(Session.class).doReturningWork(new AbstractReturningWork<ValueDatapoint[]>() {
+                entityManager.unwrap(Session.class).doReturningWork(new AbstractReturningWork<ValueDatapoint<?>[]>() {
                     @Override
-                    public ValueDatapoint[] execute(Connection connection) throws SQLException {
+                    public ValueDatapoint<?>[] execute(Connection connection) throws SQLException {
 
                         String truncateX;
                         String interval;
@@ -248,8 +252,11 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                 throw new IllegalArgumentException("Can't handle interval: " + datapointInterval);
                         }
 
+                        Class<?> attributeType = attribute.getValueType().getType();
+                        boolean isNumber = Number.class.isAssignableFrom(attributeType);
+                        boolean isBoolean = Boolean.class.isAssignableFrom(attributeType);
                         StringBuilder query = new StringBuilder();
-                        boolean downsample = attributeValueType == ValueType.NUMBER || attributeValueType == ValueType.BOOLEAN;
+                        boolean downsample = isNumber || isBoolean;
 
                         if (downsample) {
 
@@ -263,7 +270,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                 "       select " +
                                 "           date_trunc(?, TIMESTAMP)::timestamp as TS, ");
 
-                            if (attributeValueType == ValueType.NUMBER) {
+                            if (isNumber) {
                                 query.append(" AVG(VALUE::text::numeric) as AVG_VALUE ");
                             } else {
                                 query.append(" AVG(case when VALUE::text::boolean is true then 1 else 0 end) as AVG_VALUE ");
@@ -315,10 +322,10 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                             try (ResultSet rs = st.executeQuery()) {
                                 List<ValueDatapoint<?>> result = new ArrayList<>();
                                 while (rs.next()) {
-                                    Value value = rs.getObject(2) != null ? Values.parseOrNull(rs.getString(2)) : null;
+                                    Object value = rs.getObject(2) != null ? Values.convert(attributeType, rs.getString(2)) : null;
                                     result.add(new ValueDatapoint<>(rs.getTimestamp(1).getTime(), value));
                                 }
-                                return result.toArray(new ValueDatapoint[result.size()]);
+                                return result.toArray(new ValueDatapoint[0]);
                             }
                         }
                     }
@@ -332,19 +339,20 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         // Get list of attributes that have custom durations
         List<Asset> assets = assetStorageService.findAll(
                 new AssetQuery()
-                        .attributeMeta(
-                                new MetaPredicate(MetaItemType.DATA_POINTS_MAX_AGE_DAYS),
-                                new MetaPredicate(MetaItemType.STORE_DATA_POINTS))
-                        .select(AssetQuery.Select.selectExcludePathAndParentInfo()));
+                    .attributes(new AttributePredicate().meta(
+                        new NameValuePredicate(MetaItemType.DATA_POINTS_MAX_AGE_DAYS),
+                        new NameValuePredicate(STORE_DATA_POINTS)
+                    ))
+                    .select(AssetQuery.Select.selectExcludePathAndParentInfo()));
 
         List<Pair<String, Attribute<?>>> attributes = assets.stream()
                 .map(asset -> asset
-                         .getAttributes().stream()
-                        .filter(assetAttribute ->
-                                assetAttribute.isStoreDatapoints()
-                                        && assetAttribute.hasMetaItem(MetaItemType.DATA_POINTS_MAX_AGE_DAYS))
-                        .map(assetAttribute -> new Pair<String, Attribute<?>>(asset.getId(), assetAttribute))
-                        .collect(toList()))
+                    .getAttributes().stream()
+                    .filter(assetAttribute ->
+                        assetAttribute.getMetaValue(STORE_DATA_POINTS).orElse(false)
+                                    && assetAttribute.hasMeta(MetaItemType.DATA_POINTS_MAX_AGE_DAYS))
+                    .map(assetAttribute -> new Pair<String, Attribute<?>>(asset.getId(), assetAttribute))
+                    .collect(toList()))
                 .flatMap(List::stream)
                 .collect(toList());
 
@@ -361,9 +369,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
             Map<Integer, List<Pair<String, Attribute<?>>>> ageAttributeRefMap = attributes.stream()
                 .collect(groupingBy(attributeRef ->
                     attributeRef.value
-                        .getMetaItem(MetaItemType.DATA_POINTS_MAX_AGE_DAYS)
-                        .flatMap(metaItem ->
-                                Values.getIntegerCoerced(metaItem.getValue().orElse(null)))
+                        .getMetaValue(MetaItemType.DATA_POINTS_MAX_AGE_DAYS)
                         .orElse(maxDatapointAgeDays)));
 
             ageAttributeRefMap.forEach((age, attrs) -> {

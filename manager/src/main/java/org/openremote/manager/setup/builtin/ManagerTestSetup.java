@@ -31,21 +31,13 @@ import org.openremote.model.asset.UserAsset;
 import org.openremote.model.attribute.*;
 import org.openremote.model.geo.GeoJSONPoint;
 import org.openremote.model.security.Tenant;
-import org.openremote.model.simulator.element.ColorSimulatorElement;
-import org.openremote.model.simulator.element.NumberSimulatorElement;
-import org.openremote.model.simulator.element.SwitchSimulatorElement;
 import org.openremote.model.value.impl.ColourRGB;
-import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.openremote.manager.datapoint.AssetDatapointService.DATA_POINTS_MAX_AGE_DAYS_DEFAULT;
-import static org.openremote.model.asset.AssetType.*;
-import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration;
-import static org.openremote.model.attribute.AttributeValueType.*;
-import static org.openremote.model.attribute.MetaItemType.*;
 
 public class ManagerTestSetup extends AbstractManagerSetup {
 

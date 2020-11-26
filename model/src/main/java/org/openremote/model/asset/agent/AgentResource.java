@@ -25,7 +25,6 @@ import org.openremote.model.asset.AssetResource;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.file.FileInfo;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 
 import javax.annotation.security.RolesAllowed;
@@ -52,7 +51,6 @@ public interface AgentResource {
     @GET
     @Path("instanceDiscovery/{agentType}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
     Agent<?, ?, ?>[] doProtocolInstanceDiscovery(
         @BeanParam RequestParams requestParams,
@@ -72,7 +70,6 @@ public interface AgentResource {
     @Path("assetDiscovery/{agentId}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
     AssetTreeNode[] doProtocolAssetDiscovery(
         @BeanParam RequestParams requestParams,
         @PathParam("agentId") String agentId,
@@ -92,7 +89,6 @@ public interface AgentResource {
     @Path("assetImport/{agentId}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
     // TODO: File upload should use standard multipart mechanism
     AssetTreeNode[] doProtocolAssetImport(
         @BeanParam RequestParams requestParams,

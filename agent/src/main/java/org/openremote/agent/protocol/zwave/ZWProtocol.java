@@ -32,6 +32,7 @@ import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.protocol.zwave.model.commandclasses.channel.value.Value;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -53,7 +54,6 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent, ZWAgent.ZWAgentLink> i
 
     protected ZWNetwork network;
     protected Map<AttributeRef, Consumer<Value>> sensorValueConsumerMap;
-    protected Future<Void> assetDiscoveryTask;
 
     public ZWProtocol(ZWAgent agent) {
         super(agent);
@@ -126,38 +126,21 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent, ZWAgent.ZWAgentLink> i
     // Implements ProtocolAssetDiscovery ------------------------------------------------
 
     @Override
-    public synchronized boolean startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
-
-        if (assetDiscoveryTask != null) {
-            LOG.warning("Discovery requested but it is already running, please wait or stop the running discovery process");
-            return false;
-        }
+    public Future<Void> startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer) {
 
         if (network == null || network.getConnectionStatus() != ConnectionStatus.CONNECTED) {
             LOG.info("Network not connected so cannot perform discovery");
-            return false;
+            return CompletableFuture.completedFuture(null);
         }
 
-        assetDiscoveryTask = executorService.submit(() -> {
+        return executorService.submit(() -> {
 
             try {
                 AssetTreeNode[] assetTreeNodes = network.discoverDevices(agent);
                 assetConsumer.accept(assetTreeNodes);
             } catch(Exception e) {
                 LOG.log(Level.SEVERE, "Exception thrown during asset discovery: " + this, e);
-            } finally {
-                stoppedCallback.run();
             }
         }, null);
-
-        return true;
-    }
-
-    @Override
-    public synchronized void stopAssetDiscovery() {
-        if (assetDiscoveryTask != null) {
-            assetDiscoveryTask.cancel(true);
-            assetDiscoveryTask = null;
-        }
     }
 }

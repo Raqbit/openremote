@@ -88,4 +88,8 @@ public class AgentDescriptor<T extends Agent<T, U, V>, U extends Protocol<T>, V 
     public Class<V> getAgentLinkClass() {
         return agentLinkClass;
     }
+
+    public Class<? extends ProtocolInstanceDiscovery> getInstanceDiscoveryProviderClass() {
+        return instanceDiscoveryProvider;
+    }
 }

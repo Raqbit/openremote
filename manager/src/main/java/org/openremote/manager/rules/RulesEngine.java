@@ -33,13 +33,12 @@ import org.openremote.manager.predicted.AssetPredictedDatapointService;
 import org.openremote.manager.rules.facade.*;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.attribute.AttributeType;
-import org.openremote.model.attribute.MetaItemType;
 import org.openremote.model.query.filter.GeofencePredicate;
 import org.openremote.model.query.filter.LocationAttributePredicate;
 import org.openremote.model.rules.*;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
+import org.openremote.model.value.MetaItemType;
 
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
@@ -547,7 +546,7 @@ public class RulesEngine<T extends Ruleset> {
     public void updateOrInsertAssetState(AssetState assetState, boolean insert) {
         facts.putAssetState(assetState);
         // Make sure location predicate tracking is activated before notifying the deployments otherwise they won't report location predicates
-        trackLocationPredicates(trackLocationPredicates || (insert && assetState.getAttributeName().equals(AttributeType.LOCATION.getAttributeName())));
+        trackLocationPredicates(trackLocationPredicates || (insert && assetState.getAttributeName().equals(Asset.LOCATION.getName())));
         notifyAssetStatesChanged(new AssetStateChangeEvent(insert ? PersistenceEvent.Cause.CREATE : PersistenceEvent.Cause.UPDATE, assetState));
         if (running) {
             scheduleFire();
@@ -557,7 +556,7 @@ public class RulesEngine<T extends Ruleset> {
     public void removeAssetState(AssetState assetState) {
         facts.removeAssetState(assetState);
         // Make sure location predicate tracking is activated before notifying the deployments otherwise they won't report location predicates
-        trackLocationPredicates(trackLocationPredicates || assetState.getAttributeName().equals(AttributeType.LOCATION.getAttributeName()));
+        trackLocationPredicates(trackLocationPredicates || assetState.getAttributeName().equals(Asset.LOCATION.getName()));
         notifyAssetStatesChanged(new AssetStateChangeEvent(PersistenceEvent.Cause.DELETE, assetState));
         if (running) {
             scheduleFire();

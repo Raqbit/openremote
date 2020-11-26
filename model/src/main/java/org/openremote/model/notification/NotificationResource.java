@@ -21,8 +21,6 @@ package org.openremote.model.notification;
 
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 
@@ -40,8 +38,7 @@ public interface NotificationResource {
      * Only the superuser can call this operation.
      */
     @GET
-    @SuccessStatusCode(200)
-    @Produces(APPLICATION_JSON)
+@Produces(APPLICATION_JSON)
     @RolesAllowed({Constants.READ_ADMIN_ROLE})
     SentNotification[] getNotifications(@BeanParam RequestParams requestParams,
                                         @QueryParam("id") Long id,
@@ -71,8 +68,7 @@ public interface NotificationResource {
      * Only the superuser can call this operation.
      */
     @DELETE
-    @SuccessStatusCode(204)
-    @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
+@RolesAllowed({Constants.WRITE_ADMIN_ROLE})
     void removeNotifications(@BeanParam RequestParams requestParams,
                              @QueryParam("id") Long id,
                              @QueryParam("type") String type,
@@ -99,8 +95,7 @@ public interface NotificationResource {
      */
     @DELETE
     @Path("{notificationId}")
-    @SuccessStatusCode(204)
-    @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
+@RolesAllowed({Constants.WRITE_ADMIN_ROLE})
     void removeNotification(@BeanParam RequestParams requestParams,
                             @PathParam("notificationId") Long notificationId);
 
@@ -111,8 +106,7 @@ public interface NotificationResource {
      */
     @POST
     @Path("alert")
-    @SuccessStatusCode(204)
-    @Consumes(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
     void sendNotification(@BeanParam RequestParams requestParams,
                           Notification notification);
 
@@ -124,8 +118,7 @@ public interface NotificationResource {
      */
     @PUT
     @Path("{notificationId}/delivered")
-    @SuccessStatusCode(204)
-    void notificationDelivered(@BeanParam RequestParams requestParams,
+void notificationDelivered(@BeanParam RequestParams requestParams,
                                @QueryParam("targetId") String targetId,
                                @PathParam("notificationId") Long notificationId);
 
@@ -138,8 +131,7 @@ public interface NotificationResource {
     @PUT
     @Path("{notificationId}/acknowledged")
     @Consumes(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    void notificationAcknowledged(@BeanParam RequestParams requestParams,
+void notificationAcknowledged(@BeanParam RequestParams requestParams,
                                   @QueryParam("targetId") String targetId,
                                   @PathParam("notificationId") Long notificationId,
                                   Object acknowledgement);

@@ -30,8 +30,9 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.openremote.model.value.NameHolder;
 import org.openremote.model.value.AbstractNameValueDescriptorHolder;
+import org.openremote.model.value.AbstractNameValueHolder;
+import org.openremote.model.value.NameHolder;
 import org.openremote.model.value.ValueHolder;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ import java.util.function.UnaryOperator;
  */
 @JsonSerialize(using = NamedList.NamedListSerializer.class)
 @JsonDeserialize(using = NamedList.NamedListDeserializer.class)
-public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<T> {
+public class NamedList<T extends AbstractNameValueHolder<?>> extends ArrayList<T> {
 
     public static class NamedListSerializer extends StdSerializer<NamedList<?>> {
 
@@ -114,7 +115,7 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
                 }
 
                 ((ObjectNode)itemNode).put("name", name);
-                NameHolder itemObj = ctxt.readValue(itemNode.traverse(), innerType);
+                AbstractNameValueHolder itemObj = ctxt.readValue(itemNode.traverse(), innerType);
                 list.add(itemObj);
             }
             return list;
@@ -181,33 +182,29 @@ public class NamedList<T extends NameHolder & ValueHolder<?>> extends ArrayList<
         throwIfDuplicates(this);
     }
 
-    public Optional<T> get(NameHolder nameHolder) {
-        return get(nameHolder.getName());
-    }
-
     public Optional<T> get(String name) {
         return this.stream().filter(item -> item.getName().equals(name)).findFirst();
     }
 
     @SuppressWarnings("unchecked")
-    protected <S, U extends ValueHolder<S>> Optional<U> getInternal(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
-        Optional<T> valueProvider = get(nameValueDescriptorProvider);
+    public <V, W extends AbstractNameValueHolder<V>> Optional<W> get(AbstractNameValueDescriptorHolder<V> nameValueDescriptorHolder) {
+        Optional<T> valueProvider = this.stream().filter(item -> item.getName().equals(nameValueDescriptorHolder.getName())).findFirst();
         return valueProvider.map(item -> {
             Class<?> itemType = item.getValueType().getType();
-            Class<S> expectedType = nameValueDescriptorProvider.getValueType().getType();
+            Class<V> expectedType = nameValueDescriptorHolder.getValueType().getType();
             if (itemType == expectedType) {
-                return (U)item;
+                return (W)item;
             }
             return null;
         });
     }
 
     public <S> Optional<S> getValue(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
-        return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue);
+        return get(nameValueDescriptorProvider).flatMap(ValueHolder::getValue);
     }
 
     public <S> S getValueOrDefault(AbstractNameValueDescriptorHolder<S> nameValueDescriptorProvider) {
-        return getInternal(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(null);
+        return get(nameValueDescriptorProvider).flatMap(ValueHolder::getValue).orElse(null);
     }
 
     @SafeVarargs

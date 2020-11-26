@@ -37,8 +37,6 @@ import org.openremote.model.query.filter.TenantPredicate;
 import org.openremote.model.security.Tenant;
 import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.ValueException;
 import org.openremote.model.value.Values;
 
 import javax.persistence.OptimisticLockException;
@@ -49,13 +47,12 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static org.openremote.container.Values.JSON;
 import static org.openremote.model.attribute.AttributeEvent.Source.CLIENT;
-import static org.openremote.model.attribute.MetaItemType.ACCESS_RESTRICTED_READ;
 import static org.openremote.model.query.AssetQuery.Access;
 import static org.openremote.model.query.AssetQuery.Select.selectExcludeAll;
 import static org.openremote.model.query.AssetQuery.Select.selectExcludePathAndAttributes;
 import static org.openremote.model.util.TextUtil.isNullOrEmpty;
+import static org.openremote.model.value.MetaItemType.ACCESS_RESTRICTED_READ;
 
 public class AssetResourceImpl extends ManagerWebResource implements AssetResource {
 
@@ -254,7 +251,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
             boolean isRestrictedUser = isRestrictedUser();
 
             // The asset that will ultimately be stored (override/ignore some values for restricted users)
-            Asset resultAsset = Asset.map(
+            Asset resultAsset =  Asset.map(
                 asset,
                 storageAsset,
                 isRestrictedUser ? storageAsset.getName() : null, // TODO We could allow restricted users to update names?

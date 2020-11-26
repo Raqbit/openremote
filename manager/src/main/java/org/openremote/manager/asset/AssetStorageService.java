@@ -379,7 +379,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                             if (isAttributeRead) {
                                 Attribute<?> assetAttribute = asset.getAttributes().get(attributeName).orElse(null);
                                 if (assetAttribute != null) {
-                                    response = new AttributeEvent(assetId, attributeName, assetAttribute.getValue().orElse(null), assetAttribute.getTimestamp());
+                                    response = new AttributeEvent(assetId, attributeName, assetAttribute.getValue().orElse(null), assetAttribute.getTimestamp().orElse(0L));
                                 }
                             } else {
                                 response = new AssetEvent(AssetEvent.Cause.READ, asset, null);

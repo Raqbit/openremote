@@ -19,7 +19,9 @@
  */
 package org.openremote.manager.rules;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.container.persistence.PersistenceEvent;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
@@ -37,7 +39,7 @@ import org.openremote.model.rules.*;
 import org.openremote.model.rules.json.*;
 import org.openremote.model.util.TextUtil;
 import org.openremote.model.util.TimeUtil;
-import org.openremote.model.value.*;
+import org.openremote.model.value.Values;
 import org.quartz.CronExpression;
 
 import java.util.*;
@@ -49,11 +51,9 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.openremote.container.Values.JSON;
-import static org.openremote.container.Container.LOG;
-import static org.openremote.model.value.Values.distinctByKey;
 import static org.openremote.manager.rules.AssetQueryPredicate.groupIsEmpty;
 import static org.openremote.model.query.filter.LocationAttributePredicate.getLocationPredicates;
+import static org.openremote.model.value.Values.distinctByKey;
 
 public class JsonRulesBuilder extends RulesBuilder {
 
@@ -506,7 +506,7 @@ public class JsonRulesBuilder extends RulesBuilder {
         rulesStr = rulesStr.replace(PLACEHOLDER_RULESET_ID, Long.toString(ruleset.getId()));
         rulesStr = rulesStr.replace(PLACEHOLDER_RULESET_NAME, ruleset.getName());
 
-        JsonRulesetDefinition jsonRulesetDefinition = JSON.readValue(rulesStr, JsonRulesetDefinition.class);
+        JsonRulesetDefinition jsonRulesetDefinition = Values.parse(rulesStr, JsonRulesetDefinition.class).orElse(null);
 
         if (jsonRulesetDefinition == null || jsonRulesetDefinition.rules == null || jsonRulesetDefinition.rules.length == 0) {
             throw new IllegalArgumentException("No rules within ruleset so nothing to start: " + ruleset);
@@ -739,24 +739,20 @@ public class JsonRulesBuilder extends RulesBuilder {
                     if (!TextUtil.isNullOrEmpty(body)) {
                         if (body.contains(PLACEHOLDER_TRIGGER_ASSETS)) {
                             // Need to clone the notification
-                            try {
-                                notification = JSON.readValue(JSON.writeValueAsString(notification), Notification.class);
-                                String triggeredAssetInfo = buildTriggeredAssetInfo(useUnmatched, ruleState, isHtml);
-                                body = body.replace(PLACEHOLDER_TRIGGER_ASSETS, triggeredAssetInfo);
+                            notification = Values.clone(notification);
+                            String triggeredAssetInfo = buildTriggeredAssetInfo(useUnmatched, ruleState, isHtml);
+                            body = body.replace(PLACEHOLDER_TRIGGER_ASSETS, triggeredAssetInfo);
 
-                                if (isEmail) {
-                                    EmailNotificationMessage email = (EmailNotificationMessage) notification.getMessage();
-                                    if (isHtml) {
-                                        email.setHtml(body);
-                                    } else {
-                                        email.setText(body);
-                                    }
-                                } else if (isPush) {
-                                    PushNotificationMessage pushNotificationMessage = (PushNotificationMessage) notification.getMessage();
-                                    pushNotificationMessage.setBody(body);
+                            if (isEmail) {
+                                EmailNotificationMessage email = (EmailNotificationMessage) notification.getMessage();
+                                if (isHtml) {
+                                    email.setHtml(body);
+                                } else {
+                                    email.setText(body);
                                 }
-                            } catch (JsonProcessingException e) {
-                                LOG.warning("Failed to clone notification so cannot insert asset info");
+                            } else if (isPush) {
+                                PushNotificationMessage pushNotificationMessage = (PushNotificationMessage) notification.getMessage();
+                                pushNotificationMessage.setBody(body);
                             }
                         }
                     }
@@ -883,60 +879,61 @@ public class JsonRulesBuilder extends RulesBuilder {
             return new RuleActionExecution(() ->
 
                 matchingAssetStates.forEach(assetState -> {
-                    ValueType valueType = assetState.getValue().map(Value::getType).orElseGet(() -> assetState.getAttributeValueType() != null ? assetState.getAttributeValueType().getValueType() : null);
-                    Value value = assetState.getValue().orElse(null);
+                    Object value = assetState.getValue().orElse(null);
+                    Class<?> valueType = assetState.getAttributeValueType().getType();
+                    boolean isArray = Values.isArray(valueType);
 
-                    if (!(valueType == ValueType.ARRAY || valueType == ValueType.OBJECT)) {
+                    if (!isArray && !Values.isObject(valueType)) {
                         log(Level.WARNING, "Rule action target asset cannot determine value type or incompatible value type for attribute: " + assetState);
                     } else {
 
+                        // Convert value to JSON Node to easily manipulate it
+                        value = isArray ? Values.convert(ArrayNode.class, value) : Values.convert(ObjectNode.class, value);
+
                         switch (attributeUpdateAction.updateAction) {
                             case ADD:
-                                if (valueType.equals(ValueType.ARRAY)) {
-                                    value = value == null ? Values.createArray() : value;
-                                    ((ArrayValue) value).add(attributeUpdateAction.value);
+                                if (isArray) {
+                                    value = value == null ? Values.JSON.createArrayNode() : value;
+                                    ((ArrayNode)value).add(Values.convert(JsonNode.class, attributeUpdateAction.value));
                                 } else {
-                                    value = value == null ? Values.createObject() : value;
-                                    ((ObjectValue) value).put(attributeUpdateAction.key, attributeUpdateAction.value);
+                                    value = value == null ? Values.JSON.createObjectNode() : value;
+                                    ((ObjectNode) value).put(attributeUpdateAction.key, Values.convert(JsonNode.class, attributeUpdateAction.value));
                                 }
                                 break;
                             case ADD_OR_REPLACE:
                             case REPLACE:
-                                if (valueType.equals(ValueType.ARRAY)) {
-                                    value = value == null ? Values.createArray() : value;
-                                    ArrayValue arrayValue = (ArrayValue) value;
+                                if (isArray) {
+                                    value = value == null ? Values.JSON.createArrayNode() : value;
+                                    ArrayNode arrayValue = (ArrayNode) value;
 
-                                    if (attributeUpdateAction.index != null && arrayValue.length() >= attributeUpdateAction.index) {
-                                        arrayValue.set(attributeUpdateAction.index, attributeUpdateAction.value);
+                                    if (attributeUpdateAction.index != null && arrayValue.size() >= attributeUpdateAction.index) {
+                                        arrayValue.set(attributeUpdateAction.index, Values.convert(JsonNode.class, attributeUpdateAction.value));
                                     } else {
-                                        arrayValue.add(attributeUpdateAction.value);
+                                        arrayValue.add(Values.convert(JsonNode.class, attributeUpdateAction.value));
                                     }
                                 } else {
-                                    value = value == null ? Values.createObject() : value;
+                                    value = value == null ? Values.JSON.createObjectNode() : value;
                                     if (!TextUtil.isNullOrEmpty(attributeUpdateAction.key)) {
-                                        ((ObjectValue) value).put(attributeUpdateAction.key, attributeUpdateAction.value);
+                                        ((ObjectNode) value).put(attributeUpdateAction.key, Values.convert(JsonNode.class, attributeUpdateAction.value));
                                     } else {
-                                        try {
-                                            log(Level.WARNING, "JSON Rule: Rule action missing required 'key': " + JSON.writeValueAsString(attributeUpdateAction));
-                                        } catch (JsonProcessingException ignored) {
-                                        }
+                                        log(Level.WARNING, "JSON Rule: Rule action missing required 'key': " + Values.asJSON(attributeUpdateAction));
                                     }
                                 }
                                 break;
                             case DELETE:
                                 if(value != null) {
-                                    if (valueType.equals(ValueType.ARRAY)) {
-                                        ((ArrayValue) value).remove(attributeUpdateAction.index);
+                                    if (isArray) {
+                                        ((ArrayNode) value).remove(attributeUpdateAction.index);
                                     } else {
-                                        ((ObjectValue) value).remove(attributeUpdateAction.key);
+                                        ((ObjectNode) value).remove(attributeUpdateAction.key);
                                     }
                                 }
                                 break;
                             case CLEAR:
-                                if (valueType.equals(ValueType.ARRAY)) {
-                                    value = Values.createArray();
+                                if (isArray) {
+                                    value = Values.JSON.createArrayNode();
                                 } else {
-                                    value = Values.createObject();
+                                    value = Values.JSON.createObjectNode();
                                 }
                                 break;
                         }
@@ -984,7 +981,7 @@ public class JsonRulesBuilder extends RulesBuilder {
                 sb.append("</td><td>");
                 sb.append(assetState.getAttributeName());
                 sb.append("</td><td>");
-                sb.append(assetState.getValue().map(Value::toString).orElse(""));
+                sb.append(assetState.getValue().map(v -> Values.convert(String.class, v)).orElse(""));
                 sb.append("</td></tr>");
             }));
             sb.append("</table>");
@@ -997,7 +994,7 @@ public class JsonRulesBuilder extends RulesBuilder {
                 sb.append("\t\t");
                 sb.append(assetState.getAttributeName());
                 sb.append("\t\t");
-                sb.append(assetState.getValue().map(Value::toString).orElse(""));
+                sb.append(assetState.getValue().map(v -> Values.convert(String.class, v)).orElse(""));
             }));
         }
 

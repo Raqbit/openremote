@@ -33,9 +33,9 @@ public class AttributeList extends NamedList<Attribute<?>> {
         super(c);
     }
 
-    // This works around the crappy type system
+    // This works around the crappy type system and avoids the need for a  type witness
     public <S> Optional<Attribute<S>> get(AttributeDescriptor<S> attributeDescriptor) {
-        return super.getInternal(attributeDescriptor);
+        return super.get(attributeDescriptor);
     }
 
     public <S> Attribute<S> getOrCreate(AttributeDescriptor<S> attributeDescriptor) {

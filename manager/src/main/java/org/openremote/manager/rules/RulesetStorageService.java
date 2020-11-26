@@ -28,12 +28,12 @@ import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
+import org.openremote.model.attribute.MetaList;
 import org.openremote.model.query.RulesetQuery;
 import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.GlobalRuleset;
 import org.openremote.model.rules.Ruleset;
 import org.openremote.model.rules.TenantRuleset;
-import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
 import java.sql.Connection;
@@ -290,7 +290,7 @@ public class RulesetStorageService implements ContainerService {
         ruleset.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
         ruleset.setCreatedOn(rs.getTimestamp("CREATED_ON"));
         if (rs.getString("META") != null) {
-            ruleset.addMeta(Values.instance().<ObjectValue>parse(rs.getString("META")).orElse(null));
+            ruleset.setMeta(Values.convert(MetaList.class, rs.getString("META")));
         }
         if (query.fullyPopulate) {
             ruleset.setRules(rs.getString("RULES"));

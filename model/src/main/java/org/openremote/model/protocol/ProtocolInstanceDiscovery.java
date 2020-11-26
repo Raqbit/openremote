@@ -24,6 +24,8 @@ import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -34,22 +36,15 @@ import java.util.function.Consumer;
  * Implementations must have a no args constructor (i.e. a factory/provider) so that instances can be created when
  * discovery is requested for the associated {@link org.openremote.model.asset.agent.Protocol}. Implementations are
  * not re-used.
- * <p>
- *
  */
+@FunctionalInterface
 public interface ProtocolInstanceDiscovery {
 
     /**
      * Start the process asynchronously; the implementation can make as many calls as it desires to the
-     * agentConsumer with the found agents; when the implementation has finished then it should
-     * call the stoppedCallback. If for some reason the process cannot be started then this method should
-     * return false and log more details.
+     * agentConsumer with the found agents; when the implementation has finished then the returned future will become
+     * {@link Future#isDone()}. The callee can also cancel the future at any time. If for some reason the process
+     * cannot be started or encounters an error then this method should log more details before completing the future.
      */
-    <T extends Agent> boolean start(Consumer<Agent> agentConsumer, Runnable stoppedCallback);
-
-    /**
-     * Can be called by initiator to stop the process; if the implementation has already stopped then this
-     * method should just return.
-     */
-    void stop();
+    <T extends Agent<?, ?, ?>> Future<Void> startInstanceDiscovery(Consumer<T[]> agentConsumer);
 }

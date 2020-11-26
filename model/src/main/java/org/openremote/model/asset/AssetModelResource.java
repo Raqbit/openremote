@@ -20,7 +20,6 @@
 package org.openremote.model.asset;
 
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
 import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 
@@ -45,8 +44,7 @@ public interface AssetModelResource {
     @GET
     @Path("asset/descriptors")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    AssetDescriptor[] getAssetDescriptors(@BeanParam RequestParams requestParams);
+AssetDescriptor[] getAssetDescriptors(@BeanParam RequestParams requestParams);
 
     /**
      * Retrieve value descriptors {@link ValueDescriptor}.
@@ -55,8 +53,7 @@ public interface AssetModelResource {
     @GET
     @Path("attribute/valueDescriptors")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
+ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
 
     /**
      * Retrieve meta descriptors {@link MetaItemDescriptor} present.
@@ -65,8 +62,7 @@ public interface AssetModelResource {
     @GET
     @Path("metaItem/descriptors")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
+MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
 
 
 //    /**
@@ -76,7 +72,6 @@ public interface AssetModelResource {
 //    @Path("validate/{agentId}")
 //    @Consumes(APPLICATION_JSON)
 //    @Produces(APPLICATION_JSON)
-//    @SuccessStatusCode(200)
 //    //    AttributeValidationResult validateProtocolConfiguration(
 //        @BeanParam RequestParams requestParams,
 //        @PathParam("agentId") String agentId,

@@ -21,7 +21,6 @@ package org.openremote.model.apps;
 
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -37,13 +36,11 @@ public interface ConsoleAppResource {
      */
     @GET
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @RolesAllowed({Constants.READ_APPS_ROLE})
+@RolesAllowed({Constants.READ_APPS_ROLE})
     String[] getInstalledApps(@BeanParam RequestParams requestParams);
 
     @GET
     @Path("config")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    ConsoleAppConfig getAppConfig(@BeanParam RequestParams requestParams);
+ConsoleAppConfig getAppConfig(@BeanParam RequestParams requestParams);
 }

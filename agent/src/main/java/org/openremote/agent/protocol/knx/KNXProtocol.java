@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -49,7 +50,6 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
     protected KNXConnection connection;
     final protected Map<AttributeRef, Datapoint> attributeActionMap = new HashMap<>();
     final protected Map<AttributeRef, StateDP> attributeStatusMap = new HashMap<>();
-    protected Future<Void> assetImportTask;
 
     public KNXProtocol(KNXAgent agent) {
         super(agent);
@@ -195,13 +195,8 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
     }
 
     @Override
-    public boolean startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
-        if (assetImportTask != null) {
-            LOG.info("Asset import already running: " + this);
-            return false;
-        }
-
-        assetImportTask = executorService.submit(() -> {
+    public Future<Void> startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer) {
+        return executorService.submit(() -> {
             ZipInputStream zin = null;
 
             try {
@@ -271,7 +266,7 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
                 assetConsumer.accept(createdAssets.values().stream().map(AssetTreeNode::new).toArray(AssetTreeNode[]::new));
 
             } catch (Exception e) {
-                throw new IllegalStateException("ETS import error", e);
+                LOG.log(Level.WARNING, "ETS import error", e);
             } finally {
                 if (zin != null) {
                     try {
@@ -282,15 +277,6 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
                 }
             }
         }, null);
-        return true;
-    }
-
-    @Override
-    public void stopAssetImport() {
-        if (assetImportTask != null) {
-            assetImportTask.cancel(true);
-        }
-        assetImportTask = null;
     }
 
     protected void createAsset(StateDP datapoint, boolean isStatusGA, Map<String, Asset> createdAssets) {

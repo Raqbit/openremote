@@ -22,6 +22,7 @@ package org.openremote.manager.predicted;
 import org.hibernate.Session;
 import org.hibernate.jdbc.AbstractReturningWork;
 import org.openremote.agent.protocol.ProtocolPredictedAssetService;
+import org.openremote.model.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.container.persistence.PersistenceService;
 import org.openremote.container.timer.TimerService;
@@ -29,6 +30,7 @@ import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.datapoint.DatapointInterval;
 import org.openremote.model.datapoint.ValueDatapoint;
@@ -117,10 +119,9 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
         if (asset == null) {
             throw new IllegalStateException("Asset not found: " + assetId);
         }
-        ValueType attributeValueType = asset.getAttribute(attributeName)
-            .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeName))
-            .getTypeOrThrow()
-            .getValueType();
+
+        Attribute<?> attribute = asset.getAttribute(attributeName)
+            .orElseThrow(() -> new IllegalStateException("Attribute not found: " + attributeName));
 
         LOG.fine("Getting predicted datapoints for: " + attributeName);
 
@@ -129,11 +130,8 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                 @Override
                 public ValueDatapoint[] execute(Connection connection) throws SQLException {
 
-                    StringBuilder query = new StringBuilder();
-                    boolean downsample = (attributeValueType == ValueType.NUMBER || attributeValueType == ValueType.BOOLEAN);
-
-                    String truncateX = null;
-                    String interval = null;
+                    String truncateX;
+                    String interval;
 
                     switch (datapointInterval) {
                         case MINUTE:
@@ -164,6 +162,12 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                             throw new IllegalArgumentException("Can't handle interval: " + datapointInterval);
                     }
 
+                    Class<?> attributeType = attribute.getValueType().getType();
+                    boolean isNumber = Number.class.isAssignableFrom(attributeType);
+                    boolean isBoolean = Boolean.class.isAssignableFrom(attributeType);
+                    StringBuilder query = new StringBuilder();
+                    boolean downsample = isNumber || isBoolean;;
+
                     if (downsample) {
                         // TODO: Change this to use something like this max min decimation algorithm https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019YLKSA2&l=en-GB)
                         query.append("select TS as X, coalesce(AVG_VALUE, null) as Y " +
@@ -175,7 +179,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                             "       select " +
                             "           date_trunc(?, TIMESTAMP)::timestamp as TS, ");
 
-                        if (attributeValueType == ValueType.NUMBER) {
+                        if (isNumber) {
                             query.append(" AVG(VALUE::text::numeric) as AVG_VALUE ");
                         } else {
                             query.append(" AVG(case when VALUE::text::boolean is true then 1 else 0 end) as AVG_VALUE ");
@@ -229,10 +233,10 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                         try (ResultSet rs = st.executeQuery()) {
                             List<ValueDatapoint<?>> result = new ArrayList<>();
                             while (rs.next()) {
-                                Value value = rs.getObject(2) != null ? Values.parseOrNull(rs.getString(2)) : null;
+                                Object value = rs.getObject(2) != null ? Values.convert(attributeType, rs.getString(2)) : null;
                                 result.add(new ValueDatapoint<>(rs.getTimestamp(1).getTime(), value));
                             }
-                            return result.toArray(new ValueDatapoint[result.size()]);
+                            return result.toArray(new ValueDatapoint[0]);
                         }
                     }
                 }

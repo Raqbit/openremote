@@ -41,7 +41,6 @@ import org.openremote.model.query.filter.ObjectValueKeyPredicate;
 import org.openremote.model.query.filter.RadialGeofencePredicate;
 import org.openremote.model.rules.geofence.GeofenceDefinition;
 import org.openremote.model.syslog.SyslogCategory;
-import org.openremote.model.value.ObjectValue;
 import org.openremote.model.value.Values;
 
 import java.util.*;

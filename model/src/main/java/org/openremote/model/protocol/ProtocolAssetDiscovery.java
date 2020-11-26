@@ -25,6 +25,7 @@ import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -34,20 +35,17 @@ import java.util.function.Consumer;
  * a hierarchical representation using {@link AssetTreeNode}s.
  * <p>
  * {@link Protocol}s that support {@link Asset} discovery must implement this interface.
+ * <p>
+ * It is the caller's responsibility to ensure that only a single discovery request occurs at a given time.
  */
+@FunctionalInterface
 public interface ProtocolAssetDiscovery {
 
     /**
      * Start the process asynchronously; the implementation can make as many calls as it desires to the
-     * assetConsumer with the found assets; when the implementation has finished then it should
-     * call the stoppedCallback. If for some reason the process cannot be started then this method should
-     * return false and log more details.
+     * assetConsumer with the found assets; when the implementation has finished then the returned future will become
+     * {@link Future#isDone()}. The callee can also cancel the future at any time. If for some reason the process
+     * cannot be started or encounters an error then this method should log more details before completing the future.
      */
-    boolean startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback);
-
-    /**
-     * Can be called by initiator to stop the process; if the implementation has already stopped then this
-     * method should just return.
-     */
-    void stopAssetDiscovery();
+    Future<Void> startAssetDiscovery(Consumer<AssetTreeNode[]> assetConsumer);
 }

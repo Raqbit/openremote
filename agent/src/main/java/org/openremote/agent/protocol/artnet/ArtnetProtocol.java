@@ -13,6 +13,7 @@ import org.openremote.model.protocol.ProtocolAssetImport;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,7 +23,6 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
     public static final String PROTOCOL_DISPLAY_NAME = "Artnet";
     protected final Map<AttributeRef, Consumer<ArtnetPacket>> protocolMessageConsumers = new HashMap<>();
     protected final Map<String, ArtnetLightAsset> lights = new HashMap<>();
-    protected Future<Void> assetImportTask;
 
     public ArtnetProtocol(ArtnetAgent agent) {
         super(agent);
@@ -190,11 +190,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
     }
 
     @Override
-    public boolean startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
-        if (assetImportTask != null) {
-            LOG.info("Asset import already running: " + this);
-            return false;
-        }
+    public Future<Void> startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer) {
 
 //        assetImportTask = executorService.submit(() -> {
 //
@@ -205,15 +201,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //            syncLightsToMemory(newLights);
 //            assetConsumer.accept(syncLightsToAssets(newLights, protocolConfiguration));
 //        }, null);
-        return true;
-    }
-
-    @Override
-    public void stopAssetImport() {
-        if (assetImportTask != null) {
-            assetImportTask.cancel(true);
-        }
-        assetImportTask = null;
+        return CompletableFuture.completedFuture(null);
     }
 
 //    private List<ArtnetLight> parseArtnetLightsFromImport(JsonNode jsonNode) {

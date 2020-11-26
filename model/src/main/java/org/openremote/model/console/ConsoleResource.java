@@ -22,8 +22,6 @@ package org.openremote.model.console;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
-
 import javax.ws.rs.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -45,8 +43,7 @@ public interface ConsoleResource {
      */
     @POST
     @Path("register")
-    @SuccessStatusCode(200)
-    @Consumes(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     ConsoleRegistration register(@BeanParam RequestParams requestParams, ConsoleRegistration consoleRegistration);
 }

@@ -448,6 +448,25 @@ public class Asset implements IdentifiableEntity {
         return this;
     }
 
+    public <T> Optional<Attribute<T>> getAttribute(AttributeDescriptor<T> descriptor) {
+        return getAttributes().get(descriptor);
+    }
+
+    public Optional<Attribute<?>> getAttribute(String attributeName) {
+        return getAttributes().get(attributeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <U> Optional<Attribute<U>> getAttribute(String attributeName, Class<U> valueType) {
+        return getAttributes().get(attributeName).map(attribute -> {
+            if (attribute.getValueType().getType() == valueType) {
+                return (Attribute<U>)attribute;
+            } else {
+                return null;
+            }
+        });
+    }
+
     public Optional<GeoJSONPoint> getLocation() {
         return getAttributes().getValue(LOCATION);
     }

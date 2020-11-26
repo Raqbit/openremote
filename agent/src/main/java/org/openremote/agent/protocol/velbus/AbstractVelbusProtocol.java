@@ -55,7 +55,6 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
     public static final int DEFAULT_TIME_INJECTION_INTERVAL_SECONDS = 3600 * 6;
     public static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, AbstractVelbusProtocol.class);
     protected VelbusNetwork network;
-    protected Future<Void> assetImportTask;
     protected final Map<AttributeRef, Consumer<Object>> attributePropertyValueConsumers = new HashMap<>();
 
     protected AbstractVelbusProtocol(T agent) {
@@ -149,13 +148,9 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
     /* ProtocolAssetImport */
 
     @Override
-    public boolean startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer, Runnable stoppedCallback) {
-        if (assetImportTask != null) {
-            LOG.info("Asset import already running: " + this);
-            return false;
-        }
+    public Future<Void> startAssetImport(byte[] fileData, Consumer<AssetTreeNode[]> assetConsumer) {
 
-        assetImportTask = executorService.submit(() -> {
+        return executorService.submit(() -> {
             Document xmlDoc;
             try {
                 String xmlStr = new String(fileData);
@@ -166,8 +161,6 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
                     .newDocumentBuilder()
                     .parse(new InputSource(new StringReader(xmlStr)));
             } catch (Exception e) {
-                stoppedCallback.run();
-
                 LOG.log(Level.WARNING, "Failed to convert VELBUS project file into XML", e);
                 return;
             }
@@ -242,15 +235,5 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
 
             assetConsumer.accept(devices.stream().map(AssetTreeNode::new).toArray(AssetTreeNode[]::new));
         }, null);
-
-        return true;
-    }
-
-    @Override
-    public void stopAssetImport() {
-        if (assetImportTask != null) {
-            assetImportTask.cancel(true);
-        }
-        assetImportTask = null;
     }
 }

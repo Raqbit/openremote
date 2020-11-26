@@ -28,6 +28,7 @@ import org.openremote.manager.asset.AssetProcessingException;
 import org.openremote.manager.asset.AssetProcessingService;
 import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.asset.AssetUpdateProcessor;
+import org.openremote.manager.concurrent.ManagerExecutorService;
 import org.openremote.manager.event.ClientEventService;
 import org.openremote.manager.gateway.GatewayService;
 import org.openremote.manager.security.ManagerIdentityService;
@@ -35,6 +36,7 @@ import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.Container;
 import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
@@ -43,6 +45,9 @@ import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeEvent.Source;
 import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.attribute.AttributeState;
+import org.openremote.model.protocol.ProtocolAssetDiscovery;
+import org.openremote.model.protocol.ProtocolAssetImport;
+import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.query.LogicGroup;
 import org.openremote.model.query.filter.*;
@@ -51,7 +56,9 @@ import org.openremote.model.util.TextUtil;
 import org.openremote.model.value.MetaItemType;
 
 import javax.persistence.EntityManager;
+import javax.ws.rs.NotSupportedException;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -87,7 +94,9 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     protected MessageBrokerService messageBrokerService;
     protected ClientEventService clientEventService;
     protected GatewayService gatewayService;
-    protected Map<String, Agent> agentMap = new HashMap<>();
+    protected ManagerExecutorService executorService;
+    protected Map<String, Agent<?, ?, ?>> agentMap = new HashMap<>();
+    protected final Map<String, Future<Void>> agentDiscoveryImportFutureMap = new HashMap<>();
     protected final Map<String, Protocol<?>> protocolInstanceMap = new HashMap<>();
     protected final Map<String, List<Consumer<PersistenceEvent<Asset>>>> childAssetSubscriptions = new HashMap<>();
     protected boolean initDone;
@@ -108,6 +117,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         messageBrokerService = container.getService(MessageBrokerService.class);
         clientEventService = container.getService(ClientEventService.class);
         gatewayService = container.getService(GatewayService.class);
+        executorService = container.getService(ManagerExecutorService.class);
 
         if (initDone) {
             return;
@@ -130,7 +140,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
 
         // Load all enabled agents and instantiate a protocol instance for each
         LOG.fine("Loading agents...");
-        Collection<Agent> agents = getAgents().values();
+        Collection<Agent<?, ?, ?>> agents = getAgents().values();
         LOG.fine("Found enabled agent count = " + agents.size());
 
         agents.forEach(this::startAgent);
@@ -153,7 +163,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 PersistenceEvent<Asset> persistenceEvent = (PersistenceEvent<Asset>)exchange.getIn().getBody(PersistenceEvent.class);
                 Asset asset = persistenceEvent.getEntity();
                 if (isPersistenceEventForAssetType(Agent.class).matches(exchange)) {
-                    processAgentChange((Agent)asset, persistenceEvent);
+                    processAgentChange((Agent<?, ?, ?>)asset, persistenceEvent);
                 } else {
                     processAssetChange(asset, persistenceEvent);
                 }
@@ -559,7 +569,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         return withLockReturning(getClass().getSimpleName() + "::removeAgent", () -> getAgents().remove(agent.getId()) != null);
     }
 
-    public Map<String, Agent> getAgents() {
+    public Map<String, Agent<?, ?, ?>> getAgents() {
         return withLockReturning(getClass().getSimpleName() + "::getAgents", () -> {
             if (agentMap == null) {
                 agentMap = assetStorageService.findAll(
@@ -624,5 +634,116 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 }
                 return consumerList;
             }));
+    }
+
+    public boolean isProtocolAssetDiscoveryOrImportRunning(String agentId) {
+        return agentDiscoveryImportFutureMap.containsKey(agentId);
+    }
+
+    public Future<Void> doProtocolInstanceDiscovery(String parentId, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProviderClass, Consumer<Agent<?,?,?>[]> onDiscovered) {
+
+        LOG.fine("Initiating protocol instance discovery: Provider = " + instanceDiscoveryProviderClass);
+
+        Runnable task = () -> {
+            if (parentId != null && gatewayService.getLocallyRegisteredGatewayId(parentId, null) != null) {
+                // TODO: Implement gateway instance discovery using client event bus
+                return;
+            }
+
+            try {
+                ProtocolInstanceDiscovery instanceDiscovery = instanceDiscoveryProviderClass.newInstance();
+                Future<Void> discoveryFuture = instanceDiscovery.startInstanceDiscovery(onDiscovered);
+                discoveryFuture.get();
+            } catch (InterruptedException e) {
+                LOG.info("Protocol instance discovery was cancelled");
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to do protocol instance discovery: Provider = " + instanceDiscoveryProviderClass, e);
+            } finally {
+                LOG.fine("Finished protocol instance discovery: Provider = " + instanceDiscoveryProviderClass);
+            }
+        };
+
+        return executorService.submit(task, null);
+    }
+
+    public Future<Void> doProtocolAssetDiscovery(Agent<?, ?, ?> agent, Consumer<AssetTreeNode[]> onDiscovered) throws RuntimeException {
+
+        if (!(agent instanceof ProtocolAssetDiscovery)) {
+            throw new NotSupportedException("Agent protocol doesn't support asset discovery");
+        }
+
+        LOG.fine("Initiating protocol asset discovery: Agent = " + agent);
+
+        synchronized (agentDiscoveryImportFutureMap) {
+            okToContinueWithImportOrDiscovery(agent.getId());
+
+            Runnable task = () -> {
+                try {
+                    if (gatewayService.getLocallyRegisteredGatewayId(agent.getId(), null) != null) {
+                        // TODO: Implement gateway instance discovery using client event bus
+                        return;
+                    }
+
+                    ProtocolAssetDiscovery assetDiscovery = (ProtocolAssetDiscovery) agent;
+                    Future<Void> discoveryFuture = assetDiscovery.startAssetDiscovery(onDiscovered);
+                    discoveryFuture.get();
+                } catch (InterruptedException e) {
+                    LOG.info("Protocol asset discovery was cancelled");
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Failed to do protocol asset discovery: Agent = " + agent, e);
+                } finally {
+                    LOG.fine("Finished protocol asset discovery: Agent = " + agent);
+                    agentDiscoveryImportFutureMap.remove(agent.getId());
+                }
+            };
+
+            Future<Void> future = executorService.submit(task, null);
+            agentDiscoveryImportFutureMap.put(agent.getId(), future);
+            return future;
+        }
+    }
+
+    public Future<Void> doProtocolAssetImport(Agent<?, ?, ?> agent, byte[] fileData, Consumer<AssetTreeNode[]> onDiscovered) throws RuntimeException {
+
+        if (!(agent instanceof ProtocolAssetImport)) {
+            throw new NotSupportedException("Agent protocol doesn't support asset import");
+        }
+
+        LOG.fine("Initiating protocol asset import: Agent = " + agent);
+        synchronized (agentDiscoveryImportFutureMap) {
+            okToContinueWithImportOrDiscovery(agent.getId());
+
+            Runnable task = () -> {
+                try {
+                    if (gatewayService.getLocallyRegisteredGatewayId(agent.getId(), null) != null) {
+                        // TODO: Implement gateway instance discovery using client event bus
+                        return;
+                    }
+
+                    ProtocolAssetImport assetImport = (ProtocolAssetImport) agent;
+                    Future<Void> discoveryFuture = assetImport.startAssetImport(fileData, onDiscovered);
+                    discoveryFuture.get();
+                } catch (InterruptedException e) {
+                    LOG.info("Protocol asset import was cancelled");
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Failed to do protocol asset import: Agent = " + agent, e);
+                } finally {
+                    LOG.fine("Finished protocol asset import: Agent = " + agent);
+                    agentDiscoveryImportFutureMap.remove(agent.getId());
+                }
+            };
+
+            Future<Void> future = executorService.submit(task, null);
+            agentDiscoveryImportFutureMap.put(agent.getId(), future);
+            return future;
+        }
+    }
+
+    protected void okToContinueWithImportOrDiscovery(String agentId) {
+        if (agentDiscoveryImportFutureMap.containsKey(agentId)) {
+            String msg = "Protocol asset discovery or import already running for requested agent: " + agentId;
+            LOG.info(msg);
+            throw new IllegalStateException(msg);
+        }
     }
 }

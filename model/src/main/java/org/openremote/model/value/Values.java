@@ -366,6 +366,9 @@ public class Values {
     }
 
     public static <T> T convert(Class<T> targetType, Object object) {
+        if (object == null) {
+            return null;
+        }
         Map<String, Object> props = JSON.convertValue(object, Map.class);
         return JSON.convertValue(props, targetType);
     }

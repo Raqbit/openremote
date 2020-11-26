@@ -21,8 +21,6 @@ package org.openremote.model.security;
 
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
-
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -39,47 +37,40 @@ public interface UserResource {
     @GET
     @Produces(APPLICATION_JSON)
     @Path("{realm}")
-    @SuccessStatusCode(200)
-    User[] getAll(@BeanParam RequestParams requestParams, @PathParam("realm") String realm);
+User[] getAll(@BeanParam RequestParams requestParams, @PathParam("realm") String realm);
 
     @GET
     @Path("{realm}/{userId}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    User get(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId);
+User get(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId);
 
     @GET
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    User getCurrent(@BeanParam RequestParams requestParams);
+User getCurrent(@BeanParam RequestParams requestParams);
 
     @PUT
     @Path("{realm}/{userId}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void update(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId, @Valid User user);
 
     @POST
     @Path("{realm}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void create(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @Valid User user);
 
     @DELETE
     @Path("{realm}/{userId}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void delete(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId);
 
     @PUT
     @Path("{realm}/{userId}/reset-password")
-    @SuccessStatusCode(204)
-    @Consumes(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void resetPassword(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId, Credential credential);
@@ -87,19 +78,16 @@ public interface UserResource {
     @GET
     @Path("{realm}/{userId}/role")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Role[] getRoles(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId);
+Role[] getRoles(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId);
 
     @GET
     @Path("role")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Role[] getCurrentUserRoles(@BeanParam RequestParams requestParams);
+Role[] getCurrentUserRoles(@BeanParam RequestParams requestParams);
 
     @PUT
     @Path("{realm}/role/{userId}")
     @Consumes(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void updateRoles(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @PathParam("userId") String userId, Role[] roles);
 }

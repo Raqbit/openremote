@@ -21,7 +21,6 @@ package org.openremote.model.security;
 
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
@@ -41,8 +40,7 @@ public interface TenantResource {
 
     @GET
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    @RolesAllowed(Constants.READ_LOGS_ROLE)
+@RolesAllowed(Constants.READ_LOGS_ROLE)
     Tenant[] getAll(@BeanParam RequestParams requestParams);
 
     /**
@@ -51,28 +49,24 @@ public interface TenantResource {
     @GET
     @Path("{realm}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Tenant get(@BeanParam RequestParams requestParams, @PathParam("realm") String realm);
+Tenant get(@BeanParam RequestParams requestParams, @PathParam("realm") String realm);
 
     @PUT
     @Path("{realm}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void update(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @Valid Tenant tenant);
 
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void create(@BeanParam RequestParams requestParams, @Valid Tenant tenant);
 
     @DELETE
     @Path("{realm}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(204)
-    @RolesAllowed(Constants.WRITE_ADMIN_ROLE)
+@RolesAllowed(Constants.WRITE_ADMIN_ROLE)
     void delete(@BeanParam RequestParams requestParams, @PathParam("realm") String realm);
 }

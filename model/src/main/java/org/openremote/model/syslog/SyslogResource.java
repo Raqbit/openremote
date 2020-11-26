@@ -21,8 +21,6 @@ package org.openremote.model.syslog;
 
 import org.openremote.model.Constants;
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
-
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -43,21 +41,18 @@ public interface SyslogResource {
 
     @DELETE
     @Path("event")
-    @SuccessStatusCode(204)
-    @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
+@RolesAllowed({Constants.WRITE_ADMIN_ROLE})
     void clearEvents(@BeanParam RequestParams requestParams);
 
     @GET
     @Path("config")
-    @SuccessStatusCode(200)
-    @Consumes(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
     @RolesAllowed({Constants.READ_ADMIN_ROLE})
     SyslogConfig getConfig(@BeanParam RequestParams requestParams);
 
     @PUT
     @Path("config")
-    @SuccessStatusCode(204)
-    @Consumes(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
     void updateConfig(@BeanParam RequestParams requestParams, @Valid SyslogConfig config);
 }

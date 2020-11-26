@@ -24,6 +24,7 @@ import org.jeasy.rules.api.Rule;
 import org.jeasy.rules.api.RuleListener;
 import org.openremote.container.timer.TimerService;
 import org.openremote.manager.asset.AssetStorageService;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeExecuteStatus;
 import org.openremote.model.query.AssetQuery;
@@ -32,8 +33,6 @@ import org.openremote.model.rules.AssetState;
 import org.openremote.model.rules.Assets;
 import org.openremote.model.rules.TemporaryFact;
 import org.openremote.model.util.TimeUtil;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
 
 import java.time.Duration;
 import java.util.*;
@@ -44,7 +43,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.openremote.model.attribute.AttributeType.LOCATION;
 import static org.openremote.model.query.filter.LocationAttributePredicate.getLocationPredicates;
 
 public class RulesFacts extends Facts implements RuleListener {
@@ -458,28 +456,12 @@ public class RulesFacts extends Facts implements RuleListener {
                 .filter(fact -> matchFact(fact, AssetState.class, p).isPresent());
     }
 
-    public RulesFacts updateAssetState(String assetId, String attributeName, Value value) {
+    public RulesFacts updateAssetState(String assetId, String attributeName, Object value) {
         return invalidateAssetStateAndDispatch(assetId, attributeName, value);
     }
 
     public RulesFacts updateAssetState(String assetId, String attributeName) {
         return invalidateAssetStateAndDispatch(assetId, attributeName, null);
-    }
-
-    public RulesFacts updateAssetState(String assetId, String attributeName, String value) {
-        return updateAssetState(assetId, attributeName, value);
-    }
-
-    public RulesFacts updateAssetState(String assetId, String attributeName, double value) {
-        return updateAssetState(assetId, attributeName, value);
-    }
-
-    public RulesFacts updateAssetState(String assetId, String attributeName, boolean value) {
-        return updateAssetState(assetId, attributeName, value);
-    }
-
-    public RulesFacts updateAssetState(String assetId, String attributeName, AttributeExecuteStatus status) {
-        return updateAssetState(assetId, attributeName, status.asValue());
     }
 
     public void removeExpiredTemporaryFacts() {
@@ -590,7 +572,7 @@ public class RulesFacts extends Facts implements RuleListener {
                 keyExtractor = assetState -> Long.toString(assetState.getCreatedOn().getTime());
                 break;
             case ASSET_TYPE:
-                keyExtractor = AssetState::getTypeString;
+                keyExtractor = AssetState::getType;
                 break;
             case PARENT_ID:
                 keyExtractor = AssetState::getParentId;
@@ -609,7 +591,7 @@ public class RulesFacts extends Facts implements RuleListener {
         return comparator;
     }
 
-    protected RulesFacts invalidateAssetStateAndDispatch(String assetId, String attributeName, Value value) {
+    protected RulesFacts invalidateAssetStateAndDispatch(String assetId, String attributeName, Object value) {
         // Remove the asset state from the facts, it is invalid now
         getAssetStates()
                 .removeIf(assetState -> {
@@ -647,7 +629,7 @@ public class RulesFacts extends Facts implements RuleListener {
             // Collect asset states only where the attribute is location (location predicates only make sense when the location
             // attribute is exposed to rules - we don't support RULE_EVENT facts just RULE_STATE
             if (assetStateLocationPredicateMap == null) {
-                Collection<AssetState> locationAssetStates = getAssetStates().stream().filter(assetState -> assetState.getAttributeName().equalsIgnoreCase(LOCATION.getAttributeName())).collect(Collectors.toSet());
+                Collection<AssetState> locationAssetStates = getAssetStates().stream().filter(assetState -> assetState.getAttributeName().equalsIgnoreCase(Asset.LOCATION.getName())).collect(Collectors.toSet());
                 assetStateLocationPredicateMap = new HashMap<>(locationAssetStates.size());
                 locationAssetStates.forEach(assetState -> assetStateLocationPredicateMap.put(assetState.getId(), new HashSet<>()));
             }

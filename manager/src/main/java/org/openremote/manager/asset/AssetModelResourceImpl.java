@@ -25,9 +25,6 @@ import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelResource;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.attribute.AttributeDescriptor;
-import org.openremote.model.attribute.AttributeValueDescriptor;
-import org.openremote.model.attribute.MetaItemDescriptor;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.util.AssetModelUtil;
 

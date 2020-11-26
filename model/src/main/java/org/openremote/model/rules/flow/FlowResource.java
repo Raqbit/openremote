@@ -1,8 +1,6 @@
 package org.openremote.model.rules.flow;
 
 import org.openremote.model.http.RequestParams;
-import org.openremote.model.http.SuccessStatusCode;
-
 import javax.ws.rs.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -11,18 +9,15 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public interface FlowResource {
     @GET
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Node[] getAllNodeDefinitions(@BeanParam RequestParams requestParams);
+Node[] getAllNodeDefinitions(@BeanParam RequestParams requestParams);
 
     @GET
     @Path("{type}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Node[] getAllNodeDefinitionsByType(@BeanParam RequestParams requestParams, @PathParam("type") NodeType type);
+Node[] getAllNodeDefinitionsByType(@BeanParam RequestParams requestParams, @PathParam("type") NodeType type);
 
     @GET
     @Path("{name}")
     @Produces(APPLICATION_JSON)
-    @SuccessStatusCode(200)
-    Node getNodeDefinition(@BeanParam RequestParams requestParams, @PathParam("name") String name);
+Node getNodeDefinition(@BeanParam RequestParams requestParams, @PathParam("name") String name);
 }

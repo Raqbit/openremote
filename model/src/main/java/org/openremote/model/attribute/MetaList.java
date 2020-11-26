@@ -35,7 +35,7 @@ public class MetaList extends NamedList<MetaItem<?>> {
 
     // This works around the crappy type system
     public <S> Optional<MetaItem<S>> get(MetaItemDescriptor<S> metaDescriptor) {
-        return super.getInternal(metaDescriptor);
+        return super.get(metaDescriptor);
     }
 
     public <S> MetaItem<S> getOrCreate(MetaItemDescriptor<S> metaDescriptor) {
