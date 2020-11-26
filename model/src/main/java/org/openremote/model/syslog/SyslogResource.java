@@ -45,7 +45,6 @@ public interface SyslogResource {
     @Path("event")
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void clearEvents(@BeanParam RequestParams requestParams);
 
     @GET
@@ -53,7 +52,6 @@ public interface SyslogResource {
     @SuccessStatusCode(200)
     @Consumes(APPLICATION_JSON)
     @RolesAllowed({Constants.READ_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     SyslogConfig getConfig(@BeanParam RequestParams requestParams);
 
     @PUT
@@ -61,6 +59,5 @@ public interface SyslogResource {
     @SuccessStatusCode(204)
     @Consumes(APPLICATION_JSON)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void updateConfig(@BeanParam RequestParams requestParams, @Valid SyslogConfig config);
 }

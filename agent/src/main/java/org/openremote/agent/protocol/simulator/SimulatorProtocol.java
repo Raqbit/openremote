@@ -45,7 +45,7 @@ import static org.openremote.container.concurrent.GlobalLock.withLock;
 import static org.openremote.container.concurrent.GlobalLock.withLockReturning;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
-public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent> {
+public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent, SimulatorAgent.SimulatorAgentLink> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, SimulatorProtocol.class);
     public static final String PROTOCOL_DISPLAY_NAME = "Simulator";
@@ -76,10 +76,10 @@ public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, SimulatorAgent.SimulatorAgentLink agentLink) {
 
         // Look for replay data
-        attribute.getMetaValue(SimulatorAgent.SIMULATOR_REPLAY_DATA)
+        agentLink.getSimulatorReplayData()
             .ifPresent(simulatorReplayDatapoints -> {
                 LOG.info("Simulator replay data found for linked attribute: " + attribute);
                 AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
@@ -94,7 +94,7 @@ public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent> {
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, SimulatorAgent.SimulatorAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         ScheduledFuture<?> updateValueFuture = replayMap.remove(attributeRef);
 
@@ -104,7 +104,7 @@ public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent> {
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, SimulatorAgent.SimulatorAgentLink agentLink, AttributeEvent event, Object processedValue) {
         if (replayMap.containsKey(event.getAttributeRef())) {
             LOG.info("Attempt to write to linked attribute that is configured for value replay so ignoring: " + attribute);
             return;

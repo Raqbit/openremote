@@ -20,6 +20,7 @@
 package org.openremote.model.query.filter;
 
 import org.openremote.model.value.AbstractNameValueHolder;
+import org.openremote.model.value.NameHolder;
 
 /**
  * There is an implicit AND condition between the name and the value; the name is required and {@link #mustExist} or
@@ -39,6 +40,10 @@ public class NameValuePredicate {
 
     public NameValuePredicate(String name) {
         this(new StringPredicate(name));
+    }
+
+    public NameValuePredicate(NameHolder nameHolder) {
+        this(nameHolder.getName());
     }
 
     public NameValuePredicate(StringPredicate name) {

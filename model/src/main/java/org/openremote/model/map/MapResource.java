@@ -35,7 +35,6 @@ public interface MapResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     ObjectNode getSettings(@BeanParam RequestParams requestParams);
 
     /**
@@ -45,7 +44,6 @@ public interface MapResource {
     @Path("js")
     @Produces(MediaType.APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     ObjectNode getSettingsJs(@BeanParam RequestParams requestParams);
 
     /**
@@ -54,6 +52,5 @@ public interface MapResource {
     @GET
     @Produces("application/vnd.mapbox-vector-tile")
     @Path("tile/{zoom}/{column}/{row}")
-    @SuppressWarnings("unusable-by-js")
     byte[] getTile(@PathParam("zoom")int zoom, @PathParam("column")int column, @PathParam("row")int row);
 }

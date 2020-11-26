@@ -21,18 +21,32 @@ package org.openremote.agent.protocol.timer;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class TimerAgent extends Agent {
+public class TimerAgent extends Agent<TimerAgent, TimerProtocol, TimerAgent.TimerAgentLink> {
 
-    public static final ValueDescriptor<TimerValue> TIMER_VALUE_DESCRIPTOR = new ValueDescriptor<>("Timer value", TimerValue.class);
+    public static class TimerAgentLink extends AgentLink {
+
+        protected TimerValue timerValue;
+
+        public TimerAgentLink(String id) {
+            super(id);
+        }
+
+        public Optional<TimerValue> getTimerValue() {
+            return Optional.ofNullable(timerValue);
+        }
+
+        public void setTimerValue(TimerValue timerValue) {
+            this.timerValue = timerValue;
+        }
+    }
 
     public static final ValueDescriptor<CronExpressionParser> TIMER_CRON_EXPRESSION_DESCRIPTOR = new ValueDescriptor<>("Timer cron expression", CronExpressionParser.class);
 
@@ -42,14 +56,12 @@ public class TimerAgent extends Agent {
 
     public static final AttributeDescriptor<Boolean> TIMER_ACTIVE = new AttributeDescriptor<>("timerActive", ValueType.BOOLEAN);
 
-    public static final MetaItemDescriptor<TimerValue> META_TIMER_VALUE = new MetaItemDescriptor<>("timerValue", TIMER_VALUE_DESCRIPTOR);
+    public static final AgentDescriptor<TimerAgent, TimerProtocol, TimerAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        TimerAgent.class, TimerProtocol.class, TimerAgentLink.class
+    );
 
     public TimerAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends TimerAgent, S extends Protocol<T>> TimerAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override

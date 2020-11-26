@@ -114,7 +114,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * </pre></blockquote>
  * Actual body used for the request = "{myObject: {prop1: true, prop2: "test", prop3: {prop4: 1234.4223}}}"
  */
-public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
+public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent, HttpClientAgentLink> {
 
     public static class HttpClientRequest {
 
@@ -358,18 +358,18 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, HttpClientAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
-        String method = attribute.getMetaValue(META_REQUEST_METHOD).map(Enum::name).orElse(DEFAULT_HTTP_METHOD);
-        String path = attribute.getMetaValue(META_REQUEST_PATH).orElse(null);
-        String contentType = attribute.getMetaValue(META_REQUEST_CONTENT_TYPE).orElse(null);
+        String method = agentLink.getMethod().map(Enum::name).orElse(DEFAULT_HTTP_METHOD);
+        String path = agentLink.getPath().orElse(null);
+        String contentType = agentLink.getContentType().orElse(null);
 
-        ValueType.MultivaluedStringMap headers = attribute.getMetaValue(META_REQUEST_HEADERS).orElse(null);
-        ValueType.MultivaluedStringMap queryParams = attribute.getMetaValue(META_REQUEST_QUERY_PARAMETERS).orElse(null);
-        Integer pollingMillis = attribute.getMetaValue(META_REQUEST_POLLING_MILLIS).map(millis -> Math.max(millis, MIN_POLLING_MILLIS)).orElse(null);
-        boolean pagingEnabled = attribute.getMetaValue(META_REQUEST_PAGING_MODE).orElse(false);
-        String pollingAttribute = attribute.getMetaValue(META_POLLING_ATTRIBUTE).orElse(null);
+        ValueType.MultivaluedStringMap headers = agentLink.getHeaders().orElse(null);
+        ValueType.MultivaluedStringMap queryParams = agentLink.getQueryParameters().orElse(null);
+        Integer pollingMillis = agentLink.getPollingMillis().map(millis -> Math.max(millis, MIN_POLLING_MILLIS)).orElse(null);
+        boolean pagingEnabled = agentLink.getPagingMode().orElse(false);
+        String pollingAttribute = agentLink.getPollingAttribute().orElse(null);
 
         if (!TextUtil.isNullOrEmpty(pollingAttribute)) {
             synchronized (pollingLinkedAttributeMap) {
@@ -385,13 +385,13 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
             }
         }
 
-        String body = attribute.getMetaValue(IoAgent.META_WRITE_VALUE).orElse(null);
+        String body = agentLink.getWriteValue().orElse(null);
 
         addHttpClientRequest(
             attributeRef,
             path,
             method,
-
+            body,
             headers,
             queryParams,
             pagingEnabled,
@@ -400,12 +400,12 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, HttpClientAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         requestMap.remove(attributeRef);
         cancelPolling(attributeRef);
 
-        attribute.getMetaValue(META_POLLING_ATTRIBUTE).ifPresent(pollingAttribute -> {
+        agentLink.getPollingMillis().ifPresent(pollingAttribute -> {
             synchronized (pollingLinkedAttributeMap) {
                 pollingLinkedAttributeMap.remove(attributeRef);
                 pollingLinkedAttributeMap.values().forEach(links -> links.remove(attributeRef));
@@ -414,7 +414,7 @@ public class HttpClientProtocol extends AbstractProtocol<HttpClientAgent> {
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, HttpClientAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         HttpClientRequest request = requestMap.get(event.getAttributeRef());
 

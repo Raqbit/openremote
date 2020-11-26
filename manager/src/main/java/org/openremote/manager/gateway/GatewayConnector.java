@@ -25,6 +25,7 @@ import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.concurrent.ManagerExecutorService;
 import org.openremote.model.asset.*;
 import org.openremote.model.asset.agent.ConnectionStatus;
+import org.openremote.model.asset.impl.GatewayAsset;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.event.shared.EventRequestResponseWrapper;
 import org.openremote.model.event.shared.SharedEvent;
@@ -32,7 +33,6 @@ import org.openremote.model.gateway.GatewayDisconnectEvent;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.Pair;
-import org.openremote.model.value.Values;
 
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
@@ -51,7 +51,7 @@ import static org.openremote.model.query.AssetQuery.Select.selectExcludeAll;
 import static org.openremote.model.syslog.SyslogCategory.GATEWAY;
 
 /**
- * Handles all communication between a gateway representation in the local manager and the actual gateway
+ * Handles all communication between a gateway and the local manager
  */
 public class GatewayConnector {
 
@@ -80,7 +80,7 @@ public class GatewayConnector {
     List<String> syncAssetIds;
     int syncIndex;
     int syncErrors;
-    Asset gateway;
+    GatewayAsset gateway;
     String expectedSyncResponseName;
 
     protected static List<Integer> ALPHA_NUMERIC_CHARACTERS = new ArrayList<>(62);
@@ -125,12 +125,12 @@ public class GatewayConnector {
         AssetStorageService assetStorageService,
         AssetProcessingService assetProcessingService,
         ManagerExecutorService executorService,
-        Asset gateway) {
+        GatewayAsset gateway) {
 
         this.assetStorageService = assetStorageService;
         this.assetProcessingService = assetProcessingService;
         this.executorService = executorService;
-        boolean disabled = gateway.getAttribute("disabled").flatMap(Attribute::getValueAsBoolean).orElse(false);
+        boolean disabled = gateway.getDisabled().orElse(false);
         this.realm = gateway.getRealm();
         this.gatewayId = gateway.getId();
         this.disabled = disabled;
@@ -159,7 +159,7 @@ public class GatewayConnector {
         initialSyncInProgress = true;
 
         LOG.info("Gateway connector starting: Gateway ID=" + gatewayId);
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, "status", Values.create(ConnectionStatus.CONNECTING.name())), AttributeEvent.Source.GATEWAY);
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, GatewayAsset.STATUS, ConnectionStatus.CONNECTING), AttributeEvent.Source.GATEWAY);
 
         // Reinitialise state
         syncProcessorFuture = null;
@@ -194,7 +194,7 @@ public class GatewayConnector {
         }
 
         disconnectRunnable.run();
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, "status", Values.create(ConnectionStatus.DISCONNECTED.name())), AttributeEvent.Source.GATEWAY);
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, GatewayAsset.STATUS, ConnectionStatus.DISCONNECTED), AttributeEvent.Source.GATEWAY);
     }
 
     public boolean isConnected() {
@@ -229,10 +229,10 @@ public class GatewayConnector {
                 disconnect();
             }
             LOG.info("Gateway connector disabled: Gateway ID=" + gatewayId);
-            assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, "status", Values.create(ConnectionStatus.DISABLED.name())), AttributeEvent.Source.GATEWAY);
+            assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, GatewayAsset.STATUS, ConnectionStatus.DISABLED), AttributeEvent.Source.GATEWAY);
         } else {
             LOG.info("Gateway connector enabled: Gateway ID=" + gatewayId);
-            assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, "status", Values.create(ConnectionStatus.DISCONNECTED.name())), AttributeEvent.Source.GATEWAY);
+            assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, GatewayAsset.STATUS, ConnectionStatus.DISCONNECTED), AttributeEvent.Source.GATEWAY);
         }
     }
 
@@ -496,7 +496,7 @@ public class GatewayConnector {
         initialSyncInProgress = false;
         cachedAssetEvents.clear();
         cachedAttributeEvents.clear();
-        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, "status", Values.create(ConnectionStatus.CONNECTED.name())), AttributeEvent.Source.GATEWAY);
+        assetProcessingService.sendAttributeEvent(new AttributeEvent(gatewayId, GatewayAsset.STATUS, ConnectionStatus.CONNECTED), AttributeEvent.Source.GATEWAY);
     }
 
     protected Asset mergeGatewayAsset(Asset asset, boolean isUpdate) {

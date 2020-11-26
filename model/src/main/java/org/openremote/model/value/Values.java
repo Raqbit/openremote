@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -99,6 +100,18 @@ public class Values {
 
     public static <T> Optional<T> parse(String jsonString, Class<T> type) {
         return parse(jsonString, JSON.constructType(type));
+    }
+
+    public static Optional<String> asJSON(Object object) {
+        if (object == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(JSON.writeValueAsString(object));
+        } catch (JsonProcessingException e) {
+            LOG.log(Level.WARNING, "Failed to convert object to JSON string", e);
+            return Optional.empty();
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -219,11 +232,11 @@ public class Values {
         return getValueCoerced(value, Long.class);
     }
 
-    public static Optional<ObjectNode> getObject(Object value) {
+    public static Optional<ObjectNode> asJSONObject(Object value) {
         return getValue(value, ObjectNode.class);
     }
 
-    public static Optional<ArrayNode> getArray(Object value) {
+    public static Optional<ArrayNode> asJSONArray(Object value) {
         return getValue(value, ArrayNode.class);
     }
 

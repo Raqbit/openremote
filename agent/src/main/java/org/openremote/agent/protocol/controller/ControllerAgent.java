@@ -21,6 +21,7 @@ package org.openremote.agent.protocol.controller;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.MetaItemDescriptor;
@@ -28,27 +29,75 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ControllerAgent extends Agent {
+public class ControllerAgent extends Agent<ControllerAgent, ControllerProtocol, ControllerAgent.ControllerAgentLink> {
+
+    public static class ControllerAgentLink extends AgentLink {
+
+        protected String deviceName;
+        protected String sensorName;
+        protected String commandDeviceName;
+        protected String commandName;
+        protected ValueType.MultivaluedStringMap commandsMap;
+
+        public ControllerAgentLink(String id, String deviceName) {
+            super(id);
+            this.deviceName = deviceName;
+        }
+
+        public Optional<String> getDeviceName() {
+            return Optional.ofNullable(deviceName);
+        }
+
+        public void setDeviceName(String deviceName) {
+            this.deviceName = deviceName;
+        }
+
+        public Optional<String> getSensorName() {
+            return Optional.ofNullable(sensorName);
+        }
+
+        public void setSensorName(String sensorName) {
+            this.sensorName = sensorName;
+        }
+
+        public Optional<String> getCommandDeviceName() {
+            return Optional.ofNullable(commandDeviceName);
+        }
+
+        public void setCommandDeviceName(String commandDeviceName) {
+            this.commandDeviceName = commandDeviceName;
+        }
+
+        public Optional<String> getCommandName() {
+            return Optional.ofNullable(commandName);
+        }
+
+        public void setCommandName(String commandName) {
+            this.commandName = commandName;
+        }
+
+        public Optional<ValueType.MultivaluedStringMap> getCommandsMap() {
+            return Optional.ofNullable(commandsMap);
+        }
+
+        public void setCommandsMap(ValueType.MultivaluedStringMap commandsMap) {
+            this.commandsMap = commandsMap;
+        }
+    }
 
     public static final AttributeDescriptor<String> CONTROLLER_URI = new AttributeDescriptor<>("controllerURI", ValueType.STRING);
 
-    public static final MetaItemDescriptor<String> META_DEVICE_NAME = new MetaItemDescriptor<>("deviceName", ValueType.STRING);
-    public static final MetaItemDescriptor<String> META_SENSOR_NAME = new MetaItemDescriptor<>("sensorName", ValueType.STRING);
-    public static final MetaItemDescriptor<String> META_COMMAND_DEVICE_NAME = new MetaItemDescriptor<>("commandDeviceName", ValueType.STRING);
-    public static final MetaItemDescriptor<String> META_COMMAND_NAME = new MetaItemDescriptor<>("commandName", ValueType.STRING);
-    public static final MetaItemDescriptor<ValueType.MultivaluedStringMap> META_COMMANDS_MAP = new MetaItemDescriptor<>("commandsMap", ValueType.MULTIVALUED_STRING_MAP);
+    public static final AgentDescriptor<ControllerAgent, ControllerProtocol, ControllerAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        ControllerAgent.class, ControllerProtocol.class, ControllerAgentLink.class
+    );
 
     public ControllerAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends ControllerAgent, S extends Protocol<T>> ControllerAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override
-    public Protocol getProtocolInstance() {
-        return null;
+    public ControllerProtocol getProtocolInstance() {
+        return new ControllerProtocol(this);
     }
 
     public Optional<String> getControllerURI() {

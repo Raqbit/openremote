@@ -21,6 +21,7 @@ package org.openremote.agent.protocol.tcp;
 
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.Container;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.Attribute;
 
@@ -32,13 +33,13 @@ import java.util.logging.Logger;
  * It is up to the concrete implementations whether or not linked {@link Attribute}s can be used with this protocol and
  * to define the semantics of these linked attributes.
  */
-public abstract class AbstractTcpServerProtocol<T extends AbstractTcpServer<U>, U, V extends TcpServerAgent> extends AbstractProtocol<V> {
+public abstract class AbstractTcpServerProtocol<R, S extends AbstractTcpServer<R>, T extends AbstractTcpServerProtocol<R, S, T, U, V>, U extends AbstractTcpServerAgent<U, T, V>, V extends AgentLink> extends AbstractProtocol<U, V> {
 
     private static final Logger LOG = Logger.getLogger(AbstractTcpServerProtocol.class.getName());
 
-    protected T tcpServer;
+    protected S tcpServer;
 
-    public AbstractTcpServerProtocol(V agent) {
+    public AbstractTcpServerProtocol(U agent) {
         super(agent);
     }
 
@@ -46,7 +47,7 @@ public abstract class AbstractTcpServerProtocol<T extends AbstractTcpServer<U>, 
     protected void doStart(Container container) throws Exception {
 
         int port = getAgent().getBindPort().orElseThrow(() ->
-             new IllegalArgumentException("Missing or invalid attribute: " + TcpServerAgent.BIND_PORT));
+             new IllegalArgumentException("Missing or invalid attribute: " + AbstractTcpServerAgent.BIND_PORT));
 
         String bindAddress = getAgent().getBindHost().orElse(null);
 
@@ -73,7 +74,7 @@ public abstract class AbstractTcpServerProtocol<T extends AbstractTcpServer<U>, 
         stopTcpServer();
     }
 
-    protected abstract T createTcpServer(int port, String bindAddress, V agent);
+    protected abstract S createTcpServer(int port, String bindAddress, U agent);
 
     protected void startTcpServer() {
         LOG.info("Starting TCP server instance");

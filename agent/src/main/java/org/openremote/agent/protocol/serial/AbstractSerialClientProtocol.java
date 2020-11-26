@@ -22,23 +22,25 @@ package org.openremote.agent.protocol.serial;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.agent.protocol.io.IoClient;
+import org.openremote.model.asset.agent.AgentLink;
 
 /**
  * This is an abstract TCP client protocol for communicating with TCP servers; concrete implementations must provide
  * an {@link IoClient<T> for handling over the wire communication}.
  */
-public abstract class AbstractSerialClientProtocol<T, U extends IoAgent<T, SerialIoClient<T>>> extends AbstractIoClientProtocol<T, SerialIoClient<T>, U> {
+public abstract class AbstractSerialClientProtocol<T extends AbstractIoClientProtocol<T, U, W, X, V>, U extends IoAgent<U, T, V>, V extends AgentLink, W, X extends SerialIoClient<W>> extends AbstractIoClientProtocol<T, U, W, X, V> {
 
     protected AbstractSerialClientProtocol(U agent) {
         super(agent);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected SerialIoClient<T> doCreateIoClient() throws Exception {
+    protected X doCreateIoClient() throws Exception {
 
         String port = agent.getSerialPort().orElse(null);
         Integer baudrate = agent.getSerialBaudrate().orElse(null);
 
-        return new SerialIoClient<>(port, baudrate, executorService);
+        return (X) new SerialIoClient<W>(port, baudrate, executorService);
     }
 }

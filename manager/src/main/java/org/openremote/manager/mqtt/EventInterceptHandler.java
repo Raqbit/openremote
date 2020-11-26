@@ -204,7 +204,7 @@ public class EventInterceptHandler extends AbstractInterceptHandler {
             }
             if (attributeRef == null) {
                 String payloadContent = msg.getPayload().toString(Charset.defaultCharset());
-                Values.parse(payloadContent).flatMap(Values::getObject).ifPresent(objectValue -> {
+                Values.parse(payloadContent).flatMap(Values::asJSONObject).ifPresent(objectValue -> {
                     Map<String, Object> headers = prepareHeaders(connection);
                     AttributeEvent attributeEvent = new AttributeEvent(assetId, objectValue.keys()[0], objectValue.get(objectValue.keys()[0]).orElse(null));
                     messageBrokerService.getProducerTemplate().sendBodyAndHeaders(ClientEventService.CLIENT_EVENT_QUEUE, attributeEvent, headers);

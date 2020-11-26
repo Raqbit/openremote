@@ -21,16 +21,34 @@ package org.openremote.agent.protocol.macro;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.AttributeExecuteStatus;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
 
+import javax.validation.constraints.Min;
 import java.util.Optional;
 
-public class MacroAgent extends Agent {
+public class MacroAgent extends Agent<MacroAgent, MacroProtocol, MacroAgent.MacroAgentLink> {
+
+    public static final class MacroAgentLink extends AgentLink {
+
+        @Min(0)
+        protected Integer actionIndex;
+
+        public MacroAgentLink(String id) {
+            super(id);
+        }
+
+        public Optional<Integer> getActionIndex() {
+            return Optional.ofNullable(actionIndex);
+        }
+
+        public void setActionIndex(Integer actionIndex) {
+            this.actionIndex = actionIndex;
+        }
+    }
 
     public static final ValueDescriptor<MacroAction> MACRO_ACTION_VALUE = new ValueDescriptor<>("Macro action", MacroAction.class);
 
@@ -40,14 +58,12 @@ public class MacroAgent extends Agent {
 
     public static final AttributeDescriptor<AttributeExecuteStatus> MACRO_STATUS = new AttributeDescriptor<>("macroStatus", ValueType.EXECUTION_STATUS);
 
-    public static final MetaItemDescriptor<Integer> MACRO_ACTION_INDEX = new MetaItemDescriptor<>("macroActionIndex", ValueType.POSITIVE_INTEGER);
+    public static final AgentDescriptor<MacroAgent, MacroProtocol, MacroAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        MacroAgent.class, MacroProtocol.class, MacroAgentLink.class
+    );
 
     public MacroAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends MacroAgent, S extends Protocol<T>> MacroAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override

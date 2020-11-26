@@ -9,13 +9,17 @@ import org.openremote.model.attribute.AttributeEvent;
 
 import java.util.function.Consumer;
 
-public class TradfriLightAssetAsset extends LightAsset implements TradfriAsset {
+public class TradfriLightAsset extends LightAsset implements TradfriAsset {
 
-    public TradfriLightAssetAsset(String name) {
+    public static final AssetDescriptor<TradfriLightAsset> DESCRIPTOR = new AssetDescriptor<>(
+        "lightbulb", "e6688a", TradfriLightAsset.class
+    );
+
+    public TradfriLightAsset(String name) {
         this(name, DESCRIPTOR);
     }
 
-    protected TradfriLightAssetAsset(String name, AssetDescriptor<? extends TradfriLightAssetAsset> descriptor) {
+    protected TradfriLightAsset(String name, AssetDescriptor<? extends TradfriLightAsset> descriptor) {
         super(name, descriptor);
     }
 
@@ -42,7 +46,7 @@ public class TradfriLightAssetAsset extends LightAsset implements TradfriAsset {
         EventHandler<LightChangeColourEvent> lightColourChangeEventHandler = new EventHandler<LightChangeColourEvent>() {
             @Override
             public void handle(LightChangeColourEvent event) {
-                attributeEventConsumer.accept(new AttributeEvent(getId(), COLOUR.getName(), light.getColourRGB()));
+                attributeEventConsumer.accept(new AttributeEvent(getId(), COLOUR_RGB.getName(), light.getColourRGB()));
             }
         };
 
@@ -70,7 +74,7 @@ public class TradfriLightAssetAsset extends LightAsset implements TradfriAsset {
         getAttributes().get(BRIGHTNESS).ifPresent(attribute ->
             attribute.setValue(convertBrightness(light.getBrightness(), true)));
 
-        getAttributes().get(COLOUR).ifPresent(attribute -> attribute.setValue(light.getColourRGB()));
+        getAttributes().get(COLOUR_RGB).ifPresent(attribute -> attribute.setValue(light.getColourRGB()));
 
         getAttributes().get(TEMPERATURE).ifPresent(attribute -> attribute.setValue(light.getColourTemperature()));
     }

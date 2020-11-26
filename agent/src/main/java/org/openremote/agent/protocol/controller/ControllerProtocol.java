@@ -90,7 +90,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <p>
  */
 // TODO: Fix or remove this protocol - it does polling per device and also futures are not cancelled and NPEs appear etc...nasty
-public class ControllerProtocol extends AbstractProtocol<ControllerAgent> {
+public class ControllerProtocol extends AbstractProtocol<ControllerAgent, ControllerAgentLink> {
 
     public static final int HEARTBEAT_DELAY_SECONDS = 5;
     public static final String PROTOCOL_DISPLAY_NAME = "Controller Client";
@@ -162,14 +162,14 @@ public class ControllerProtocol extends AbstractProtocol<ControllerAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, ControllerAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
-        String deviceName = attribute.getMetaValue(META_DEVICE_NAME).orElse(null);
-        String sensorName = attribute.getMetaValue(META_SENSOR_NAME).orElse(null);
-        String commandDeviceName = attribute.getMetaValue(META_COMMAND_DEVICE_NAME).orElse(null);
-        String commandName = attribute.getMetaValue(META_COMMAND_NAME).orElse(null);
+        String deviceName = agentLink.getDeviceName().orElse(null);
+        String sensorName = agentLink.getSensorName().orElse(null);
+        String commandDeviceName = agentLink.getCommandDeviceName().orElse(null);
+        String commandName = agentLink.getCommandName().orElse(null);
 
-        ValueType.MultivaluedStringMap commandsMap = attribute.getMetaValue(META_COMMANDS_MAP).orElse(null);
+        ValueType.MultivaluedStringMap commandsMap = agentLink.getCommandsMap().orElse(null);
 
         /*
          * Build Sensor Status info for polling request
@@ -216,7 +216,7 @@ public class ControllerProtocol extends AbstractProtocol<ControllerAgent> {
      * #pollingSensorList} as a check is done before scheduling task {@link #schedulePollingTask}
      */
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, ControllerAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         controller.removeAttributeRef(attributeRef);
     }
@@ -226,7 +226,7 @@ public class ControllerProtocol extends AbstractProtocol<ControllerAgent> {
      * manage it's return code. (No value is returned from the execution of a command)
      */
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, ControllerAgentLink agentLink, AttributeEvent event, Object processedValue) {
         LOG.fine("### Process Linked Attribute Write");
 
         AttributeRef attributeRef = event.getAttributeRef();

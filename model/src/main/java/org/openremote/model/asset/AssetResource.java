@@ -85,7 +85,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     Asset[] getCurrentUserAssets(@BeanParam RequestParams requestParams);
 
     /**
@@ -106,7 +105,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     UserAsset[] getUserAssetLinks(@BeanParam RequestParams requestParams,
                                   @QueryParam("realm") String realm,
                                   @QueryParam("userId") String userId,
@@ -125,7 +123,6 @@ public interface AssetResource {
     @Consumes(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void createUserAsset(@BeanParam RequestParams requestParams, UserAsset userAsset);
 
     /**
@@ -142,7 +139,6 @@ public interface AssetResource {
     @Path("link/{realm}/{userId}/{assetId}")
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void deleteUserAsset(@BeanParam RequestParams requestParams,
                          @PathParam("realm") String realm,
                          @PathParam("userId") String userId,
@@ -159,7 +155,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     Asset get(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId);
 
     /**
@@ -170,7 +165,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     Asset getPartial(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId);
 
     /**
@@ -188,7 +182,6 @@ public interface AssetResource {
     @Consumes(APPLICATION_JSON)
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void update(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId, @Valid Asset asset);
 
     /**
@@ -211,7 +204,6 @@ public interface AssetResource {
     @Path("{assetId}/attribute/{attributeName}")
     @Consumes(APPLICATION_JSON)
     @SuccessStatusCode(204)
-    @SuppressWarnings("unusable-by-js")
     void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId, @PathParam("attributeName") String attributeName, String rawJson);
 
     /**
@@ -227,7 +219,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     Asset create(@BeanParam RequestParams requestParams, @Valid Asset asset);
 
     /**
@@ -239,7 +230,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void delete(@BeanParam RequestParams requestParams, @QueryParam("assetId") List<String> assetIds);
 
     /**
@@ -257,7 +247,6 @@ public interface AssetResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     Asset[] queryAssets(@BeanParam RequestParams requestParams, AssetQuery query);
 
     /**
@@ -270,7 +259,6 @@ public interface AssetResource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     Asset[] queryPublicAssets(@BeanParam RequestParams requestParams, AssetQuery query);
 
     /**
@@ -282,6 +270,5 @@ public interface AssetResource {
     @Path("public/query")
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     Asset[] getPublicAssets(@BeanParam RequestParams requestParams, @QueryParam("q") String q);
 }

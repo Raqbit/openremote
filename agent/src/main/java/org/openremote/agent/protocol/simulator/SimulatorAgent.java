@@ -19,33 +19,48 @@
  */
 package org.openremote.agent.protocol.simulator;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.simulator.SimulatorReplayDatapoint;
 import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 
-public class SimulatorAgent extends Agent {
+import java.util.Optional;
 
-    public static final ValueDescriptor<SimulatorReplayDatapoint> REPLAY_DATAPOINT_VALUE = new ValueDescriptor<>("Replay datapoint", SimulatorReplayDatapoint.class);
+public class SimulatorAgent extends Agent<SimulatorAgent, SimulatorProtocol, SimulatorAgent.SimulatorAgentLink> {
 
-    /**
-     * Used to store 24h dataset of values that should be replayed (i.e. written to the linked attribute) in a continuous
-     * loop.
-     */
-    public static final MetaItemDescriptor<SimulatorReplayDatapoint[]> SIMULATOR_REPLAY_DATA = new MetaItemDescriptor<>("simulatorReplayData", REPLAY_DATAPOINT_VALUE.asArray());
+    public static class SimulatorAgentLink extends AgentLink {
+
+        @JsonPropertyDescription("Used to store 24h dataset of values that should be replayed (i.e. written to the" +
+            " linked attribute) in a continuous loop.")
+        protected SimulatorReplayDatapoint[] simulatorReplayData;
+
+        public SimulatorAgentLink(String id) {
+            super(id);
+        }
+
+        public Optional<SimulatorReplayDatapoint[]> getSimulatorReplayData() {
+            return Optional.ofNullable(simulatorReplayData);
+        }
+
+        public void setSimulatorReplayData(SimulatorReplayDatapoint[] simulatorReplayData) {
+            this.simulatorReplayData = simulatorReplayData;
+        }
+    }
+
+    public static final AgentDescriptor<SimulatorAgent, SimulatorProtocol, SimulatorAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        SimulatorAgent.class, SimulatorProtocol.class, SimulatorAgentLink.class
+    );
 
     public SimulatorAgent(String name) {
         super(name, DESCRIPTOR);
     }
 
-    protected <T extends SimulatorAgent, S extends Protocol<T>> SimulatorAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
-    }
-
     @Override
-    public Protocol getProtocolInstance() {
+    public SimulatorProtocol getProtocolInstance() {
         return new SimulatorProtocol(this);
     }
 }

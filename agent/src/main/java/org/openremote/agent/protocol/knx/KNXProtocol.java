@@ -35,12 +35,13 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
  * This protocol is used to connect to a KNX bus via an IP interface.
  */
-public class KNXProtocol extends AbstractProtocol<KNXAgent> implements ProtocolAssetImport {
+public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLink> implements ProtocolAssetImport {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, KNXProtocol.class);
     public static final String PROTOCOL_DISPLAY_NAME = "KNX";
@@ -85,15 +86,14 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent> implements ProtocolA
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, KNXAgent.KNXAgentLink agentLink) throws RuntimeException {
         final AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // Check there is a META_KNX_DPT
-        String dpt = attribute.getMetaValue(KNXAgent.META_DPT).orElseThrow(() ->
-            new IllegalArgumentException("No META_KNX_DPT for protocol attribute: " + attributeRef));
+        String dpt = getOrThrowAgentLinkProperty(agentLink.getDpt(), "DPT");
 
-        Optional<String> statusGA = attribute.getMetaValue(KNXAgent.META_STATUS_GROUP_ADDRESS);
-        Optional<String> actionGA = attribute.getMetaValue(KNXAgent.META_ACTION_GROUP_ADDRESS);
+        Optional<String> statusGA = agentLink.getStatusGroupAddress();
+        Optional<String> actionGA = agentLink.getActionGroupAddress();
 
         if (!statusGA.isPresent() && !actionGA.isPresent()) {
             LOG.warning("No status group address or action group address provided so nothing to do for protocol attribute: " + attributeRef);
@@ -121,7 +121,7 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent> implements ProtocolA
 
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, KNXAgent.KNXAgentLink agentLink) {
         final AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // If this attribute is registered for status updates then un-subscribe it
@@ -132,7 +132,7 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent> implements ProtocolA
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, KNXAgent.KNXAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         synchronized (attributeActionMap) {
             Datapoint datapoint = attributeActionMap.get(event.getAttributeRef());
@@ -307,16 +307,16 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent> implements ProtocolA
         String attrName = assetName.replaceAll(" ", "");
         ValueDescriptor<?> type = TypeMapper.toAttributeType(datapoint);
 
+        KNXAgent.KNXAgentLink agentLink = new KNXAgent.KNXAgentLink(
+            agent.getId(),
+            datapoint.getDPT(),
+            !isStatusGA ? datapoint.getMainAddress().toString() : null,
+            isStatusGA ? datapoint.getMainAddress().toString() : null);
+
         Attribute<?> attr = asset.getAttributes().get(attrName).orElse(new Attribute<>(attrName, type).addMeta(
                         new MetaItem<>(MetaItemType.LABEL, name),
-                        new MetaItem<>(KNXAgent.META_DPT, datapoint.getDPT()),
-                        new MetaItem<>(MetaItemType.AGENT_LINK, agent.getId())
+                        new MetaItem<>(MetaItemType.AGENT_LINK, agentLink)
         ));
-        if (isStatusGA) {
-            attr.addMeta(new MetaItem<>(KNXAgent.META_STATUS_GROUP_ADDRESS, datapoint.getMainAddress().toString()));
-        } else {
-            attr.addMeta(new MetaItem<>(KNXAgent.META_ACTION_GROUP_ADDRESS, datapoint.getMainAddress().toString()));
-        }
 
         asset.getAttributes().addOrReplace(attr);
 

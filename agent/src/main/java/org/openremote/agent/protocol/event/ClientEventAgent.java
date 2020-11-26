@@ -21,6 +21,7 @@ package org.openremote.agent.protocol.event;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.security.ClientRole;
 import org.openremote.model.value.AttributeDescriptor;
@@ -29,19 +30,19 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ClientEventAgent extends Agent {
+public class ClientEventAgent extends Agent<ClientEventAgent, ClientEventProtocol, AgentLink> {
 
     public static final ValueDescriptor<ClientRole> VALUE_CLIENT_ROLE = new ValueDescriptor<>("Client role", ClientRole.class);
 
     public static final AttributeDescriptor<String> CLIENT_SECRET = new AttributeDescriptor<>("clientSecret", ValueType.STRING);
     public static final AttributeDescriptor<ClientRole[]> CLIENT_ROLES = new AttributeDescriptor<>("clientRoles", VALUE_CLIENT_ROLE.asArray());
 
-    public ClientEventAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
+    public static final AgentDescriptor<ClientEventAgent, ClientEventProtocol, AgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        ClientEventAgent.class, ClientEventProtocol.class, AgentLink.class
+    );
 
-    protected <T extends ClientEventAgent, S extends Protocol<T>> ClientEventAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+    public ClientEventAgent(String name) {
+        super(name, DESCRIPTOR);
     }
 
     @Override

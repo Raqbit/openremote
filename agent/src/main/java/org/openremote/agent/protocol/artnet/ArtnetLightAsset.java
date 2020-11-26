@@ -17,6 +17,10 @@ public class ArtnetLightAsset extends LightAsset {
     public static final AttributeDescriptor<Integer> UNIVERSE = new AttributeDescriptor<>("universe", ValueType.POSITIVE_INTEGER);
     public static final AttributeDescriptor<String[]> REQUIRED_VALUES = new AttributeDescriptor<>("requiredValues", ValueType.STRING.asArray());
 
+    public static final AssetDescriptor<ArtnetLightAsset> DESCRIPTOR = new AssetDescriptor<>(
+        "lightbulb", "e6688a", ArtnetLightAsset.class
+    );
+
     @JsonIgnore
     private Map<String, Integer> receivedValues;
 

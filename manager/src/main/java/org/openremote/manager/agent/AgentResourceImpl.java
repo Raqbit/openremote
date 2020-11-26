@@ -25,6 +25,8 @@ import org.openremote.manager.asset.AssetStorageService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetType;
 import org.openremote.model.asset.agent.AgentResource;
@@ -34,6 +36,7 @@ import org.openremote.model.attribute.AttributeValidationResult;
 import org.openremote.model.event.shared.TenantFilter;
 import org.openremote.model.file.FileInfo;
 import org.openremote.model.http.RequestParams;
+import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
 
@@ -61,82 +64,49 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
         this.assetStorageService = assetStorageService;
     }
 
+
+    // TODO: Redirect gateway agent requests to the gateway
+    // TODO: Allow user to select which assets/attributes are actually added to the DB
     @Override
-    public ProtocolDescriptor[] getSupportedProtocols(RequestParams requestParams, String agentId) {
-        return withAgentConnector(agentId, agentConnector -> {
-            LOG.finer("Asking connector '" + agentConnector.value.getClass().getSimpleName() + "' for protocol configurations");
-            return agentConnector.value.getProtocolDescriptors(agentConnector.key);
-        }, () -> new ProtocolDescriptor[0]);
-    }
-
-    @Override
-    public List<AgentStatusEvent> getAgentStatus(RequestParams requestParams, String agentId) {
-
-        if (!identityService.getIdentityProvider().canSubscribeWith(
-            getAuthContext(),
-            new TenantFilter<AgentStatusEvent>() {
-                @Override
-                public boolean apply(AgentStatusEvent event) {
-                    return event.getRealm().equals(getAuthenticatedTenant().getRealm());
-                }
-            }
-        )) {
-            LOG.fine("Forbidden access for user '" + getUsername() + "', can't get agent status of: " + agentId);
-            throw new WebApplicationException(Response.Status.FORBIDDEN);
-        }
-
-        List<AgentStatusEvent> result = withAgentConnector(agentId, agentConnector -> {
-            LOG.finer("Asking connector '" + agentConnector.value.getClass().getSimpleName() + "' for connection status");
-            return agentConnector.value.getConnectionStatus(agentConnector.key);
-        }, Collections::emptyList);
-
-        // Compress response (the request attribute enables the interceptor)
-        request.setAttribute(HttpHeaders.CONTENT_ENCODING, "gzip");
-
-        return result;
-    }
-
-    @Override
-    public Map<String, ProtocolDescriptor[]> getAllSupportedProtocols(RequestParams requestParams) {
-        Map<String, ProtocolDescriptor[]> agentDescriptorMap = new HashMap<>(agentService.getAgents().size());
-        agentService.getAgents().forEach((id, agent) ->
-            agentDescriptorMap.put(
-                id,
-                agentService.getAgentConnector(agent)
-                    .map(agentConnector -> {
-                        LOG.finer("Asking connector '" + agentConnector.getClass().getSimpleName() + "' for protocol descriptors");
-                        return agentConnector.getProtocolDescriptors(agent);
-                    })
-                    .orElseThrow(() -> {
-                        LOG.warning("Agent connector not found for agent ID: " + id);
-                        return new IllegalStateException("Agent connector not found or returned invalid response");
-                    })
-            ));
-
-        return agentDescriptorMap;
-    }
-
-    @Override
-    public Attribute[] getDiscoveredProtocolConfigurations(RequestParams requestParams, String agentId, String protocolName) {
-        return new Attribute[0];
-    }
-
-    @Override
-    public AttributeValidationResult validateProtocolConfiguration(RequestParams requestParams, String agentId, Attribute<?> protocolConfiguration) {
-        return withAgentConnector(agentId, agentConnector -> agentConnector.value.validateProtocolConfiguration(protocolConfiguration), () -> null);
-    }
-
-    @Override
-    public AssetTreeNode[] searchForLinkedAttributes(RequestParams requestParams, String agentId, String protocolConfigurationName, String parentId, String realm) {
-        AttributeRef protocolConfigRef = new AttributeRef(agentId, protocolConfigurationName);
+    public AssetTreeNode[] doProtocolAssetDiscovery(RequestParams requestParams, String agentId, String realm) {
 
         if (!isSuperUser() && TextUtil.isNullOrEmpty(realm)) {
             realm = getAuthenticatedRealm();
         }
 
-        Asset parentAsset = getParent(parentId, realm);
+        Agent<?, ?, ?> agent = agentService.getAgents().get(agentId);
 
-        // TODO: Allow user to select which assets/attributes are actually added to the DB
+        if (agent == null) {
+            throw new IllegalArgumentException("Agent not found: agent ID =" + agentId);
+        }
+
+        if (realm != null && !realm.equals(agent.getRealm())) {
+            throw new NotAuthorizedException("Agent not in the correct realm: agent ID =" + agentId);
+        }
+
+        Optional<AgentDescriptor<?, ?, ?>> agentDescriptor = AssetModelUtil.getAgentDescriptor(agent.getType());
+
+        if (!agentDescriptor.isPresent()) {
+            throw new IllegalArgumentException("Agent descriptor not found: agent ID =" + agentId);
+        }
+
+        if (!agentDescriptor.map(AgentDescriptor::isAssetDiscovery).orElse(false)) {
+            throw new NotSupportedException("Agent protocol doesn't support agent discovery");
+        }
+
+        // Check protocol is of correct type
+        if (!(protocolAndConfigOptional.get().key instanceof ProtocolLinkedAttributeDiscovery)) {
+            LOG.info("Protocol not of type '" + ProtocolLinkedAttributeDiscovery.class.getSimpleName() + "'");
+            throw new UnsupportedOperationException("Protocol doesn't support linked attribute discovery:" + protocolAndConfigOptional.get().key.getProtocolDisplayName());
+        }
+
+        return protocolAndConfigOptional
+            .map(protocolAndConfig -> {
+                ProtocolLinkedAttributeDiscovery discoveryProtocol = (ProtocolLinkedAttributeDiscovery)protocolAndConfig.key;
+                return discoveryProtocol.discoverLinkedAssetAttributes(protocolAndConfig.value);
+            })
+            .orElse(new AssetTreeNode[0]);
+
         AssetTreeNode[] assets = withAgentConnector(
             agentId,
             agentConnector -> {
@@ -178,17 +148,6 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
 
         persistAssets(assets, parentAsset, realm);
         return assets;
-    }
-
-    protected <T> T withAgentConnector(String agentId, Function<Pair<Asset, AgentConnector>, T> function, Supplier<T> failureFunction) {
-        return Optional.ofNullable(agentService.getAgents().get(agentId))
-            .filter(asset -> asset.getWellKnownType() == AssetType.AGENT)
-            .map(agent -> new Pair<>(agent, agentService.getAgentConnector(agent).orElseThrow(() -> {
-                LOG.warning("Failed to find agent connector for: " + agent);
-                return new IllegalStateException("Agent connector not found or returned invalid response");
-            })))
-            .map(function)
-            .orElseGet(failureFunction);
     }
 
     // TODO: Allow user to select which assets/attributes are actually added to the DB

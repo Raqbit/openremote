@@ -217,6 +217,17 @@ public class AssetModelUtil {
             .findFirst();
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T extends Agent<T, ?, ?>> Optional<AgentDescriptor<T, ?, ?>> getAgentDescriptor(Class<T> agentType) {
+        return getAssetDescriptor(agentType)
+            .map(assetDescriptor -> assetDescriptor instanceof AgentDescriptor ? (AgentDescriptor<T, ?, ?>)assetDescriptor : null);
+    }
+
+    public static Optional<AgentDescriptor<?, ?, ?>> getAgentDescriptor(String agentType) {
+        return getAssetDescriptor(agentType)
+            .map(assetDescriptor -> assetDescriptor instanceof AgentDescriptor ? (AgentDescriptor<?, ?, ?>)assetDescriptor : null);
+    }
+
     public static MetaItemDescriptor<?>[] getMetaItemDescriptors() {
         if (!initialised) {
             initialise();

@@ -12,6 +12,10 @@ import java.util.function.Consumer;
 
 public class TradfriPlugAsset extends PlugAsset implements TradfriAsset {
 
+    public static final AssetDescriptor<TradfriPlugAsset> DESCRIPTOR = new AssetDescriptor<>(
+        "plug", "e6688a", TradfriPlugAsset.class
+    );
+
     public TradfriPlugAsset(String name) {
         this(name, DESCRIPTOR);
     }
@@ -43,8 +47,6 @@ public class TradfriPlugAsset extends PlugAsset implements TradfriAsset {
             return;
         }
 
-        getAttributes().get(ON_OFF).ifPresent(attribute -> {
-            attribute.setValue(plug.getOn());
-        });
+        getAttributes().get(ON_OFF).ifPresent(attribute -> attribute.setValue(plug.getOn()));
     }
 }

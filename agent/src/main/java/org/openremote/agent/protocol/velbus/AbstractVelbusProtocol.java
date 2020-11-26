@@ -45,10 +45,11 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 
-public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends AbstractProtocol<T> implements
+public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,T>, T extends VelbusAgent<T, S>> extends AbstractProtocol<T, VelbusAgent.VelbusAgentLink> implements
     ProtocolAssetImport {
 
     public static final int DEFAULT_TIME_INJECTION_INTERVAL_SECONDS = 3600 * 6;
@@ -72,7 +73,7 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
         try {
 
             IoClient<VelbusPacket> messageProcessor = createIoClient(agent);
-            int timeInjectionSeconds = agent.getTimeInjectionInterval();
+            int timeInjectionSeconds = agent.getTimeInjectionInterval().orElse(DEFAULT_TIME_INJECTION_INTERVAL_SECONDS);
 
             LOG.fine("Creating new VELBUS network instance for protocol instance: " + agent);
             network = new VelbusNetwork(messageProcessor, executorService, timeInjectionSeconds);
@@ -96,28 +97,13 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, VelbusAgent.VelbusAgentLink agentLink) {
 
         // Get the device that this attribute is linked to
-        Optional<Integer> deviceAddress = attribute.getMeta().getValue(VelbusAgent.META_DEVICE_ADDRESS);
+        int deviceAddress = getOrThrowAgentLinkProperty(agentLink.getDeviceAddress(), "device address");
 
         // Get the property that this attribute is linked to
-        Optional<String> property = attribute.getMeta().getValue(VelbusAgent.META_DEVICE_VALUE_LINK);
-        boolean ok = true;
-
-        if (!deviceAddress.isPresent()) {
-            LOG.warning("Required linked attribute meta item value is missing: " + VelbusAgent.META_DEVICE_ADDRESS.getName());
-            ok = false;
-        }
-
-        if (!property.isPresent()) {
-            LOG.warning("Required linked attribute meta item value is missing: " + VelbusAgent.META_DEVICE_VALUE_LINK.getName());
-            ok = false;
-        }
-
-        if (!ok) {
-            throw new IllegalArgumentException("Linked attribute is missing one or more required meta items");
-        }
+        String property = getOrThrowAgentLinkProperty(agentLink.getDeviceValueLink(), "device value");
 
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         LOG.fine("Linking attribute to device '" + deviceAddress + "' and property '" + property + "': " + attributeRef);
@@ -126,17 +112,17 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
             updateLinkedAttribute(new AttributeState(attributeRef, propertyValue));
 
         attributePropertyValueConsumers.put(attributeRef, propertyValueConsumer);
-        network.addPropertyValueConsumer(deviceAddress.get(), property.get(), propertyValueConsumer);
+        network.addPropertyValueConsumer(deviceAddress, property, propertyValueConsumer);
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, VelbusAgent.VelbusAgentLink agentLink) {
 
         // Get the device that this attribute is linked to
-        int deviceAddress = attribute.getMeta().getValueOrDefault(VelbusAgent.META_DEVICE_ADDRESS);
+        int deviceAddress = getOrThrowAgentLinkProperty(agentLink.getDeviceAddress(), "device address");
 
         // Get the property that this attribute is linked to
-        String property = attribute.getMeta().getValueOrDefault(VelbusAgent.META_DEVICE_VALUE_LINK);
+        String property = getOrThrowAgentLinkProperty(agentLink.getDeviceValueLink(), "device value");
 
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         Consumer<Object> propertyValueConsumer = attributePropertyValueConsumers.remove(attributeRef);
@@ -144,19 +130,19 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, VelbusAgent.VelbusAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         // Get the device that this attribute is linked to
-        int deviceAddress = attribute.getMeta().getValueOrDefault(VelbusAgent.META_DEVICE_ADDRESS);
+        int deviceAddress = getOrThrowAgentLinkProperty(agentLink.getDeviceAddress(), "device address");
 
         // Get the property that this attribute is linked to
-        String property = attribute.getMeta().getValueOrDefault(VelbusAgent.META_DEVICE_VALUE_LINK);
+        String property = getOrThrowAgentLinkProperty(agentLink.getDeviceValueLink(), "device value");
 
         network.writeProperty(deviceAddress, property, event.getValue().orElse(null));
     }
 
     /**
-     * Should return an instance of {@link IoClient} for the supplied protocolConfiguration
+     * Should return an instance of {@link IoClient} for the supplied agent
      */
     protected abstract IoClient<VelbusPacket> createIoClient(T agent) throws RuntimeException;
 
@@ -192,7 +178,6 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
             LOG.info("Found " + modules.getLength() + " module(s)");
 
             List<Asset> devices = new ArrayList<>(modules.getLength());
-            MetaItem<String> agentLink = new MetaItem<>(MetaItemType.AGENT_LINK, agent.getId());
 
             for (int i = 0; i < modules.getLength(); i++) {
                 Element module = (Element) modules.item(i);
@@ -234,19 +219,15 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
                             Arrays.stream(processors).flatMap(processor ->
                                 processor.getPropertyDescriptors(type).stream().map(descriptor -> {
 
+                                    VelbusAgent.VelbusAgentLink agentLink = new VelbusAgent.VelbusAgentLink(agent.getId(), baseAddress, descriptor.getLinkName());
+
                                     Attribute<?> attribute = new Attribute<>(descriptor.getName(), descriptor.getAttributeValueDescriptor())
                                         .addMeta(
-                                            agentLink,
+                                            new MetaItem<>(MetaItemType.AGENT_LINK, agentLink),
                                             new MetaItem<>(MetaItemType.LABEL, descriptor.getDisplayName())
-                                        )
-                                        .addMeta(
-                                            createLinkedAttributeMetaItems(
-                                                baseAddress,
-                                                descriptor.getLinkName()
-                                            )
                                         );
 
-                                    if (descriptor.hasMeta(MetaItemType.READ_ONLY)) {
+                                    if (descriptor.isReadOnly()) {
                                         attribute.addMeta(new MetaItem<>(MetaItemType.READ_ONLY, true));
                                     }
                                     return attribute;
@@ -271,12 +252,5 @@ public abstract class AbstractVelbusProtocol<T extends VelbusAgent> extends Abst
             assetImportTask.cancel(true);
         }
         assetImportTask = null;
-    }
-
-    public static MetaItem<?>[] createLinkedAttributeMetaItems(int address, String deviceLink) {
-        return new MetaItem[] {
-            new MetaItem<>(VelbusAgent.META_DEVICE_ADDRESS, address),
-            new MetaItem<>(VelbusAgent.META_DEVICE_VALUE_LINK, deviceLink)
-        };
     }
 }

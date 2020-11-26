@@ -22,24 +22,27 @@ package org.openremote.agent.protocol.tcp;
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.agent.protocol.io.IoClient;
+import org.openremote.agent.protocol.udp.UdpIoClient;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 
 /**
  * This is an abstract TCP client protocol for communicating with TCP servers; concrete implementations must provide
  * an {@link IoClient<T> for handling over the wire communication}.
  */
-public abstract class AbstractTcpClientProtocol<T, U extends IoAgent<T, TcpIoClient<T>>> extends AbstractIoClientProtocol<T, TcpIoClient<T>, U> {
+public abstract class AbstractTcpClientProtocol<T extends AbstractIoClientProtocol<T, U, W, X, V>, U extends IoAgent<U, T, V>, V extends AgentLink, W, X extends TcpIoClient<W>> extends AbstractIoClientProtocol<T, U, W, X, V> {
 
     protected AbstractTcpClientProtocol(U agent) {
         super(agent);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected TcpIoClient<T> doCreateIoClient() throws Exception {
+    protected X doCreateIoClient() throws Exception {
 
         String host = agent.getAttributes().getValue(Agent.HOST).orElse(null);
         int port = agent.getAttributes().getValue(Agent.PORT).orElse(0);
 
-        return new TcpIoClient<>(host, port, executorService);
+        return (X) new TcpIoClient<W>(host, port, executorService);
     }
 }

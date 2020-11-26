@@ -37,6 +37,8 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
+
 public class ZWProtocol extends AbstractProtocol<ZWAgent, ZWAgent.ZWAgentLink> implements ProtocolAssetDiscovery {
 
     // Constants ------------------------------------------------------------------------------------
@@ -111,8 +113,13 @@ public class ZWProtocol extends AbstractProtocol<ZWAgent, ZWAgent.ZWAgentLink> i
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, ZWAgent.ZWAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
+        int nodeId = getOrThrowAgentLinkProperty(agentLink.getDeviceNodeId(), "device node ID");
+        int endpoint = getOrThrowAgentLinkProperty(agentLink.getDeviceEndpoint(), "device endpoint");
+        String linkName = getOrThrowAgentLinkProperty(agentLink.getDeviceValue(), "device property");
+
+        network.writeChannel(nodeId, endpoint, linkName, processedValue);
     }
 
 

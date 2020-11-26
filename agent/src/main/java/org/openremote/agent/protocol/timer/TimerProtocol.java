@@ -29,7 +29,6 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.AttributeState;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.Values;
 import org.quartz.CronExpression;
 
@@ -38,6 +37,7 @@ import java.text.ParseException;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.FINER;
+import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -46,7 +46,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * It is also possible to link {@link Attribute}s to this {@link Protocol} to allow reading information about the
  * timer instance and also to allow altering the timer instance (e.g. altering what time a daily timer triggers).
  */
-public class TimerProtocol extends AbstractProtocol<TimerAgent> {
+public class TimerProtocol extends AbstractProtocol<TimerAgent, TimerAgent.TimerAgentLink> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, TimerProtocol.class);
 
@@ -93,14 +93,8 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException {
-        TimerValue timerValue = attribute.getMetaValue(TimerAgent.META_TIMER_VALUE).orElse(null);
-
-        if (timerValue == null) {
-            String msg = "Attribute doesn't have a valid timer value so ignoring write request: " + attribute;
-            LOG.warning(msg);
-            throw new IllegalArgumentException(msg);
-        }
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, TimerAgent.TimerAgentLink agentLink) throws RuntimeException {
+        TimerValue timerValue = getOrThrowAgentLinkProperty(agentLink.getTimerValue(), "timer value");
 
         LOG.fine("Attribute is linked to timer value: " + timerValue);
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
@@ -108,15 +102,15 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, TimerAgent.TimerAgentLink agentLink) {
         // Nothing to do here
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, TimerAgent.TimerAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         // Should never be null as attribute would've only been linked if it has a valid timer value
-        TimerValue timerValue = attribute.getMetaValue(TimerAgent.META_TIMER_VALUE).orElseThrow(() -> new IllegalStateException("Linked attribute timer value is invalid but this should not happen: " + attribute));
+        TimerValue timerValue = getOrThrowAgentLinkProperty(agentLink.getTimerValue(), "timer value");
 
         switch (timerValue) {
             case ACTIVE:
@@ -194,10 +188,13 @@ public class TimerProtocol extends AbstractProtocol<TimerAgent> {
     }
 
     protected void updateLinkedAttributesTimerValues() {
-        linkedAttributes.entrySet().stream()
-            .filter(es -> es.getValue().getMetaValue(MetaItemType.AGENT_LINK).map(agentId -> agentId.equals(agent.getId())).orElse(false))
-            .filter(es -> es.getValue().hasMeta(TimerAgent.META_TIMER_VALUE))
-            .forEach(es -> updateLinkedAttributeTimerValue(es.getValue().getMetaValue(TimerAgent.META_TIMER_VALUE).orElse(null), es.getKey()));
+        linkedAttributes.entrySet()
+            .forEach(es -> {
+                TimerAgent.TimerAgentLink agentLink = getAgent().getAgentLink(es.getValue());
+                if (agentLink != null && agentLink.getId().equals(agent.getId()) && agentLink.getTimerValue().isPresent()) {
+                    updateLinkedAttributeTimerValue(agentLink.getTimerValue().get(), es.getKey());
+                }
+            });
     }
 
     protected void updateLinkedAttributeTimerValue(TimerValue timerValue, AttributeRef attributeRef) {

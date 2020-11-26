@@ -9,6 +9,7 @@ import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.model.Container;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
@@ -31,7 +32,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * {@link Agent}; {@link Asset}s are automatically added/removed depending on whether they are available on the gateway,
  * for a given {@link Agent} a device {@link Asset} will have a consistent ID.
  */
-public class TradfriProtocol extends AbstractProtocol<TradfriAgent> {
+public class TradfriProtocol extends AbstractProtocol<TradfriAgent, AgentLink> {
 
     /**
      * The logger for the IKEA TRÅDFRI protocol.
@@ -127,17 +128,17 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
         // Nothing to do here as assets are already connected to devices
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
         // Nothing to do here
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, AgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         Device device = tradfriDevices.get(event.getAttributeRef().getAssetId());
 
@@ -238,14 +239,17 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent> {
         String name = (!TextUtil.isNullOrEmpty(device.getName()) ? device.getName() : "Unnamed") + " " + device.getInstanceId();
 
         if (device.isPlug()) {
-            asset = new TradfriPlugAsset(name);
+            TradfriPlugAsset plugAsset = new TradfriPlugAsset(name);
+            plugAsset.setDeviceId(device.getInstanceId());
+            asset = plugAsset;
 
         } else if (device.isLight()) {
-            TradfriLightAssetAsset lightAsset = new TradfriLightAssetAsset(name);
+            TradfriLightAsset lightAsset = new TradfriLightAsset(name);
+            lightAsset.setDeviceId(device.getInstanceId());
 
             // Add agent links
             lightAsset.getAttributes().get(BRIGHTNESS).ifPresent(attribute -> attribute.addOrReplaceMeta(
-                new MetaItem<>(MetaItemType.AGENT_LINK, agent.getId())
+                new MetaItem<>(MetaItemType.AGENT_LINK, new AgentLink(agent.getId()))
             ));
             asset = lightAsset;
         }

@@ -19,27 +19,25 @@
  */
 package org.openremote.manager.asset;
 
-import org.openremote.model.protocol.ProtocolUtil;
-import org.openremote.model.ContainerService;
 import org.openremote.manager.agent.AgentService;
 import org.openremote.manager.asset.AssetProcessingException.Reason;
+import org.openremote.model.Container;
+import org.openremote.model.ContainerService;
 import org.openremote.model.asset.Asset;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.*;
 import org.openremote.model.attribute.AttributeEvent.Source;
+import org.openremote.model.protocol.ProtocolUtil;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.util.Pair;
-import org.openremote.model.value.*;
+import org.openremote.model.value.MetaItemType;
+import org.openremote.model.value.Values;
 
 import javax.persistence.EntityManager;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.openremote.model.attribute.AttributeEvent.Source.ATTRIBUTE_LINKING_SERVICE;
-import static org.openremote.model.attribute.MetaItem.isMetaNameEqualTo;
 import static org.openremote.model.query.AssetQuery.Select;
 
 /**
@@ -121,9 +119,8 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             return false;
         }
 
-        attribute.getMetaStream()
-            .filter(isMetaNameEqualTo(MetaItemType.ATTRIBUTE_LINK))
-            .forEach(metaItem -> processLinkedAttributeUpdate(em, metaItem, new AttributeState(asset.getId(), attribute)));
+        attribute.getMetaValue(MetaItemType.ATTRIBUTE_LINK)
+            .ifPresent(attributeLink -> processLinkedAttributeUpdate(em, attributeLink, new AttributeState(asset.getId(), attribute)));
 
         return false;
     }
@@ -133,25 +130,17 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
         assetProcessingService.sendAttributeEvent(attributeEvent, ATTRIBUTE_LINKING_SERVICE);
     }
 
-    protected void processLinkedAttributeUpdate(EntityManager em, MetaItem metaItem, AttributeState attributeState) {
+    protected void processLinkedAttributeUpdate(EntityManager em, AttributeLink attributeLink, AttributeState attributeState) {
         if (attributeState == null)
             return;
         LOG.fine("Processing attribute state for linked attribute");
-
-        AttributeLink attributeLink = null;
-
-        try {
-            attributeLink = Values.JSON.readValue(metaItem.getValue().map(Value::toJson).orElse(""), AttributeLink.class);
-        } catch (IOException e) {
-            LOG.log(Level.WARNING, "Failed to deserialize AttributeLink", e);
-        }
 
         if (attributeLink == null) {
             throw new AssetProcessingException(Reason.INVALID_ATTRIBUTE_LINK);
         }
 
         // Convert the value as required
-        Pair<Boolean, Value> sendConvertedValue = convertValueForLinkedAttribute(
+        Pair<Boolean, Object> sendConvertedValue = convertValueForLinkedAttribute(
             em,
             assetStorageService,
             attributeState.getValue().orElse(null),
@@ -163,47 +152,47 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             return;
         }
 
-        Value value = sendConvertedValue.value;
+        final Object[] value = {sendConvertedValue.value};
 
-        Optional<Attribute<?>> attribute = getAttribute(em, assetStorageService, attributeLink.getAttributeRef());
-        if (attribute.isPresent()) {
-            // Do built in value conversion
-            Optional<ValueType> attributeValueType = attribute.get().getValueType().map(AttributeValueDescriptor::getValueType);
+        // Get the attribute and try and coerce the value into the correct type
+        getAttribute(em, assetStorageService, attributeLink.getAttributeRef()).ifPresent(attribute -> {
 
-            if (value != null && attributeValueType.isPresent()) {
-                if (attributeValueType.get() != value.getType()) {
-                    LOG.fine("Trying to convert value: " + value.getType() + " -> " + attributeValueType.get());
-                    Optional<Value> convertedValue = Values.convertToValue(value, attributeValueType.get());
-                    if (!convertedValue.isPresent()) {
-                        LOG.warning("Failed to convert value: " + value.getType() + " -> " + attributeValueType.get());
+            if (value[0] != null) {
+
+                // Do basic value conversion
+                if (!attribute.getValueType().getType().isAssignableFrom(value[0].getClass())) {
+                    Object val = Values.convert(attribute.getValueType().getType(), value[0]);
+
+                    if (val == null) {
+                        LOG.warning("Failed to convert value: " + value[0].getClass() + " -> " + attribute.getValueType().getType());
                         LOG.warning("Cannot send linked attribute update");
                         return;
-                    } else {
-                        value = convertedValue.get();
                     }
+                    value[0] = val;
                 }
             }
-        }
 
-        sendAttributeEvent(new AttributeEvent(attributeLink.getAttributeRef(), value));
+            sendAttributeEvent(new AttributeEvent(attributeLink.getAttributeRef(), value[0]));
+
+        });
     }
 
-    protected Pair<Boolean, Value> convertValueForLinkedAttribute(EntityManager em,
+    protected Pair<Boolean, Object> convertValueForLinkedAttribute(EntityManager em,
                                                                          AssetStorageService assetStorageService,
-                                                                         Value originalValue,
+                                                                         Object originalValue,
                                                                          AttributeLink attributeLink) throws AssetProcessingException {
 
         // Filter the value first
         if (attributeLink.getFilters() != null) {
-            originalValue = agentService.applyValueFilters(originalValue, attributeLink.getFilters());
+            originalValue = Values.applyValueFilters(originalValue, attributeLink.getFilters());
         }
-        Value finalOriginalValue = originalValue;
+        Object finalOriginalValue = originalValue;
 
         // Apply converter
         return attributeLink.getConverter()
             .map(
                 converter -> {
-                    Pair<Boolean, Value> converterValue = ProtocolUtil.applyValueConverter(finalOriginalValue, converter);
+                    Pair<Boolean, Object> converterValue = ProtocolUtil.applyValueConverter(finalOriginalValue, converter);
 
                     if (converterValue.key) {
                         return converterValue;
@@ -222,14 +211,14 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             .orElse(new Pair<>(false, originalValue));
     }
 
-    protected static Optional<AttributeLink.ConverterType> getSpecialConverter(Value value) {
-        if (value.getType() == ValueType.STRING) {
-            return AttributeLink.ConverterType.fromValue(value.toString());
+    protected static Optional<AttributeLink.ConverterType> getSpecialConverter(Object value) {
+        if (value instanceof String) {
+            return AttributeLink.ConverterType.fromValue((String)value);
         }
         return Optional.empty();
     }
 
-    protected static Pair<Boolean, Value> doSpecialConversion(EntityManager em,
+    protected static Pair<Boolean, Object> doSpecialConversion(EntityManager em,
                                                               AssetStorageService assetStorageService,
                                                               AttributeLink.ConverterType converter,
                                                               AttributeRef linkedAttributeRef) throws AssetProcessingException {
@@ -237,14 +226,14 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             case TOGGLE:
                 // Look up current value of the linked attribute within the same database session
                 try {
-                    Value currentValue = getCurrentValue(em, assetStorageService, linkedAttributeRef);
-                    if (currentValue == null || currentValue.getType() != ValueType.BOOLEAN) {
+                    Object currentValue = getCurrentValue(em, assetStorageService, linkedAttributeRef);
+                    if (!(currentValue instanceof Boolean)) {
                         throw new AssetProcessingException(
                             Reason.LINKED_ATTRIBUTE_CONVERSION_FAILURE,
                             "cannot toggle value as attribute is not of type BOOLEAN: " + linkedAttributeRef
                         );
                     }
-                    return new Pair<>(false, Values.create(!((BooleanValue) currentValue).getBoolean()));
+                    return new Pair<>(false, !(Boolean)currentValue);
                 } catch (NoSuchElementException e) {
                     LOG.fine("The attribute doesn't exist so ignoring toggle value request: " + linkedAttributeRef);
                     return new Pair<>(true, null);
@@ -253,15 +242,15 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             case DECREMENT:
                 // Look up current value of the linked attribute within the same database session
                 try {
-                    Value currentValue = getCurrentValue(em, assetStorageService, linkedAttributeRef);
-                    if (currentValue == null || currentValue.getType() != ValueType.NUMBER) {
+                    Object currentValue = getCurrentValue(em, assetStorageService, linkedAttributeRef);
+                    if (!(currentValue instanceof Number)) {
                         throw new AssetProcessingException(
                             Reason.LINKED_ATTRIBUTE_CONVERSION_FAILURE,
                             "cannot increment/decrement value as attribute is not of type NUMBER: " + linkedAttributeRef
                         );
                     }
                     int change = converter == AttributeLink.ConverterType.INCREMENT ? +1 : -1;
-                    return new Pair<>(false, Values.create(((NumberValue) currentValue).getNumber() + change));
+                    return new Pair<>(false, ((Number)currentValue).doubleValue() + change);
                 } catch (NoSuchElementException e) {
                     LOG.fine("The attribute doesn't exist so ignoring increment/decrement value request: " + linkedAttributeRef);
                     return new Pair<>(true, null);
@@ -284,7 +273,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
                 .select(new Select().attributes(attributeRef.getAttributeName()))
         );
 
-        Attribute<?> attribute = asset != null ? asset.getAttribute(attributeRef.getAttributeName()).orElse(null) : null;
+        Attribute<?> attribute = asset != null ? asset.getAttributes().get(attributeRef.getAttributeName()).orElse(null) : null;
 
         if (attribute == null) {
             LOG.warning("Attribute or asset could not be found: " + attributeRef);
@@ -293,7 +282,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
         return Optional.ofNullable(attribute);
     }
 
-    protected static Value getCurrentValue(EntityManager em,
+    protected static Object getCurrentValue(EntityManager em,
                                            AssetStorageService assetStorageService,
                                            AttributeRef attributeRef) {
         Optional<Attribute<?>> attribute = getAttribute(em, assetStorageService, attributeRef);

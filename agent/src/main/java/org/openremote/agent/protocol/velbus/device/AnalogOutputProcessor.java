@@ -413,7 +413,7 @@ public class AnalogOutputProcessor extends OutputChannelProcessor {
         }
 
         if (Values.isArray(value.getClass())) {
-            return Values.getArray(value)
+            return Values.asJSONArray(value)
                 .map(arr -> {
                     Optional<Integer> level = Values.getIntegerCoerced(arr.get(0));
                     Optional<Integer> speed = Values.getIntegerCoerced(arr.get(1));
@@ -422,7 +422,7 @@ public class AnalogOutputProcessor extends OutputChannelProcessor {
         }
 
         if (Values.isObject(value.getClass())) {
-            return Values.getObject(value)
+            return Values.asJSONObject(value)
                 .map(obj -> {
                     Optional<Integer> level = Values.getIntegerCoerced(obj.get("level"));
                     Optional<Integer> speed = Values.getIntegerCoerced(obj.get("speed"));

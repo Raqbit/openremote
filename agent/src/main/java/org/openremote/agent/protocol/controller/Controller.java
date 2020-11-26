@@ -54,7 +54,7 @@ public class Controller {
     }
 
     public void removeAttributeRef(AttributeRef attributeRef) {
-        withLock(ControllerProtocol.PROTOCOL_NAME + ":Controller::removeAttributeRef", () -> {
+        withLock(ControllerProtocol.PROTOCOL_DISPLAY_NAME + ":Controller::removeAttributeRef", () -> {
             this.commandsList.remove(attributeRef);
             this.sensorsList.remove(attributeRef);
         });

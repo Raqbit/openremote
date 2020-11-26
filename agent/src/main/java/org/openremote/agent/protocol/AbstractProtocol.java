@@ -230,7 +230,7 @@ public abstract class AbstractProtocol<T extends Agent<T, ?, U>, U extends Agent
                     return;
                 }
 
-                doLinkedAttributeWrite(attribute, event, ignoreAndConverted.value);
+                doLinkedAttributeWrite(attribute, agent.getAgentLink(attribute), event, ignoreAndConverted.value);
             }
         });
     }
@@ -336,5 +336,5 @@ public abstract class AbstractProtocol<T extends Agent<T, ?, U>, U extends Agent
      * (see {@link ProtocolUtil#doOutboundValueProcessing}). Protocol implementations should generally use the
      * processedValue but may also choose to use the original value for some purpose if required.
      */
-    abstract protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue);
+    abstract protected void doLinkedAttributeWrite(Attribute<?> attribute, U agentLink, AttributeEvent event, Object processedValue);
 }

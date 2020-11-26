@@ -31,12 +31,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     property = "type",
     defaultImpl = WebsocketSubscription.class
 )
-public class WebsocketSubscription<T> {
+public class WebsocketSubscription {
 
     public static final String TYPE = "websocket";
 
     public String type = TYPE;
-    public T body;
+    public Object body;
 
     public WebsocketSubscription() {
     }
@@ -45,7 +45,7 @@ public class WebsocketSubscription<T> {
         this.type = type;
     }
 
-    public WebsocketSubscription<T> body(T body) {
+    public WebsocketSubscription body(Object body) {
         this.body = body;
         return this;
     }

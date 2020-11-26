@@ -21,13 +21,18 @@ package org.openremote.agent.protocol.tradfri;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.asset.agent.Protocol;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class TradfriAgent extends Agent {
+public class TradfriAgent extends Agent<TradfriAgent, TradfriProtocol, AgentLink> {
+
+    public static final AgentDescriptor<TradfriAgent, TradfriProtocol, AgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        TradfriAgent.class, TradfriProtocol.class, AgentLink.class
+    );
 
     /**
      * The security code for the IKEA TRÅDFRI gateway.
@@ -38,16 +43,12 @@ public class TradfriAgent extends Agent {
         super(name, DESCRIPTOR);
     }
 
-    protected <T extends TradfriAgent, S extends Protocol<T>> TradfriAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
-    }
-
     public Optional<String> getSecurityCode() {
         return getAttributes().getValue(SECURITY_CODE);
     }
 
     @Override
-    public Protocol<TradfriAgent> getProtocolInstance() {
+    public TradfriProtocol getProtocolInstance() {
         return new TradfriProtocol(this);
     }
 }

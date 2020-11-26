@@ -103,7 +103,7 @@ class KNXImportTest extends Specification implements ManagerContainerTrait {
         )
         String base64Content = Base64.getEncoder().encodeToString(knxProjectFileResource.bytes)
         def fileInfo = new FileInfo("knx-import-testproject.knxproj", base64Content, true)
-        def assets = agentResource.importLinkedAttributes(null, knxAgent.getId(), "knxConfigError1", null, null, fileInfo)
+        def assets = agentResource.doProtocolAssetImport(null, knxAgent.getId(), "knxConfigError1", null, null, fileInfo)
         
         then: "the new things and attributes should be created"
         conditions.eventually {

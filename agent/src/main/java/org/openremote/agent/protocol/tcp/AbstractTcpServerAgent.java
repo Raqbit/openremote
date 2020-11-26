@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, OpenRemote Inc.
+ * Copyright 2020, OpenRemote Inc.
  *
  * See the CONTRIBUTORS.txt file in the distribution for a
  * full listing of individual contributors.
@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openremote.model.http;
+package org.openremote.agent.protocol.tcp;
 
-import java.lang.annotation.*;
+import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-/**
- * The expected outcome of an HTTP operation.
- */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface SuccessStatusCode {
-    int value();
+public abstract class AbstractTcpServerAgent<T extends AbstractTcpServerAgent<T, U, V>, U extends AbstractTcpServerProtocol<?, ?, U, T, V>, V extends AgentLink> extends Agent<T, U, V> {
+
+    protected AbstractTcpServerAgent(String name, AgentDescriptor<T, U, V> descriptor) {
+        super(name, descriptor);
+    }
 }

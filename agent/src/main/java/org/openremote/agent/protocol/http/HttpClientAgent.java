@@ -21,15 +21,94 @@ package org.openremote.agent.protocol.http;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class HttpClientAgent extends Agent {
+public class HttpClientAgent extends Agent<HttpClientAgent, HttpClientProtocol, HttpClientAgent.HttpClientAgentLink> {
+
+    public static class HttpClientAgentLink extends AgentLink {
+
+        protected ValueType.MultivaluedStringMap headers;
+        protected ValueType.MultivaluedStringMap queryParameters;
+        protected Integer pollingMillis;
+        protected Boolean pagingMode;
+        protected String path;
+        protected HttpMethod method;
+        protected String contentType;
+        protected String pollingAttribute;
+
+        public HttpClientAgentLink(String id) {
+            super(id);
+        }
+
+        public Optional<ValueType.MultivaluedStringMap> getHeaders() {
+            return Optional.ofNullable(headers);
+        }
+
+        public void setHeaders(ValueType.MultivaluedStringMap headers) {
+            this.headers = headers;
+        }
+
+        public Optional<ValueType.MultivaluedStringMap> getQueryParameters() {
+            return Optional.ofNullable(queryParameters);
+        }
+
+        public void setQueryParameters(ValueType.MultivaluedStringMap queryParameters) {
+            this.queryParameters = queryParameters;
+        }
+
+        public Optional<Integer> getPollingMillis() {
+            return Optional.ofNullable(pollingMillis);
+        }
+
+        public void setPollingMillis(Integer pollingMillis) {
+            this.pollingMillis = pollingMillis;
+        }
+
+        public Optional<Boolean> getPagingMode() {
+            return Optional.ofNullable(pagingMode);
+        }
+
+        public void setPagingMode(Boolean pagingMode) {
+            this.pagingMode = pagingMode;
+        }
+
+        public Optional<String> getPath() {
+            return Optional.ofNullable(path);
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public Optional<HttpMethod> getMethod() {
+            return Optional.ofNullable(method);
+        }
+
+        public void setMethod(HttpMethod method) {
+            this.method = method;
+        }
+
+        public Optional<String> getContentType() {
+            return Optional.ofNullable(contentType);
+        }
+
+        public void setContentType(String contentType) {
+            this.contentType = contentType;
+        }
+
+        public Optional<String> getPollingAttribute() {
+            return Optional.ofNullable(pollingAttribute);
+        }
+
+        public void setPollingAttribute(String pollingAttribute) {
+            this.pollingAttribute = pollingAttribute;
+        }
+    }
 
     public static final ValueDescriptor<HttpMethod> VALUE_HTTP_METHOD = new ValueDescriptor<>("HTTP method", HttpMethod.class);
 
@@ -39,21 +118,12 @@ public class HttpClientAgent extends Agent {
     public static final AttributeDescriptor<ValueType.MultivaluedStringMap> REQUEST_QUERY_PARAMETERS = new AttributeDescriptor<>("requestQueryParameters", ValueType.MULTIVALUED_STRING_MAP);
     public static final AttributeDescriptor<Integer> REQUEST_TIMEOUT_MILLIS = new AttributeDescriptor<>("requestTimeoutMillis", ValueType.POSITIVE_INTEGER);
 
-    public static final MetaItemDescriptor<ValueType.MultivaluedStringMap> META_REQUEST_HEADERS = new MetaItemDescriptor<>("requestHeaders", ValueType.MULTIVALUED_STRING_MAP);
-    public static final MetaItemDescriptor<ValueType.MultivaluedStringMap> META_REQUEST_QUERY_PARAMETERS = new MetaItemDescriptor<>("requestQueryParameters", ValueType.MULTIVALUED_STRING_MAP);
-    public static final MetaItemDescriptor<Integer> META_REQUEST_POLLING_MILLIS = new MetaItemDescriptor<>("requestPollingMillis", ValueType.POSITIVE_INTEGER);
-    public static final MetaItemDescriptor<Boolean> META_REQUEST_PAGING_MODE = new MetaItemDescriptor<>("requestPagingMode", ValueType.BOOLEAN);
-    public static final MetaItemDescriptor<String> META_REQUEST_PATH = new MetaItemDescriptor<>("requestPath", ValueType.STRING);
-    public static final MetaItemDescriptor<HttpMethod> META_REQUEST_METHOD = new MetaItemDescriptor<>("requestMethod", VALUE_HTTP_METHOD);
-    public static final MetaItemDescriptor<String> META_REQUEST_CONTENT_TYPE = new MetaItemDescriptor<>("requestContentType", ValueType.STRING);
-    public static final MetaItemDescriptor<String> META_POLLING_ATTRIBUTE = new MetaItemDescriptor<>("pollingAttribute", ValueType.STRING);
+    public static final AgentDescriptor<HttpClientAgent, HttpClientProtocol, HttpClientAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        HttpClientAgent.class, HttpClientProtocol.class, HttpClientAgentLink.class
+    );
 
     public HttpClientAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends HttpClientAgent, S extends Protocol<T>> HttpClientAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     public Optional<String> getBaseURI() {
@@ -77,7 +147,7 @@ public class HttpClientAgent extends Agent {
     }
 
     @Override
-    public Protocol getProtocolInstance() {
+    public HttpClientProtocol getProtocolInstance() {
         return new HttpClientProtocol(this);
     }
 }

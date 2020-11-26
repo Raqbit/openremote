@@ -19,27 +19,63 @@
  */
 package org.openremote.agent.protocol.velbus;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueType;
 
-abstract class VelbusAgent extends Agent {
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
+
+abstract class VelbusAgent<T extends VelbusAgent<T, U>, U extends AbstractVelbusProtocol<U, T>> extends Agent<T, U, VelbusAgent.VelbusAgentLink> {
+
+    public static class VelbusAgentLink extends AgentLink {
+
+        @NotNull
+        @Min(1)
+        protected String deviceValueLink;
+
+        @Min(1)
+        @Max(255)
+        @NotNull
+        protected Integer deviceAddress;
+
+        @JsonCreator
+        public VelbusAgentLink(@JsonProperty("id") String id, @JsonProperty("deviceAddress") Integer deviceAddress, @JsonProperty("deviceValueLink") String deviceValueLink) {
+            super(id);
+            this.deviceValueLink = deviceValueLink;
+            this.deviceAddress = deviceAddress;
+        }
+
+        public Optional<String> getDeviceValueLink() {
+            return Optional.ofNullable(deviceValueLink);
+        }
+
+        public void setDeviceValueLink(String deviceValueLink) {
+            this.deviceValueLink = deviceValueLink;
+        }
+
+        public Optional<Integer> getDeviceAddress() {
+            return Optional.ofNullable(deviceAddress);
+        }
+
+        public void setDeviceAddress(Integer deviceAddress) {
+            this.deviceAddress = deviceAddress;
+        }
+    }
 
     public static final AttributeDescriptor<Integer> TIME_INJECTION_INTERVAL_SECONDS = new AttributeDescriptor<>("timeInjectionInterval", ValueType.POSITIVE_INTEGER);
 
-    public static final MetaItemDescriptor<String> META_DEVICE_VALUE_LINK = new MetaItemDescriptor<>("deviceValueLink", ValueType.STRING);
-    public static final MetaItemDescriptor<Integer> META_DEVICE_ADDRESS = new MetaItemDescriptor<>("deviceAddress", ValueType.INT_BYTE);
-
-    protected <T extends VelbusAgent, S extends AbstractVelbusProtocol<T>> VelbusAgent(String name, AgentDescriptor<T, S> descriptor) {
+    protected VelbusAgent(String name, AgentDescriptor<T, U, VelbusAgentLink> descriptor) {
         super(name, descriptor);
     }
 
-    public Integer getTimeInjectionInterval() {
-        return getAttributes().getValueOrDefault(TIME_INJECTION_INTERVAL_SECONDS);
+    public Optional<Integer> getTimeInjectionInterval() {
+        return getAttributes().getValue(TIME_INJECTION_INTERVAL_SECONDS);
     }
-
-    @Override
-    abstract public AbstractVelbusProtocol<? extends VelbusAgent> getProtocolInstance();
 }

@@ -20,6 +20,7 @@
 package org.openremote.agent.protocol.serial;
 
 import io.netty.channel.ChannelHandler;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeExecuteStatus;
@@ -43,7 +44,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * handle the communication and all messages are processed as strings; if you require custom message type handling
  * then please sub class the {@link AbstractSerialClientProtocol}).
  */
-public class SerialClientProtocol extends AbstractSerialClientProtocol<String, SerialAgent> {
+public class SerialClientProtocol extends AbstractSerialClientProtocol<SerialClientProtocol, SerialAgent, AgentLink, String, SerialIoClient<String>> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, SerialClientProtocol.class);
     public static final String PROTOCOL_DISPLAY_NAME = "Serial Client";
@@ -60,9 +61,9 @@ public class SerialClientProtocol extends AbstractSerialClientProtocol<String, S
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
 
-        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
+        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, agentLink, timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
 
         if (messageConsumer != null) {
             protocolMessageConsumers.add(new Pair<>(
@@ -73,7 +74,7 @@ public class SerialClientProtocol extends AbstractSerialClientProtocol<String, S
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         protocolMessageConsumers.removeIf(attRefConsumerPair -> attRefConsumerPair.key.equals(attributeRef));
     }
@@ -93,7 +94,7 @@ public class SerialClientProtocol extends AbstractSerialClientProtocol<String, S
     }
 
     @Override
-    protected String createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected String createWriteMessage(Attribute<?> attribute, AgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         if (attribute.getValueType().equals(ValueType.EXECUTION_STATUS)) {
             AttributeExecuteStatus status = event.getValue()

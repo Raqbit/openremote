@@ -21,7 +21,7 @@ package org.openremote.agent.protocol.websocket;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-public class WebsocketHttpSubscription<T> extends WebsocketSubscription<T> {
+public class WebsocketHttpSubscription extends WebsocketSubscription {
 
     public enum Method {
         GET,

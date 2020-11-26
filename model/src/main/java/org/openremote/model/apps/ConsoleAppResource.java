@@ -39,7 +39,6 @@ public interface ConsoleAppResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_APPS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     String[] getInstalledApps(@BeanParam RequestParams requestParams);
 
     @GET

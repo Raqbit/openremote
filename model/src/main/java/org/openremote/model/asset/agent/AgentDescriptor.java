@@ -52,8 +52,12 @@ public class AgentDescriptor<T extends Agent<T, U, V>, U extends Protocol<T>, V 
     @JsonSerialize(converter = DiscoveryBooleanConverter.class)
     protected Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProvider;
 
-    public AgentDescriptor(Class<T> type, Class<U> protocolClass, Class<V> agentLinkClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProvider) {
-        super(ICON, ICON_COLOUR, type);
+    public AgentDescriptor(Class<T> agentClass, Class<U> protocolClass, Class<V> agentLinkClass) {
+        this(agentClass, protocolClass, agentLinkClass, null);
+    }
+
+    public AgentDescriptor(Class<T> agentClass, Class<U> protocolClass, Class<V> agentLinkClass, Class<? extends ProtocolInstanceDiscovery> instanceDiscoveryProvider) {
+        super(ICON, ICON_COLOUR, agentClass);
         this.protocolClass = protocolClass;
         this.agentLinkClass = agentLinkClass;
         this.instanceDiscoveryProvider = instanceDiscoveryProvider;

@@ -21,41 +21,74 @@ package org.openremote.agent.protocol.knx;
 
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.asset.agent.Protocol;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Optional;
 
-public class KNXAgent extends Agent {
+public class KNXAgent extends Agent<KNXAgent, KNXProtocol, KNXAgent.KNXAgentLink> {
 
-    @Pattern(regexp = "^\\d{1,3}/\\d{1,3}/\\d{1,3}$")
-    public static final ValueDescriptor<String> GROUP_ADDRESS_VALUE = new ValueDescriptor<>("KNX group address", String.class);
+    public static class KNXAgentLink extends AgentLink {
+
+        @NotNull
+        @Pattern(regexp = "^\\d{1,3}\\.\\d{1,3}$")
+        protected String dpt;
+        @NotNull
+        @Pattern(regexp = "^\\d{1,3}/\\d{1,3}/\\d{1,3}$")
+        protected String actionGroupAddress;
+        @NotNull
+        @Pattern(regexp = "^\\d{1,3}/\\d{1,3}/\\d{1,3}$")
+        protected String statusGroupAddress;
+
+        public KNXAgentLink(String id, String dpt, String actionGroupAddress, String statusGroupAddress) {
+            super(id);
+            this.dpt = dpt;
+            this.actionGroupAddress = actionGroupAddress;
+            this.statusGroupAddress = statusGroupAddress;
+        }
+
+        public Optional<String> getDpt() {
+            return Optional.ofNullable(dpt);
+        }
+
+        public void setDpt(String dpt) {
+            this.dpt = dpt;
+        }
+
+        public Optional<String> getActionGroupAddress() {
+            return Optional.ofNullable(actionGroupAddress);
+        }
+
+        public void setActionGroupAddress(String actionGroupAddress) {
+            this.actionGroupAddress = actionGroupAddress;
+        }
+
+        public Optional<String> getStatusGroupAddress() {
+            return Optional.ofNullable(statusGroupAddress);
+        }
+
+        public void setStatusGroupAddress(String statusGroupAddress) {
+            this.statusGroupAddress = statusGroupAddress;
+        }
+    }
 
     @Pattern(regexp = "^\\d\\.\\d\\.\\d$")
     public static final ValueDescriptor<String> SOURCE_ADDRESS_VALUE = new ValueDescriptor<>("KNX message source address", String.class);
-
-    @Pattern(regexp = "^\\d{1,3}\\.\\d{1,3}$")
-    public static final ValueDescriptor<String> DPT_VALUE = new ValueDescriptor<>("KNX datapoint type", String.class);
 
     public static final AttributeDescriptor<Boolean> NAT_MODE = new AttributeDescriptor<>("nATMode", ValueType.BOOLEAN);
     public static final AttributeDescriptor<Boolean> ROUTING_MODE = new AttributeDescriptor<>("routingMode", ValueType.BOOLEAN);
     public static final AttributeDescriptor<String> MESSAGE_SOURCE_ADDRESS = new AttributeDescriptor<>("messageSourceAddress", SOURCE_ADDRESS_VALUE);
 
-
-    public static final MetaItemDescriptor<String> META_DPT = new MetaItemDescriptor<>("dpt", DPT_VALUE);
-    public static final MetaItemDescriptor<String> META_STATUS_GROUP_ADDRESS = new MetaItemDescriptor<>("statusGA", GROUP_ADDRESS_VALUE);
-    public static final MetaItemDescriptor<String> META_ACTION_GROUP_ADDRESS = new MetaItemDescriptor<>("actionGA", GROUP_ADDRESS_VALUE);
+    public static final AgentDescriptor<KNXAgent, KNXProtocol, KNXAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        KNXAgent.class, KNXProtocol.class, KNXAgentLink.class
+    );
 
     public KNXAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends KNXAgent, S extends Protocol<T>> KNXAgent(String name, AgentDescriptor<T, S> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     public Optional<String> getMessageSourceAddress() {
@@ -71,7 +104,7 @@ public class KNXAgent extends Agent {
     }
 
     @Override
-    public Protocol getProtocolInstance() {
+    public KNXProtocol getProtocolInstance() {
         return new KNXProtocol(this);
     }
 }

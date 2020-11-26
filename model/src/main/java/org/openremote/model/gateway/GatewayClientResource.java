@@ -73,7 +73,6 @@ public interface GatewayClientResource {
     @Consumes(APPLICATION_JSON)
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void setConnection(@BeanParam RequestParams requestParams, @PathParam("realm") String realm, @Valid GatewayConnection connection);
 
     @DELETE

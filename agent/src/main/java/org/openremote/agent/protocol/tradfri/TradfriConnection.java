@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.openremote.agent.protocol.tradfri.TradfriLightAssetAsset.convertBrightness;
+import static org.openremote.agent.protocol.tradfri.TradfriLightAsset.convertBrightness;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -163,7 +163,7 @@ public class TradfriConnection {
                         light.setBrightness(convertBrightness(value, false));
                     } else if (event.getAttributeName().equals(LightAsset.ON_OFF.getName())) {
                         light.setOn(Values.getBooleanCoerced(event.getValue()).orElse(false));
-                    } else if (event.getAttributeName().equals(LightAsset.COLOUR.getName())) {
+                    } else if (event.getAttributeName().equals(LightAsset.COLOUR_RGB.getName())) {
                         light.setColour(Values.convert(ColourRGB.class, event.getValue()));
                     } else if (event.getAttributeName().equals(LightAsset.TEMPERATURE.getName())) {
                         light.setColourTemperature(Values.getInteger(event.getValue()).orElse(0));

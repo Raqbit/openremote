@@ -23,9 +23,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentLink;
-import org.openremote.model.asset.agent.GenericAgentLink;
-import org.openremote.model.query.filter.ValuePredicate;
-import org.openremote.model.value.*;
+import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueDescriptor;
+import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
@@ -34,39 +34,18 @@ public class WebsocketClientAgent extends IoAgent<WebsocketClientAgent, Websocke
     public static class WebsocketClientAgentLink extends AgentLink {
 
         protected WebsocketSubscription[] websocketSubscriptions;
-        protected ValuePredicate messageMatchPredicate;
-        protected ValueFilter[] messageMatchFilters;
 
         public WebsocketClientAgentLink(String id) {
             super(id);
         }
 
         @JsonPropertyDescription("Array of WebsocketSubscriptions that should be executed when the linked attribute is linked; the subscriptions are executed in the order specified in the array.")
-        public WebsocketSubscription[] getWebsocketSubscriptions() {
-            return websocketSubscriptions;
-        }
-
-        @JsonPropertyDescription("The predicate to apply to incoming messages to determine if the message is intended for the" +
-            " linked attribute")
-        Optional<ValuePredicate> getMessageMatchPredicate() {
-            return Optional.ofNullable(messageMatchPredicate);
-        }
-
-        @JsonPropertyDescription("ValueFilters to apply to incoming messages prior to comparison with the messageMatchPredicate")
-        Optional<ValueFilter[]> getMessageMatchFilters() {
-            return Optional.ofNullable(messageMatchFilters);
+        public Optional<WebsocketSubscription[]> getWebsocketSubscriptions() {
+            return Optional.ofNullable(websocketSubscriptions);
         }
 
         public void setWebsocketSubscriptions(WebsocketSubscription[] websocketSubscriptions) {
             this.websocketSubscriptions = websocketSubscriptions;
-        }
-
-        public void setMessageMatchPredicate(ValuePredicate messageMatchPredicate) {
-            this.messageMatchPredicate = messageMatchPredicate;
-        }
-
-        public void setMessageMatchFilters(ValueFilter[] messageMatchFilters) {
-            this.messageMatchFilters = messageMatchFilters;
         }
     }
 

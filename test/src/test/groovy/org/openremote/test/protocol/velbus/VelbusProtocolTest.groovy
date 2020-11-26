@@ -20,7 +20,6 @@ import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.MetaItem
 import org.openremote.model.file.FileInfo
 import org.openremote.model.util.TextUtil
-import org.openremote.model.value.Values
 import org.openremote.test.ManagerContainerTrait
 import org.openremote.test.MockVelbusClient
 import spock.lang.Shared
@@ -191,7 +190,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
 
         when: "discovery is requested with a VELBUS project file"
         def fileInfo = new FileInfo("VelbusProject.vlp", velbusProjectFile, false)
-        def assets = agentResource.importLinkedAttributes(null, agent.getId(), "protocolConfig", null, null, fileInfo)
+        def assets = agentResource.doProtocolAssetImport(null, agent.getId(), "protocolConfig", null, null, fileInfo)
 
         then: "the correct number of assets should be returned and all should have IDs"
         assert assets != null

@@ -48,6 +48,5 @@ public interface ConsoleResource {
     @SuccessStatusCode(200)
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @SuppressWarnings("unusable-by-js")
     ConsoleRegistration register(@BeanParam RequestParams requestParams, ConsoleRegistration consoleRegistration);
 }

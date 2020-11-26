@@ -42,9 +42,9 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * The protocol will then try to perform the request on the linked macro protocol instance.
  * <p>
  * {@link Attribute}s can also read/write the macro configuration's {@link MacroAction} values by using the
- * {@link MacroAgent#MACRO_ACTION_INDEX} Meta Item with the index of the {@link MacroAction} to link to.
+ * {@link MacroAgent.MacroAgentLink#getActionIndex} with the index of the {@link MacroAction} to link to.
  */
-public class MacroProtocol extends AbstractProtocol<MacroAgent> {
+public class MacroProtocol extends AbstractProtocol<MacroAgent, MacroAgent.MacroAgentLink> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, MacroProtocol.class);
 
@@ -143,7 +143,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
         actions.addAll(Arrays.asList(agent.getMacroActions().orElseThrow(() -> {
             String msg = "Macro actions attribute missing or invalid: " + this;
             LOG.warning(msg);
-            throw new IllegalArgumentException(msg);
+            return new IllegalArgumentException(msg);
         })));
 
         setConnectionStatus(ConnectionStatus.CONNECTED);
@@ -157,7 +157,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, MacroAgent.MacroAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         // Check for executable meta item
@@ -176,7 +176,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
         }
 
         // Check for action index or default to index 0
-        int actionIndex = attribute.getMetaValue(MacroAgent.MACRO_ACTION_INDEX).orElse(0);
+        int actionIndex = agentLink.getActionIndex().orElse(0);
 
         // Pull the macro action value out with the same type as the linked attribute
         // otherwise push a null value through to the attribute
@@ -195,11 +195,11 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, MacroAgent.MacroAgentLink agentLink) {
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, MacroAgent.MacroAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         if (attribute.getValueType().getType() == AttributeExecuteStatus.class) {
             // This is a macro execution related write operation
@@ -234,7 +234,7 @@ public class MacroProtocol extends AbstractProtocol<MacroAgent> {
         }
 
         // Assume this is a write to a macro action value (default to index 0)
-        int actionIndex = attribute.getMetaValue(MacroAgent.MACRO_ACTION_INDEX).orElse(0);
+        int actionIndex = agentLink.getActionIndex().orElse(0);
 
         if (actions.isEmpty()) {
             LOG.fine("No actions are available for the linked macro, maybe it is disabled?: " + this);

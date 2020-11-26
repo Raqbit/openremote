@@ -35,6 +35,7 @@ import org.openremote.container.security.IdentityService;
 import org.openremote.container.web.*;
 import org.openremote.model.Container;
 import org.openremote.model.asset.agent.Agent;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.util.TextUtil;
@@ -68,7 +69,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * that this protocol creates and therefore only users of that realm will be able to make calls to the deployment when
  * {@link AbstractHttpServerAgent#ROLE_BASED_SECURITY} is true.
  */
-public abstract class AbstractHttpServerProtocol<T extends AbstractHttpServerAgent> extends AbstractProtocol<T> {
+public abstract class AbstractHttpServerProtocol<T extends AbstractHttpServerProtocol<T, U, V>, U extends AbstractHttpServerAgent<U, T, V>, V extends AgentLink> extends AbstractProtocol<U, V> {
 
     public static class DeploymentInstance {
         protected DeploymentInfo deploymentInfo;
@@ -106,7 +107,7 @@ public abstract class AbstractHttpServerProtocol<T extends AbstractHttpServerAge
     protected IdentityService identityService;
     protected WebService webService;
 
-    public AbstractHttpServerProtocol(T agent) {
+    public AbstractHttpServerProtocol(U agent) {
         super(agent);
     }
 

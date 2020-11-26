@@ -19,27 +19,22 @@
  */
 package org.openremote.agent.protocol.udp;
 
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-public class UdpClientAgent extends IoAgent<String, UdpIoClient<String>> {
+public class UdpClientAgent extends IoAgent<UdpClientAgent, UdpClientProtocol, AgentLink> {
 
-//    public static final AgentDescriptor<TcpClientAgent, TcpClientProtocol> DESCRIPTOR = new AgentDescriptor(
-//
-//    );
-
+    public static final AgentDescriptor<UdpClientAgent, UdpClientProtocol, AgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        UdpClientAgent.class, UdpClientProtocol.class, AgentLink.class
+    );
 
     public UdpClientAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <V extends IoAgent<String, UdpIoClient<String>>, W extends AbstractIoClientProtocol<String, UdpIoClient<String>, V>> UdpClientAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override
-    public AbstractIoClientProtocol<String, UdpIoClient<String>, UdpClientAgent> getProtocolInstance() {
+    public UdpClientProtocol getProtocolInstance() {
         return new UdpClientProtocol(this);
     }
 }

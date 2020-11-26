@@ -24,6 +24,7 @@ import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.agent.protocol.ProtocolClientEventService;
 import org.openremote.container.web.ConnectionConstants;
 import org.openremote.model.Container;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeState;
@@ -46,7 +47,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * creation of a Keycloak client that allows client secret 'authentication' for machines therefore this protocol
  * requires the Keycloak identity provider.
  */
-public class ClientEventProtocol extends AbstractProtocol<ClientEventAgent> {
+public class ClientEventProtocol extends AbstractProtocol<ClientEventAgent, AgentLink> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "Client Event";
     public static final String CLIENT_ID_PREFIX = "ClientEventProtocol-";
@@ -86,17 +87,17 @@ public class ClientEventProtocol extends AbstractProtocol<ClientEventAgent> {
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) throws RuntimeException {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) throws RuntimeException {
         // Nothing to do here
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
         // Nothing to do here
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, AgentLink agentLink, AttributeEvent event, Object processedValue) {
         // Nothing to do here
     }
 

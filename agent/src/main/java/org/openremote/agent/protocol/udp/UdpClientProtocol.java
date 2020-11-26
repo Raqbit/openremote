@@ -20,6 +20,7 @@
 package org.openremote.agent.protocol.udp;
 
 import io.netty.channel.ChannelHandler;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
@@ -42,7 +43,7 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <p>
  * To use this protocol create a {@link UdpClientAgent}.
  */
-public class UdpClientProtocol extends AbstractUdpClientProtocol<String, UdpClientAgent> {
+public class UdpClientProtocol extends AbstractUdpClientProtocol<UdpClientProtocol, UdpClientAgent, AgentLink, String, UdpIoClient<String>> {
 
     private static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, UdpClientProtocol.class);
     public static final String PROTOCOL_DISPLAY_NAME = "UDP Client";
@@ -58,10 +59,10 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String, UdpClie
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
 
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
-        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
+        Consumer<String> messageConsumer = ProtocolUtil.createGenericAttributeMessageConsumer(assetId, attribute, agentLink, timerService::getCurrentTimeMillis, this::updateLinkedAttribute);
 
         protocolMessageConsumers.add(new Pair<>(
             attributeRef,
@@ -70,7 +71,7 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String, UdpClie
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         protocolMessageConsumers.removeIf(attributeRefConsumerPair -> attributeRefConsumerPair.key.equals(attributeRef));
     }
@@ -87,7 +88,7 @@ public class UdpClientProtocol extends AbstractUdpClientProtocol<String, UdpClie
     }
 
     @Override
-    protected String createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected String createWriteMessage(Attribute<?> attribute, AgentLink agentLink, AttributeEvent event, Object processedValue) {
         return processedValue != null ? processedValue.toString() : null;
     }
 }

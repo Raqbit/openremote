@@ -27,7 +27,7 @@ import org.openremote.model.util.TextUtil;
 
 import java.util.Objects;
 
-public class VelbusTcpProtocol extends AbstractVelbusProtocol<VelbusTcpAgent> {
+public class VelbusTcpProtocol extends AbstractVelbusProtocol<VelbusTcpProtocol, VelbusTcpAgent> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "VELBUS TCP";
 

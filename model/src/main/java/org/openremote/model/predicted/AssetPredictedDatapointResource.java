@@ -44,7 +44,6 @@ public interface AssetPredictedDatapointResource {
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
     @RolesAllowed({Constants.READ_ASSETS_ROLE})
-    @SuppressWarnings("unusable-by-js")
     ValueDatapoint[] getPredictedDatapoints(@BeanParam RequestParams requestParams,
                                             @PathParam("assetId") String assetId,
                                             @PathParam("attributeName") String attributeName,

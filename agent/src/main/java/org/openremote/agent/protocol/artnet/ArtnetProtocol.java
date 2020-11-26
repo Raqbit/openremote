@@ -5,6 +5,7 @@ import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.udp.UdpIoClient;
 import org.openremote.model.asset.AssetTreeNode;
+import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.attribute.AttributeRef;
@@ -16,7 +17,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIoClient<ArtnetPacket>, ArtnetAgent> implements ProtocolAssetImport {
+public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, ArtnetAgent, ArtnetPacket, UdpIoClient<ArtnetPacket>, AgentLink> implements ProtocolAssetImport {
 
     public static final String PROTOCOL_DISPLAY_NAME = "Artnet";
     protected final Map<AttributeRef, Consumer<ArtnetPacket>> protocolMessageConsumers = new HashMap<>();
@@ -54,7 +55,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIo
     }
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
 //        AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 //        ArtnetLight light = lights.get(assetId);
 //
@@ -99,7 +100,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIo
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, AgentLink agentLink) {
 //        Attribute<?> assetAttribute = getLinkedAttribute(attribute.getReference().orElse(null));
 //        if(assetAttribute != null) {
 //            String assetId = assetAttribute.getAssetId().orElse(null);
@@ -128,7 +129,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetPacket, UdpIo
     }
 
     @Override
-    protected ArtnetPacket createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected ArtnetPacket createWriteMessage(Attribute<?> attribute, AgentLink agentLink, AttributeEvent event, Object processedValue) {
 //        // TODO check for group later here
 //        AttributeRef attributeRef = event.getAttributeRef();
 //

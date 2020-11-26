@@ -75,12 +75,12 @@ public class AssetPredictedDatapointResourceImpl extends ManagerWebResource impl
                 throw new WebApplicationException(Response.Status.FORBIDDEN);
             }
 
-            Attribute<?> attribute = asset.getAttribute(attributeName).orElseThrow(() ->
+            Attribute<?> attribute = asset.getAttributes().get(attributeName).orElseThrow(() ->
                 new WebApplicationException(Response.Status.NOT_FOUND)
             );
 
-            return assetPredictedDatapointService.getValueDatapoints(,
-                attribute.getReferenceOrThrow(),
+            return assetPredictedDatapointService.getValueDatapoints(assetId,
+                attributeName,
                 datapointInterval,
                 fromTimestamp,
                 toTimestamp);

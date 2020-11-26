@@ -19,27 +19,23 @@
  */
 package org.openremote.agent.protocol.tcp;
 
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-public class TcpClientAgent extends IoAgent<String, TcpIoClient<String>> {
+public class TcpClientAgent extends IoAgent<TcpClientAgent, TcpClientProtocol, AgentLink> {
 
-//    public static final AgentDescriptor<TcpClientAgent, TcpClientProtocol> DESCRIPTOR = new AgentDescriptor(
-//
-//    );
+    public static final AgentDescriptor<TcpClientAgent, TcpClientProtocol, AgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        TcpClientAgent.class, TcpClientProtocol.class, AgentLink.class
+    );
 
 
     public TcpClientAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <V extends IoAgent<String, TcpIoClient<String>>, W extends AbstractIoClientProtocol<String, TcpIoClient<String>, V>> TcpClientAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override
-    public AbstractIoClientProtocol<String, TcpIoClient<String>, TcpClientAgent> getProtocolInstance() {
+    public TcpClientProtocol getProtocolInstance() {
         return new TcpClientProtocol(this);
     }
 }

@@ -19,19 +19,18 @@
  */
 package org.openremote.agent.protocol.artnet;
 
-import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
-import org.openremote.agent.protocol.udp.UdpIoClient;
 import org.openremote.model.asset.agent.AgentDescriptor;
+import org.openremote.model.asset.agent.AgentLink;
 
-public class ArtnetAgent extends IoAgent<ArtnetPacket, UdpIoClient<ArtnetPacket>> {
+public class ArtnetAgent extends IoAgent<ArtnetAgent, ArtnetProtocol, AgentLink> {
+
+    public static final AgentDescriptor<ArtnetAgent, ArtnetProtocol, AgentLink> DESCRIPTOR = new AgentDescriptor<>(
+        ArtnetAgent.class, ArtnetProtocol.class, AgentLink.class
+    );
 
     public ArtnetAgent(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <V extends IoAgent<ArtnetPacket, UdpIoClient<ArtnetPacket>>, W extends AbstractIoClientProtocol<ArtnetPacket, UdpIoClient<ArtnetPacket>, V>> ArtnetAgent(String name, AgentDescriptor<V, W> descriptor) {
-        super(name, descriptor);
+        super(name, DESCRIPTOR);
     }
 
     @Override

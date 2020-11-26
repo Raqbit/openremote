@@ -31,6 +31,10 @@ import javax.ws.rs.Produces;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+/**
+ * Resource for handling model requests and also providing server side validation of {@link Asset}s
+ */
+// TODO: Implement generic Asset validation for assets and agents
 @Path("model")
 public interface AssetModelResource {
 
@@ -42,7 +46,6 @@ public interface AssetModelResource {
     @Path("asset/descriptors")
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     AssetDescriptor[] getAssetDescriptors(@BeanParam RequestParams requestParams);
 
     /**
@@ -53,7 +56,6 @@ public interface AssetModelResource {
     @Path("attribute/valueDescriptors")
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
 
     /**
@@ -64,6 +66,20 @@ public interface AssetModelResource {
     @Path("metaItem/descriptors")
     @Produces(APPLICATION_JSON)
     @SuccessStatusCode(200)
-    @SuppressWarnings("unusable-by-js")
     MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
+
+
+//    /**
+//     * Ask the appropriate protocol on the specified agent to validate the supplied {@link org.openremote.model.asset.agent.ProtocolConfiguration}
+//     */
+//    @POST
+//    @Path("validate/{agentId}")
+//    @Consumes(APPLICATION_JSON)
+//    @Produces(APPLICATION_JSON)
+//    @SuccessStatusCode(200)
+//    //    AttributeValidationResult validateProtocolConfiguration(
+//        @BeanParam RequestParams requestParams,
+//        @PathParam("agentId") String agentId,
+//        Attribute<?> protocolConfiguration
+//    );
 }

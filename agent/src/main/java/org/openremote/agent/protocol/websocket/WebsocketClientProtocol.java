@@ -53,7 +53,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import static org.openremote.agent.protocol.http.HttpClientProtocol.*;
+import static org.openremote.agent.protocol.http.HttpClientProtocol.DEFAULT_CONTENT_TYPE;
+import static org.openremote.agent.protocol.http.HttpClientProtocol.DEFAULT_HTTP_METHOD;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 /**
@@ -63,8 +64,8 @@ import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
  * <h2>Protocol Specifics</h2>
  * When the websocket connection is established it is possible to subscribe to events by specifying the
  * {@link WebsocketClientAgent#CONNECT_SUBSCRIPTIONS} on the {@link WebsocketClientAgent} or
- * {@link WebsocketClientAgent#META_SUBSCRIPTIONS} on linked {@link Attribute}s; a subscription can be a message
- * sent over the websocket or a HTTP REST API call.
+ * {@link WebsocketClientAgent.WebsocketClientAgentLink#getConnectSubscriptions()} on linked {@link Attribute}s; a
+ * subscription can be a message sent over the websocket or a HTTP REST API call.
  */
 public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketClientProtocol, WebsocketClientAgent, String, WebsocketIoClient<String>, WebsocketClientAgent.WebsocketClientAgentLink> {
 
@@ -111,7 +112,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
     }
 
     @Override
-    protected String createWriteMessage(Attribute<?> attribute, AttributeEvent event, Object processedValue) {
+    protected String createWriteMessage(Attribute<?> attribute, WebsocketClientAgent.WebsocketClientAgentLink agentLink, AttributeEvent event, Object processedValue) {
 
         if (attribute.getValueType().equals(ValueType.EXECUTION_STATUS)) {
             boolean isRequestStart = event.getValue()
@@ -140,8 +141,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
         Optional<OAuthGrant> oAuthGrant = agent.getOAuthGrant();
         Optional<UsernamePassword> usernameAndPassword = agent.getUsernamePassword();
         Optional<ValueType.MultivaluedStringMap> headers = agent.getConnectHeaders();
-        @SuppressWarnings("unchecked")
-        Optional<WebsocketSubscription<String>[]> subscriptions = agent.getConnectSubscriptions().map(s -> s);
+        Optional<WebsocketSubscription[]> subscriptions = agent.getConnectSubscriptions();
 
         if (!oAuthGrant.isPresent() && usernameAndPassword.isPresent()) {
             String authValue = BasicAuthHelper.createHeader(usernameAndPassword.get().getUsername(), usernameAndPassword.get().getPassword());
@@ -178,7 +178,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
     @Override
     protected void doLinkAttribute(String assetId, Attribute<?> attribute, WebsocketClientAgent.WebsocketClientAgentLink agentLink) {
         @SuppressWarnings("unchecked")
-        Optional<WebsocketSubscription<String>[]> subscriptions = attribute.getMetaValue(WebsocketClientAgent.META_SUBSCRIPTIONS).map(s -> s);
+        Optional<WebsocketSubscription[]> subscriptions = agentLink.getWebsocketSubscriptions();
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
 
         subscriptions.ifPresent(websocketSubscriptions -> {
@@ -231,7 +231,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
         attributeConnectedTasks.put(attributeRef, task);
     }
 
-    protected void doSubscriptions(MultivaluedMap<String, String> headers, WebsocketSubscription<String>[] subscriptions) {
+    protected void doSubscriptions(MultivaluedMap<String, String> headers, WebsocketSubscription[] subscriptions) {
         LOG.info("Executing subscriptions for websocket: " + client.ioClient.getClientUri());
 
         // Inject OAuth header
@@ -249,9 +249,9 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
         );
     }
 
-    protected void doSubscription(MultivaluedMap<String, String> headers, WebsocketSubscription<String> subscription) {
+    protected void doSubscription(MultivaluedMap<String, String> headers, WebsocketSubscription subscription) {
         if (subscription instanceof WebsocketHttpSubscription) {
-            WebsocketHttpSubscription<?> httpSubscription = (WebsocketHttpSubscription<?>)subscription;
+            WebsocketHttpSubscription httpSubscription = (WebsocketHttpSubscription)subscription;
 
             if (TextUtil.isNullOrEmpty(httpSubscription.uri)) {
                 LOG.warning("Websocket subscription missing or empty URI so skipping: " + subscription);
@@ -276,7 +276,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
             }
 
             if (httpSubscription.headers != null) {
-                headers = headers != null ? new MultivaluedHashMap<>(headers) : new MultivaluedHashMap<>();
+                headers = headers != null ? new MultivaluedHashMap<String, String>(headers) : new MultivaluedHashMap<>();
                 MultivaluedMap<String, String> finalHeaders = headers;
                 httpSubscription.headers.forEach((header, values) -> {
                     if (values == null || values.isEmpty()) {
@@ -309,7 +309,7 @@ public class WebsocketClientProtocol extends AbstractIoClientProtocol<WebsocketC
                 LOG.warning("WebsocketHttpSubscription returned an un-successful response code: " + response.getStatus());
             }
         } else {
-            client.ioClient.sendMessage(subscription.body);
+            Values.asJSON(subscription.body).ifPresent(jsonString -> client.ioClient.sendMessage(jsonString));
         }
     }
 }

@@ -219,15 +219,14 @@ public class ZWNetwork {
         int endpoint = channel.getCommandClass() != null ? channel.getCommandClass().getContext().getDestEndPoint() : 0;
         String linkValue = channel.getLinkName();
 
+        ZWAgent.ZWAgentLink agentLink = new ZWAgent.ZWAgentLink(agentId, nodeId, endpoint, linkValue);
+
         attribute.addOrReplaceMeta(
-            new MetaItem<>(MetaItemType.AGENT_LINK, agentId),
-            new MetaItem<>(ZWAgent.DEVICE_NODE_ID, nodeId),
-            new MetaItem<>(ZWAgent.DEVICE_ENDPOINT, endpoint),
-            new MetaItem<>(ZWAgent.DEVICE_VALUE, linkValue),
+            new MetaItem<>(MetaItemType.AGENT_LINK, agentLink),
             new MetaItem<>(MetaItemType.LABEL, channel.getDisplayName())
         );
 
-        if (channel.hasMeta(MetaItemType.READ_ONLY)) {
+        if (channel.isReadOnly()) {
             attribute.getMeta().add(new MetaItem<>(MetaItemType.READ_ONLY, true));
         }
     }
@@ -509,6 +508,7 @@ public class ZWNetwork {
         return attributes;
     }
 
+    // TODO: How to deal with runtime/instance
     private void addValidRangeMeta(Attribute<?> attribute, ZWParameterItem parameter) {
         Long min = null;
         Long max = null;

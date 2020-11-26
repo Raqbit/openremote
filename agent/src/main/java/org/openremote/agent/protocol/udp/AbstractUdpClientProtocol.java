@@ -21,24 +21,26 @@ package org.openremote.agent.protocol.udp;
 
 import org.openremote.agent.protocol.io.AbstractIoClientProtocol;
 import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.model.asset.agent.AgentLink;
 
 /**
  * This is an abstract UDP client protocol for communicating with UDP servers; concrete implementations must implement
  * {@link #getEncoderDecoderProvider} to provide encoders/decoders for messages of type &lt;T&gt;.
  */
-public abstract class AbstractUdpClientProtocol<T, U extends IoAgent<T, UdpIoClient<T>>> extends AbstractIoClientProtocol<T, UdpIoClient<T>, U> {
+public abstract class AbstractUdpClientProtocol<T extends AbstractIoClientProtocol<T, U, W, X, V>, U extends IoAgent<U, T, V>, V extends AgentLink, W, X extends UdpIoClient<W>> extends AbstractIoClientProtocol<T, U, W, X, V> {
 
     protected AbstractUdpClientProtocol(U agent) {
         super(agent);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected UdpIoClient<T> doCreateIoClient() throws Exception {
+    protected X doCreateIoClient() throws Exception {
 
         String host = agent.getHost().orElse(null);
         Integer port = agent.getPort().orElse(null);
         Integer bindPort = agent.getBindPort().orElse(null);
 
-        return new UdpIoClient<>(host, port, bindPort, executorService);
+        return (X) new UdpIoClient<W>(host, port, bindPort, executorService);
     }
 }

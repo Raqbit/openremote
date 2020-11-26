@@ -43,7 +43,6 @@ public interface NotificationResource {
     @SuccessStatusCode(200)
     @Produces(APPLICATION_JSON)
     @RolesAllowed({Constants.READ_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     SentNotification[] getNotifications(@BeanParam RequestParams requestParams,
                                         @QueryParam("id") Long id,
                                         @QueryParam("type") String type,
@@ -74,7 +73,6 @@ public interface NotificationResource {
     @DELETE
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void removeNotifications(@BeanParam RequestParams requestParams,
                              @QueryParam("id") Long id,
                              @QueryParam("type") String type,
@@ -103,7 +101,6 @@ public interface NotificationResource {
     @Path("{notificationId}")
     @SuccessStatusCode(204)
     @RolesAllowed({Constants.WRITE_ADMIN_ROLE})
-    @SuppressWarnings("unusable-by-js")
     void removeNotification(@BeanParam RequestParams requestParams,
                             @PathParam("notificationId") Long notificationId);
 
@@ -116,7 +113,6 @@ public interface NotificationResource {
     @Path("alert")
     @SuccessStatusCode(204)
     @Consumes(APPLICATION_JSON)
-    @SuppressWarnings("unusable-by-js")
     void sendNotification(@BeanParam RequestParams requestParams,
                           Notification notification);
 
@@ -129,7 +125,6 @@ public interface NotificationResource {
     @PUT
     @Path("{notificationId}/delivered")
     @SuccessStatusCode(204)
-    @SuppressWarnings("unusable-by-js")
     void notificationDelivered(@BeanParam RequestParams requestParams,
                                @QueryParam("targetId") String targetId,
                                @PathParam("notificationId") Long notificationId);
@@ -144,7 +139,6 @@ public interface NotificationResource {
     @Path("{notificationId}/acknowledged")
     @Consumes(APPLICATION_JSON)
     @SuccessStatusCode(204)
-    @SuppressWarnings("unusable-by-js")
     void notificationAcknowledged(@BeanParam RequestParams requestParams,
                                   @QueryParam("targetId") String targetId,
                                   @PathParam("notificationId") Long notificationId,

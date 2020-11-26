@@ -22,6 +22,8 @@ package org.openremote.model.asset.agent;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openremote.model.attribute.Attribute;
+import org.openremote.model.query.filter.ValuePredicate;
+import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.value.ValueFilter;
 
 import java.util.Optional;
@@ -31,13 +33,15 @@ import java.util.Optional;
  * own concrete implementation of this class with fields describing each configuration item and standard JSR-380
  * annotations should be used to provide validation logic.
  */
-public abstract class AgentLink {
+public class AgentLink {
 
     protected String id;
     protected ValueFilter[] valueFilters;
     protected ObjectNode valueConverter;
     protected ObjectNode writeValueConverter;
     protected String writeValue;
+    protected ValuePredicate messageMatchPredicate;
+    protected ValueFilter[] messageMatchFilters;
 
     public AgentLink(String id) {
         this.id = id;
@@ -76,6 +80,17 @@ public abstract class AgentLink {
         return Optional.ofNullable(writeValue);
     }
 
+    @JsonPropertyDescription("The predicate to apply to incoming messages to determine if the message is intended for the" +
+        " linked attribute")
+    public Optional<ValuePredicate> getMessageMatchPredicate() {
+        return Optional.ofNullable(messageMatchPredicate);
+    }
+
+    @JsonPropertyDescription("ValueFilters to apply to incoming messages prior to comparison with the messageMatchPredicate")
+    public Optional<ValueFilter[]> getMessageMatchFilters() {
+        return Optional.ofNullable(messageMatchFilters);
+    }
+
     public void setValueFilters(ValueFilter[] valueFilters) {
         this.valueFilters = valueFilters;
     }
@@ -90,5 +105,21 @@ public abstract class AgentLink {
 
     public void setWriteValue(String writeValue) {
         this.writeValue = writeValue;
+    }
+
+    public void setMessageMatchPredicate(ValuePredicate messageMatchPredicate) {
+        this.messageMatchPredicate = messageMatchPredicate;
+    }
+
+    public void setMessageMatchFilters(ValueFilter[] messageMatchFilters) {
+        this.messageMatchFilters = messageMatchFilters;
+    }
+
+    public static <T> T getOrThrowAgentLinkProperty(Optional<T> value, String name) {
+        return value.orElseThrow(() -> {
+            String msg = "Required agent link property is undefined: " + name;
+            AssetModelUtil.LOG.warning(msg);
+            return new IllegalStateException("msg");
+        });
     }
 }

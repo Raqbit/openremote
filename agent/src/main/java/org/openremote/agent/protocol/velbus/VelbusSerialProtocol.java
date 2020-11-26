@@ -26,7 +26,7 @@ import org.openremote.agent.protocol.serial.SerialIoClient;
 import org.openremote.model.protocol.ProtocolInstanceDiscovery;
 import org.openremote.model.util.TextUtil;
 
-public class VelbusSerialProtocol extends AbstractVelbusProtocol<VelbusSerialAgent> {
+public class VelbusSerialProtocol extends AbstractVelbusProtocol<VelbusSerialProtocol, VelbusSerialAgent> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "VELBUS Serial";
     public static final int DEFAULT_BAUDRATE = 38400;
