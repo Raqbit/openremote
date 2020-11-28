@@ -20,6 +20,7 @@
 package org.openremote.model.attribute;
 
 import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -33,13 +34,20 @@ public class AttributeList extends NamedList<Attribute<?>> {
         super(c);
     }
 
-    // This works around the crappy type system and avoids the need for a  type witness
+    // This works around the crappy type system and avoids the need for a type witness
     public <S> Optional<Attribute<S>> get(AttributeDescriptor<S> attributeDescriptor) {
         return super.get(attributeDescriptor);
     }
 
     public <S> Attribute<S> getOrCreate(AttributeDescriptor<S> attributeDescriptor) {
         Attribute<S> attribute = get(attributeDescriptor).orElse(new Attribute<>(attributeDescriptor));
+        addOrReplace(attribute);
+        return attribute;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> Attribute<S> getOrCreate(String attributeName, ValueDescriptor<S> valueDescriptor) {
+        Attribute<S> attribute = (Attribute<S>) get(attributeName).orElse(new Attribute<>(attributeName, valueDescriptor));
         addOrReplace(attribute);
         return attribute;
     }

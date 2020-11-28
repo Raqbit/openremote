@@ -20,6 +20,14 @@
 package org.openremote.model.console;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ConsoleProviders extends HashMap<String, ConsoleProvider> {
+
+    public ConsoleProviders() {
+    }
+
+    public ConsoleProviders(Map<? extends String, ? extends ConsoleProvider> m) {
+        super(m);
+    }
 }

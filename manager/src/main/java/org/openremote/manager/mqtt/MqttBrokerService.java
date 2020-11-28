@@ -38,7 +38,7 @@ import org.openremote.manager.security.ManagerKeycloakIdentityProvider;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.attribute.AttributeEvent;
 import org.openremote.model.event.TriggeredEventSubscription;
-import org.openremote.model.value.Value;
+import org.openremote.model.value.Values;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -167,7 +167,7 @@ public class MqttBrokerService implements ContainerService {
     }
 
     public void sendAttributeValue(String clientId, AttributeEvent attributeEvent) {
-        ByteBuf payload = Unpooled.copiedBuffer(attributeEvent.getValue().map(Value::toString).orElse(""), Charset.defaultCharset());
+        ByteBuf payload = Unpooled.copiedBuffer(Values.asJSON(attributeEvent.getValue()).orElse(""), Charset.defaultCharset());
 
         MqttPublishMessage publishMessage = MqttMessageBuilders.publish()
                 .qos(MqttQoS.AT_MOST_ONCE)

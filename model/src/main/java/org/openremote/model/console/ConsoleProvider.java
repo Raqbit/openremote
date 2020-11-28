@@ -21,8 +21,7 @@ package org.openremote.model.console;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Map;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ConsoleProvider {
     protected String version;
@@ -31,7 +30,7 @@ public class ConsoleProvider {
     protected boolean success;
     protected boolean enabled;
     protected boolean disabled;
-    protected Map<String, Object> data;
+    protected ObjectNode data;
 
     @JsonCreator
     public ConsoleProvider(@JsonProperty("version") String version,
@@ -40,7 +39,7 @@ public class ConsoleProvider {
                            @JsonProperty("success") boolean success,
                            @JsonProperty("enabled") boolean enabled,
                            @JsonProperty("disabled") boolean disabled,
-                           @JsonProperty("data") Map<String, Object> data) {
+                           @JsonProperty("data") ObjectNode data) {
         this.version = version;
         this.requiresPermission = requiresPermission;
         this.hasPermission = hasPermission;
@@ -74,7 +73,7 @@ public class ConsoleProvider {
         return disabled;
     }
 
-    public Map<String, Object> getData() {
+    public ObjectNode getData() {
         return data;
     }
 }

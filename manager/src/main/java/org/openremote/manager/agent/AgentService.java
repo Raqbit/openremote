@@ -397,7 +397,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 new AssetQuery()
                     .attributes(
                         new AttributePredicate().meta(
-                            new NameValuePredicate(new StringPredicate(MetaItemType.AGENT_LINK.getName()), new StringPredicate(agent.getId()))
+                            new NameValuePredicate(new StringPredicate(AGENT_LINK.getName()), new StringPredicate(agent.getId()))
                         )
                     )
             );
@@ -408,7 +408,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                 asset ->
                     getGroupedAgentLinkAttributes(
                         asset.getAttributes().stream(),
-                        assetAttribute -> assetAttribute.getMetaValue(MetaItemType.AGENT_LINK)
+                        assetAttribute -> assetAttribute.getMetaValue(AGENT_LINK)
                             .map(agentId -> agentId.equals(agent.getId()))
                             .orElse(false)
                     ).forEach((agentId, attributes) -> linkAttributes(agent, asset.getId(), attributes))
@@ -509,7 +509,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         }
 
         Boolean result = withLockReturning(getClass().getSimpleName() + "::processAssetUpdate", () ->
-            attribute.getMetaValue(MetaItemType.AGENT_LINK)
+            attribute.getMetaValue(AGENT_LINK)
                 .map(agentLink -> {
                     LOG.fine("Attribute write for agent linked attribute: agent=" + agentLink.getId() + ", asset=" + asset.getId() + ", attribute=" + attribute.getName());
                     AttributeEvent attributeEvent = new AttributeEvent(new AttributeState(asset.getId(), attribute));
@@ -533,7 +533,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         return attributes
             .filter(attribute ->
                 // Exclude attributes without agent link or with agent link to not recognised agents (could be gateway agents)
-                attribute.getMetaValue(MetaItemType.AGENT_LINK)
+                attribute.getMetaValue(AGENT_LINK)
                     .map(agentLink -> {
                         if (!getAgents().containsKey(agentLink.getId())) {
                             LOG.fine("Agent linked attribute, agent not found or this is a gateway asset: " + attribute);
@@ -543,7 +543,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
                     })
                     .orElse(false))
             .filter(filter)
-            .map(attribute -> new Pair<String, Attribute<?>>(attribute.getMetaValue(MetaItemType.AGENT_LINK).map(AgentLink::getId).orElse(null), attribute))
+            .map(attribute -> new Pair<String, Attribute<?>>(attribute.getMetaValue(AGENT_LINK).map(AgentLink::getId).orElse(null), attribute))
             .collect(Collectors.groupingBy(
                 agentIdAttribute -> getAgents().get(agentIdAttribute.key),
                 mapping(agentIdAttribute -> agentIdAttribute.value, toList())

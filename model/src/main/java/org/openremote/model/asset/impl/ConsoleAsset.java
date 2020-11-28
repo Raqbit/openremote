@@ -38,7 +38,7 @@ public class ConsoleAsset extends Asset {
 
     public static final AssetDescriptor<ConsoleAsset> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, ConsoleAsset.class);
 
-    protected <T extends ConsoleAsset> ConsoleAsset(String name) {
+    public <T extends ConsoleAsset> ConsoleAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
@@ -120,7 +120,7 @@ public class ConsoleAsset extends Asset {
 //            valid = false;
 //        }
 //
-//        Value providerValue = asset.getAttribute(AttributeType.CONSOLE_PROVIDERS.getAttributeName()).flatMap(AbstractValueHolder::getValue).orElse(null);
+//        Value providerValue = asset.getAttribute(Asset.CONSOLE_PROVIDERS.getAttributeName()).flatMap(AbstractValueHolder::getValue).orElse(null);
 //
 //        if (providerValue != null && !getConsoleProviders(asset).isPresent()) {
 //            if (validationFailures != null) {

@@ -19,7 +19,7 @@
  */
 package org.openremote.manager;
 
-import org.openremote.model.Container;
+import org.openremote.container.Container;
 
 public class Main {
 

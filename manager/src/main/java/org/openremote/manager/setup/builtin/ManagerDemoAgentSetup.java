@@ -33,9 +33,6 @@ import java.util.logging.Logger;
 
 import static org.openremote.container.util.MapAccess.getBoolean;
 import static org.openremote.container.util.MapAccess.getString;
-import static org.openremote.model.asset.AssetType.AGENT;
-import static org.openremote.model.asset.AssetType.THING;
-import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration;
 
 public class ManagerDemoAgentSetup extends AbstractManagerSetup {
 

@@ -150,7 +150,7 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
         def asset = new Asset("Kitchen", AssetType.ROOM, apartment2)
         asset.setRealm(keycloakTestSetup.tenantBuilding.getRealm())
         def attributes = [
-            new Attribute<>("testString", AttributeValueType.STRING, "test")
+            new Attribute<>("testString", ValueType.STRING, "test")
                 .setMeta(
                 new Meta(new MetaItem<>(MetaItemType.RULE_STATE, true)
                 )
@@ -231,11 +231,11 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
         apartment2LastFireTimestamp = rulesImport.apartment2Engine.lastFireTimestamp
         apartment3LastFireTimestamp = rulesImport.apartment3Engine.lastFireTimestamp
         attributes = [
-            new Attribute<>("testString", AttributeValueType.STRING, "test")
+            new Attribute<>("testString", ValueType.STRING, "test")
                 .setMeta(
                 new MetaItem<>(MetaItemType.RULE_STATE, true)
             ),
-            new Attribute<>("testInteger", AttributeValueType.NUMBER, 0)
+            new Attribute<>("testInteger", ValueType.NUMBER, 0)
         ]
         asset.setAttributes(attributes)
         asset = assetStorageService.merge(asset)
@@ -267,11 +267,11 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
         when: "the Kitchen room asset is modified to set the RULE_STATE to false"
         rulesImport.resetRulesFired()
         attributes = [
-            new Attribute<>("testString", AttributeValueType.STRING, "test")
+            new Attribute<>("testString", ValueType.STRING, "test")
                 .setMeta(
                 new MetaItem<>(MetaItemType.RULE_STATE, false)
             ),
-            new Attribute<>("testInteger", AttributeValueType.NUMBER, 0)
+            new Attribute<>("testInteger", ValueType.NUMBER, 0)
         ]
         asset.setAttributes(attributes)
         asset = assetStorageService.merge(asset)
@@ -296,11 +296,11 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
         when: "the Kitchen room asset is modified to set all attributes to RULE_STATE = true"
         rulesImport.resetRulesFired()
         attributes = [
-            new Attribute<>("testString", AttributeValueType.STRING, "test")
+            new Attribute<>("testString", ValueType.STRING, "test")
                 .setMeta(
                 new MetaItem<>(MetaItemType.RULE_STATE, true)
             ),
-            new Attribute<>("testInteger", AttributeValueType.NUMBER, 0)
+            new Attribute<>("testInteger", ValueType.NUMBER, 0)
                 .setMeta(
                 new MetaItem<>(MetaItemType.RULE_STATE, true)
             )

@@ -185,7 +185,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
             // write attribute value
-            new Attribute<>("readWriteTargetTemp", AttributeValueType.NUMBER)
+            new Attribute<>("readWriteTargetTemp", ValueType.NUMBER)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(Protocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("\'" + SharedEvent.MESSAGE_PREFIX +
@@ -217,7 +217,7 @@ class WebsocketClientProtocolTest extends Specification implements ManagerContai
                                 ))
                             ], Container.JSON.writer()).orElse(null))
                 ),
-            new Attribute<>("readCo2Level", AttributeValueType.NUMBER)
+            new Attribute<>("readCo2Level", ValueType.NUMBER)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                         new MetaItem<>(MetaItemType.READ_ONLY),

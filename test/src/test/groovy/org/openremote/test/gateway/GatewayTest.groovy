@@ -170,7 +170,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                     "master",
                     (String[])[agentAssetIds[i-1]].toArray(new String[0]),
                     null).addAttributes(
-                    new Attribute<>("protocolConfig", AttributeValueType.STRING, Values.create(HttpClientProtocol.PROTOCOL_NAME))
+                    new Attribute<>("protocolConfig", ValueType.STRING, Values.create(HttpClientProtocol.PROTOCOL_NAME))
                         .addMeta(
                             new MetaItem<>(MetaItemType.PROTOCOL_CONFIGURATION),
                             new MetaItem<>(HttpClientProtocol.META_PROTOCOL_BASE_URI, Values.create("https://google.co.uk")),
@@ -204,12 +204,12 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                             .addMeta(
                                 MetaItemType.ACCESS_PUBLIC_READ
                             ),
-                        new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
+                        new Attribute<>("temp", ValueType.TEMPERATURE, null)
                             .addMeta(
                                 new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
                                 new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                             ),
-                        new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+                        new Attribute<>("tempSetpoint", ValueType.TEMPERATURE, null)
                             .addMeta(
                                 new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[i-1], "protocolConfig").toArrayValue()),
                                 new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
@@ -408,12 +408,12 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                 .addMeta(
                     MetaItemType.ACCESS_PUBLIC_READ
                 ),
-            new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("temp", ValueType.TEMPERATURE, null)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 ),
-            new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("tempSetpoint", ValueType.TEMPERATURE, null)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
@@ -437,7 +437,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         building1Room5Asset.setName("Test Building 1 Room 5 Updated")
         building1Room5Asset.setVersion(1)
         building1Room5Asset.addAttributes(
-            new Attribute<>("co2Level", AttributeValueType.CO2, 500)
+            new Attribute<>("co2Level", ValueType.CO2, 500)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[0], "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
@@ -683,12 +683,12 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                 .addMeta(
                     MetaItemType.ACCESS_PUBLIC_READ
                 ),
-            new Attribute<>("temp", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("temp", ValueType.TEMPERATURE, null)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
                 ),
-            new Attribute<>("tempSetpoint", AttributeValueType.TEMPERATURE, null)
+            new Attribute<>("tempSetpoint", ValueType.TEMPERATURE, null)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agentAssetIds[1], "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "")
@@ -837,7 +837,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
         microphone1.setName("Microphone 1 Updated")
         microphone1.getAttribute("microphoneLevel").ifPresent{it.addMeta(MetaItemType.UNIT_TYPE.withInitialValue(UNITS_SOUND_DECIBELS))}
         microphone1.addAttributes(
-            new Attribute<>("test", AttributeValueType.DISTANCE, 100)
+            new Attribute<>("test", ValueType.DISTANCE, 100)
         )
         microphone1 = assetStorageService.merge(microphone1)
 
@@ -852,7 +852,7 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
 
         when: "a gateway client asset is added"
         def microphone2 = new Asset("Microphone 2", AssetType.MICROPHONE, null, managerTestSetup.realmCityTenant).addAttributes(
-            new Attribute<>("test", AttributeValueType.STRING, "testValue")
+            new Attribute<>("test", ValueType.STRING, "testValue")
         )
         microphone2.setParentId(managerTestSetup.area1Id)
         microphone2 = assetStorageService.merge(microphone2)

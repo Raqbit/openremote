@@ -23,10 +23,7 @@ import org.openremote.model.http.RequestParams;
 import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -38,31 +35,28 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public interface AssetModelResource {
 
     /**
-     * Retrieve asset descriptors {@link AssetDescriptor} present.
-     * <p>
+     * Retrieve the asset descriptors {@link AssetDescriptor} available in the system
      */
     @GET
-    @Path("asset/descriptors")
+    @Path("asset/descriptors/{parentId}")
     @Produces(APPLICATION_JSON)
-AssetDescriptor[] getAssetDescriptors(@BeanParam RequestParams requestParams);
+    AssetDescriptor<?>[] getAssetDescriptors(@BeanParam RequestParams requestParams, @PathParam("parentId") String parentId);
 
     /**
      * Retrieve value descriptors {@link ValueDescriptor}.
-     * <p>
      */
     @GET
     @Path("attribute/valueDescriptors")
     @Produces(APPLICATION_JSON)
-ValueDescriptor<?>[] getAttributeValueDescriptors(@BeanParam RequestParams requestParams);
+    ValueDescriptor<?>[] getValueDescriptors(@BeanParam RequestParams requestParams);
 
     /**
      * Retrieve meta descriptors {@link MetaItemDescriptor} present.
-     * <p>
      */
     @GET
     @Path("metaItem/descriptors")
     @Produces(APPLICATION_JSON)
-MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
+    MetaItemDescriptor<?>[] getMetaItemDescriptors(@BeanParam RequestParams requestParams);
 
 
 //    /**

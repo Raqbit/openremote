@@ -22,6 +22,7 @@ package org.openremote.manager.gateway;
 import io.netty.channel.ChannelHandler;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.http.client.utils.URIBuilder;
+import org.openremote.model.Container;
 import org.openremote.model.auth.OAuthClientCredentialsGrant;
 import org.openremote.agent.protocol.io.AbstractNettyIoClient;
 import org.openremote.agent.protocol.websocket.WebsocketIoClient;
@@ -49,6 +50,7 @@ import org.openremote.model.gateway.GatewayDisconnectEvent;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.query.filter.TenantPredicate;
 import org.openremote.model.syslog.SyslogCategory;
+import org.openremote.model.value.Values;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -272,7 +274,6 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     protected void onGatewayClientConnectionStatusChanged(GatewayConnection connection, ConnectionStatus connectionStatus) {
-        connection.
         LOG.info("Connection status change for gateway IO client '" + connectionStatus + "': " + connection);
         clientEventService.publishEvent(new GatewayConnectionStatusEvent(timerService.getCurrentTimeMillis(), connection.getLocalRealm(), connectionStatus));
     }
@@ -370,21 +371,13 @@ public class GatewayClientService extends RouteBuilder implements ContainerServi
     }
 
     protected <T> T messageFromString(String message, String prefix, Class<T> clazz) {
-        try {
-            message = message.substring(prefix.length());
-            return Values.JSON.readValue(message, clazz);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to parse message");
-        }
+        message = message.substring(prefix.length());
+        return Values.parse(message, clazz).orElse(null);
     }
 
     protected String messageToString(String prefix, Object message) {
-        try {
-            String str = Values.JSON.writeValueAsString(message);
-            return prefix + str;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Unable to serialise message");
-        }
+        String str = Values.asJSON(message).orElse("null");
+        return prefix + str;
     }
 
     /** GATEWAY RESOURCE METHODS */

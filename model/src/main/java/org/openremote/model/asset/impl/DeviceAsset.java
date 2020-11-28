@@ -45,7 +45,19 @@ public class DeviceAsset extends Asset {
         return getAttributes().getValue(MANUFACTURER);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends DeviceAsset> T setManufacturer(String manufacturer) {
+        getAttributes().getOrCreate(MANUFACTURER).setValue(manufacturer);
+        return (T)this;
+    }
+
     public Optional<String> getModel() {
         return getAttributes().getValue(MODEL);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends DeviceAsset> T setModel(String model) {
+        getAttributes().getOrCreate(MODEL).setValue(model);
+        return (T)this;
     }
 }

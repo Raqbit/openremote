@@ -1,15 +1,14 @@
 package org.openremote.manager.rules.flow;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.openremote.model.Container;
 import org.openremote.manager.rules.RulesBuilder;
 import org.openremote.manager.rules.RulesEngine;
 import org.openremote.model.query.AssetQuery;
 import org.openremote.model.rules.AssetState;
 import org.openremote.model.rules.flow.*;
-import org.openremote.model.value.*;
+import org.openremote.model.value.Values;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,7 +39,7 @@ public enum NodeModel {
                     long timestamp = state.getTimestamp();
                     long triggerStamp = params.getBuilder().getTriggerMap().getOrDefault(params.getRuleName(), -1L);
                     if (triggerStamp == -1L) return true; //The flow has never been executed
-                    return timestamp > triggerStamp && state.isValueChanged();
+                    return timestamp > triggerStamp && !Objects.equals(state.getValue().orElse(null), state.getOldValue().orElse(null));
                 });
             }
     ),
@@ -64,23 +63,10 @@ public enum NodeModel {
                     if (existingValue.get().getValue().isPresent())
                         if (existingValue.get().getValue().get().equals(value)) return;
 
-                try {
-                    if (value instanceof Value) {
-                        info.getAssets().dispatch(
-                                assetAttributePair.getAssetId(),
-                                assetAttributePair.getAttributeName(),
-                                (Value) value
-                        );
-                    } else {
-                        info.getAssets().dispatch(
-                                assetAttributePair.getAssetId(),
-                                assetAttributePair.getAttributeName(),
-                                Values.parseOrNull(Values.JSON.writeValueAsString(value))
-                        );
-                    }
-                } catch (JsonProcessingException e) {
-                    RulesEngine.LOG.severe("Flow rule error: node " + info.getNode().getName() + " receives invalid value");
-                }
+                info.getAssets().dispatch(
+                    assetAttributePair.getAssetId(),
+                    assetAttributePair.getAttributeName(),
+                    value);
             })),
 
     BOOLEAN_INPUT(new Node(NodeType.INPUT, new NodeInternal[]{
@@ -92,7 +78,7 @@ public enum NodeModel {
                 Object value = info.getInternals()[0].getValue();
                 if (value == null) return false;
                 if (!(value instanceof Boolean)) return false;
-                return Values.create((boolean) value);
+                return value;
             }),
 
     AND_GATE(new Node(NodeType.PROCESSOR, "&", new NodeInternal[0], new NodeSocket[]{
@@ -103,9 +89,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    BooleanValue a = (BooleanValue) info.getValueFromInput(0);
-                    BooleanValue b = (BooleanValue) info.getValueFromInput(1);
-                    return Values.create(a.getBoolean() && b.getBoolean());
+                    boolean a = (boolean) info.getValueFromInput(0);
+                    boolean b = (boolean) info.getValueFromInput(1);
+                    return a && b;
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return false;
@@ -120,9 +106,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    BooleanValue a = (BooleanValue) info.getValueFromInput(0);
-                    BooleanValue b = (BooleanValue) info.getValueFromInput(1);
-                    return Values.create(a.getBoolean() || b.getBoolean());
+                    boolean a = (boolean) info.getValueFromInput(0);
+                    boolean b = (boolean) info.getValueFromInput(1);
+                    return a || b;
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return false;
@@ -136,8 +122,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    BooleanValue a = (BooleanValue) info.getValueFromInput(0);
-                    return Values.create(!a.getBoolean());
+                    boolean a = (boolean) info.getValueFromInput(0);
+                    return !a;
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return true;
@@ -151,8 +137,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    return Values.create(Float.parseFloat(Values.JSON.writeValueAsString(info.getInternals()[0].getValue())));
-                } catch (JsonProcessingException e) {
+                    return Values.convert(Double.class, info.getInternals()[0].getValue());
+                } catch (IllegalArgumentException e) {
                     RulesEngine.RULES_LOG.warning("Number node returned invalid value");
                     return 0f;
                 }
@@ -166,9 +152,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create(a.getNumber() + b.getNumber());
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() + b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -183,9 +169,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create(a.getNumber() - b.getNumber());
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() - b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -200,9 +186,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create(a.getNumber() * b.getNumber());
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() * b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -217,13 +203,13 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
 
-                    if (b.getNumber() == 0)
-                        return 0f;
+                    if (b.doubleValue() == 0d)
+                        return 0d;
 
-                    return Values.create(a.getNumber() / b.getNumber());
+                    return a.doubleValue() / b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -240,7 +226,7 @@ public enum NodeModel {
                 try {
                     Object a = info.getValueFromInput(0);
                     Object b = info.getValueFromInput(1);
-                    return Values.create(a.equals(b));
+                    return a.equals(b);
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return false;
@@ -255,9 +241,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create(a.getNumber() > b.getNumber());
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() > b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return false;
@@ -272,9 +258,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create(a.getNumber() < b.getNumber());
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() < b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return false;
@@ -294,16 +280,17 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
+                    Number a = (Number) info.getValueFromInput(0);
+
                     switch ((String) info.getInternals()[0].getValue()) {
                         case "round":
-                            return Values.create((float) Math.round(a.getNumber()));
+                            return Math.round(a.doubleValue());
                         case "ceil":
-                            return Values.create((float) Math.ceil(a.getNumber()));
+                            return Math.ceil(a.doubleValue());
                         case "floor":
-                            return Values.create((float) Math.floor(a.getNumber()));
+                            return Math.floor(a.doubleValue());
                     }
-                    return Values.create((float) Math.round(a.getNumber()));
+                    return a;
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -317,8 +304,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    return Values.create((float) Math.abs(a.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    return Math.abs(a.doubleValue());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -333,9 +320,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create((float) Math.pow(a.getNumber(), b.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return Math.pow(a.doubleValue(), b.doubleValue());
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -351,15 +338,12 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    BooleanValue condition;
-                    try {
-                        condition = (BooleanValue) info.getValueFromInput(0);
-                    } catch (Exception e) {
-                        condition = false;
-                    }
-                    NumberValue then = (NumberValue) info.getValueFromInput(1);
-                    NumberValue _else = (NumberValue) info.getValueFromInput(2);
-                    return Values.create(condition.getBoolean() ? then.getNumber() : _else.getNumber());
+                    boolean condition = Values.convert(Boolean.class, info.getValueFromInput(0));
+
+                    Number a = (Number) info.getValueFromInput(1);
+                    Number b = (Number) info.getValueFromInput(2);
+
+                    return condition ? a.doubleValue() : b.doubleValue();
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -375,7 +359,7 @@ public enum NodeModel {
                 Object value = info.getInternals()[0].getValue();
                 if (value == null) return "";
                 if (!(value instanceof String)) return "";
-                return Values.create((String) value);
+                return value;
             }),
 
     COMBINE_TEXT(new Node(NodeType.PROCESSOR, new NodeInternal[]{
@@ -388,21 +372,12 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    Object rJoiner = info.getInternals()[0].getValue();
-                    Object rA = info.getValueFromInput(0);
-                    Object rB = info.getValueFromInput(1);
-                    StringValue a, b;
+                    Object joiner = Values.convert(String.class, info.getInternals()[0].getValue());
+                    Object a = Values.convert(String.class, info.getValueFromInput(0));
+                    Object b = Values.convert(String.class, info.getValueFromInput(1));
 
-                    if (rA instanceof StringValue)
-                        a = (StringValue) rA;
-                    else a = Values.create(rA.toString());
-
-                    if (rB instanceof StringValue)
-                        b = (StringValue) rB;
-                    else b = Values.create(rB.toString());
-
-                    String joiner = rJoiner == null ? "" : (String) rJoiner;
-                    return Values.create(a.getString() + joiner + b.getString());
+                    joiner = joiner == null ? "" : joiner;
+                    return "" + a + joiner + b;
                 } catch (Exception e) {
                     RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
                     return 0;
@@ -417,20 +392,10 @@ public enum NodeModel {
             new NodeSocket("output", NodeDataType.STRING),
     }),
             info -> {
-                try {
-                    BooleanValue condition;
-                    try {
-                        condition = (BooleanValue) info.getValueFromInput(0);
-                    } catch (Exception e) {
-                        condition = false;
-                    }
-                    StringValue then = (StringValue) info.getValueFromInput(1);
-                    StringValue _else = (StringValue) info.getValueFromInput(2);
-                    return Values.create(condition.getBoolean() ? then.getString() : _else.getString());
-                } catch (Exception e) {
-                    RulesEngine.LOG.warning("Flow rule processing error: " + e.getMessage());
-                    return 0;
-                }
+                boolean condition = Values.convert(Boolean.class, info.getValueFromInput(0));
+                String a = Values.convert(String.class, info.getValueFromInput(1));
+                String b = Values.convert(String.class, info.getValueFromInput(2));
+                return condition ? a : b;
             }),
 
     SIN(new Node(NodeType.PROCESSOR, "sin", new NodeInternal[0], new NodeSocket[]{
@@ -440,8 +405,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    return Values.create((float) Math.sin(a.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    return Math.sin(a.doubleValue());
                 } catch (Exception e) {
                     return 0;
                 }
@@ -453,12 +418,8 @@ public enum NodeModel {
             new NodeSocket("out", NodeDataType.NUMBER)
     }),
             info -> {
-                try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    return Values.create((float) Math.cos(a.getNumber()));
-                } catch (Exception e) {
-                    return 0;
-                }
+                Number a = (Number) info.getValueFromInput(0);
+                return Math.cos(a.doubleValue());
             }),
 
     TAN(new Node(NodeType.PROCESSOR, "tan", new NodeInternal[0], new NodeSocket[]{
@@ -468,8 +429,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    return Values.create((float) Math.tan(a.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    return Math.tan(a.doubleValue());
                 } catch (Exception e) {
                     return 0;
                 }
@@ -482,8 +443,8 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    return Values.create((float) Math.sqrt(a.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    return Math.sqrt(a.doubleValue());
                 } catch (Exception e) {
                     return 0;
                 }
@@ -497,9 +458,9 @@ public enum NodeModel {
     }),
             info -> {
                 try {
-                    NumberValue a = (NumberValue) info.getValueFromInput(0);
-                    NumberValue b = (NumberValue) info.getValueFromInput(1);
-                    return Values.create((float) (a.getNumber() % b.getNumber()));
+                    Number a = (Number) info.getValueFromInput(0);
+                    Number b = (Number) info.getValueFromInput(1);
+                    return a.doubleValue() % b.doubleValue();
                 } catch (Exception e) {
                     return 0;
                 }

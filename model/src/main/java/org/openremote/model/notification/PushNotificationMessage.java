@@ -21,6 +21,7 @@ package org.openremote.model.notification;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class PushNotificationMessage extends AbstractNotificationMessage {
     protected String body;
     protected PushNotificationAction action;
     protected List<PushNotificationButton> buttons;
-    protected Object data;
+    protected ObjectNode data;
     protected MessagePriority priority;
     protected TargetType targetType;
     protected String target;
@@ -54,7 +55,7 @@ public class PushNotificationMessage extends AbstractNotificationMessage {
                                    @JsonProperty("body") String body,
                                    @JsonProperty("action") PushNotificationAction action,
                                    @JsonProperty("buttons") List<PushNotificationButton> buttons,
-                                   @JsonProperty("data") Object data,
+                                   @JsonProperty("data") ObjectNode data,
                                    @JsonProperty("priority") MessagePriority priority,
                                    @JsonProperty("targetType") TargetType targetType,
                                    @JsonProperty("target") String target,
@@ -75,7 +76,7 @@ public class PushNotificationMessage extends AbstractNotificationMessage {
                                    String body,
                                    PushNotificationAction action,
                                    List<PushNotificationButton> buttons,
-                                   Object data) {
+                                   ObjectNode data) {
         super(TYPE);
         this.title = title;
         this.body = body;
@@ -124,11 +125,11 @@ public class PushNotificationMessage extends AbstractNotificationMessage {
         return this;
     }
 
-    public Object getData() {
+    public ObjectNode getData() {
         return data;
     }
 
-    public PushNotificationMessage setData(Object data) {
+    public PushNotificationMessage setData(ObjectNode data) {
         this.data = data;
         return this;
     }

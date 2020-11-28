@@ -214,7 +214,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         when: "a mock thing asset is created that links to the mock protocol configurations"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-            new Attribute<>("lightToggle1", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle1", ValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                     new MetaItem<>(
@@ -222,7 +222,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute<>("tempTarget1", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget1", ValueType.NUMBER)
                 .setMeta(
                     new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                     new MetaItem<>(
@@ -230,14 +230,14 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute<>("invalidToggle1", AttributeValueType.BOOLEAN)
+            new Attribute<>("invalidToggle1", ValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "mockConfig1").toArrayValue()
                     )
                 ),
-            new Attribute<>("lightToggle2", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle2", ValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -245,7 +245,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new Attribute<>("tempTarget2", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget2", ValueType.NUMBER)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -253,7 +253,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig2").toArrayValue()
                 )
             ),
-            new Attribute<>("lightToggle3", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle3", ValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -261,7 +261,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new Attribute<>("tempTarget3", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget3", ValueType.NUMBER)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -269,7 +269,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig3").toArrayValue()
                 )
             ),
-            new Attribute<>("lightToggle4", AttributeValueType.BOOLEAN)
+            new Attribute<>("lightToggle4", ValueType.BOOLEAN)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -277,7 +277,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                 )
             ),
-            new Attribute<>("tempTarget4", AttributeValueType.NUMBER)
+            new Attribute<>("tempTarget4", ValueType.NUMBER)
                     .setMeta(
                     new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                     new MetaItem<>(
@@ -285,14 +285,14 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                             new AttributeRef(mockAgent.getId(), "mockConfig4").toArrayValue()
                     )
             ),
-            new Attribute<>("invalidToggle5", AttributeValueType.BOOLEAN, false)
+            new Attribute<>("invalidToggle5", ValueType.BOOLEAN, false)
                 .setMeta(
                     new MetaItem<>(
                         MetaItemType.AGENT_LINK,
                         new AttributeRef(mockAgent.getId(), "INVALID CONFIG").toArrayValue()
                     )
                 ),
-            new Attribute<>("plainAttribute", AttributeValueType.STRING, "demo")
+            new Attribute<>("plainAttribute", ValueType.STRING, "demo")
                 .setMeta(
                 new MetaItem<>(
                         MetaItemType.DESCRIPTION,
@@ -300,7 +300,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                 ),
                 new MetaItem<>(MetaItemType.READ_ONLY, true)
             ),
-            new Attribute<>("filterRegex", AttributeValueType.NUMBER)
+            new Attribute<>("filterRegex", ValueType.NUMBER)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -312,7 +312,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                     Values.createArray().add(Util.objectToValue(new RegexValueFilter("\\w(\\d+)", 1, 2)).get())
                 )
             ),
-            new Attribute<>("filterSubstring", AttributeValueType.STRING)
+            new Attribute<>("filterSubstring", ValueType.STRING)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(
@@ -324,7 +324,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                     Values.createArray().add(Util.objectToValue(new SubStringValueFilter(10, 12)).get())
                 )
             ),
-            new Attribute<>("filterRegexSubstring", AttributeValueType.NUMBER)
+            new Attribute<>("filterRegexSubstring", ValueType.NUMBER)
                 .setMeta(
                 new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
                 new MetaItem<>(

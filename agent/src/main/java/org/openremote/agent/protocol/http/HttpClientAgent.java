@@ -22,6 +22,7 @@ package org.openremote.agent.protocol.http;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentLink;
+import org.openremote.model.asset.impl.ElectricityChargerAsset;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
@@ -130,20 +131,50 @@ public class HttpClientAgent extends Agent<HttpClientAgent, HttpClientProtocol, 
         return getAttributes().getValue(BASE_URI);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends HttpClientAgent> T setBaseURI(String value) {
+        getAttributes().getOrCreate(BASE_URI).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Boolean> getFollowRedirects() {
         return getAttributes().getValue(FOLLOW_REDIRECTS);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends HttpClientAgent> T setFollowRedirects(Boolean value) {
+        getAttributes().getOrCreate(FOLLOW_REDIRECTS).setValue(value);
+        return (T)this;
     }
 
     public Optional<ValueType.MultivaluedStringMap> getRequestHeaders() {
         return getAttributes().getValue(REQUEST_HEADERS);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends HttpClientAgent> T setRequestHeaders(ValueType.MultivaluedStringMap value) {
+        getAttributes().getOrCreate(REQUEST_HEADERS).setValue(value);
+        return (T)this;
+    }
+
     public Optional<ValueType.MultivaluedStringMap> getRequestQueryParameters() {
         return getAttributes().getValue(REQUEST_QUERY_PARAMETERS);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends HttpClientAgent> T setRequestQueryParameters(ValueType.MultivaluedStringMap value) {
+        getAttributes().getOrCreate(REQUEST_QUERY_PARAMETERS).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getRequestTimeoutMillis() {
         return getAttributes().getValue(REQUEST_TIMEOUT_MILLIS);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends HttpClientAgent> T setRequestTimeoutMillis(Integer value) {
+        getAttributes().getOrCreate(REQUEST_TIMEOUT_MILLIS).setValue(value);
+        return (T)this;
     }
 
     @Override

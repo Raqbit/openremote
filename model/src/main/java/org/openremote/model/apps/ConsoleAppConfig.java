@@ -39,7 +39,7 @@ public class ConsoleAppConfig {
     public ConsoleAppConfig() {
     }
 
-    public ConsoleAppConfig(String realm, String initialUrl, String url, Boolean menuEnabled, MenuPosition menuPosition, String menuImage, String primaryColor, String secondaryColor, List<AppLink> links) {
+    public ConsoleAppConfig(String realm, String initialUrl, String url, Boolean menuEnabled, MenuPosition menuPosition, String menuImage, String primaryColor, String secondaryColor, AppLink[] links) {
         this.realm = realm;
         this.initialUrl = initialUrl;
         this.url = url;
@@ -83,5 +83,5 @@ public class ConsoleAppConfig {
 
     @Column(name = "LINKS", columnDefinition = "jsonb")
     @org.hibernate.annotations.Type(type = PERSISTENCE_JSON_VALUE_TYPE)
-    protected List<AppLink> links;
+    protected AppLink[] links;
 }

@@ -531,7 +531,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public Asset merge(Asset asset) {
+    public <T extends Asset> T merge(T asset) {
         return merge(asset, false);
     }
 
@@ -541,7 +541,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public Asset merge(Asset asset, boolean overrideVersion) {
+    public <T extends Asset> T merge(T asset, boolean overrideVersion) {
         return merge(asset, overrideVersion, false, null);
     }
 
@@ -550,7 +550,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public Asset merge(Asset asset, String userName) {
+    public <T extends Asset> T merge(T asset, String userName) {
         return merge(asset, false, false, userName);
     }
 
@@ -565,7 +565,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public Asset merge(Asset asset, boolean overrideVersion, boolean skipGatewayCheck, String userName) {
+    public <T extends Asset> T merge(T asset, boolean overrideVersion, boolean skipGatewayCheck, String userName) {
         return persistenceService.doReturningTransaction(em -> {
 
             Asset existingAsset = null;
@@ -713,7 +713,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
 
             LOG.fine("Storing: " + asset);
 
-            Asset updatedAsset;
+            T updatedAsset;
             String gatewayId = gatewayService.getLocallyRegisteredGatewayId(asset.getId(), asset.getParentId());
 
             if (!skipGatewayCheck && gatewayId != null) {

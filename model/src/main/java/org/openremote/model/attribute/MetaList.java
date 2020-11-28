@@ -33,7 +33,7 @@ public class MetaList extends NamedList<MetaItem<?>> {
         super(meta);
     }
 
-    // This works around the crappy type system
+    // This works around the crappy type system and avoids the need for a type witness
     public <S> Optional<MetaItem<S>> get(MetaItemDescriptor<S> metaDescriptor) {
         return super.get(metaDescriptor);
     }

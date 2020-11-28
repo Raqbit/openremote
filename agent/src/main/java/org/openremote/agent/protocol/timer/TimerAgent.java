@@ -43,8 +43,9 @@ public class TimerAgent extends Agent<TimerAgent, TimerProtocol, TimerAgent.Time
             return Optional.ofNullable(timerValue);
         }
 
-        public void setTimerValue(TimerValue timerValue) {
+        public TimerAgentLink setTimerValue(TimerValue timerValue) {
             this.timerValue = timerValue;
+            return this;
         }
     }
 
@@ -73,11 +74,26 @@ public class TimerAgent extends Agent<TimerAgent, TimerProtocol, TimerAgent.Time
         return getAttributes().getValue(TIMER_ACTION);
     }
 
+    public TimerAgent setTimerAction(AttributeState timerAction) {
+        getAttributes().getOrCreate(TIMER_ACTION).setValue(timerAction);
+        return this;
+    }
+
     public Optional<CronExpressionParser> getTimerCronExpression() {
         return getAttributes().getValue(TIMER_CRON_EXPRESSION);
     }
 
+    public TimerAgent setTimerCronExpression(CronExpressionParser cronExpression) {
+        getAttributes().getOrCreate(TIMER_CRON_EXPRESSION).setValue(cronExpression);
+        return this;
+    }
+
     public Optional<Boolean> isTimerActive() {
         return getAttributes().getValue(TIMER_ACTIVE);
+    }
+
+    public TimerAgent setTimerActive(boolean timerActive) {
+        getAttributes().getOrCreate(TIMER_ACTIVE).setValue(timerActive);
+        return this;
     }
 }

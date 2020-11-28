@@ -38,6 +38,7 @@ import org.openremote.model.calendar.CalendarEvent;
 import org.openremote.model.rules.*;
 import org.openremote.model.rules.flow.NodeCollection;
 import org.openremote.model.util.Pair;
+import org.openremote.model.value.Values;
 
 import javax.script.*;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.openremote.container.concurrent.GlobalLock.withLock;
-import static org.openremote.model.query.filter.CalendarEventPredicate.getNextOrActiveFromTo;
 
 public class RulesetDeployment {
 
@@ -151,11 +151,11 @@ public class RulesetDeployment {
         this.historicDatapointsFacade = historicDatapointsFacade;
         this.predictedDatapointsFacade = predictedDatapointsFacade;
 
-        if (ruleset.hasMeta(Ruleset.META_KEY_VALIDITY)) {
+        if (ruleset.getMeta().has(Ruleset.VALIDITY)) {
             validity = ruleset.getValidity();
 
             if (validity == null) {
-                RulesEngine.LOG.log(Level.SEVERE, "Ruleset has invalid validity value '" + ruleset.getMeta(Ruleset.META_KEY_VALIDITY) + "'");
+                RulesEngine.LOG.log(Level.SEVERE, "Ruleset has invalid validity value '" + ruleset.getMeta().get(Ruleset.VALIDITY) + "'");
             }
         }
     }

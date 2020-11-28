@@ -38,14 +38,5 @@ public abstract class Assets {
 
     abstract public Assets dispatch(String assetId, String attributeName, Object value);
 
-    abstract public Assets dispatch(String assetId, String attributeName, String value);
-
-    abstract public Assets dispatch(String assetId, String attributeName, double value);
-
-    abstract public Assets dispatch(String assetId, String attributeName, boolean value);
-
-    abstract public Assets dispatch(String assetId, String attributeName, AttributeExecuteStatus status);
-
     abstract public Assets dispatch(String assetId, String attributeName);
-
 }

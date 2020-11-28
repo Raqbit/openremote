@@ -21,32 +21,31 @@ package org.openremote.model.asset.impl;
 
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-/**
- * An asset for grouping other assets together; if the {@link #CHILD_ASSET_TYPE} {@link Attribute} is specified then
- * all children must be of the specified type.
- */
-public class GroupAsset extends Asset {
+public class CityAsset extends Asset {
 
-    public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", ValueType.STRING);
-public static final String t = GroupAsset.class.getSimpleName();
-    public static final AssetDescriptor<GroupAsset> DESCRIPTOR = new AssetDescriptor<>("folder", "B3B3B3", GroupAsset.class);
+    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", ValueType.STRING);
+    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", ValueType.STRING);
 
-    public GroupAsset(String name) {
+    public static final AssetDescriptor<CityAsset> DESCRIPTOR = new AssetDescriptor<>("city", null, CityAsset.class);
+
+    public CityAsset(String name) {
         super(name, DESCRIPTOR);
     }
 
-    public Optional<String> getChildAssetType() {
-        return getAttributes().getValue(CHILD_ASSET_TYPE);
+    protected <T extends AssetDescriptor<U>, U extends CityAsset> CityAsset(String name, T descriptor) {
+        super(name, descriptor);
     }
 
-    public GroupAsset setChildAssetType(String childAssetType) {
-        getAttributes().getOrCreate(CHILD_ASSET_TYPE).setValue(childAssetType);
-        return this;
+    public Optional<String> getCity() {
+        return getAttributes().getValue(CITY);
+    }
+
+    public Optional<String> getCountry() {
+        return getAttributes().getValue(COUNTRY);
     }
 }

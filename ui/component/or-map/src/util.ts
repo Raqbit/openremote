@@ -23,7 +23,7 @@ export function getLngLat(lngLatLike?: LngLatLike | Asset | Attribute | GeoJSONP
 
         if ((obj as Attribute).name && (obj as Attribute).type) {
             const attr = obj as Attribute;
-            if (attr.type !== AttributeValueType.GEO_JSON_POINT.name || !attr.value) {
+            if (attr.type !== ValueType.GEO_JSON_POINT.name || !attr.value) {
                 return;
             }
             obj = attr.value;

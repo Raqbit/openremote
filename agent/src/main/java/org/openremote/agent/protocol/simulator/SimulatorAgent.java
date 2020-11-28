@@ -46,8 +46,9 @@ public class SimulatorAgent extends Agent<SimulatorAgent, SimulatorProtocol, Sim
             return Optional.ofNullable(simulatorReplayData);
         }
 
-        public void setSimulatorReplayData(SimulatorReplayDatapoint[] simulatorReplayData) {
+        public SimulatorAgentLink setSimulatorReplayData(SimulatorReplayDatapoint[] simulatorReplayData) {
             this.simulatorReplayData = simulatorReplayData;
+            return this;
         }
     }
 

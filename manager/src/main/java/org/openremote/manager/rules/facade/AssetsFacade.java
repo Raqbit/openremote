@@ -31,8 +31,6 @@ import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.Assets;
 import org.openremote.model.rules.Ruleset;
 import org.openremote.model.rules.TenantRuleset;
-import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -115,24 +113,8 @@ public class AssetsFacade<T extends Ruleset> extends Assets {
         return this;
     }
 
-    public AssetsFacade<T> dispatch(String assetId, String attributeName, Value value) {
+    public AssetsFacade<T> dispatch(String assetId, String attributeName, Object value) {
         return dispatch(new AttributeEvent(assetId, attributeName, value));
-    }
-
-    public AssetsFacade<T> dispatch(String assetId, String attributeName, String value) {
-        return dispatch(assetId, attributeName, value);
-    }
-
-    public AssetsFacade<T> dispatch(String assetId, String attributeName, double value) {
-        return dispatch(assetId, attributeName, value);
-    }
-
-    public AssetsFacade<T> dispatch(String assetId, String attributeName, boolean value) {
-        return dispatch(assetId, attributeName, value);
-    }
-
-    public AssetsFacade<T> dispatch(String assetId, String attributeName, AttributeExecuteStatus status) {
-        return dispatch(assetId, attributeName, status.asValue());
     }
 
     public AssetsFacade<T> dispatch(String assetId, String attributeName) {

@@ -330,7 +330,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         def testAsset = new Asset("Test Asset", AssetType.THING)
         testAsset.setId("12345")
         testAsset.setAttributes(
-            new Attribute<>("attribute1", AttributeValueType.STRING, "Test")
+            new Attribute<>("attribute1", ValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(1d, 2d))
         authenticatedTestResource.postAsset(testAsset)
@@ -388,7 +388,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         testAsset = new Asset("Test Asset 2", AssetType.THING)
         testAsset.setId("67890")
         testAsset.setAttributes(
-            new Attribute<>("attribute2", AttributeValueType.STRING, "Test")
+            new Attribute<>("attribute2", ValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(3d, 4d))
         authenticatedTestResource.postAsset(testAsset)

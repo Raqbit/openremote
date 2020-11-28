@@ -61,27 +61,69 @@ public class ElectricityChargerAsset extends DeviceAsset {
         return getAttributes().getValue(STATUS);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setStatus(String value) {
+        getAttributes().getOrCreate(STATUS).setValue(value);
+        return (T)this;
+    }
+
     public Optional<String> getChargerType() {
         return getAttributes().getValue(CHARGER_TYPE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setChargerType(String value) {
+        getAttributes().getOrCreate(CHARGER_TYPE).setValue(value);
+        return (T)this;
     }
 
     public Optional<Double> getPowerCapacity() {
         return getAttributes().getValue(POWER_CAPACITY);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setPowerCapacity(Double value) {
+        getAttributes().getOrCreate(POWER_CAPACITY).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Double> getPowerConsumption() {
         return getAttributes().getValue(POWER_CONSUMPTION);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setPowerConsumption(Double value) {
+        getAttributes().getOrCreate(POWER_CONSUMPTION).setValue(value);
+        return (T)this;
     }
 
     public Optional<Double> getTariffImport() {
         return getAttributes().getValue(TARIFF_IMPORT);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setTariffImport(Double value) {
+        getAttributes().getOrCreate(TARIFF_IMPORT).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Double> getTariffExport() {
         return getAttributes().getValue(TARIFF_EXPORT);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setTariffExport(Double value) {
+        getAttributes().getOrCreate(TARIFF_EXPORT).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Double> getTariffStart() {
         return getAttributes().getValue(TARIFF_START);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ElectricityChargerAsset> T setTariffStart(Double value) {
+        getAttributes().getOrCreate(TARIFF_START).setValue(value);
+        return (T)this;
     }
 }

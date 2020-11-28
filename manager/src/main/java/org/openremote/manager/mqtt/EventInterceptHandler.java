@@ -19,6 +19,7 @@
  */
 package org.openremote.manager.mqtt;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.moquette.interception.AbstractInterceptHandler;
 import io.moquette.interception.messages.*;
 import org.keycloak.adapters.rotation.AdapterTokenVerifier;
@@ -38,7 +39,6 @@ import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.event.shared.CancelEventSubscription;
 import org.openremote.model.event.shared.EventSubscription;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.Value;
 import org.openremote.model.value.Values;
 
 import java.nio.charset.Charset;
@@ -206,12 +206,13 @@ public class EventInterceptHandler extends AbstractInterceptHandler {
                 String payloadContent = msg.getPayload().toString(Charset.defaultCharset());
                 Values.parse(payloadContent).flatMap(Values::asJSONObject).ifPresent(objectValue -> {
                     Map<String, Object> headers = prepareHeaders(connection);
-                    AttributeEvent attributeEvent = new AttributeEvent(assetId, objectValue.keys()[0], objectValue.get(objectValue.keys()[0]).orElse(null));
+                    Map.Entry<String, JsonNode> firstElem = objectValue.fields().next();
+                    AttributeEvent attributeEvent = new AttributeEvent(assetId, firstElem.getKey(), firstElem.getValue());
                     messageBrokerService.getProducerTemplate().sendBodyAndHeaders(ClientEventService.CLIENT_EVENT_QUEUE, attributeEvent, headers);
                 });
             } else {
                 String payloadContent = msg.getPayload().toString(Charset.defaultCharset());
-                Value value = null;
+                Object value = null;
                 if (Character.isLetter(payloadContent.charAt(0))) {
                     if (payloadContent.equals(Boolean.TRUE.toString())) {
                         value = true;
@@ -222,7 +223,10 @@ public class EventInterceptHandler extends AbstractInterceptHandler {
                     payloadContent = '"' + payloadContent + '"';
                 }
                 if (value == null) {
-                    value = Values.parse(payloadContent).orElse(payloadContent);
+                    value = Values.parse(payloadContent);
+                }
+                if (value == null) {
+                    value = payloadContent;
                 }
 
                 Map<String, Object> headers = prepareHeaders(connection);

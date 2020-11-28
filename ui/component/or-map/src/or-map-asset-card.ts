@@ -30,11 +30,11 @@ orAttributeTemplateProvider.setTemplate((attribute:Attribute) => {
     let template;
     const value = Util.getAttributeValueFormatted(attribute, undefined, undefined);
     switch (attribute.type) {
-        case AttributeValueType.SWITCH_TOGGLE.name:
+        case ValueType.SWITCH_TOGGLE.name:
             template = html`<or-translate value="${value ? "On" : "Off"}"></or-translate>`;
             break;
-        case AttributeValueType.OBJECT.name:
-        case AttributeValueType.ARRAY.name:
+        case ValueType.OBJECT.name:
+        case ValueType.ARRAY.name:
             if(attribute.name === "status") {
                 template = html`<or-translate value="${value.result}"></or-translate>`;
             }

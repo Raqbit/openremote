@@ -138,24 +138,24 @@ class UdpClientProtocolTest extends Specification implements ManagerContainerTra
         when: "an asset is created with attributes linked to the protocol configuration"
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
-            new Attribute<>("echoHello", AttributeValueType.STRING)
+            new Attribute<>("echoHello", ValueType.STRING)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create('"Hello {$value};"')),
                     new MetaItem<>(MetaItemType.EXECUTABLE)
                 ),
-            new Attribute<>("echoWorld", AttributeValueType.STRING)
+            new Attribute<>("echoWorld", ValueType.STRING)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(UdpClientProtocol.META_ATTRIBUTE_WRITE_VALUE, Values.create("World;"))
                 ),
-            new Attribute<>("responseHello", AttributeValueType.STRING)
+            new Attribute<>("responseHello", ValueType.STRING)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,
                         new StringPredicate(AssetQuery.Match.BEGIN, true, "Hello").toModelValue())
                 ),
-            new Attribute<>("responseWorld", AttributeValueType.STRING)
+            new Attribute<>("responseWorld", ValueType.STRING)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(Protocol.META_ATTRIBUTE_MATCH_PREDICATE,

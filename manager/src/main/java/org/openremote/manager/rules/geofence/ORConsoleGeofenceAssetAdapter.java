@@ -19,6 +19,7 @@
  */
 package org.openremote.manager.rules.geofence;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.camel.builder.RouteBuilder;
 import org.openremote.model.Container;
 import org.openremote.container.message.MessageBrokerService;
@@ -29,9 +30,8 @@ import org.openremote.manager.notification.NotificationService;
 import org.openremote.manager.rules.RulesEngine;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.impl.ConsoleAsset;
 import org.openremote.model.attribute.AttributeRef;
-import org.openremote.model.attribute.AttributeType;
-import org.openremote.model.console.ConsoleConfiguration;
 import org.openremote.model.console.ConsoleProvider;
 import org.openremote.model.notification.Notification;
 import org.openremote.model.notification.PushNotificationMessage;
@@ -43,6 +43,7 @@ import org.openremote.model.rules.geofence.GeofenceDefinition;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.value.Values;
 
+import java.io.Console;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,7 +55,6 @@ import static org.openremote.container.concurrent.GlobalLock.withLock;
 import static org.openremote.container.persistence.PersistenceEvent.*;
 import static org.openremote.model.asset.AssetResource.Util.WRITE_ATTRIBUTE_HTTP_METHOD;
 import static org.openremote.model.asset.AssetResource.Util.getWriteAttributeUrl;
-import static org.openremote.model.asset.AssetType.CONSOLE;
 import static org.openremote.model.syslog.SyslogCategory.RULES;
 
 /**
@@ -103,11 +103,12 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
         assetStorageService.findAll(
             new AssetQuery()
                 .select(new AssetQuery.Select().excludePath(true)
-                    .attributes(AttributeType.CONSOLE_PROVIDERS.getAttributeName()))
-                .types(CONSOLE)
-                .attributeValue(AttributeType.CONSOLE_PROVIDERS.getAttributeName(),
+                    .attributes(ConsoleAsset.CONSOLE_PROVIDERS.getName()))
+                .types(ConsoleAsset.class)
+                .attributeValue(ConsoleAsset.CONSOLE_PROVIDERS.getName(),
                     new ObjectValueKeyPredicate("geofence")))
             .stream()
+            .map(asset -> (ConsoleAsset)asset)
             .filter(ORConsoleGeofenceAssetAdapter::isLinkedToORConsoleGeofenceAdapter)
             .forEach(asset -> consoleIdRealmMap.put(asset.getId(), asset.getRealm()));
     }
@@ -125,10 +126,9 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
             .routeId("ORConsoleGeofenceAdapterAssetChanges")
             .filter(isPersistenceEventForEntityType(Asset.class))
             .process(exchange -> {
-                if (isPersistenceEventForAssetType(CONSOLE).matches(exchange)) {
-                    PersistenceEvent persistenceEvent = exchange.getIn().getBody(PersistenceEvent.class);
-                    final Asset console = (Asset) persistenceEvent.getEntity();
-                    processConsoleAssetChange(console, persistenceEvent);
+                if (isPersistenceEventForAssetType(ConsoleAsset.class).matches(exchange)) {
+                    @SuppressWarnings("unchecked") PersistenceEvent<ConsoleAsset> persistenceEvent = (PersistenceEvent<ConsoleAsset>)exchange.getIn().getBody(PersistenceEvent.class);
+                    processConsoleAssetChange(persistenceEvent);
                 }
             });
     }
@@ -240,7 +240,7 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
     protected GeofenceDefinition locationPredicateToGeofenceDefinition(String assetId, GeofencePredicate geofencePredicate) {
         RadialGeofencePredicate radialLocationPredicate = (RadialGeofencePredicate) geofencePredicate;
         String id = assetId + "_" + Integer.toString(radialLocationPredicate.hashCode());
-        String url = getWriteAttributeUrl(new AttributeRef(assetId, AttributeType.LOCATION.getAttributeName()));
+        String url = getWriteAttributeUrl(new AttributeRef(assetId, Asset.LOCATION.getName()));
         return new GeofenceDefinition(id,
             radialLocationPredicate.getLat(),
             radialLocationPredicate.getLng(),
@@ -258,7 +258,7 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
         }
 
         List<String> ids = new ArrayList<>(assetIds);
-        ObjectValue data = Values.createObject();
+        ObjectNode data = Values.JSON.createObjectNode();
         data.put("action", "GEOFENCE_REFRESH");
 
         // Break into batches of 10 sent every 10s to avoid consoles bombarding the backend
@@ -279,7 +279,8 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
             });
     }
 
-    protected void processConsoleAssetChange(Asset asset, PersistenceEvent persistenceEvent) {
+    protected void processConsoleAssetChange(PersistenceEvent<ConsoleAsset> persistenceEvent) {
+        ConsoleAsset asset = persistenceEvent.getEntity();
 
         withLock(getClass().getSimpleName() + "::processAssetChange", () -> {
             switch (persistenceEvent.getCause()) {
@@ -301,8 +302,9 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
         });
     }
 
-    protected static boolean isLinkedToORConsoleGeofenceAdapter(Asset asset) {
-        return ConsoleConfiguration.getConsoleProvider(asset, "geofence")
-            .map(ConsoleProvider::getVersion).map(NAME::equals).orElse(false);
+    protected static boolean isLinkedToORConsoleGeofenceAdapter(ConsoleAsset asset) {
+        return asset.getConsoleProviders().flatMap(consoleProviders ->
+            Optional.ofNullable(consoleProviders.get("geofence"))
+            .map(ConsoleProvider::getVersion).map(NAME::equals)).orElse(false);
     }
 }

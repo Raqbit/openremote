@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.openremote.model.util.TextUtil;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -75,6 +76,9 @@ public class Values {
     public static final String NULL_LITERAL = "null";
 
     public static Optional<JsonNode> parse(String jsonString) {
+        if (TextUtil.isNullOrEmpty(jsonString)) {
+            return Optional.empty();
+        }
         try {
             return Optional.of(JSON.readTree(jsonString));
         } catch (Exception e) {
@@ -103,15 +107,19 @@ public class Values {
     }
 
     public static Optional<String> asJSON(Object object) {
-        if (object == null) {
-            return Optional.empty();
-        }
         try {
-            return Optional.of(JSON.writeValueAsString(object));
+            return Optional.of(asJSONOrThrow(object));
         } catch (JsonProcessingException e) {
             LOG.log(Level.WARNING, "Failed to convert object to JSON string", e);
             return Optional.empty();
         }
+    }
+
+    public static String asJSONOrThrow(Object object) throws JsonProcessingException {
+        if (object == null) {
+            return NULL_LITERAL;
+        }
+        return JSON.writeValueAsString(object);
     }
 
     @SuppressWarnings("rawtypes")

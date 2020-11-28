@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.asset.impl.LightAsset.BRIGHTNESS;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 
 /**
  * Protocol for communicating with the IKEA TRÅDFRI gateway; devices are represented as {@link Asset}s under the linked
@@ -249,7 +250,7 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent, AgentLink> {
 
             // Add agent links
             lightAsset.getAttributes().get(BRIGHTNESS).ifPresent(attribute -> attribute.addOrReplaceMeta(
-                new MetaItem<>(MetaItemType.AGENT_LINK, new AgentLink(agent.getId()))
+                new MetaItem<>(AGENT_LINK, new AgentLink(agent.getId()))
             ));
             asset = lightAsset;
         }

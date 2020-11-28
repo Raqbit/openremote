@@ -19,18 +19,15 @@
  */
 package org.openremote.model.asset.impl;
 
-import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class BuildingAsset extends Asset {
+public class BuildingAsset extends CityAsset {
 
     public static final AttributeDescriptor<String> STREET = new AttributeDescriptor<>("street", ValueType.STRING);
-    public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", ValueType.STRING);
-    public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", ValueType.STRING);
     public static final AttributeDescriptor<String> POSTAL_CODE = new AttributeDescriptor<>("postalCode", ValueType.STRING);
 
     public static final AssetDescriptor<BuildingAsset> DESCRIPTOR = new AssetDescriptor<>("office-building", "4b5966", BuildingAsset.class);
@@ -41,14 +38,6 @@ public class BuildingAsset extends Asset {
 
     public Optional<String> getStreet() {
         return getAttributes().getValue(STREET);
-    }
-
-    public Optional<String> getCity() {
-        return getAttributes().getValue(CITY);
-    }
-
-    public Optional<String> getCountry() {
-        return getAttributes().getValue(COUNTRY);
     }
 
     public Optional<String> getPostalCode() {

@@ -135,7 +135,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
 
         when: "an attribute is added that links to a timers cron expression"
         apartment1.addAttributes(
-                new Attribute<>("daySceneCronFRIDAY", AttributeValueType.STRING)
+                new Attribute<>("daySceneCronFRIDAY", ValueType.STRING)
                     .addMeta(
                         AgentLink.asAgentLinkMetaItem(new AttributeRef(sceneAgent.id, "daySceneFRIDAY")),
                         TimerValue.CRON_EXPRESSION.asMetaItem()

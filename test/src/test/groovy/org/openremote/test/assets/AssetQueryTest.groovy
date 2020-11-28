@@ -33,7 +33,7 @@ import java.util.function.Function
 
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import static org.openremote.model.asset.AssetType.THING
-import static org.openremote.model.attribute.AttributeValueType.TIMESTAMP_ISO8601
+import static org.openremote.model.attribute.ValueType.TIMESTAMP_ISO8601
 import static org.openremote.model.query.AssetQuery.*
 import static org.openremote.model.query.AssetQuery.Access.PRIVATE
 import static org.openremote.model.query.AssetQuery.Access.PROTECTED
@@ -845,7 +845,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         recur.setInterval(2)
 
         lobby.addAttributes(
-            new Attribute<>("test", AttributeValueType.CALENDAR_EVENT, new CalendarEvent(start, end, recur).toValue())
+            new Attribute<>("test", ValueType.CALENDAR_EVENT, new CalendarEvent(start, end, recur).toValue())
         )
         lobby = assetStorageService.merge(lobby)
 

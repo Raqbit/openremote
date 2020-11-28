@@ -75,7 +75,7 @@ export class OrRuleAssetQuery extends translate(i18next)(LitElement) {
 
     // Value predicates for specific attribute value descriptors
     protected _queryOperatorsMap: Map<AssetTypeAttributeName | AttributeDescriptor | AttributeValueDescriptor | ValueType, AssetQueryOperator[]> = new Map<AssetTypeAttributeName | AttributeDescriptor | AttributeValueDescriptor | ValueType, AssetQueryOperator[]>([
-        [AttributeValueType.GEO_JSON_POINT, [
+        [ValueType.GEO_JSON_POINT, [
             AssetQueryOperator.EQUALS,
             AssetQueryOperator.NOT_EQUALS,
             AssetQueryOperator.WITHIN_RADIUS,
@@ -618,7 +618,7 @@ export class OrRuleAssetQuery extends translate(i18next)(LitElement) {
             // multiple
             case AssetQueryOperator.EQUALS:
             case AssetQueryOperator.NOT_EQUALS:
-                if (descriptor && descriptor.valueDescriptor && descriptor.valueDescriptor.name === AttributeValueType.TIMESTAMP_ISO8601.name) {
+                if (descriptor && descriptor.valueDescriptor && descriptor.valueDescriptor.name === ValueType.TIMESTAMP_ISO8601.name) {
                     predicate = {
                         predicateType: "datetime",
                         negate: value === AssetQueryOperator.NOT_EQUALS,

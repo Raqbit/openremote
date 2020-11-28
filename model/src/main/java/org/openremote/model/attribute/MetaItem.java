@@ -35,8 +35,10 @@ public class MetaItem<T> extends AbstractNameValueHolder<T> {
     protected MetaItem() {
     }
 
+    @SuppressWarnings("unchecked")
     public MetaItem(MetaItemDescriptor<T> metaDescriptor) {
-        this(metaDescriptor, null);
+        // If it's a boolean meta descriptor assume the caller wants it to be true as a default
+        this(metaDescriptor, (T)(Boolean.valueOf(metaDescriptor.getValueType().getType() == Boolean.class)));
     }
 
     public MetaItem(MetaItemDescriptor<T> metaDescriptor, T value) {

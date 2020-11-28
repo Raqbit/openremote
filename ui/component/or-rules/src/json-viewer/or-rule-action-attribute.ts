@@ -133,7 +133,7 @@ export class OrRuleActionAttribute extends translate(i18next)(LitElement) {
         let attributeInput: TemplateResult | undefined;
 
         if (this.action.attributeName) {
-            const label = (attributeValueDescriptor && (attributeValueDescriptor.valueType === ValueType.BOOLEAN || attributeValueDescriptor.name === AttributeValueType.BOOLEAN.name || attributeValueDescriptor.name === AttributeValueType.SWITCH_TOGGLE.name)) ? "" : i18next.t("value");
+            const label = (attributeValueDescriptor && (attributeValueDescriptor.valueType === ValueType.BOOLEAN || attributeValueDescriptor.name === ValueType.BOOLEAN.name || attributeValueDescriptor.name === ValueType.SWITCH_TOGGLE.name)) ? "" : i18next.t("value");
             attributeInput = html`<or-attribute-input @or-attribute-input-changed="${(ev: OrAttributeInputChangedEvent) => this.setActionAttributeValue(ev.detail.value)}" .customProvider="${this.config?.inputProvider}" .label="${label}" .assetType="${assetType}" .attributeDescriptor="${attributeDescriptor}" .attributeValueDescriptor="${attributeValueDescriptor}" .value="${this.action.value}" .readonly="${this.readonly || false}"></or-attribute-input>`;
         }
 

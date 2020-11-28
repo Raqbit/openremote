@@ -38,6 +38,7 @@ import java.util.zip.ZipInputStream;
 
 import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 
 /**
  * This protocol is used to connect to a KNX bus via an IP interface.
@@ -301,7 +302,7 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
 
         Attribute<?> attr = asset.getAttributes().get(attrName).orElse(new Attribute<>(attrName, type).addMeta(
                         new MetaItem<>(MetaItemType.LABEL, name),
-                        new MetaItem<>(MetaItemType.AGENT_LINK, agentLink)
+                        new MetaItem<>(AGENT_LINK, agentLink)
         ));
 
         asset.getAttributes().addOrReplace(attr);

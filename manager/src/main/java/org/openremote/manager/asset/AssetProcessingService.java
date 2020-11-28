@@ -295,7 +295,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                             break;
 
                         case SENSOR:
-                            Optional<Protocol<?>> protocol = oldAttribute.getMetaValue(MetaItemType.AGENT_LINK)
+                            Optional<Protocol<?>> protocol = oldAttribute.getMetaValue(AGENT_LINK)
                                     .map(agentLink -> agentService.getProtocolInstance(agentLink.getId()));
 
                             // Sensor event must be for an attribute linked to a protocol configuration

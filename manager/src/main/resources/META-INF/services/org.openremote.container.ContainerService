@@ -1,5 +1,4 @@
 org.openremote.manager.rules.geofence.ORConsoleGeofenceAssetAdapter
-org.openremote.manager.asset.AssetModelService
 org.openremote.manager.concurrent.ManagerExecutorService
 org.openremote.container.timer.TimerService
 org.openremote.manager.i18n.I18NService
@@ -11,7 +10,7 @@ org.openremote.manager.rules.RulesetStorageService
 org.openremote.manager.rules.RulesService
 org.openremote.manager.asset.AssetStorageService
 org.openremote.manager.datapoint.AssetDatapointService
-org.openremote.manager.attribute.AttributeLinkingService
+org.openremote.manager.asset.AttributeLinkingService
 org.openremote.manager.asset.AssetProcessingService
 org.openremote.container.message.MessageBrokerService
 org.openremote.manager.system.HealthStatusService

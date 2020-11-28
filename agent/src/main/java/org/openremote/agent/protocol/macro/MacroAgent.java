@@ -45,8 +45,9 @@ public class MacroAgent extends Agent<MacroAgent, MacroProtocol, MacroAgent.Macr
             return Optional.ofNullable(actionIndex);
         }
 
-        public void setActionIndex(Integer actionIndex) {
+        public MacroAgentLink setActionIndex(Integer actionIndex) {
             this.actionIndex = actionIndex;
+            return this;
         }
     }
 
@@ -75,8 +76,18 @@ public class MacroAgent extends Agent<MacroAgent, MacroProtocol, MacroAgent.Macr
         return getAttributes().getValue(MACRO_ACTIONS);
     }
 
+    public MacroAgent setMacroActions(MacroAction[] actions) {
+        getAttributes().getOrCreate(MACRO_ACTIONS).setValue(actions);
+        return this;
+    }
+
     public Optional<Boolean> isMacroDisabled() {
         return getAttributes().getValue(MACRO_DISABLED);
+    }
+
+    public MacroAgent setMacroDisabled(boolean macroDisabled) {
+        getAttributes().getOrCreate(MACRO_DISABLED).setValue(macroDisabled);
+        return this;
     }
 
     public Optional<AttributeExecuteStatus> getMacroStatus() {

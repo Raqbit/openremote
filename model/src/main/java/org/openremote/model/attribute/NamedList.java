@@ -164,6 +164,9 @@ public class NamedList<T extends AbstractNameValueHolder<?>> extends ArrayList<T
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
+        if (c == null) {
+            return false;
+        }
         throwIfDuplicates(c);
         c.forEach(item -> throwIfHas(this, item.getName()));
         return super.addAll(c);
@@ -171,6 +174,9 @@ public class NamedList<T extends AbstractNameValueHolder<?>> extends ArrayList<T
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
+        if (c == null) {
+            return false;
+        }
         throwIfDuplicates(c);
         c.forEach(item -> throwIfHas(this, item.getName()));
         return super.addAll(index, c);
@@ -180,6 +186,10 @@ public class NamedList<T extends AbstractNameValueHolder<?>> extends ArrayList<T
     public void replaceAll(UnaryOperator<T> operator) {
         super.replaceAll(operator);
         throwIfDuplicates(this);
+    }
+
+    public <U extends AbstractNameValueDescriptorHolder<T>> void remove(U descriptor) {
+        removeIf(item -> item.getName().equals(descriptor.getName()));
     }
 
     public Optional<T> get(String name) {

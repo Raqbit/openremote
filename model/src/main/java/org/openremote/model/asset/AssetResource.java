@@ -28,7 +28,6 @@ import org.openremote.model.value.MetaItemType;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.*;
-
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -82,7 +81,7 @@ public interface AssetResource {
     @GET
     @Path("user/current")
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.READ_ASSETS_ROLE})
+    @RolesAllowed({Constants.READ_ASSETS_ROLE})
     Asset[] getCurrentUserAssets(@BeanParam RequestParams requestParams);
 
     /**
@@ -101,7 +100,7 @@ public interface AssetResource {
     @GET
     @Path("user/link")
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.READ_ASSETS_ROLE})
+    @RolesAllowed({Constants.READ_ASSETS_ROLE})
     UserAsset[] getUserAssetLinks(@BeanParam RequestParams requestParams,
                                   @QueryParam("realm") String realm,
                                   @QueryParam("userId") String userId,
@@ -118,7 +117,7 @@ public interface AssetResource {
     @POST
     @Path("user/link")
     @Consumes(APPLICATION_JSON)
-@RolesAllowed({Constants.WRITE_ASSETS_ROLE})
+    @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
     void createUserAsset(@BeanParam RequestParams requestParams, UserAsset userAsset);
 
     /**
@@ -133,7 +132,7 @@ public interface AssetResource {
      */
     @DELETE
     @Path("link/{realm}/{userId}/{assetId}")
-@RolesAllowed({Constants.WRITE_ASSETS_ROLE})
+    @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
     void deleteUserAsset(@BeanParam RequestParams requestParams,
                          @PathParam("realm") String realm,
                          @PathParam("userId") String userId,
@@ -148,7 +147,7 @@ public interface AssetResource {
     @GET
     @Path("{assetId}")
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.READ_ASSETS_ROLE})
+    @RolesAllowed({Constants.READ_ASSETS_ROLE})
     Asset get(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId);
 
     /**
@@ -157,7 +156,7 @@ public interface AssetResource {
     @GET
     @Path("partial/{assetId}")
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.READ_ASSETS_ROLE})
+    @RolesAllowed({Constants.READ_ASSETS_ROLE})
     Asset getPartial(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId);
 
     /**
@@ -173,7 +172,7 @@ public interface AssetResource {
     @PUT
     @Path("{assetId}")
     @Consumes(APPLICATION_JSON)
-@RolesAllowed({Constants.WRITE_ASSETS_ROLE})
+    @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
     void update(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId, @Valid Asset asset);
 
     /**
@@ -195,7 +194,7 @@ public interface AssetResource {
     @PUT
     @Path("{assetId}/attribute/{attributeName}")
     @Consumes(APPLICATION_JSON)
-void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId, @PathParam("attributeName") String attributeName, String rawJson);
+    void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("assetId") String assetId, @PathParam("attributeName") String attributeName, String rawJson);
 
     /**
      * Creates an asset. The identifier value of the asset can be provided, it should be a globally unique string value,
@@ -208,7 +207,7 @@ void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("ass
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.WRITE_ASSETS_ROLE})
+    @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
     Asset create(@BeanParam RequestParams requestParams, @Valid Asset asset);
 
     /**
@@ -218,7 +217,7 @@ void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("ass
      */
     @DELETE
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.WRITE_ASSETS_ROLE})
+    @RolesAllowed({Constants.WRITE_ASSETS_ROLE})
     void delete(@BeanParam RequestParams requestParams, @QueryParam("assetId") List<String> assetIds);
 
     /**
@@ -234,7 +233,7 @@ void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("ass
     @Path("query")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-@RolesAllowed({Constants.READ_ASSETS_ROLE})
+    @RolesAllowed({Constants.READ_ASSETS_ROLE})
     Asset[] queryAssets(@BeanParam RequestParams requestParams, AssetQuery query);
 
     /**
@@ -246,7 +245,7 @@ void writeAttributeValue(@BeanParam RequestParams requestParams, @PathParam("ass
     @Path("public/query")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-Asset[] queryPublicAssets(@BeanParam RequestParams requestParams, AssetQuery query);
+    Asset[] queryPublicAssets(@BeanParam RequestParams requestParams, AssetQuery query);
 
     /**
      * Retrieve public assets using an {@link AssetQuery} as a JSON serialized query parameter.
@@ -256,5 +255,5 @@ Asset[] queryPublicAssets(@BeanParam RequestParams requestParams, AssetQuery que
     @GET
     @Path("public/query")
     @Produces(APPLICATION_JSON)
-Asset[] getPublicAssets(@BeanParam RequestParams requestParams, @QueryParam("q") String q);
+    Asset[] getPublicAssets(@BeanParam RequestParams requestParams, @QueryParam("q") String q);
 }

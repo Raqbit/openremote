@@ -76,7 +76,7 @@ public class AgentHealthStatusProvider implements HealthStatusProvider, Containe
         objectValue.put("agents", agentService.getAgents().size());
         objectValue.put("protocols", agentService.protocolInstanceMap.size());
 
-        for (Agent agent : agentService.getAgents().values()) {
+        for (Agent<?, ?, ?> agent : agentService.getAgents().values()) {
             ConnectionStatus status = agent.getAgentStatus().orElse(null);
 
             if (status != null) {

@@ -77,6 +77,10 @@ public class Attribute<T> extends AbstractNameValueHolder<T> {
         return meta;
     }
 
+    public void setMeta(MetaList meta) {
+        this.meta = meta;
+    }
+
     public Attribute<T> addMeta(@NotNull MetaList meta) {
         getMeta().addAll(meta);
         return this;
@@ -116,6 +120,10 @@ public class Attribute<T> extends AbstractNameValueHolder<T> {
 
     public boolean hasMeta(MetaItemDescriptor<?> metaItemDescriptor) {
         return getMeta().has(metaItemDescriptor);
+    }
+
+    public boolean hasMeta(String metaItemName) {
+        return getMeta().has(metaItemName);
     }
 
     @Override

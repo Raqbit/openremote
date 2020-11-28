@@ -171,7 +171,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         and: "a mock thing asset is created with a valid protocol attribute, an invalid protocol attribute and a plain attribute"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
         mockThing.setAttributes(
-                new Attribute<>("light1Toggle", AttributeValueType.BOOLEAN, true)
+                new Attribute<>("light1Toggle", ValueType.BOOLEAN, true)
                         .setMeta(
                         new MetaItem<>(
                                 MetaItemType.DESCRIPTION,
@@ -182,7 +182,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
                                 new AttributeRef(mockAgent.getId(), "mock123").toArrayValue()
                         )
                 ),
-                new Attribute<>("light2Toggle", AttributeValueType.BOOLEAN, true)
+                new Attribute<>("light2Toggle", ValueType.BOOLEAN, true)
                         .setMeta(
                         new MetaItem<>(
                                 MetaItemType.DESCRIPTION,
@@ -193,7 +193,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
                                 new AttributeRef("INVALID AGENT ID", managerTestSetup.agentProtocolConfigName).toArrayValue()
                         )
                 ),
-                new Attribute<>("plainAttribute", AttributeValueType.STRING, "demo")
+                new Attribute<>("plainAttribute", ValueType.STRING, "demo")
                         .setMeta(
                         new MetaItem<>(
                                 MetaItemType.DESCRIPTION,

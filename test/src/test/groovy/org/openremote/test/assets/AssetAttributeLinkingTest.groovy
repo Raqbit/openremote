@@ -37,15 +37,15 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         when: "assets are created"
         def asset1 = new Asset("Asset 1", AssetType.THING, null, Constants.MASTER_REALM)
         asset1.setAttributes(
-            new Attribute<>("button", AttributeValueType.STRING, "RELEASED", getClockTimeOf(container)),
-            new Attribute<>("array", AttributeValueType.ARRAY, null)
+            new Attribute<>("button", ValueType.STRING, "RELEASED", getClockTimeOf(container)),
+            new Attribute<>("array", ValueType.ARRAY, null)
         )
         asset1 = assetStorageService.merge(asset1)
         def asset2 = new Asset("Asset 2", AssetType.THING, null, Constants.MASTER_REALM)
         asset2.setAttributes(
-            new Attribute<>("lightOnOff", AttributeValueType.BOOLEAN, false, getClockTimeOf(container)),
-            new Attribute<>("counter", AttributeValueType.NUMBER, 0, getClockTimeOf(container)),
-            new Attribute<>("item2Prop1", AttributeValueType.BOOLEAN, null)
+            new Attribute<>("lightOnOff", ValueType.BOOLEAN, false, getClockTimeOf(container)),
+            new Attribute<>("counter", ValueType.NUMBER, 0, getClockTimeOf(container)),
+            new Attribute<>("item2Prop1", ValueType.BOOLEAN, null)
         )
         asset2 = assetStorageService.merge(asset2)
 

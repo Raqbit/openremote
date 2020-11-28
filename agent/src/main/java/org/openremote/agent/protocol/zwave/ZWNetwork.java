@@ -49,6 +49,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import static java.util.stream.Collectors.toList;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 import static org.openremote.protocol.zwave.model.ZWNodeInitializerListener.NodeInitState.INITIALIZATION_FINISHED;
 
 public class ZWNetwork {
@@ -222,7 +223,7 @@ public class ZWNetwork {
         ZWAgent.ZWAgentLink agentLink = new ZWAgent.ZWAgentLink(agentId, nodeId, endpoint, linkValue);
 
         attribute.addOrReplaceMeta(
-            new MetaItem<>(MetaItemType.AGENT_LINK, agentLink),
+            new MetaItem<>(AGENT_LINK, agentLink),
             new MetaItem<>(MetaItemType.LABEL, channel.getDisplayName())
         );
 

@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 import static org.openremote.model.asset.agent.AgentLink.getOrThrowAgentLinkProperty;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 import static org.openremote.model.util.TextUtil.isNullOrEmpty;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 
 public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,T>, T extends VelbusAgent<T, S>> extends AbstractProtocol<T, VelbusAgent.VelbusAgentLink> implements
     ProtocolAssetImport {
@@ -216,7 +217,7 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
 
                                     Attribute<?> attribute = new Attribute<>(descriptor.getName(), descriptor.getAttributeValueDescriptor())
                                         .addMeta(
-                                            new MetaItem<>(MetaItemType.AGENT_LINK, agentLink),
+                                            new MetaItem<>(AGENT_LINK, agentLink),
                                             new MetaItem<>(MetaItemType.LABEL, descriptor.getDisplayName())
                                         );
 

@@ -27,16 +27,20 @@ import org.openremote.model.IdentifiableEntity;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.geo.GeoJSONPoint;
+import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
@@ -288,11 +292,15 @@ public class Asset implements IdentifiableEntity {
     Asset() {
     }
 
+    /**
+     * All sub types of this class must have a public constructor that only takes a single string parameter representing
+     * the name of the asset.
+     */
     public Asset(String name) {
         this(name, DESCRIPTOR);
     }
 
-    public <T extends Asset> Asset(String name, AssetDescriptor<T> descriptor) {
+    protected <T extends Asset> Asset(String name, AssetDescriptor<T> descriptor) {
         setName(name);
         this.type = descriptor.getName();
     }
@@ -503,6 +511,14 @@ public class Asset implements IdentifiableEntity {
         return this;
     }
 
+    public boolean hasAttribute(AttributeDescriptor<?> attributeDescriptor) {
+        return getAttributes().has(attributeDescriptor);
+    }
+
+    public boolean hasAttribute(String attributeName) {
+        return getAttributes().has(attributeName);
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
@@ -533,36 +549,14 @@ public class Asset implements IdentifiableEntity {
 //    ---------------------------------------------------
 //    FUNCTIONAL METHODS BELOW
 //    ---------------------------------------------------
-//
-//    public static boolean isAssetTypeEqualTo(Asset asset, AssetType assetType) {
-//        return asset != null && asset.getWellKnownType() == assetType;
-//    }
-//
-//    public static Asset map(Asset assetToMap, Asset asset,
-//                            String overrideName,
-//                            String overrideRealm,
-//                            String overrideParentId,
-//                            String overrideType,
-//                            Boolean overrideAccessPublicRead,
-//                            ObjectValue overrideAttributes) {
-//        asset.setVersion(assetToMap.getVersion());
-//        asset.setName(overrideName != null ? overrideName : assetToMap.getName());
-//        if (overrideType != null) {
-//            asset.setType(overrideType);
-//        } else {
-//            asset.setType(assetToMap.getType());
-//        }
-//
-//        asset.setAccessPublicRead(overrideAccessPublicRead != null ? overrideAccessPublicRead : assetToMap.isAccessPublicRead());
-//
-//        asset.setParentId(overrideParentId != null ? overrideParentId : assetToMap.getParentId());
-//        asset.setParentName(null);
-//        asset.setParentType(null);
-//
-//        asset.setRealm(overrideRealm != null ? overrideRealm : assetToMap.getRealm());
-//
-//        asset.setAttributes(overrideAttributes != null ? overrideAttributes : assetToMap.getAttributes());
-//
-//        return asset;
-//    }
+
+    public static <T extends Asset> T createAsset(Class<T> assetClass, String name) {
+        try {
+            Constructor<T> constructor = assetClass.getConstructor(String.class);
+            return constructor.newInstance(name);
+        } catch (Exception e) {
+            AssetModelUtil.LOG.log(Level.WARNING, "Failed to create instance of asset, ensure there is a public constructor that takes a single string argument, asset type = " + assetClass);
+        }
+        return null;
+    }
 }

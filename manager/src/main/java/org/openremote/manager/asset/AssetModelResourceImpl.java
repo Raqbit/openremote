@@ -24,9 +24,10 @@ import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebResource;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelResource;
-import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.http.RequestParams;
 import org.openremote.model.util.AssetModelUtil;
+import org.openremote.model.value.MetaItemDescriptor;
+import org.openremote.model.value.ValueDescriptor;
 
 public class AssetModelResourceImpl extends ManagerWebResource implements AssetModelResource {
 
@@ -35,27 +36,17 @@ public class AssetModelResourceImpl extends ManagerWebResource implements AssetM
     }
 
     @Override
-    public AssetDescriptor[] getAssetDescriptors(RequestParams requestParams) {
-        return AssetModelUtil.getAssetDescriptors();
+    public AssetDescriptor[] getAssetDescriptors(RequestParams requestParams, String parentId) {
+        return AssetModelUtil.getAssetDescriptors(parentId);
     }
 
     @Override
-    public AgentDescriptor[] getAgentDescriptors(RequestParams requestParams) {
-        return AssetModelUtil.getAgentDescriptors();
+    public ValueDescriptor<?>[] getValueDescriptors(RequestParams requestParams) {
+        return new ValueDescriptor[0];
     }
 
     @Override
-    public AttributeDescriptor[] getAttributeDescriptors(RequestParams requestParams) {
-        return AssetModelUtil.getAttributeDescriptors();
-    }
-
-    @Override
-    public AttributeValueDescriptor[] getAttributeValueDescriptors(RequestParams requestParams) {
-        return AssetModelUtil.getAttributeValueDescriptors();
-    }
-
-    @Override
-    public MetaItemDescriptor[] getMetaItemDescriptors(RequestParams requestParams) {
-        return AssetModelUtil.getMetaItemDescriptors();
+    public MetaItemDescriptor<?>[] getMetaItemDescriptors(RequestParams requestParams) {
+        return new MetaItemDescriptor[0];
     }
 }

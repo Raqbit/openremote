@@ -29,4 +29,17 @@ public class SimulatorReplayDatapoint {
      */
     public long timestamp;
     public Object value;
+
+    public SimulatorReplayDatapoint(long timestamp, Object value) {
+        this.timestamp = timestamp;
+        this.value = value;
+    }
+
+    public Optional<long> getTimestamp() {
+        return Optional.ofNullable(timestamp);
+    }
+
+    public Optional<Object> getValue() {
+        return Optional.ofNullable(value);
+    }
 }

@@ -205,7 +205,7 @@ public class LDAPComponentBuilder {
     }
 
     public LDAPComponentBuilder setMemberShipAttributeType(MemberShipAttributeType memberShipAttributeType) {
-        ldapConfig.add("membership.attribute.type", memberShipAttributeType.toString());
+        ldapConfig.add("membership.attribute.type", memberShipAsset.toString());
         return this;
     }
 

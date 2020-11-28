@@ -143,7 +143,7 @@ public class NotificationResourceImpl extends WebResource implements Notificatio
     }
 
     @Override
-    public void notificationAcknowledged(RequestParams requestParams, String targetId, Long notificationId, Value acknowledgement) {
+    public void notificationAcknowledged(RequestParams requestParams, String targetId, Long notificationId, Object acknowledgement) {
         if (notificationId == null) {
             throw new WebApplicationException("Missing notification ID", BAD_REQUEST);
         }

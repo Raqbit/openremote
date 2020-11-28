@@ -19,6 +19,7 @@
  */
 package org.openremote.model.util;
 
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
@@ -32,6 +33,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -196,7 +199,7 @@ public class AssetModelUtil {
     }
 
     // TODO: Implement ability to restrict which asset types are allowed to be added to a given parent type
-    public static AssetDescriptor<?>[] getAssetDescriptors(Class<? extends Asset> parentAssetType) {
+    public static AssetDescriptor<?>[] getAssetDescriptors(String parentId) {
         if (!initialised) {
             initialise();
         }
@@ -316,19 +319,42 @@ public class AssetModelUtil {
     }
 
     /**
-     * Validates the {@link Attribute}s of the specified {@link Asset} by comparing to the {@link AssetDescriptor} for
-     * the asset type; if the specific {@link AssetDescriptor} is not available then
+     * Validates the supplied object using standard JSR-380 bean validation; therefore any passed in here must follow
+     * the JSR-380 annotation requirements.
      */
     // TODO: Implement validation using javax bean validation JSR-380
-    public static AttributeValidationFailure[] validateAsset(Asset asset) {
-        AssetDescriptor<?> descriptor = getAssetDescriptor(asset.getType()).orElse(Asset.DESCRIPTOR);
+    public static ConstraintViolation<?>[] validate(@NotNull Object asset) {
 
-        Arrays.stream(descriptor.getAttributeDescriptors()).forEach(
-            attributeDescriptor -> {
 
-            }
-        );
+//        AssetDescriptor<?> descriptor = getAssetDescriptor(asset.getType())
+//            .orElseThrow(() -> new IllegalStateException("Cannot find asset descriptor for asset type: " + asset.getType()));
+//
+//        Arrays.stream(descriptor.getAttributeDescriptors()).forEach(
+//            attributeDescriptor -> {
+//
+//            }
+//        );
 
-        return new AttributeValidationFailure[0];
+//        asset .getAttributes().stream().forEach(assetAttribute -> {
+//            AssetModelUtil.getAttributeDescriptor(assetAttribute.name).ifPresent(wellKnownAttribute -> {
+//                //Check if the type matches
+//                if (!wellKnownAttribute.getValueDescriptor().equals(assetAttribute.getTypeOrThrow())) {
+//                    throw new IllegalStateException(
+//                        String.format("Well known attribute isn't of the correct type. Attribute name: %s. Expected type: %s",
+//                            assetAttribute.name, wellKnownAttribute.getValueDescriptor().getName()));
+//                }
+//
+//                //Check if the value is valid
+//                wellKnownAttribute.getValueDescriptor()
+//                    .getValidator().flatMap(v -> v.apply(assetAttribute.getValue().orElseThrow(() -> new IllegalStateException("Value is empty for " + assetAttribute.name))))
+//                    .ifPresent(validationFailure -> {
+//                        throw new IllegalStateException(
+//                            String.format("Validation failed for %s with reason %s", assetAttribute.name, validationFailure.getReason().name())
+//                        );
+//                    });
+//            });
+//        });
+
+        return new ConstraintViolation[0];
     }
 }

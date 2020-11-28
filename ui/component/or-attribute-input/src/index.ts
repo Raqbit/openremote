@@ -756,10 +756,10 @@ export class OrAttributeInput extends subscribe(manager)(translate(i18next)(LitE
             this._inputType = this.inputType;
         } else if (this._attributeValueDescriptor) {
             switch (this._attributeValueDescriptor.name) {
-                case AttributeValueType.GEO_JSON_POINT.name:
+                case ValueType.GEO_JSON_POINT.name:
                     this._template = GeoJsonPointInputTemplateProvider(this.assetType, this.attribute, this._attributeDescriptor, this._attributeValueDescriptor, (v) => this._updateValue(v), this);
                     return;
-                case AttributeValueType.SWITCH_MOMENTARY.name:
+                case ValueType.SWITCH_MOMENTARY.name:
                     this._inputType = InputType.BUTTON_MOMENTARY;
                     break;
                 default:

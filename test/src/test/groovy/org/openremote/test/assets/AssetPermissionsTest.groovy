@@ -27,8 +27,8 @@ import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMI
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD_DEFAULT
 import static org.openremote.model.Constants.*
 import static org.openremote.model.attribute.MetaItemType.*
-import static org.openremote.model.attribute.AttributeValueType.BOOLEAN
-import static org.openremote.model.attribute.AttributeValueType.NUMBER
+import static org.openremote.model.attribute.ValueType.BOOLEAN
+import static org.openremote.model.attribute.ValueType.NUMBER
 import static org.openremote.model.attribute.MetaItem.isMetaNameEqualTo
 
 class AssetPermissionsTest extends Specification implements ManagerContainerTrait {
@@ -651,7 +651,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         def resultAttributes = apartment1Livingroom.getAttributes()
         resultAttributes.size() == 7
         def currentTemperature = apartment1Livingroom.getAttribute("currentTemperature").get()
-        currentTemperature.getValueType().get() == AttributeValueType.TEMPERATURE
+        currentTemperature.getValueType().get() == ValueType.TEMPERATURE
         !currentTemperature.getValue().isPresent()
         Meta resultMeta = currentTemperature.getMeta()
         resultMeta.size() == 7

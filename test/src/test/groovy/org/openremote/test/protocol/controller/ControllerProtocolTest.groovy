@@ -210,14 +210,14 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         def asset = new Asset("Test Asset", AssetType.THING, agent)
         asset.setAttributes(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
-                new Attribute<>("sensor", AttributeValueType.STRING)
+                new Attribute<>("sensor", ValueType.STRING)
                         .addMeta(
                         new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
                         new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "MyDevice"),
                         new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_SENSOR_NAME, "my_sensor1a"),
                         new MetaItem<>(MetaItemType.READ_ONLY, true)
                 ),
-                new Attribute<>("command", AttributeValueType.STRING)
+                new Attribute<>("command", ValueType.STRING)
                         .addMeta(
                         new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME).toArrayValue()),
                         new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "MyDevice"),
@@ -294,7 +294,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         def asset2 = new Asset("Test Asset2", AssetType.THING, agent)
         asset2.setAttributes(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
-                new Attribute<>("command", AttributeValueType.STRING, "command1")
+                new Attribute<>("command", ValueType.STRING, "command1")
                         .addMeta(
                         new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, CONTROLLER_PROTOCOL_ATTRIBUTE_NAME3).toArrayValue()),
                         new MetaItem<>(ControllerProtocol.META_ATTRIBUTE_DEVICE_NAME, "DeviceName2"),
