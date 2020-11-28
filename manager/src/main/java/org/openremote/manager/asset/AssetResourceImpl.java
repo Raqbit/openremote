@@ -76,7 +76,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
             }
 
             if (!isRestrictedUser()) {
-                List<Asset> result = assetStorageService.findAll(
+                List<Asset<?>> result = assetStorageService.findAll(
                     new AssetQuery()
                         .select(selectExcludePathAndAttributes())
                         .parents(new ParentPredicate(true))
@@ -85,7 +85,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 return result.toArray(new Asset[result.size()]);
             }
 
-            List<Asset> assets = assetStorageService.findAll(
+            List<Asset<?>> assets = assetStorageService.findAll(
                 new AssetQuery()
                     .select(selectExcludePathAndAttributes().meta(ACCESS_RESTRICTED_READ))
                     .userIds(getUserId())
@@ -93,9 +93,9 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
 
             // Filter assets that might have been moved into a different realm and can no longer be accessed by user
             // TODO: Should we forbid moving assets between realms?
-            Iterator<Asset> it = assets.iterator();
+            Iterator<Asset<?>> it = assets.iterator();
             while (it.hasNext()) {
-                Asset asset = it.next();
+                Asset<?> asset = it.next();
                 if (!asset.getRealm().equals(getAuthenticatedRealm())) {
                     LOG.warning("User '" + getUsername() + "' linked to asset in other realm, skipping: " + asset);
                     it.remove();
@@ -148,7 +148,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
         if (!identityService.getIdentityProvider().isUserInTenant(userId, realm))
             throw new WebApplicationException(BAD_REQUEST);
 
-        Asset asset;
+        Asset<?> asset;
         if ((asset = assetStorageService.find(assetId)) == null || !asset.getRealm().equals(realm)) {
             throw new WebApplicationException(BAD_REQUEST);
         }
@@ -185,18 +185,18 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
     }
 
     @Override
-    public Asset getPartial(RequestParams requestParams, String assetId) {
+    public Asset<?> getPartial(RequestParams requestParams, String assetId) {
         return get(requestParams, assetId, false);
     }
 
     @Override
-    public Asset get(RequestParams requestParams, String assetId) {
+    public Asset<?> get(RequestParams requestParams, String assetId) {
         return get(requestParams, assetId, true);
     }
 
-    public Asset get(RequestParams requestParams, String assetId, boolean loadComplete) {
+    public Asset<?> get(RequestParams requestParams, String assetId, boolean loadComplete) {
         try {
-            Asset asset;
+            Asset<?> asset;
 
             // Check restricted
             if (isRestrictedUser()) {
@@ -227,7 +227,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
     }
 
     @Override
-    public void update(RequestParams requestParams, String assetId, Asset asset) {
+    public void update(RequestParams requestParams, String assetId, Asset<?> asset) {
         try {
             Asset storageAsset = assetStorageService.find(assetId, true);
 
@@ -384,7 +384,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
     }
 
     @Override
-    public Asset create(RequestParams requestParams, Asset asset) {
+    public <T extends Asset<?>> T create(RequestParams requestParams, T asset) {
         try {
             if (isRestrictedUser()) {
                 throw new WebApplicationException(FORBIDDEN);
@@ -403,7 +403,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 throw new WebApplicationException(FORBIDDEN);
             }
 
-            Asset newAsset = Values.clone(asset);
+            T newAsset = Values.clone(asset);
 
             // Allow client to set identifier
             if (asset.getId() != null) {
@@ -459,7 +459,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 throw new WebApplicationException(FORBIDDEN);
             }
 
-            List<Asset> assets = assetStorageService.findAll(new AssetQuery().ids(assetIds.toArray(new String[0])).select(selectExcludeAll()));
+            List<Asset<?>> assets = assetStorageService.findAll(new AssetQuery().ids(assetIds.toArray(new String[0])).select(selectExcludeAll()));
             if (assets == null || assets.size() != assetIds.size()) {
                 LOG.fine("Request to delete one or more invalid assets");
                 throw new WebApplicationException(BAD_REQUEST);
@@ -511,7 +511,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
                 query.tenant(new TenantPredicate(realm));
             }
 
-            List<Asset> result = assetStorageService.findAll(query);
+            List<Asset<?>> result = assetStorageService.findAll(query);
 
             // Compress response (the request attribute enables the interceptor)
             request.setAttribute(HttpHeaders.CONTENT_ENCODING, "gzip");
@@ -547,7 +547,7 @@ public class AssetResourceImpl extends ManagerWebResource implements AssetResour
         }
 
         try {
-            List<Asset> result = assetStorageService.findAll(query);
+            List<Asset<?>> result = assetStorageService.findAll(query);
 
             // Compress response (the request attribute enables the interceptor)
             request.setAttribute(HttpHeaders.CONTENT_ENCODING, "gzip");

@@ -26,6 +26,7 @@ import org.openremote.model.Container;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
+import org.openremote.model.asset.impl.ThingAsset;
 import org.openremote.model.attribute.*;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.syslog.SyslogCategory;
@@ -171,7 +172,7 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
             NodeList modules = xmlDoc.getElementsByTagName("Module");
             LOG.info("Found " + modules.getLength() + " module(s)");
 
-            List<Asset> devices = new ArrayList<>(modules.getLength());
+            List<Asset<?>> devices = new ArrayList<>(modules.getLength());
 
             for (int i = 0; i < modules.getLength(); i++) {
                 Element module = (Element) modules.item(i);
@@ -192,7 +193,7 @@ public abstract class AbstractVelbusProtocol<S extends AbstractVelbusProtocol<S,
                 name = isNullOrEmpty(name) ? deviceType.toString() : name;
 
                 // TODO: Use device specific asset types
-                Asset device = new Asset(name);
+                Asset<?> device = new ThingAsset(name);
 
                 device.setAttributes(
                     new Attribute<>("build", ValueType.STRING, build)

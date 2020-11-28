@@ -20,6 +20,7 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.AttributeDescriptor;
@@ -28,7 +29,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class GroundwaterSensorAsset extends DeviceAsset {
+public class GroundwaterSensorAsset extends Asset<GroundwaterSensorAsset> {
 
     public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
@@ -39,6 +40,10 @@ public class GroundwaterSensorAsset extends DeviceAsset {
     );
 
     public static final AssetDescriptor<GroundwaterSensorAsset> DESCRIPTOR = new AssetDescriptor<>("water-outline", "95d0df", GroundwaterSensorAsset.class);
+
+    protected GroundwaterSensorAsset(String name, AssetDescriptor<? extends GroundwaterSensorAsset> descriptor) {
+        super(name, descriptor);
+    }
 
     public GroundwaterSensorAsset(String name) {
         super(name, DESCRIPTOR);

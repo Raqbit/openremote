@@ -64,7 +64,7 @@ public class AssetPredictedDatapointResourceImpl extends ManagerWebResource impl
                 throw new WebApplicationException(Response.Status.FORBIDDEN);
             }
 
-            Asset asset = assetStorageService.find(assetId, true);
+            Asset<?> asset = assetStorageService.find(assetId, true);
 
             if (asset == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);

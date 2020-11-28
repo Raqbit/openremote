@@ -26,19 +26,19 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class CityAsset extends Asset {
+public class CityAsset extends Asset<CityAsset> {
 
     public static final AttributeDescriptor<String> CITY = new AttributeDescriptor<>("city", ValueType.STRING);
     public static final AttributeDescriptor<String> COUNTRY = new AttributeDescriptor<>("country", ValueType.STRING);
 
     public static final AssetDescriptor<CityAsset> DESCRIPTOR = new AssetDescriptor<>("city", null, CityAsset.class);
 
-    public CityAsset(String name) {
-        super(name, DESCRIPTOR);
+    protected CityAsset(String name, AssetDescriptor<? extends CityAsset> descriptor) {
+        super(name, descriptor);
     }
 
-    protected <T extends AssetDescriptor<U>, U extends CityAsset> CityAsset(String name, T descriptor) {
-        super(name, descriptor);
+    public CityAsset(String name) {
+        super(name, DESCRIPTOR);
     }
 
     public Optional<String> getCity() {

@@ -47,7 +47,6 @@ public final class MetaItemType {
     public static final MetaItemDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaItemDescriptor<>("attributeLink", ValueType.ATTRIBUTE_LINK);
 
 
-
     /* ACCESS PERMISSION META */
 
     /**

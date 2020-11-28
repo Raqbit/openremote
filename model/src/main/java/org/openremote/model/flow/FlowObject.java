@@ -30,7 +30,7 @@ public class FlowObject implements IdentifiableEntity {
     @Column(name = "MODEL_TYPE")
     public String type;
 
-    @Column(name = "LABEL", nullable = true)
+    @Column(name = "LABEL")
     public String label;
 
 
@@ -50,8 +50,9 @@ public class FlowObject implements IdentifiableEntity {
     }
 
     @Override
-    public void setId(String id) {
+    public FlowObject setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getType() {

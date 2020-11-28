@@ -29,7 +29,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class WeatherAsset extends Asset {
+public class WeatherAsset extends Asset<WeatherAsset> {
 
     public static final AttributeDescriptor<Double> TEMPERATURE = new AttributeDescriptor<>("temperature", ValueType.NUMBER,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_TEMPERATURE_CELSIUS),
@@ -67,6 +67,10 @@ public class WeatherAsset extends Asset {
     );
 
     public static final AssetDescriptor<WeatherAsset> DESCRIPTOR = new AssetDescriptor<>("weather-partly-cloudy", "49B0D8", WeatherAsset.class);
+
+    protected WeatherAsset(String name, AssetDescriptor<? extends WeatherAsset> descriptor) {
+        super(name, descriptor);
+    }
 
     public WeatherAsset(String name) {
         super(name, DESCRIPTOR);

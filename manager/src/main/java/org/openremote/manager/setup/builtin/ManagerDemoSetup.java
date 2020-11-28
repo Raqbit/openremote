@@ -20,17 +20,14 @@
 package org.openremote.manager.setup.builtin;
 
 import org.openremote.agent.protocol.http.HttpClientAgent;
-import org.openremote.agent.protocol.http.HttpClientProtocol;
 import org.openremote.agent.protocol.simulator.SimulatorAgent;
-import org.openremote.agent.protocol.simulator.SimulatorProtocol;
-import org.openremote.model.Container;
 import org.openremote.container.util.UniqueIdentifierGenerator;
 import org.openremote.manager.setup.AbstractManagerSetup;
+import org.openremote.model.Container;
 import org.openremote.model.apps.ConsoleAppConfig;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.impl.*;
 import org.openremote.model.attribute.Attribute;
-import org.openremote.model.asset.ElectricityProducerPanelOrientation;
 import org.openremote.model.attribute.AttributeLink;
 import org.openremote.model.attribute.AttributeRef;
 import org.openremote.model.attribute.MetaItem;
@@ -39,16 +36,15 @@ import org.openremote.model.security.Tenant;
 import org.openremote.model.simulator.SimulatorReplayDatapoint;
 import org.openremote.model.value.JsonPathFilter;
 import org.openremote.model.value.ValueFilter;
-import org.openremote.model.value.Values;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
 import static java.time.temporal.ChronoField.SECOND_OF_DAY;
 import static org.openremote.model.Constants.UNITS_POWER_KILOWATT;
+import static org.openremote.model.value.MetaItemType.ATTRIBUTE_LINK;
 import static org.openremote.model.value.MetaItemType.*;
 import static org.openremote.model.value.ValueType.*;
 
@@ -106,7 +102,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         // ################################ Realm smartcity - Energy Management ###################################
 
-        Asset energyManagement = new Asset("Energy management");
+        ThingAsset energyManagement = new ThingAsset("Energy management");
         energyManagement.setRealm(this.realmCityTenant);
         energyManagement.getAttributes().addOrReplace(
                 new Attribute<>("totalPowerProducers", NUMBER)
@@ -243,7 +239,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         BuildingAsset building2Asset = new BuildingAsset("Stadhuis");
         building2Asset.setParent(energyManagement);
-        building2Asset.setAttributes(
+        building2Asset.getAttributes().addOrReplace(
                 new Attribute<>(BuildingAsset.STREET, "Coolsingel 40"),
                 new Attribute<>(BuildingAsset.POSTAL_CODE, "3011 AD"),
                 new Attribute<>(BuildingAsset.CITY, "Rotterdam"),
@@ -350,7 +346,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         BuildingAsset building3Asset = new BuildingAsset("Markthal");
         building3Asset.setParent(energyManagement);
-        building3Asset.setAttributes(
+        building3Asset.getAttributes().addOrReplace(
                 new Attribute<>(BuildingAsset.STREET, "Dominee Jan Scharpstraat 298"),
                 new Attribute<>(BuildingAsset.POSTAL_CODE, "3011 GZ"),
                 new Attribute<>(BuildingAsset.CITY, "Rotterdam"),
@@ -580,7 +576,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         BuildingAsset building4Asset = new BuildingAsset("Erasmianum");
         building4Asset.setParent(energyManagement);
-        building4Asset.setAttributes(
+        building4Asset.getAttributes().addOrReplace(
                 new Attribute<>(BuildingAsset.STREET, "Wytemaweg 25"),
                 new Attribute<>(BuildingAsset.POSTAL_CODE, "3015 CN"),
                 new Attribute<>(BuildingAsset.CITY, "Rotterdam"),
@@ -634,7 +630,7 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         BuildingAsset building5Asset = new BuildingAsset("Oostelijk zwembad");
         building5Asset.setParent(energyManagement);
-        building5Asset.setAttributes(
+        building5Asset.getAttributes().addOrReplace(
                 new Attribute<>(BuildingAsset.STREET, "Gerdesiaweg 480"),
                 new Attribute<>(BuildingAsset.POSTAL_CODE, "3061 RA"),
                 new Attribute<>(BuildingAsset.CITY, "Rotterdam"),
@@ -752,18 +748,15 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         WeatherAsset weather = new WeatherAsset("Weather");
         weather.setParent(energyManagement);
         weather.setId(UniqueIdentifierGenerator.generateId(weather.getName()));
+
         HttpClientAgent.HttpClientAgentLink agentLink = new HttpClientAgent.HttpClientAgentLink(weatherHttpApiAgentId);
         agentLink.setPath("weather");
-        agentLink.setPollingMillis(halfHourInMillis);
-        agentLink.
+        agentLink.setPollingMillis((int)halfHourInMillis);
+
         weather.getAttributes().addOrReplace(
                 new Attribute<>("currentWeather", JSON_OBJECT)
                         .addMeta(
-                                new MetaItem<>(
-                                        AGENT_LINK,
-                                        new HttpAttributeRef(weatherHttpApiAgentId, "weatherApiClient").toArrayValue()),
-                                new MetaItem<>(META_ATTRIBUTE_PATH, "weather"),
-                                new MetaItem<>(META_ATTRIBUTE_POLLING_MILLIS, halfHourInMillis),
+                                new MetaItem<>(AGENT_LINK, agentLink),
                                 new MetaItem<>(LABEL, "Open Weather Map API weather end point"),
                                 new MetaItem<>(READ_ONLY, true),
                                 new MetaItem<>(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "main", "temp", "temperature")),
@@ -776,46 +769,30 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         // ################################ Realm smartcity - Environment monitor ###################################
 
-        Asset environmentMonitor = new Asset();
+        Asset<?> environmentMonitor = new ThingAsset("Environment monitor");
         environmentMonitor.setRealm(this.realmCityTenant);
-        environmentMonitor.setName("Environment Monitor");
-        environmentMonitor.setType(THING);
         environmentMonitor.setId(UniqueIdentifierGenerator.generateId(environmentMonitor.getName()));
         environmentMonitor = assetStorageService.merge(environmentMonitor);
 
-        Asset environment1Asset = createDemoEnvironmentAsset("Oudehaven", environmentMonitor, new GeoJSONPoint(4.49313, 51.91885), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
-        Asset environment2Asset = createDemoEnvironmentAsset("Kaappark", environmentMonitor, new GeoJSONPoint(4.480434, 51.899287), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
-        Asset environment3Asset = createDemoEnvironmentAsset("Museumpark", environmentMonitor, new GeoJSONPoint(4.472457, 51.912047), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
-        Asset environment4Asset = createDemoEnvironmentAsset("Eendrachtsplein", environmentMonitor, new GeoJSONPoint(4.473599, 51.916292), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
+        EnvironmentSensorAsset environment1Asset = createDemoEnvironmentAsset("Oudehaven", environmentMonitor, new GeoJSONPoint(4.49313, 51.91885), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
+        EnvironmentSensorAsset environment2Asset = createDemoEnvironmentAsset("Kaappark", environmentMonitor, new GeoJSONPoint(4.480434, 51.899287), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
+        EnvironmentSensorAsset environment3Asset = createDemoEnvironmentAsset("Museumpark", environmentMonitor, new GeoJSONPoint(4.472457, 51.912047), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
+        EnvironmentSensorAsset environment4Asset = createDemoEnvironmentAsset("Eendrachtsplein", environmentMonitor, new GeoJSONPoint(4.473599, 51.916292), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
 
-        Asset[] environmentArray = {environment1Asset, environment2Asset, environment3Asset, environment4Asset};
-        for (int i = 0; i < environmentArray.length; i++) {
-            environmentArray[i].setManufacturer("Intemo");
-            environmentArray[i].setModel("Josene outdoor");
-            environmentArray[i].getAttribute("ozone").ifPresent(assetAttribute -> {
+        EnvironmentSensorAsset[] environmentArray = {environment1Asset, environment2Asset, environment3Asset, environment4Asset};
+        for (EnvironmentSensorAsset asset : environmentArray) {
+            asset.setManufacturer("Intemo");
+            asset.setModel("Josene outdoor");
+            asset.getAttribute("ozone").ifPresent(assetAttribute -> {
                 assetAttribute.addMeta(
                         new MetaItem<>(
                                 AGENT_LINK,
-                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                                Values.createArray().addAll(
+                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                    new SimulatorReplayDatapoint[] {
                                         new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
                                         new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
                                         new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
@@ -833,287 +810,262 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                                         new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), getRandomNumberInRange(110,120)),
                                         new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), getRandomNumberInRange(115,125)),
                                         new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), getRandomNumberInRange(115,125)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(90,110)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(90,110)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(80,90)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(80,90)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(80,90)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(80,90))
-                                )
+                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), getRandomNumberInRange(110,120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), getRandomNumberInRange(90,110)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), getRandomNumberInRange(90,110)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), getRandomNumberInRange(80,90)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), getRandomNumberInRange(80,90))
+                                    }
+                                )                            
                         )
                 );
             });
-            environmentArray[i].setId(UniqueIdentifierGenerator.generateId(environmentArray[i].getName()));
-            environmentArray[i] = assetStorageService.merge(environmentArray[i]);
+            asset.setId(UniqueIdentifierGenerator.generateId(asset.getName()));
+            asset = assetStorageService.merge(asset);
         }
 
-        Asset groundwater1Asset = createDemoGroundwaterAsset("Leuvehaven", environmentMonitor, new GeoJSONPoint(4.48413, 51.91431));
-        Asset groundwater2Asset = createDemoGroundwaterAsset("Steiger", environmentMonitor, new GeoJSONPoint(4.482887, 51.920082));
-        Asset groundwater3Asset = createDemoGroundwaterAsset("Stadhuis", environmentMonitor, new GeoJSONPoint(4.480876, 51.923212));
+        GroundwaterSensorAsset groundwater1Asset = createDemoGroundwaterAsset("Leuvehaven", environmentMonitor, new GeoJSONPoint(4.48413, 51.91431));
+        GroundwaterSensorAsset groundwater2Asset = createDemoGroundwaterAsset("Steiger", environmentMonitor, new GeoJSONPoint(4.482887, 51.920082));
+        GroundwaterSensorAsset groundwater3Asset = createDemoGroundwaterAsset("Stadhuis", environmentMonitor, new GeoJSONPoint(4.480876, 51.923212));
 
-        Asset[] groundwaterArray = {groundwater1Asset, groundwater2Asset, groundwater3Asset};
-        for (int i = 0; i < groundwaterArray.length; i++) {
-            groundwaterArray[i].setManufacturer("Eijkelkamp");
-            groundwaterArray[i].setModel("TeleControlNet");
-            groundwaterArray[i].getAttribute("soilTemperature").ifPresent(assetAttribute -> {
+        GroundwaterSensorAsset[] groundwaterArray = {groundwater1Asset, groundwater2Asset, groundwater3Asset};
+        for (GroundwaterSensorAsset asset : groundwaterArray) {
+            asset.setManufacturer("Eijkelkamp");
+            asset.setModel("TeleControlNet");
+            asset.getAttribute("soilTemperature").ifPresent(assetAttribute -> {
                 assetAttribute.addMeta(
                         new MetaItem<>(
                                 AGENT_LINK,
-                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                                Values.createArray().addAll(
-                                        new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 12.2),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 12.1),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 12.0),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 11.8),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 11.7),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 11.7),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 11.9),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 12.1),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 12.8),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 13.5),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 13.9),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 15.2),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 15.3),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 15.5),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 15.5),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 15.4),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 15.2),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 15.2),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 14.6),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 14.2),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 13.8),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 13.4),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 12.8),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 12.3)
+                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                    new SimulatorReplayDatapoint[] {
+                                        new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 12.2),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 12.1),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 12.0),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 11.8),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 11.7),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 11.7),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 11.9),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 12.1),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 12.8),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 13.5),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 13.9),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 15.2),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 15.3),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 15.5),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 15.5),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 15.4),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 15.2),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 15.2),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 14.6),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 14.2),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 13.8),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 13.4),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 12.8),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 12.3)
+                                    }
                                 )
                         )
                 );
             });
-            groundwaterArray[i].getAttribute("waterLevel").ifPresent(assetAttribute -> {
+            asset.getAttribute("waterLevel").ifPresent(assetAttribute -> {
                 assetAttribute.addMeta(
                         new MetaItem<>(
                                 AGENT_LINK,
-                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                        ),
-                        new MetaItem<>(
-                                SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                                Values.createArray().addAll(
-                                        new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(100,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(100,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(90,110)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(100,110)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(100,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120)),
-                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(110,120))
+                                new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                    new SimulatorReplayDatapoint[]{
+                                        new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), getRandomNumberInRange(100, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), getRandomNumberInRange(100, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), getRandomNumberInRange(90, 110)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), getRandomNumberInRange(100, 110)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), getRandomNumberInRange(100, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120)),
+                                        new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), getRandomNumberInRange(110, 120))
+                                    }
                                 )
                         )
                 );
             });
-            groundwaterArray[i].setId(UniqueIdentifierGenerator.generateId(groundwaterArray[i].getName()));
-            groundwaterArray[i] = assetStorageService.merge(groundwaterArray[i]);
+            asset.setId(UniqueIdentifierGenerator.generateId(asset.getName()));
+            asset = assetStorageService.merge(asset);
         }
 
         // ################################ Realm smartcity - Mobility and Safety ###################################
 
-        Asset mobilityAndSafety = new Asset();
+        Asset<?> mobilityAndSafety = new ThingAsset("Mobility and safety");
         mobilityAndSafety.setRealm(this.realmCityTenant);
-        mobilityAndSafety.setName("Mobility and Safety");
-        mobilityAndSafety.setType(THING);
         mobilityAndSafety.setId(UniqueIdentifierGenerator.generateId(mobilityAndSafety.getName()));
         mobilityAndSafety = assetStorageService.merge(mobilityAndSafety);
 
         // ### Parking ###
 
-        Asset parkingGroupAsset = new Asset("Parking group", GROUP, mobilityAndSafety);
-        parkingGroupAsset.getAttribute("childAssetType").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create("urn:openremote:asset:parking")));
-        parkingGroupAsset.addAttributes(
-                new Attribute<>("totalOccupancy", PERCENTAGE)
+        GroupAsset parkingGroupAsset = new GroupAsset("Parking group", ParkingAsset.DESCRIPTOR);
+        parkingGroupAsset.setParent(mobilityAndSafety);
+        parkingGroupAsset.getAttributes().addOrReplace(
+                new Attribute<>("totalOccupancy", PERCENTAGE_INTEGER_0_100)
                         .addMeta(
-                                LABEL, "Percentage of total parking spaces in use",
-                                RULE_STATE,
-                                READ_ONLY,
-                                STORE_DATA_POINTS));
+                                new MetaItem<>(LABEL, "Percentage of total parking spaces in use"),
+                                new MetaItem<>(RULE_STATE),
+                                new MetaItem<>(READ_ONLY),
+                                new MetaItem<>(STORE_DATA_POINTS)));
         parkingGroupAsset.setId(UniqueIdentifierGenerator.generateId(parkingGroupAsset.getName()));
         parkingGroupAsset = assetStorageService.merge(parkingGroupAsset);
 
-        Asset parking1Asset = createDemoParkingAsset("Markthal", parkingGroupAsset, new GeoJSONPoint(4.48527, 51.91984));
-        parking1Asset.setManufacturer("SKIDATA");
-        parking1Asset.setModel(Values.create("Barrier.Gate"));
-        parking1Asset.getAttribute("occupiedSpaces").ifPresent(assetAttribute -> {
+        ParkingAsset parking1Asset = createDemoParkingAsset("Markthal", parkingGroupAsset, new GeoJSONPoint(4.48527, 51.91984))
+            .setManufacturer("SKIDATA")
+            .setModel("Barrier.Gate");
+        parking1Asset.getAttribute(ParkingAsset.SPACES_OCCUPIED).ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
                     new MetaItem<>(
                             AGENT_LINK,
-                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                            Values.createArray().addAll(
-                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 34),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 37),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 31),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 36),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 32),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 39),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 47),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 53),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 165),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 301),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 417),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 442),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 489),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 467),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 490),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 438),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 457),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 402),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 379),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 336),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 257),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 204),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 112),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 75)
+                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                new SimulatorReplayDatapoint[]{
+                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 34),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 37),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 31),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 36),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 32),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 39),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 47),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 53),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 165),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 301),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 417),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 442),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 489),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 467),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 490),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 438),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 457),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 402),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 379),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 336),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 257),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 204),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 112),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 75)
+                                }
                             )
                     )
             );
         });
-        parking1Asset.getAttribute("priceHourly").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(3.75)));
-        parking1Asset.getAttribute("priceDaily").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(25.00)));
-        parking1Asset.getAttribute("totalSpaces").ifPresent(assetAttribute -> assetAttribute.setValue(512));
+        parking1Asset.setPriceHourly(3.75);
+        parking1Asset.setPriceDaily(25.00);
+        parking1Asset.setSpacesTotal(512);
         parking1Asset.setId(UniqueIdentifierGenerator.generateId(parking1Asset.getName()));
         parking1Asset = assetStorageService.merge(parking1Asset);
 
-        Asset parking2Asset = createDemoParkingAsset("Lijnbaan", parkingGroupAsset, new GeoJSONPoint(4.47681, 51.91849));
+        ParkingAsset parking2Asset = createDemoParkingAsset("Lijnbaan", parkingGroupAsset, new GeoJSONPoint(4.47681, 51.91849));
         parking2Asset.setManufacturer("SKIDATA");
-        parking2Asset.setModel(Values.create("Barrier.Gate"));
-        parking2Asset.getAttribute("occupiedSpaces").ifPresent(assetAttribute -> {
+        parking2Asset.setModel("Barrier.Gate");
+        parking2Asset.getAttribute(ParkingAsset.SPACES_OCCUPIED).ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
                     new MetaItem<>(
                             AGENT_LINK,
-                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                            Values.createArray().addAll(
-                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 31),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 24),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 36),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 38),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 46),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 48),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 52),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 89),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 142),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 187),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 246),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 231),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 367),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 345),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 386),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 312),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 363),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 276),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 249),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 256),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 123),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 153),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 83),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 25)
+                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                new SimulatorReplayDatapoint[]{
+                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 31),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 24),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 36),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 38),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 46),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 48),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 52),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 89),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 142),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 187),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 246),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 231),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 367),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 345),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 386),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 312),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 363),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 276),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 249),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 256),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 123),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 153),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 83),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 25)
+                                }
                             )
                     )
             );
         });
-        parking2Asset.getAttribute("priceHourly").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(3.50)));
-        parking2Asset.getAttribute("priceDaily").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(23.00)));
-        parking2Asset.getAttribute("totalSpaces").ifPresent(assetAttribute -> assetAttribute.setValue(390));
+        parking2Asset.setPriceHourly(3.50);
+        parking2Asset.setPriceDaily(23.00);
+        parking2Asset.setSpacesTotal(390);
         parking2Asset.setId(UniqueIdentifierGenerator.generateId(parking2Asset.getName()));
         parking2Asset = assetStorageService.merge(parking2Asset);
 
-        Asset parking3Asset = createDemoParkingAsset("Erasmusbrug", parkingGroupAsset, new GeoJSONPoint(4.48207, 51.91127));
+        ParkingAsset parking3Asset = createDemoParkingAsset("Erasmusbrug", parkingGroupAsset, new GeoJSONPoint(4.48207, 51.91127));
         parking3Asset.setManufacturer("Kiestra");
         parking3Asset.setModel("Genius Rainbow");
         parking3Asset.getAttribute("occupiedSpaces").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
                     new MetaItem<>(
                             AGENT_LINK,
-                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                            Values.createArray().addAll(
-                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 25),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 23),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 23),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 21),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 18),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 13),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 29),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 36),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 119),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 257),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 357),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 368),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 362),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 349),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 370),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 367),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 355),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 314),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 254),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 215),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 165),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 149),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 108),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 47)
+                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                new SimulatorReplayDatapoint[]{
+                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 25),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 23),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 23),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 21),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 18),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 13),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 29),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 36),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 119),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 257),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 357),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 368),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 362),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 349),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 370),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 367),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 355),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 314),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 254),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 215),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 165),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 149),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 108),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 47)
+                                }
                             )
                     )
             );
         });
-        parking3Asset.getAttribute("priceHourly").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(3.40)));
-        parking3Asset.getAttribute("priceDaily").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create(20.00)));
-        parking3Asset.getAttribute("totalSpaces").ifPresent(assetAttribute -> assetAttribute.setValue(373));
+        parking3Asset.setPriceHourly(3.40);
+        parking3Asset.setPriceDaily(20.00);
+        parking3Asset.setSpacesTotal(373);
         parking3Asset.setId(UniqueIdentifierGenerator.generateId(parking3Asset.getName()));
         parking3Asset = assetStorageService.merge(parking3Asset);
 
         // ### Crowd control ###
 
-        Asset assetAreaStation = new Asset("Stationsplein", AREA, mobilityAndSafety)
-                .setAttributes(
+        ThingAsset assetAreaStation = new ThingAsset("Stationsplein");
+        assetAreaStation.setParent(mobilityAndSafety)
+                .getAttributes().addOrReplace(
                         new Attribute<>(Asset.LOCATION, STATIONSPLEIN_LOCATION),
                         new Attribute<>(BuildingAsset.POSTAL_CODE, "3013 AK"),
                         new Attribute<>(BuildingAsset.CITY, "Rotterdam"),
@@ -1123,48 +1075,41 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         assetAreaStation = assetStorageService.merge(assetAreaStation);
         area1Id = assetAreaStation.getId();
 
-        Asset peopleCounter1Asset = createDemoPeopleCounterAsset("People Counter South", assetAreaStation, new GeoJSONPoint(4.470147, 51.923171), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
+        PeopleCounterAsset peopleCounter1Asset = createDemoPeopleCounterAsset("People Counter South", assetAreaStation, new GeoJSONPoint(4.470147, 51.923171), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
         peopleCounter1Asset.setManufacturer("ViNotion");
         peopleCounter1Asset.setModel("ViSense");
         peopleCounter1Asset.getAttribute("peopleCountGrowth").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
                     new MetaItem<>(
                             AGENT_LINK,
-                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                            Values.createArray().addAll(
-                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 0.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 0.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 0.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 0.0),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 0.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 0.4),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 0.5),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 0.7),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 1.8),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 2.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 2.4),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 1.9),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 1.8),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 2.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 1.8),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 1.7),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 2.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 3.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 2.8),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 2.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 1.6),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 1.7),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 1.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 0.8)
+                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                new SimulatorReplayDatapoint[]{
+                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 0.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 0.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 0.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 0.0),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 0.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 0.4),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 0.5),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 0.7),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 1.8),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 2.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 2.4),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 1.9),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 1.8),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 2.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 1.8),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 1.7),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 2.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 3.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 2.8),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 2.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 1.6),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 1.7),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 1.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 0.8)
+                                }
                             )
                     )
             );
@@ -1172,48 +1117,41 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         peopleCounter1Asset.setId(UniqueIdentifierGenerator.generateId(peopleCounter1Asset.getName()));
         peopleCounter1Asset = assetStorageService.merge(peopleCounter1Asset);
 
-        Asset peopleCounter2Asset = createDemoPeopleCounterAsset("People Counter North", assetAreaStation, new GeoJSONPoint(4.469329, 51.923700), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(NumberSimulatorElement.ELEMENT_NAME))
-        });
+        Asset<?> peopleCounter2Asset = createDemoPeopleCounterAsset("People Counter North", assetAreaStation, new GeoJSONPoint(4.469329, 51.923700), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId));
         peopleCounter2Asset.setManufacturer("Axis");
-        peopleCounter2Asset.setModel(Values.create("P1375-E"));
+        peopleCounter2Asset.setModel("P1375-E");
         peopleCounter2Asset.getAttribute("peopleCountGrowth").ifPresent(assetAttribute -> {
             assetAttribute.addMeta(
                     new MetaItem<>(
                             AGENT_LINK,
-                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                    ),
-                    new MetaItem<>(
-                            SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                            Values.createArray().addAll(
-                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", 0.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", 0.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", 0.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", 0.1),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", 0.0),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", 0.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", 0.7),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", 0.6),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", 1.9),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", 2.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", 2.8),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", 1.6),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", 1.9),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", 2.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", 1.9),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", 1.6),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", 2.4),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", 3.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", 2.9),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", 2.3),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", 1.7),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", 1.4),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", 1.2),
-                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", 0.7)
+                            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                new SimulatorReplayDatapoint[]{
+                                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), 0.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), 0.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), 0.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), 0.1),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), 0.0),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), 0.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), 0.7),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), 0.6),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), 1.9),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), 2.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), 2.8),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), 1.6),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), 1.9),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), 2.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), 1.9),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), 1.6),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), 2.4),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), 3.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), 2.9),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), 2.3),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), 1.7),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), 1.4),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), 1.2),
+                                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), 0.7)
+                                }
                             )
                     )
             );
@@ -1221,95 +1159,87 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
         peopleCounter2Asset.setId(UniqueIdentifierGenerator.generateId(peopleCounter2Asset.getName()));
         peopleCounter2Asset = assetStorageService.merge(peopleCounter2Asset);
 
-        Asset microphone1Asset = createDemoMicrophoneAsset("Microphone South", assetAreaStation, new GeoJSONPoint(4.470362, 51.923201), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)),
-                new MetaItem<>(
-                        SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                        Values.createArray().addAll(
-                                new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,70)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,70)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,60))
-                        )
-                )
-        });
+        MicrophoneAsset microphone1Asset = createDemoMicrophoneAsset("Microphone South", assetAreaStation, new GeoJSONPoint(4.470362, 51.923201), () ->
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                new SimulatorReplayDatapoint[] {
+                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), getRandomNumberInRange(50,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), getRandomNumberInRange(60,70)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), getRandomNumberInRange(60,70)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), getRandomNumberInRange(50,60))
+                }
+            ));
         microphone1Asset.setManufacturer("Sorama");
         microphone1Asset.setModel("CAM1K");
         microphone1Asset.setId(UniqueIdentifierGenerator.generateId(microphone1Asset.getName()));
         microphone1Asset = assetStorageService.merge(microphone1Asset);
 
-        Asset microphone2Asset = createDemoMicrophoneAsset("Microphone North", assetAreaStation, new GeoJSONPoint(4.469190, 51.923786), () -> new MetaItem[]{
-                new MetaItem<>(AGENT_LINK, new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)),
-                new MetaItem<>(SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)),
-                new MetaItem<>(
-                        SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                        Values.createArray().addAll(
-                                new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(45,50)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,55)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,70)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(55,60)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,70)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(60,65)),
-                                new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", getRandomNumberInRange(50,60))
-                        )
-                )
-        });
+        MicrophoneAsset microphone2Asset = createDemoMicrophoneAsset("Microphone North", assetAreaStation, new GeoJSONPoint(4.469190, 51.923786), () -> 
+            new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                new SimulatorReplayDatapoint[] {
+                    new SimulatorReplayDatapoint(midnight.get(SECOND_OF_DAY), getRandomNumberInRange(50,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(1).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(2).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(3).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(4).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(5).get(SECOND_OF_DAY), getRandomNumberInRange(45,50)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), getRandomNumberInRange(50,55)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), getRandomNumberInRange(60,70)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), getRandomNumberInRange(55,60)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), getRandomNumberInRange(60,70)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), getRandomNumberInRange(60,65)),
+                    new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), getRandomNumberInRange(50,60))
+                }
+            ));
         microphone2Asset.setManufacturer("Sorama");
         microphone2Asset.setModel("CAM1K");
         microphone2Asset.setId(UniqueIdentifierGenerator.generateId(microphone2Asset.getName()));
         microphone2Asset = assetStorageService.merge(microphone2Asset);
 
-        Asset lightStation1Asset = createDemoLightAsset("Station Light NW", assetAreaStation, new GeoJSONPoint(4.468874, 51.923881));
+        LightAsset lightStation1Asset = createDemoLightAsset("Station Light NW", assetAreaStation, new GeoJSONPoint(4.468874, 51.923881));
         lightStation1Asset.setManufacturer("Philips");
         lightStation1Asset.setModel("CityTouch");
         lightStation1Asset.setId(UniqueIdentifierGenerator.generateId(lightStation1Asset.getName()));
         lightStation1Asset = assetStorageService.merge(lightStation1Asset);
 
-        Asset lightStation2Asset = createDemoLightAsset("Station Light NE", assetAreaStation, new GeoJSONPoint(4.470539, 51.923991));
+        LightAsset lightStation2Asset = createDemoLightAsset("Station Light NE", assetAreaStation, new GeoJSONPoint(4.470539, 51.923991));
         lightStation2Asset.setManufacturer("Philips");
         lightStation2Asset.setModel("CityTouch");
         lightStation2Asset.setId(UniqueIdentifierGenerator.generateId(lightStation2Asset.getName()));
         lightStation2Asset = assetStorageService.merge(lightStation2Asset);
 
-        Asset lightStation3Asset = createDemoLightAsset("Station Light S", assetAreaStation, new GeoJSONPoint(4.470558, 51.923186));
+        LightAsset lightStation3Asset = createDemoLightAsset("Station Light S", assetAreaStation, new GeoJSONPoint(4.470558, 51.923186));
         lightStation3Asset.setManufacturer("Philips");
         lightStation3Asset.setModel("CityTouch");
         lightStation3Asset.setId(UniqueIdentifierGenerator.generateId(lightStation3Asset.getName()));
@@ -1317,288 +1247,283 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
 
         // ### Lighting controller ###
 
-        Asset lightingControllerOPAsset = createDemoLightControllerAsset("Lighting Noordereiland", mobilityAndSafety, new GeoJSONPoint(4.496177, 51.915060));
+        LightAsset lightingControllerOPAsset = createDemoLightControllerAsset("Lighting Noordereiland", mobilityAndSafety, new GeoJSONPoint(4.496177, 51.915060));
         lightingControllerOPAsset.setManufacturer("Pharos");
         lightingControllerOPAsset.setModel("LPC X");
         lightingControllerOPAsset.setId(UniqueIdentifierGenerator.generateId(lightingControllerOPAsset.getName()));
         lightingControllerOPAsset = assetStorageService.merge(lightingControllerOPAsset);
 
-        Asset lightOP1Asset = createDemoLightAsset("OnsPark1", lightingControllerOPAsset, new GeoJSONPoint(4.49626, 51.91516));
-        lightOP1Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP1Asset = createDemoLightAsset("OnsPark1", lightingControllerOPAsset, new GeoJSONPoint(4.49626, 51.91516));
+        lightOP1Asset.setManufacturer("Schréder");
         lightOP1Asset.setModel("Axia 2");
         lightOP1Asset.setId(UniqueIdentifierGenerator.generateId(lightOP1Asset.getName()));
         lightOP1Asset = assetStorageService.merge(lightOP1Asset);
 
-        Asset lightOP2Asset = createDemoLightAsset("OnsPark2", lightingControllerOPAsset, new GeoJSONPoint(4.49705, 51.91549));
-        lightOP2Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP2Asset = createDemoLightAsset("OnsPark2", lightingControllerOPAsset, new GeoJSONPoint(4.49705, 51.91549));
+        lightOP2Asset.setManufacturer("Schréder");
         lightOP2Asset.setModel("Axia 2");
         lightOP2Asset.setId(UniqueIdentifierGenerator.generateId(lightOP2Asset.getName()));
         lightOP2Asset = assetStorageService.merge(lightOP2Asset);
 
-        Asset lightOP3Asset = createDemoLightAsset("OnsPark3", lightingControllerOPAsset, new GeoJSONPoint(4.49661, 51.91495));
-        lightOP3Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP3Asset = createDemoLightAsset("OnsPark3", lightingControllerOPAsset, new GeoJSONPoint(4.49661, 51.91495));
+        lightOP3Asset.setManufacturer("Schréder");
         lightOP3Asset.setModel("Axia 2");
         lightOP3Asset.setId(UniqueIdentifierGenerator.generateId(lightOP3Asset.getName()));
         lightOP3Asset = assetStorageService.merge(lightOP3Asset);
 
-        Asset lightOP4Asset = createDemoLightAsset("OnsPark4", lightingControllerOPAsset, new GeoJSONPoint(4.49704, 51.91520));
-        lightOP4Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP4Asset = createDemoLightAsset("OnsPark4", lightingControllerOPAsset, new GeoJSONPoint(4.49704, 51.91520));
+        lightOP4Asset.setManufacturer("Schréder");
         lightOP4Asset.setModel("Axia 2");
         lightOP4Asset.setId(UniqueIdentifierGenerator.generateId(lightOP4Asset.getName()));
         lightOP4Asset = assetStorageService.merge(lightOP4Asset);
 
-        Asset lightOP5Asset = createDemoLightAsset("OnsPark5", lightingControllerOPAsset, new GeoJSONPoint(4.49758, 51.91440));
-        lightOP5Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP5Asset = createDemoLightAsset("OnsPark5", lightingControllerOPAsset, new GeoJSONPoint(4.49758, 51.91440));
+        lightOP5Asset.setManufacturer("Schréder");
         lightOP5Asset.setModel("Axia 2");
         lightOP5Asset.setId(UniqueIdentifierGenerator.generateId(lightOP5Asset.getName()));
         lightOP5Asset = assetStorageService.merge(lightOP5Asset);
 
-        Asset lightOP6Asset = createDemoLightAsset("OnsPark6", lightingControllerOPAsset, new GeoJSONPoint(4.49786, 51.91452));
-        lightOP6Asset.setManufacturer(Values.create("Schréder"));
+        LightAsset lightOP6Asset = createDemoLightAsset("OnsPark6", lightingControllerOPAsset, new GeoJSONPoint(4.49786, 51.91452));
+        lightOP6Asset.setManufacturer("Schréder");
         lightOP6Asset.setModel("Axia 2");
         lightOP6Asset.setId(UniqueIdentifierGenerator.generateId(lightOP6Asset.getName()));
         lightOP6Asset = assetStorageService.merge(lightOP6Asset);
 
         // ### Ships ###
 
-        Asset shipGroupAsset = new Asset("Ship group", GROUP, mobilityAndSafety);
-        shipGroupAsset.getAttribute("childAssetType").ifPresent(assetAttribute -> assetAttribute.setValue(Values.create("urn:openremote:asset:ship")));
+        GroupAsset shipGroupAsset = new GroupAsset("Ship group", ShipAsset.DESCRIPTOR);
+        shipGroupAsset.setParent(mobilityAndSafety);
         shipGroupAsset.setId(UniqueIdentifierGenerator.generateId(shipGroupAsset.getName()));
         shipGroupAsset = assetStorageService.merge(shipGroupAsset);
 
-        Asset ship1Asset = createDemoShipAsset("Hotel New York", shipGroupAsset, new GeoJSONPoint(4.48527, 51.91984));
-        ship1Asset.getAttribute("shipLength").ifPresent(assetAttribute -> assetAttribute.setValue(12));
-        ship1Asset.getAttribute("shipType").ifPresent(assetAttribute -> assetAttribute.setValue("Passenger"));
-        ship1Asset.getAttribute("shipImoNumber").ifPresent(assetAttribute -> assetAttribute.setValue(9183527));
-        ship1Asset.getAttribute("shipMssiNumber").ifPresent(assetAttribute -> assetAttribute.setValue(244650537));
-        ship1Asset.getAttribute("location").ifPresent(assetAttribute -> {
+        ShipAsset ship1Asset = createDemoShipAsset("Hotel New York", shipGroupAsset, new GeoJSONPoint(4.48527, 51.91984));
+        ship1Asset.setLength(12);
+        ship1Asset.setShipType("Passenger");
+        ship1Asset.setIMONumber(9183527);
+        ship1Asset.setMSSINumber(244650537);
+        ship1Asset.getAttribute(Asset.LOCATION).ifPresent(assetAttribute -> {
                     assetAttribute.addMeta(
                             new MetaItem<>(
                                     AGENT_LINK,
-                                    new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId)
-                            ),
-                            new MetaItem<>(
-                                    SimulatorProtocol.SIMULATOR_ELEMENT, Values.create(ReplaySimulatorElement.ELEMENT_NAME)
-                            ),
-                            new MetaItem<>(
-                                    SimulatorProtocol.REPLAY_ATTRIBUTE_LINK_DATA,
-                                    Values.createArray().addAll(
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(5).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(10).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(15).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(20).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(25).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(30).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.484374, 51.903518)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(35).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.479779, 51.904404)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(40).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482914, 51.906769)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(45).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.486156, 51.908570)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(50).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.483362, 51.911897)),
-                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(55).get(SECOND_OF_DAY)).put("value", new GeoJSONPoint(4.482669, 51.916436))
+                                    new SimulatorAgent.SimulatorAgentLink(smartcitySimulatorAgentId).setSimulatorReplayData(
+                                        new SimulatorReplayDatapoint[]{
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(6).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(7).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(8).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(9).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(10).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(11).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(12).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(13).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(14).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(15).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(16).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(17).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(18).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(19).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(20).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(21).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(22).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(5).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(10).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(15).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(20).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(25).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(30).get(SECOND_OF_DAY), new GeoJSONPoint(4.484374, 51.903518)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(35).get(SECOND_OF_DAY), new GeoJSONPoint(4.479779, 51.904404)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(40).get(SECOND_OF_DAY), new GeoJSONPoint(4.482914, 51.906769)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(45).get(SECOND_OF_DAY), new GeoJSONPoint(4.486156, 51.908570)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(50).get(SECOND_OF_DAY), new GeoJSONPoint(4.483362, 51.911897)),
+                                            new SimulatorReplayDatapoint(midnight.plusHours(23).plusMinutes(55).get(SECOND_OF_DAY), new GeoJSONPoint(4.482669, 51.916436))
+                                        }
                                     )
                             )
                     );
@@ -1625,13 +1550,13 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    protected static Value createWeatherApiAttributeLink (String assetId, String jsonParentName, String jsonName, String parameter){
-        return Values.convertToValue(new AttributeLink(
+    protected static AttributeLink createWeatherApiAttributeLink(String assetId, String jsonParentName, String jsonName, String parameter) {
+        return new AttributeLink(
                 new AttributeRef(assetId, parameter),
                 null,
                 new ValueFilter[]{
                         new JsonPathFilter("$." + jsonParentName + "." + jsonName, true, false),
                 }
-        ), Values.JSON.writer()).get();
+        );
     }
 }

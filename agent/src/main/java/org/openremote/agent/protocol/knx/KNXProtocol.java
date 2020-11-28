@@ -5,6 +5,7 @@ import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.model.Container;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetTreeNode;
+import org.openremote.model.asset.impl.ThingAsset;
 import org.openremote.model.attribute.*;
 import org.openremote.model.protocol.ProtocolAssetImport;
 import org.openremote.model.syslog.SyslogCategory;
@@ -250,7 +251,7 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
                     throw new IllegalStateException(msg, e);
                 }
 
-                Map<String, Asset> createdAssets = new HashMap<>();
+                Map<String, Asset<?>> createdAssets = new HashMap<>();
                 for (StateDP dp : datapoints.getDatapoints()) {
                     if (dp.getName().endsWith("#A")) {
                         createAsset(dp, false, createdAssets);
@@ -280,15 +281,15 @@ public class KNXProtocol extends AbstractProtocol<KNXAgent, KNXAgent.KNXAgentLin
         }, null);
     }
 
-    protected void createAsset(StateDP datapoint, boolean isStatusGA, Map<String, Asset> createdAssets) {
+    protected void createAsset(StateDP datapoint, boolean isStatusGA, Map<String, Asset<?>> createdAssets) {
         String name = datapoint.getName().substring(0, datapoint.getName().length()-3);
         String assetName = name.replaceAll(" -.*-", "");
-        Asset asset;
+        Asset<?> asset;
 
         if (createdAssets.containsKey(assetName)) {
             asset = createdAssets.get(assetName);
         } else {
-            asset = new Asset(assetName);
+            asset = new ThingAsset(assetName);
         }
 
         String attrName = assetName.replaceAll(" ", "");

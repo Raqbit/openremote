@@ -22,6 +22,7 @@ package org.openremote.agent.protocol.knx;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentLink;
+import org.openremote.model.asset.impl.ShipAsset;
 import org.openremote.model.value.AttributeDescriptor;
 import org.openremote.model.value.ValueDescriptor;
 import org.openremote.model.value.ValueType;
@@ -95,12 +96,30 @@ public class KNXAgent extends Agent<KNXAgent, KNXProtocol, KNXAgent.KNXAgentLink
         return getAttributes().getValue(MESSAGE_SOURCE_ADDRESS);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends KNXAgent> T setMessageSourceAddress(String value) {
+        getAttributes().getOrCreate(MESSAGE_SOURCE_ADDRESS).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Boolean> isNATMode() {
         return getAttributes().getValue(NAT_MODE);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends KNXAgent> T setNATMode(Boolean value) {
+        getAttributes().getOrCreate(NAT_MODE).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Boolean> isRoutingMode() {
         return getAttributes().getValue(ROUTING_MODE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends KNXAgent> T setRoutingMode(Boolean value) {
+        getAttributes().getOrCreate(ROUTING_MODE).setValue(value);
+        return (T)this;
     }
 
     @Override

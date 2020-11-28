@@ -20,18 +20,20 @@
 package org.openremote.manager.setup.builtin;
 
 import org.apache.commons.io.IOUtils;
-import org.openremote.model.Container;
 import org.openremote.manager.setup.AbstractManagerSetup;
+import org.openremote.model.Container;
+import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.rules.AssetRuleset;
 import org.openremote.model.rules.Ruleset;
 import org.openremote.model.rules.TenantRuleset;
-import org.openremote.model.value.Values;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import static org.openremote.model.rules.Ruleset.Lang.GROOVY;
+import static org.openremote.model.rules.Ruleset.Lang.SHOW_ON_LIST;
+import static org.openremote.model.value.MetaItemType.SHOW_ON_DASHBOARD;
 
 public class RulesTestSetup extends AbstractManagerSetup {
 
@@ -124,7 +126,10 @@ public class RulesTestSetup extends AbstractManagerSetup {
             String rules = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             Ruleset ruleset = new TenantRuleset(
                     keycloakTestSetup.tenantCity.getRealm(), "Demo Geofences", Ruleset.Lang.JSON, rules
-            ).setAccessPublicRead(true).addMeta("showOnMap", true).addMeta("showOnList", true);
+            ).setAccessPublicRead(true);
+            ruleset.getMeta().addOrReplace(
+                new MetaItem<>(SHOW_ON_DASHBOARD),
+                new MetaItem<>(SHOW_ON_LIST));
             tenantSmartCityRulesetId = rulesetStorageService.merge(ruleset).getId();
         }
     }

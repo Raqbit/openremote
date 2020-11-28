@@ -29,7 +29,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ShipAsset extends Asset {
+public class ShipAsset extends Asset<ShipAsset> {
 
     public static final AttributeDescriptor<Integer> MSSI_NUMBER = new AttributeDescriptor<>("mSSINumber", ValueType.POSITIVE_INTEGER);
     public static final AttributeDescriptor<Integer> IMO_NUMBER = new AttributeDescriptor<>("iMONumber", ValueType.POSITIVE_INTEGER);
@@ -44,35 +44,71 @@ public class ShipAsset extends Asset {
 
     public static final AssetDescriptor<ShipAsset> DESCRIPTOR = new AssetDescriptor<>("ferry", "000080", ShipAsset.class);
 
-    public <T extends ShipAsset> ShipAsset(String name, AssetDescriptor<T> descriptor) {
+    protected ShipAsset(String name, AssetDescriptor<? extends ShipAsset> descriptor) {
         super(name, descriptor);
     }
 
     public ShipAsset(String name) {
-        super(name, DESCRIPTOR);
+        this(name, DESCRIPTOR);
     }
 
     public Optional<Integer> getMSSINumber() {
         return getAttributes().getValue(MSSI_NUMBER);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setMSSINumber(Integer value) {
+        getAttributes().getOrCreate(MSSI_NUMBER).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getIMONumber() {
         return getAttributes().getValue(IMO_NUMBER);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setIMONumber(Integer value) {
+        getAttributes().getOrCreate(IMO_NUMBER).setValue(value);
+        return (T)this;
     }
 
     public Optional<Integer> getDirection() {
         return getAttributes().getValue(DIRECTION);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setDirection(Integer value) {
+        getAttributes().getOrCreate(DIRECTION).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getLength() {
         return getAttributes().getValue(LENGTH);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setLength(Integer value) {
+        getAttributes().getOrCreate(LENGTH).setValue(value);
+        return (T)this;
     }
 
     public Optional<Double> getSpeed() {
         return getAttributes().getValue(SPEED);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setSpeed(Double value) {
+        getAttributes().getOrCreate(SPEED).setValue(value);
+        return (T)this;
+    }
+
     public Optional<String> getShipType() {
         return getAttributes().getValue(SHIP_TYPE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends ShipAsset> T setShipType(String value) {
+        getAttributes().getOrCreate(SHIP_TYPE).setValue(value);
+        return (T)this;
     }
 }

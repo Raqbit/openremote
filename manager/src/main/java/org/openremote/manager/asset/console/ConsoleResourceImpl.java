@@ -143,7 +143,7 @@ public class ConsoleResourceImpl extends ManagerWebResource implements ConsoleRe
             String id = realmConsoleParentMap.get(realm);
 
             if (TextUtil.isNullOrEmpty(id)) {
-                Asset consoleParent = getConsoleParentAsset(assetStorageService, getRequestTenant());
+                Asset<?> consoleParent = getConsoleParentAsset(assetStorageService, getRequestTenant());
                 id = consoleParent.getId();
                 realmConsoleParentMap.put(realm, id);
             }
@@ -152,7 +152,7 @@ public class ConsoleResourceImpl extends ManagerWebResource implements ConsoleRe
         });
     }
 
-    public static Asset getConsoleParentAsset(AssetStorageService assetStorageService, Tenant tenant) {
+    public static Asset<?> getConsoleParentAsset(AssetStorageService assetStorageService, Tenant tenant) {
 
         // Look for a group asset with a child type of console in the realm root
         GroupAsset consoleParent = (GroupAsset) assetStorageService.find(
@@ -166,7 +166,7 @@ public class ConsoleResourceImpl extends ManagerWebResource implements ConsoleRe
         );
 
         if (consoleParent == null) {
-            consoleParent = new GroupAsset(CONSOLE_PARENT_ASSET_NAME);
+            consoleParent = new GroupAsset(CONSOLE_PARENT_ASSET_NAME, ConsoleAsset.DESCRIPTOR);
             consoleParent.setChildAssetType(ConsoleAsset.DESCRIPTOR.getName());
             consoleParent.setRealm(tenant.getRealm());
             consoleParent = assetStorageService.merge(consoleParent);

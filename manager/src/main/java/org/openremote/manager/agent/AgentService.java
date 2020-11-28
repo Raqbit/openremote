@@ -53,7 +53,6 @@ import org.openremote.model.query.LogicGroup;
 import org.openremote.model.query.filter.*;
 import org.openremote.model.util.Pair;
 import org.openremote.model.util.TextUtil;
-import org.openremote.model.value.MetaItemType;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.NotSupportedException;
@@ -77,6 +76,7 @@ import static org.openremote.model.asset.agent.Protocol.SENSOR_QUEUE;
 import static org.openremote.model.attribute.AttributeEvent.HEADER_SOURCE;
 import static org.openremote.model.attribute.AttributeEvent.Source.GATEWAY;
 import static org.openremote.model.attribute.AttributeEvent.Source.SENSOR;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 
 /**
  * Handles life cycle and communication with {@link Protocol}s.
@@ -98,7 +98,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     protected Map<String, Agent<?, ?, ?>> agentMap = new HashMap<>();
     protected final Map<String, Future<Void>> agentDiscoveryImportFutureMap = new HashMap<>();
     protected final Map<String, Protocol<?>> protocolInstanceMap = new HashMap<>();
-    protected final Map<String, List<Consumer<PersistenceEvent<Asset>>>> childAssetSubscriptions = new HashMap<>();
+    protected final Map<String, List<Consumer<PersistenceEvent<Asset<?>>>>> childAssetSubscriptions = new HashMap<>();
     protected boolean initDone;
     protected Container container;
 
@@ -160,8 +160,8 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
             .filter(isPersistenceEventForEntityType(Asset.class))
             .process(exchange -> {
                 @SuppressWarnings("unchecked")
-                PersistenceEvent<Asset> persistenceEvent = (PersistenceEvent<Asset>)exchange.getIn().getBody(PersistenceEvent.class);
-                Asset asset = persistenceEvent.getEntity();
+                PersistenceEvent<Asset<?>> persistenceEvent = (PersistenceEvent<Asset<?>>)exchange.getIn().getBody(PersistenceEvent.class);
+                Asset<?> asset = persistenceEvent.getEntity();
                 if (isPersistenceEventForAssetType(Agent.class).matches(exchange)) {
                     processAgentChange((Agent<?, ?, ?>)asset, persistenceEvent);
                 } else {
@@ -178,7 +178,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public Asset mergeAsset(Asset asset) {
+    public <T extends Asset<?>> T mergeAsset(T asset) {
         Objects.requireNonNull(asset.getId());
         Objects.requireNonNull(asset.getParentId());
 
@@ -202,19 +202,19 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public Asset findAsset(String assetId) {
+    public Asset<?> findAsset(String assetId) {
         LOG.fine("Getting protocol-provided: " + assetId);
         return assetStorageService.find(assetId);
     }
 
     @Override
-    public <T extends Asset> T findAsset(String assetId, Class<T> assetType) {
+    public <T extends Asset<?>> T findAsset(String assetId, Class<T> assetType) {
         LOG.fine("Getting protocol-provided: " + assetId);
         return assetStorageService.find(assetId, assetType);
     }
 
     @Override
-    public List<Asset> findAssets(String assetId, AssetQuery assetQuery) {
+    public List<Asset<?>> findAssets(String assetId, AssetQuery assetQuery) {
         if (TextUtil.isNullOrEmpty(assetId)) {
             return Collections.emptyList();
         }
@@ -287,7 +287,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
      * Looks for new, modified and obsolete AGENT_LINK attributes and links / unlinks them
      * with the protocol
      */
-    protected void processAssetChange(Asset asset, PersistenceEvent<Asset> persistenceEvent) {
+    protected void processAssetChange(Asset<?> asset, PersistenceEvent<Asset<?>> persistenceEvent) {
         LOG.finest("Processing asset persistence event: " + persistenceEvent.getCause());
 
         switch (persistenceEvent.getCause()) {
@@ -357,10 +357,10 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
         }
     }
 
-    protected String getAgentAncestorId(Asset asset) {
+    protected String getAgentAncestorId(Asset<?> asset) {
         if (asset.getPath() == null) {
             // Fully load
-            Asset fullyLoaded = assetStorageService.find(asset.getId());
+            Asset<?> fullyLoaded = assetStorageService.find(asset.getId());
             if (fullyLoaded != null) {
                 asset = fullyLoaded;
             } else if (!TextUtil.isNullOrEmpty(asset.getParentId())) {
@@ -393,7 +393,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
             LOG.fine("Linking attributes to protocol instance: " + protocol);
 
             // Get all assets that have attributes with agent link meta to this agent
-            List<Asset> assets = assetStorageService.findAll(
+            List<Asset<?>> assets = assetStorageService.findAll(
                 new AssetQuery()
                     .attributes(
                         new AttributePredicate().meta(
@@ -500,7 +500,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
      */
     @Override
     public boolean processAssetUpdate(EntityManager entityManager,
-                                      Asset asset,
+                                      Asset<?> asset,
                                       Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
 
@@ -599,14 +599,14 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void subscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset>> assetChangeConsumer) {
+    public void subscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset<?>>> assetChangeConsumer) {
         if (!getAgents().containsKey(agentId)) {
             LOG.info("Attempt to subscribe to child asset changes with an invalid agent ID: " +agentId);
             return;
         }
 
         withLock(getClass().getSimpleName() + "::subscribeChildAssetChange", () -> {
-            List<Consumer<PersistenceEvent<Asset>>> consumerList = childAssetSubscriptions
+            List<Consumer<PersistenceEvent<Asset<?>>>> consumerList = childAssetSubscriptions
                 .computeIfAbsent(agentId, (id) -> new ArrayList<>());
             if (!consumerList.contains(assetChangeConsumer)) {
                 consumerList.add(assetChangeConsumer);
@@ -615,7 +615,7 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
     }
 
     @Override
-    public void unsubscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset>> assetChangeConsumer) {
+    public void unsubscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset<?>>> assetChangeConsumer) {
         withLock(getClass().getSimpleName() + "::unsubscribeChildAssetChange", () ->
             childAssetSubscriptions.computeIfPresent(agentId, (id, consumerList) -> {
                 consumerList.remove(assetChangeConsumer);
@@ -623,14 +623,14 @@ public class AgentService extends RouteBuilder implements ContainerService, Asse
             }));
     }
 
-    protected void notifyChildAssetChange(String agentId, PersistenceEvent<Asset> assetPersistenceEvent) {
+    protected void notifyChildAssetChange(String agentId, PersistenceEvent<Asset<?>> assetPersistenceEvent) {
         withLock(getClass().getSimpleName() + "::notifyChildAssetChange", () ->
             childAssetSubscriptions.computeIfPresent(agentId, (id, consumerList) -> {
-                LOG.fine("Notifying child asset change consumers of change to agent child asset: Agent ID=" + id + ", Asset ID=" + assetPersistenceEvent.getEntity().getId());
+                LOG.fine("Notifying child asset change consumers of change to agent child asset: Agent ID=" + id + ", Asset<?> ID=" + assetPersistenceEvent.getEntity().getId());
                 try {
                     consumerList.forEach(consumer -> consumer.accept(assetPersistenceEvent));
                 } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Child asset change consumer threw an exception: Agent ID=" + id + ", Asset ID=" + assetPersistenceEvent.getEntity().getId(), e);
+                    LOG.log(Level.WARNING, "Child asset change consumer threw an exception: Agent ID=" + id + ", Asset<?> ID=" + assetPersistenceEvent.getEntity().getId(), e);
                 }
                 return consumerList;
             }));

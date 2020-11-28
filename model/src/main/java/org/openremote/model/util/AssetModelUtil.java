@@ -91,7 +91,7 @@ public class AssetModelUtil {
 
         protected Set<Class<? extends Asset>> getAssetClasses() {
             if (assetClasses == null) {
-                LOG.info("Scanning classpath for Asset classes");
+                LOG.info("Scanning classpath for Asset<?> classes");
                 assetClasses = reflections.getSubTypesOf(Asset.class);
                 LOG.info("Found asset class count = " + assetClasses.size());
             }
@@ -207,7 +207,7 @@ public class AssetModelUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Asset> Optional<AssetDescriptor<T>> getAssetDescriptor(Class<T> assetType) {
+    public static <T extends Asset<?>> Optional<AssetDescriptor<T>> getAssetDescriptor(Class<T> assetType) {
         return Arrays.stream(assetDescriptors)
             .filter(assetDescriptor -> assetDescriptor.getType() == assetType)
             .map(assetDescriptor -> (AssetDescriptor<T>)assetDescriptor)

@@ -156,7 +156,7 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent, AgentLink> {
             tradfriDevices = new HashMap<>(devices.length);
 
             // Find all existing child assets of this agent that have a deviceId attribute
-            List<Asset> childAssets = assetService.findAssets(
+            List<Asset<?>> childAssets = assetService.findAssets(
                 agent.getId(),
                 new AssetQuery().attributeName(TradfriAsset.DEVICE_ID.getName()));
 
@@ -179,7 +179,7 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent, AgentLink> {
             Arrays.stream(devices)
                 .forEach(device -> {
                     String assetId = getDeviceAssetId(device);
-                    Optional<Asset> existingAsset = childAssets.stream().filter(asset -> asset.getId().equals(assetId)).findFirst();
+                    Optional<Asset<?>> existingAsset = childAssets.stream().filter(asset -> asset.getId().equals(assetId)).findFirst();
                     existingAsset.ifPresent(asset -> addDevice((TradfriAsset)asset, device));
             });
         } else {
@@ -234,9 +234,9 @@ public class TradfriProtocol extends AbstractProtocol<TradfriAgent, AgentLink> {
         device.getEventHandlers().clear();
     }
 
-    private Asset createDeviceAsset(Device device) {
+    private Asset<?> createDeviceAsset(Device device) {
 
-        Asset asset = null;
+        Asset<?> asset = null;
         String name = (!TextUtil.isNullOrEmpty(device.getName()) ? device.getName() : "Unnamed") + " " + device.getInstanceId();
 
         if (device.isPlug()) {

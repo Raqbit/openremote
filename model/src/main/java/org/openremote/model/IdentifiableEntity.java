@@ -25,7 +25,7 @@ package org.openremote.model;
  */
 public interface IdentifiableEntity {
 
-    void setId(String id);
+    <T> T setId(String id);
 
     String getId();
 }

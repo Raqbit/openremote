@@ -31,14 +31,24 @@ import java.util.Optional;
  * An asset for grouping other assets together; if the {@link #CHILD_ASSET_TYPE} {@link Attribute} is specified then
  * all children must be of the specified type.
  */
-public class GroupAsset extends Asset {
+public class GroupAsset extends Asset<GroupAsset> {
 
     public static final AttributeDescriptor<String> CHILD_ASSET_TYPE = new AttributeDescriptor<>("childAssetType", ValueType.STRING);
-public static final String t = GroupAsset.class.getSimpleName();
+    public static final String t = GroupAsset.class.getSimpleName();
     public static final AssetDescriptor<GroupAsset> DESCRIPTOR = new AssetDescriptor<>("folder", "B3B3B3", GroupAsset.class);
 
-    public GroupAsset(String name) {
+    protected GroupAsset(String name, AssetDescriptor<? extends GroupAsset> descriptor, String childAssetType) {
+        super(name, descriptor);
+        setChildAssetType(childAssetType);
+    }
+
+    public GroupAsset(String name, AssetDescriptor<?> childAssetType) {
+        this(name, childAssetType.getName());
+    }
+
+    public GroupAsset(String name, String childAssetType) {
         super(name, DESCRIPTOR);
+        setChildAssetType(childAssetType);
     }
 
     public Optional<String> getChildAssetType() {

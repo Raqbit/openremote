@@ -130,7 +130,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         smartOffice = assetStorageService.merge(smartOffice);
         smartOfficeId = smartOffice.getId();
 
-        Asset groundFloor = new Asset("Ground Floor");
+        Asset<?> groundFloor = new ThingAsset("Ground Floor");
         groundFloor.setParent(smartOffice);
         groundFloor.getAttributes().addOrReplace(
                 new Attribute<>(Asset.LOCATION, SMART_OFFICE_LOCATION)
@@ -156,7 +156,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         agent = assetStorageService.merge(agent);
         agentId = agent.getId();
 
-        Asset thing = new Asset("Demo Thing");
+        Asset<?> thing = new ThingAsset("Demo Thing");
         thing.setParent(agent);
         thing.getAttributes().addOrReplace(
             new Attribute<>(Asset.LOCATION, SMART_OFFICE_LOCATION).addMeta(new MetaItem<>(RULE_STATE, true)),
@@ -362,7 +362,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
         apartment1Id = apartment1.getId();
 
         if (importDemoScenes) {
-            List<Agent<?,?,?>> demoApartment1SceneAgents = createDemoApartmentScenes(
+            List<Agent> demoApartment1SceneAgents = createDemoApartmentScenes(
                     assetStorageService, apartment1, DEMO_APARTMENT_SCENES, apartment1Livingroom, apartment1Kitchen, apartment1Hallway);
             apartment1SceneAgentIds = demoApartment1SceneAgents.stream().map(Asset::getId).collect(Collectors.toList());
         }
@@ -556,7 +556,7 @@ public class ManagerTestSetup extends AbstractManagerSetup {
 
         // ################################ Realm B Area 1 ###################################
 
-        Asset assetArea1 = new Asset("Area 1");
+        Asset<?> assetArea1 = new ThingAsset("Area 1");
         assetArea1.setParent(smartCity);
         assetArea1.getAttributes().addOrReplace(
             new Attribute<>(Asset.LOCATION, AREA_1_LOCATION)
@@ -568,49 +568,49 @@ public class ManagerTestSetup extends AbstractManagerSetup {
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         peopleCounter1Asset = assetStorageService.merge(peopleCounter1Asset);
 
-        Asset microphone1Asset = createDemoMicrophoneAsset("Microphone 1", assetArea1, new GeoJSONPoint(5.478092, 51.438655), () ->
+        Asset<?> microphone1Asset = createDemoMicrophoneAsset("Microphone 1", assetArea1, new GeoJSONPoint(5.478092, 51.438655), () ->
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         microphone1Asset = assetStorageService.merge(microphone1Asset);
         microphone1Id = microphone1Asset.getId();
 
-        Asset enviroment1Asset = createDemoEnvironmentAsset("Environment 1", assetArea1, new GeoJSONPoint(5.478907, 51.438943),() ->
+        Asset<?> enviroment1Asset = createDemoEnvironmentAsset("Environment 1", assetArea1, new GeoJSONPoint(5.478907, 51.438943),() ->
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         enviroment1Asset = assetStorageService.merge(enviroment1Asset);
 
-        Asset light1Asset = createDemoLightAsset("Light 1", assetArea1, new GeoJSONPoint(5.476111, 51.438492));
+        Asset<?> light1Asset = createDemoLightAsset("Light 1", assetArea1, new GeoJSONPoint(5.476111, 51.438492));
         light1Asset = assetStorageService.merge(light1Asset);
 
-        Asset light2Asset = createDemoLightAsset("Light 2", assetArea1, new GeoJSONPoint(5.477272, 51.439214));
+        Asset<?> light2Asset = createDemoLightAsset("Light 2", assetArea1, new GeoJSONPoint(5.477272, 51.439214));
         light2Asset = assetStorageService.merge(light2Asset);
 
         // ################################ Realm B Area 2 ###################################
 
-        Asset assetArea2 = new Asset("Area 2");
+        Asset<?> assetArea2 = new ThingAsset("Area 2");
         assetArea2.setParent(smartCity);
         assetArea2.getAttributes().addOrReplace(
                 new Attribute<>(Asset.LOCATION, AREA_2_LOCATION)
         );
         assetArea2 = assetStorageService.merge(assetArea2);
 
-        Asset peopleCounter2Asset = createDemoPeopleCounterAsset("PeopleCounter 2", assetArea2, new GeoJSONPoint(5.473686, 51.438603), () ->
+        Asset<?> peopleCounter2Asset = createDemoPeopleCounterAsset("PeopleCounter 2", assetArea2, new GeoJSONPoint(5.473686, 51.438603), () ->
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         peopleCounter2Asset = assetStorageService.merge(peopleCounter2Asset);
 
-        Asset environment2Asset = createDemoEnvironmentAsset("Environment 2", assetArea2, new GeoJSONPoint(5.473552, 51.438412), () ->
+        Asset<?> environment2Asset = createDemoEnvironmentAsset("Environment 2", assetArea2, new GeoJSONPoint(5.473552, 51.438412), () ->
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         environment2Asset = assetStorageService.merge(environment2Asset);
 
 
         // ################################ Realm B Area 3 ###################################
 
-        Asset assetArea3 = new Asset("Area 3");
+        Asset<?> assetArea3 = new ThingAsset("Area 3");
         assetArea3.setParent(smartCity);
         assetArea3.getAttributes().addOrReplace(
                 new Attribute<>(Asset.LOCATION, AREA_3_LOCATION)
         );
         assetArea3 = assetStorageService.merge(assetArea3);
 
-        Asset peopleCounter3Asset = createDemoPeopleCounterAsset("PeopleCounter 3", assetArea3, new GeoJSONPoint(5.487234, 51.447065), () ->
+        Asset<?> peopleCounter3Asset = createDemoPeopleCounterAsset("PeopleCounter 3", assetArea3, new GeoJSONPoint(5.487234, 51.447065), () ->
             new SimulatorAgent.SimulatorAgentLink(smartCityServiceAgentId));
         peopleCounter3Asset = assetStorageService.merge(peopleCounter3Asset);
         peopleCounter3AssetId = peopleCounter3Asset.getId();

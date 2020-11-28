@@ -29,7 +29,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ConsoleAsset extends Asset {
+public class ConsoleAsset extends Asset<ConsoleAsset> {
 
     public static final AttributeDescriptor<String> CONSOLE_NAME = new AttributeDescriptor<>("consoleName", ValueType.STRING);
     public static final AttributeDescriptor<String> CONSOLE_VERSION = new AttributeDescriptor<>("consoleVersion", ValueType.STRING);
@@ -37,6 +37,10 @@ public class ConsoleAsset extends Asset {
     public static final AttributeDescriptor<ConsoleProviders> CONSOLE_PROVIDERS = new AttributeDescriptor<>("consoleProviders", ValueType.CONSOLE_PROVIDERS);
 
     public static final AssetDescriptor<ConsoleAsset> DESCRIPTOR = new AssetDescriptor<>("monitor-cellphone", null, ConsoleAsset.class);
+
+    protected ConsoleAsset(String name, AssetDescriptor<? extends ConsoleAsset> descriptor) {
+        super(name, descriptor);
+    }
 
     public <T extends ConsoleAsset> ConsoleAsset(String name) {
         super(name, DESCRIPTOR);
@@ -89,7 +93,7 @@ public class ConsoleAsset extends Asset {
     }
 
     // TODO: Replace with standard validation
-//    public static boolean validateConsoleConfiguration(Asset asset, List<ValidationFailure> validationFailures) {
+//    public static boolean validateConsoleConfiguration(Asset<?> asset, List<ValidationFailure> validationFailures) {
 //        boolean valid = isConsole(asset);
 //
 //        if (!valid) {

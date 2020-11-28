@@ -22,6 +22,7 @@ package org.openremote.agent.protocol.zwave;
 import org.openremote.agent.protocol.ProtocolExecutorService;
 import org.openremote.controller.exception.ConfigurationException;
 import org.openremote.model.asset.Asset;
+import org.openremote.model.asset.impl.ThingAsset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.asset.AssetTreeNode;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -281,7 +282,7 @@ public class ZWNetwork {
 
                 // Device Info
 
-                Asset deviceInfoAsset = new Asset("Info");
+                Asset<?> deviceInfoAsset = new ThingAsset("Info");
                 deviceInfoAsset.getAttributes().addAll(createNodeInfoAttributes(agent.getId(), node));
                 deviceNode.addChild(new AssetTreeNode(deviceInfoAsset));
 
@@ -302,7 +303,7 @@ public class ZWNetwork {
 
                 List<ZWParameterItem> parameters = node.getParameters();
                 if (parameters.size() > 0) {
-                    AssetTreeNode parameterListNode = new AssetTreeNode(new Asset("Parameters"));
+                    AssetTreeNode parameterListNode = new AssetTreeNode(new ThingAsset("Parameters"));
                     deviceNode.addChild(parameterListNode);
 
                     List<AssetTreeNode> parameterNodes = parameters
@@ -312,7 +313,7 @@ public class ZWNetwork {
                             int number = parameter.getNumber();
                             String parameterLabel = number + " : " + parameter.getDisplayName();
                             String description = parameter.getDescription();
-                            Asset parameterAsset = new Asset(parameterLabel);
+                            Asset<?> parameterAsset = new ThingAsset(parameterLabel);
                             AssetTreeNode parameterNode = new AssetTreeNode(parameterAsset);
 
                             List<Attribute<?>> attributes = parameter.getChannels()
@@ -349,7 +350,7 @@ public class ZWNetwork {
 
         // Z-Wave Controller
 
-        Asset networkManagementAsset = new Asset("Z-Wave Controller");
+        Asset<?> networkManagementAsset = new ThingAsset("Z-Wave Controller");
         List<Attribute<?>> attributes = controller.getSystemCommandManager().getChannels()
             .stream()
             .filter(channel ->
@@ -370,7 +371,7 @@ public class ZWNetwork {
 
     private AssetTreeNode createDeviceNode(String agentId, List<ZWCommandClass> cmdClasses, String name) {
 
-        Asset device = new Asset(name);
+        Asset<?> device = new ThingAsset(name);
 
         List<Attribute<?>> attributes = cmdClasses
             .stream()

@@ -37,7 +37,7 @@ public class TestFixture extends AbstractGlobalExtension {
     public static List<Ruleset> globalRulesets;
     public static List<Ruleset> tenantRulesets;
     public static List<Ruleset> assetRulesets;
-    public static List<Asset> assets;
+    public static List<Asset<?>> assets;
     public static List<UserAsset> userAssets;
 
     @Override

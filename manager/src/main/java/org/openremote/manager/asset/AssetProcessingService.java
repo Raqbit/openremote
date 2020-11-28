@@ -61,6 +61,7 @@ import static org.openremote.manager.asset.AssetProcessingException.Reason.*;
 import static org.openremote.manager.event.ClientEventService.CLIENT_EVENT_TOPIC;
 import static org.openremote.model.attribute.AttributeEvent.HEADER_SOURCE;
 import static org.openremote.model.attribute.AttributeEvent.Source.*;
+import static org.openremote.model.value.MetaItemType.AGENT_LINK;
 
 /**
  * Receives {@link AttributeEvent} from {@link Source} and processes them.
@@ -73,9 +74,9 @@ import static org.openremote.model.attribute.AttributeEvent.Source.*;
  * <dt>{@link Source#SENSOR}</dt>
  * <dd><p>Protocol sensor updates sent to {@link Protocol#SENSOR_QUEUE}.</dd>
  * </dl>
- * NOTE: An attribute value can be changed during Asset CRUD but this does not come through
+ * NOTE: An attribute value can be changed during Asset<?> CRUD but this does not come through
  * this route but is handled separately, see {@link AssetResource}. Any attribute values
- * assigned during Asset CRUD can be thought of as the attributes initial value.
+ * assigned during Asset<?> CRUD can be thought of as the attributes initial value.
  * <p>
  * The {@link AttributeEvent}s are first validated depending on their source, and if validation fails
  * at any point then an {@link AssetProcessingException} will be logged as a warning with an
@@ -239,7 +240,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
                 // will see consistent database state and we only commit if no processor failed. This
                 // still won't make this procedure consistent with the message queue from which we consume!
                 persistenceService.doTransaction(em -> {
-                    Asset asset = assetStorageService.find(em, event.getAssetId(), true);
+                    Asset<?> asset = assetStorageService.find(em, event.getAssetId(), true);
                     if (asset == null)
                         throw new AssetProcessingException(ASSET_NOT_FOUND);
 
@@ -414,7 +415,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
      * update, the attribute will be stored in the database.
      */
     protected boolean processAssetUpdate(EntityManager em,
-                                         Asset asset,
+                                         Asset<?> asset,
                                          Attribute<?> attribute,
                                          Source source) throws AssetProcessingException {
 
@@ -491,7 +492,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         };
     }
 
-    protected void storeAttributeValue(EntityManager em, Asset asset, Attribute<?> attribute) throws AssetProcessingException {
+    protected void storeAttributeValue(EntityManager em, Asset<?> asset, Attribute<?> attribute) throws AssetProcessingException {
         String attributeName = attribute.getName();
         Object value = attribute.getValue().orElse(null);
 
@@ -506,7 +507,7 @@ public class AssetProcessingService extends RouteBuilder implements ContainerSer
         }
     }
 
-    protected void publishClientEvent(Asset asset, Attribute<?> attribute) {
+    protected void publishClientEvent(Asset<?> asset, Attribute<?> attribute) {
         // TODO Catch "queue full" exception (e.g. when producing thousands of INFO messages in rules)?
         clientEventService.publishEvent(
             attribute.getMetaValue(MetaItemType.ACCESS_RESTRICTED_READ).orElse(false),

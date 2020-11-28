@@ -215,7 +215,7 @@ public class ORConsoleGeofenceAssetAdapter extends RouteBuilder implements Geofe
 
         if (realm == null) {
             LOG.info("Console ID not found in map so cannot retrieve geofences");
-            // Asset not supported by this adapter
+            // Asset<?> not supported by this adapter
             return null;
         }
 

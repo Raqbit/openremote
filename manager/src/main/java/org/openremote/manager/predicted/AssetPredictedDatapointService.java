@@ -115,7 +115,7 @@ public class AssetPredictedDatapointService implements ContainerService, Protoco
                                                long fromTimestamp,
                                                long toTimestamp) {
 
-        Asset asset = assetStorageService.find(assetId);
+        Asset<?> asset = assetStorageService.find(assetId);
         if (asset == null) {
             throw new IllegalStateException("Asset not found: " + assetId);
         }

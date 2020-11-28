@@ -24,23 +24,20 @@ import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Formula;
 import org.openremote.model.Constants;
 import org.openremote.model.IdentifiableEntity;
+import org.openremote.model.asset.impl.ThingAsset;
 import org.openremote.model.attribute.Attribute;
 import org.openremote.model.attribute.AttributeList;
 import org.openremote.model.geo.GeoJSONPoint;
-import org.openremote.model.util.AssetModelUtil;
 import org.openremote.model.value.AttributeDescriptor;
-import org.openremote.model.value.MetaItemDescriptor;
 import org.openremote.model.value.ValueType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import static org.openremote.model.Constants.PERSISTENCE_JSON_VALUE_TYPE;
 import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
@@ -63,7 +60,7 @@ import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
  * <p>
  * The {@link #type} of the asset is an arbitrary string which should correspond with an {@link AssetDescriptor}
  * registered within the running instance. If the corresponding {@link AssetDescriptor} cannot be found then
- * the fallback generic {@link Asset#DESCRIPTOR} will be assumed.
+ * the fallback generic {@link ThingAsset#DESCRIPTOR} will be assumed.
  * <p>
  * The {@link #path} is a list of parent asset identifiers, starting with the identifier of
  * this asset, followed by parent asset identifiers, and ending with the identifier of the
@@ -217,12 +214,7 @@ import static org.openremote.model.Constants.PERSISTENCE_UNIQUE_ID_GENERATOR;
 @DiscriminatorValue("non null")
 @Check(constraints = "ID != PARENT_ID")
 @JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, use = JsonTypeInfo.Id.CUSTOM, defaultImpl = Asset.class)
-public class Asset implements IdentifiableEntity {
-
-    /**
-     * Generic asset descriptor called "Thing"
-     */
-    public static final AssetDescriptor<Asset> DESCRIPTOR = new AssetDescriptor<>("cube-outline", null, Asset.class);
+public abstract class Asset<T extends Asset<?>> implements IdentifiableEntity {
 
     /*
      * ATTRIBUTE DESCRIPTORS DESCRIBING FIXED NAME ATTRIBUTES AND THEIR VALUE TYPE - ALL SUB TYPES OF THIS ASSET TYPE
@@ -236,6 +228,8 @@ public class Asset implements IdentifiableEntity {
     public static final AttributeDescriptor<String[]> TAGS = new AttributeDescriptor<>("tags", ValueType.STRING.asArray());
 
     public static final AttributeDescriptor<String> NOTES = new AttributeDescriptor<>("notes", ValueType.STRING);
+    public static final AttributeDescriptor<String> MANUFACTURER = new AttributeDescriptor<>("manufacturer", ValueType.STRING);
+    public static final AttributeDescriptor<String> MODEL = new AttributeDescriptor<>("model", ValueType.STRING);
 
     @Id
     @Column(name = "ID", length = 22, columnDefinition = "char(22)")
@@ -292,15 +286,7 @@ public class Asset implements IdentifiableEntity {
     Asset() {
     }
 
-    /**
-     * All sub types of this class must have a public constructor that only takes a single string parameter representing
-     * the name of the asset.
-     */
-    public Asset(String name) {
-        this(name, DESCRIPTOR);
-    }
-
-    protected <T extends Asset> Asset(String name, AssetDescriptor<T> descriptor) {
+    protected Asset(String name, AssetDescriptor<? extends T> descriptor) {
         setName(name);
         this.type = descriptor.getName();
     }
@@ -309,32 +295,40 @@ public class Asset implements IdentifiableEntity {
         return id;
     }
 
-    public void setId(String id) {
+    @SuppressWarnings("unchecked")
+    public T setId(String id) {
         this.id = id;
+        return (T) this;
     }
 
     public long getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    @SuppressWarnings("unchecked")
+    public T setVersion(long version) {
         this.version = version;
+        return (T)this;
     }
 
     public Date getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(Date createdOn) {
+    @SuppressWarnings("unchecked")
+    public T setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
+        return (T)this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) throws IllegalArgumentException {
+    @SuppressWarnings("unchecked")
+    public T setName(String name) throws IllegalArgumentException {
         this.name = name;
+        return (T)this;
     }
 
     public String getType() {
@@ -345,11 +339,14 @@ public class Asset implements IdentifiableEntity {
         return accessPublicRead;
     }
 
-    public void setAccessPublicRead(boolean accessPublicRead) {
+    @SuppressWarnings("unchecked")
+    public T setAccessPublicRead(boolean accessPublicRead) {
         this.accessPublicRead = accessPublicRead;
+        return (T)this;
     }
 
-    public void setParent(Asset parent) {
+    @SuppressWarnings("unchecked")
+    public T setParent(Asset<?> parent) {
         if (parent == null) {
             parentId = null;
             parentName = null;
@@ -359,14 +356,17 @@ public class Asset implements IdentifiableEntity {
             parentName = parent.name;
             parentType = parent.type;
         }
+        return (T)this;
     }
 
     public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
+    @SuppressWarnings("unchecked")
+    public T setParentId(String parentId) {
         this.parentId = parentId;
+        return (T)this;
     }
 
     /**
@@ -376,8 +376,10 @@ public class Asset implements IdentifiableEntity {
         return parentName;
     }
 
-    public void setParentName(String parentName) {
+    @SuppressWarnings("unchecked")
+    public T setParentName(String parentName) {
         this.parentName = parentName;
+        return (T)this;
     }
 
     /**
@@ -391,8 +393,10 @@ public class Asset implements IdentifiableEntity {
         return realm;
     }
 
-    public void setRealm(String realm) {
+    @SuppressWarnings("unchecked")
+    public T setRealm(String realm) {
         this.realm = realm;
+        return (T)this;
     }
 
     /**
@@ -405,8 +409,10 @@ public class Asset implements IdentifiableEntity {
         return path;
     }
 
-    public void setPath(String[] path) {
+    @SuppressWarnings("unchecked")
+    public T setPath(String[] path) {
         this.path = path;
+        return (T)this;
     }
 
     /**
@@ -439,21 +445,23 @@ public class Asset implements IdentifiableEntity {
         return attributes;
     }
 
-    public Asset setAttributes(AttributeList attributes) {
+    @SuppressWarnings("unchecked")
+    public T setAttributes(AttributeList attributes) {
         if (attributes == null) {
             attributes = new AttributeList();
         }
         this.attributes = attributes;
-        return this;
+        return (T)this;
     }
 
-    public Asset setAttributes(Attribute<?>...attributes) {
+    public Asset<?> setAttributes(Attribute<?>...attributes) {
         return setAttributes(Arrays.asList(attributes));
     }
 
-    public Asset setAttributes(Collection<Attribute<?>> attributes) {
+    @SuppressWarnings("unchecked")
+    public T setAttributes(Collection<Attribute<?>> attributes) {
         this.attributes = new AttributeList(attributes);
-        return this;
+        return (T)this;
     }
 
     public <T> Optional<Attribute<T>> getAttribute(AttributeDescriptor<T> descriptor) {
@@ -473,42 +481,6 @@ public class Asset implements IdentifiableEntity {
                 return null;
             }
         });
-    }
-
-    public Optional<GeoJSONPoint> getLocation() {
-        return getAttributes().getValue(LOCATION);
-    }
-
-    public Asset setLocation(GeoJSONPoint location) {
-        getAttributes().addOrReplace(new Attribute<>(LOCATION, location));
-        return this;
-    }
-
-    public Optional<String[]> getTags() {
-        return getAttributes().getValue(TAGS);
-    }
-
-    public Asset setTags(String[] tags) {
-        getAttributes().getOrCreate(TAGS).setValue(tags);
-        return this;
-    }
-
-    public Optional<String> getEmail() {
-        return getAttributes().getValue(EMAIL);
-    }
-
-    public Asset setEmail(String email) {
-        getAttributes().getOrCreate(EMAIL).setValue(email);
-        return this;
-    }
-
-    public Optional<String> getNotes() {
-        return getAttributes().getValue(NOTES);
-    }
-
-    public Asset setNotes(String notes) {
-        getAttributes().getOrCreate(NOTES).setValue(notes);
-        return this;
     }
 
     public boolean hasAttribute(AttributeDescriptor<?> attributeDescriptor) {
@@ -546,17 +518,66 @@ public class Asset implements IdentifiableEntity {
             '}';
     }
 
-//    ---------------------------------------------------
-//    FUNCTIONAL METHODS BELOW
-//    ---------------------------------------------------
+    /* WELL KNNOWN ATTRIBUTE GETTER / SETTERS */
 
-    public static <T extends Asset> T createAsset(Class<T> assetClass, String name) {
-        try {
-            Constructor<T> constructor = assetClass.getConstructor(String.class);
-            return constructor.newInstance(name);
-        } catch (Exception e) {
-            AssetModelUtil.LOG.log(Level.WARNING, "Failed to create instance of asset, ensure there is a public constructor that takes a single string argument, asset type = " + assetClass);
-        }
-        return null;
+
+    public Optional<GeoJSONPoint> getLocation() {
+        return getAttributes().getValue(LOCATION);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setLocation(GeoJSONPoint location) {
+        getAttributes().addOrReplace(new Attribute<>(LOCATION, location));
+        return (T)this;
+    }
+
+    public Optional<String[]> getTags() {
+        return getAttributes().getValue(TAGS);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setTags(String[] tags) {
+        getAttributes().getOrCreate(TAGS).setValue(tags);
+        return (T)this;
+    }
+
+    public Optional<String> getEmail() {
+        return getAttributes().getValue(EMAIL);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setEmail(String email) {
+        getAttributes().getOrCreate(EMAIL).setValue(email);
+        return (T)this;
+    }
+
+    public Optional<String> getNotes() {
+        return getAttributes().getValue(NOTES);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setNotes(String notes) {
+        getAttributes().getOrCreate(NOTES).setValue(notes);
+        return (T)this;
+    }
+
+    public Optional<String> getManufacturer() {
+        return getAttributes().getValue(MANUFACTURER);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setManufacturer(String manufacturer) {
+        getAttributes().getOrCreate(MANUFACTURER).setValue(manufacturer);
+        return (T)this;
+    }
+
+    public Optional<String> getModel() {
+        return getAttributes().getValue(MODEL);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setModel(String model) {
+        getAttributes().getOrCreate(MODEL).setValue(model);
+        return (T)this;
     }
 }

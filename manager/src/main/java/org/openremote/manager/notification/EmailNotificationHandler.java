@@ -188,7 +188,7 @@ public class EmailNotificationHandler implements NotificationHandler {
                         break;
                     case ASSET:
                         // Find descendant assets with email attribute
-                        List<Asset> assets = assetStorageService.findAll(
+                        List<Asset<?>> assets = assetStorageService.findAll(
                             new AssetQuery()
                                 .select(AssetQuery.Select.selectExcludePathAndParentInfo()
                                     .attributes(Asset.EMAIL.getName()))
@@ -363,7 +363,7 @@ public class EmailNotificationHandler implements NotificationHandler {
             return assetEmails.get(assetId);
         }
 
-        Asset asset = assetStorageService.find(assetId);
+        Asset<?> asset = assetStorageService.find(assetId);
         if (asset == null) {
             return null;
         }

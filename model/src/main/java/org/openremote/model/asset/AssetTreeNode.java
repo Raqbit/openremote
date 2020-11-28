@@ -29,21 +29,21 @@ import java.util.Arrays;
  */
 public class AssetTreeNode {
 
-    public Asset asset;
+    public Asset<?> asset;
     public AssetTreeNode[] children;
 
-    public AssetTreeNode(Asset asset) {
+    public AssetTreeNode(Asset<?> asset) {
         this.asset = asset;
     }
 
     @JsonCreator
-    public AssetTreeNode(@JsonProperty("asset") Asset asset,
+    public AssetTreeNode(@JsonProperty("asset") Asset<?> asset,
                          @JsonProperty("children") AssetTreeNode... children) {
         this.asset = asset;
         this.children = children;
     }
 
-    public Asset getAsset() {
+    public Asset<?> getAsset() {
         return asset;
     }
 

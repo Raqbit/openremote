@@ -110,7 +110,7 @@ public interface ProtocolAssetService extends ContainerService {
      * This operation stores transient or detached state and returns the current state. It will override any existing
      * stored asset data, ignoring versions.
      */
-    Asset mergeAsset(Asset asset);
+    <T extends Asset<?>> T mergeAsset(T asset);
 
     /**
      * Protocols may remove assets from the context store.
@@ -122,18 +122,18 @@ public interface ProtocolAssetService extends ContainerService {
     /**
      * Get asset of specified type from the store by ID.
      */
-    <T extends Asset> T findAsset(String assetId, Class<T> assetType);
+    <T extends Asset<?>> T findAsset(String assetId, Class<T> assetType);
 
     /**
      * Get asset from the store by ID.
      */
-    Asset findAsset(String assetId);
+    <T extends Asset<?>> T findAsset(String assetId);
 
     /**
      * Get assets by an {@link org.openremote.model.query.AssetQuery}; can only access {@link Asset}s that are
      * descendants of the specified {@link Asset}
      */
-    List<Asset> findAssets(String assetId, AssetQuery assetQuery);
+    List<Asset<?>> findAssets(String assetId, AssetQuery assetQuery);
 
     /**
      * Protocols can send arbitrary attribute change events for regular processing.
@@ -147,12 +147,12 @@ public interface ProtocolAssetService extends ContainerService {
      * to call this method multiple times for the same agentId and assetChangeConsumer and only a single subscription
      * would actually be created.
      */
-    void subscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset>> assetChangeConsumer);
+    void subscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset<?>>> assetChangeConsumer);
 
     /**
      * Unsubscribe from asset changes for the specified agent.
      * <p>
      * When an agent is unlinked from a protocol then all subscriptions will be automatically removed also.
      */
-    void unsubscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset>> assetChangeConsumer);
+    void unsubscribeChildAssetChange(String agentId, Consumer<PersistenceEvent<Asset<?>>> assetChangeConsumer);
 }

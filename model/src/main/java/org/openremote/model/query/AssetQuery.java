@@ -27,6 +27,7 @@ import org.openremote.model.value.NameHolder;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -354,7 +355,7 @@ public class AssetQuery {
     }
 
     @SuppressWarnings("unchecked")
-    public AssetQuery types(AssetDescriptor<?>... types) {
+    public AssetQuery types(AssetDescriptor<? extends Asset<?>>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;

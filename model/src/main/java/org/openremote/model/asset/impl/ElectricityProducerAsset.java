@@ -20,6 +20,7 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.AttributeDescriptor;
@@ -29,7 +30,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ElectricityProducerAsset extends DeviceAsset {
+public class ElectricityProducerAsset extends Asset<ElectricityProducerAsset> {
 
     public enum PanelOrientation {
         SOUTH,
@@ -60,6 +61,10 @@ public class ElectricityProducerAsset extends DeviceAsset {
     public static final AttributeDescriptor<PanelOrientation> PANEL_ORIENTATION = new AttributeDescriptor<>("panelOrientation", PANEL_ORIENTATION_VALUE);
 
     public static final AssetDescriptor<ElectricityProducerAsset> DESCRIPTOR = new AssetDescriptor<>("ev-station", "8A293D", ElectricityProducerAsset.class);
+
+    protected ElectricityProducerAsset(String name, AssetDescriptor<? extends ElectricityProducerAsset> descriptor) {
+        super(name, descriptor);
+    }
 
     public ElectricityProducerAsset(String name) {
         super(name, DESCRIPTOR);

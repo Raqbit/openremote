@@ -111,7 +111,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
 
     @Override
     public boolean processAssetUpdate(EntityManager em,
-                                      Asset asset,
+                                      Asset<?> asset,
                                       Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
         if (source == ATTRIBUTE_LINKING_SERVICE) {
@@ -266,7 +266,7 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
     protected static Optional<Attribute<?>> getAttribute(EntityManager em,
                                                  AssetStorageService assetStorageService,
                                                  AttributeRef attributeRef) {
-        Asset asset = assetStorageService.find(
+        Asset<?> asset = assetStorageService.find(
             em,
             new AssetQuery()
                 .ids(attributeRef.getAssetId())

@@ -20,6 +20,7 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.AttributeDescriptor;
@@ -32,7 +33,7 @@ import org.openremote.model.value.impl.ColourRGBW;
 
 import java.util.Optional;
 
-public class LightAsset extends DeviceAsset {
+public class LightAsset extends Asset<LightAsset> {
 
     public static final AttributeDescriptor<Boolean> ON_OFF = new AttributeDescriptor<>("onOff", ValueType.BOOLEAN,
         new MetaItem<>(MetaItemType.UNIT_TYPE, Constants.UNITS_ON_OFF)
@@ -49,7 +50,7 @@ public class LightAsset extends DeviceAsset {
 
     public static final AssetDescriptor<LightAsset> DESCRIPTOR = new AssetDescriptor<>("lightbulb", "e6688a", LightAsset.class);
 
-    public <T extends LightAsset> LightAsset(String name, AssetDescriptor<T> descriptor) {
+    protected LightAsset(String name, AssetDescriptor<? extends LightAsset> descriptor) {
         super(name, descriptor);
     }
 

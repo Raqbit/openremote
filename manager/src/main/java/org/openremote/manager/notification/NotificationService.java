@@ -211,7 +211,7 @@ public class NotificationService extends RouteBuilder implements ContainerServic
                         case ASSET_RULESET:
                             assetId = exchange.getIn().getHeader(Notification.HEADER_SOURCE_ID, String.class);
                             sourceId.set(assetId);
-                            Asset asset = assetStorageService.find(assetId, false);
+                            Asset<?> asset = assetStorageService.find(assetId, false);
                             realm = asset.getRealm();
                             break;
                     }

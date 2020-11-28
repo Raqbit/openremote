@@ -37,7 +37,7 @@ import static org.openremote.model.value.MetaItemType.AGENT_LINK;
  * An agent is a special sub type of {@link Asset} that is associated with a {@link Protocol} and is responsible
  * for providing an instance of the associated {@link Protocol} when requested via {@link #getProtocolInstance}.
  */
-public abstract class Agent<T extends Agent<T, U, V>, U extends Protocol<T>, V extends AgentLink> extends Asset {
+public abstract class Agent<T extends Agent<T, U, V>, U extends Protocol<T>, V extends AgentLink> extends Asset<T> {
 
     @ModelDescriptor
     public static final AttributeDescriptor<Boolean> DISABLED = new AttributeDescriptor<>("agentDisabled", ValueType.BOOLEAN);
@@ -151,9 +151,10 @@ public abstract class Agent<T extends Agent<T, U, V>, U extends Protocol<T>, V e
         return getAttributes().getValue(DISABLED);
     }
 
-    public Agent setDisabled(boolean disabled) {
+    @SuppressWarnings("unchecked")
+    public T setDisabled(boolean disabled) {
         getAttributes().addOrReplace(new Attribute<>(DISABLED, disabled));
-        return this;
+        return (T)this;
     }
 
     public Optional<ConnectionStatus> getAgentStatus() {
@@ -164,32 +165,80 @@ public abstract class Agent<T extends Agent<T, U, V>, U extends Protocol<T>, V e
         return getAttributes().getValue(OAUTH_GRANT);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setOAuthGrant(OAuthGrant value) {
+        getAttributes().getOrCreate(OAUTH_GRANT).setValue(value);
+        return (T)this;
+    }
+
     public Optional<UsernamePassword> getUsernamePassword() {
         return getAttributes().getValue(USERNAME_AND_PASSWORD);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setUsernamePassword(UsernamePassword value) {
+        getAttributes().getOrCreate(USERNAME_AND_PASSWORD).setValue(value);
+        return (T)this;
     }
 
     public Optional<String> getHost() {
         return getAttributes().getValue(HOST);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setHost(String value) {
+        getAttributes().getOrCreate(HOST).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getPort() {
         return getAttributes().getValue(PORT);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setPort(Integer value) {
+        getAttributes().getOrCreate(PORT).setValue(value);
+        return (T)this;
     }
 
     public Optional<Integer> getBindPort() {
         return getAttributes().getValue(BIND_PORT);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setBindPort(Integer value) {
+        getAttributes().getOrCreate(BIND_PORT).setValue(value);
+        return (T)this;
+    }
+
     public Optional<String> getBindHost() {
         return getAttributes().getValue(BIND_HOST);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setBindHost(String value) {
+        getAttributes().getOrCreate(BIND_HOST).setValue(value);
+        return (T)this;
     }
 
     public Optional<String> getSerialPort() {
         return getAttributes().getValue(SERIAL_PORT);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setSerialPort(String value) {
+        getAttributes().getOrCreate(SERIAL_PORT).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getSerialBaudrate() {
         return getAttributes().getValue(SERIAL_BAUDRATE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setSerialBaudrate(Integer value) {
+        getAttributes().getOrCreate(SERIAL_BAUDRATE).setValue(value);
+        return (T)this;
     }
 
     public Optional<Integer> getPollingMillis() {

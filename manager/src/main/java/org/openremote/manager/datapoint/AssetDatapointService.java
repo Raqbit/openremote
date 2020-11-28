@@ -117,7 +117,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
 
     @Override
     public boolean processAssetUpdate(EntityManager em,
-                                      Asset asset,
+                                      Asset<?> asset,
                                       Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
 
@@ -195,7 +195,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
                                                long fromTimestamp,
                                                long toTimestamp) {
 
-        Asset asset = assetStorageService.find(attributeRef.getAssetId());
+        Asset<?> asset = assetStorageService.find(attributeRef.getAssetId());
         if (asset == null) {
             throw new IllegalStateException("Asset not found: " + attributeRef.getAssetId());
         }
@@ -337,7 +337,7 @@ public class AssetDatapointService implements ContainerService, AssetUpdateProce
         LOG.info("Starting data points purge daily task");
 
         // Get list of attributes that have custom durations
-        List<Asset> assets = assetStorageService.findAll(
+        List<Asset<?>> assets = assetStorageService.findAll(
                 new AssetQuery()
                     .attributes(new AttributePredicate().meta(
                         new NameValuePredicate(MetaItemType.DATA_POINTS_MAX_AGE_DAYS),

@@ -32,6 +32,10 @@ public class BuildingAsset extends CityAsset {
 
     public static final AssetDescriptor<BuildingAsset> DESCRIPTOR = new AssetDescriptor<>("office-building", "4b5966", BuildingAsset.class);
 
+    protected BuildingAsset(String name, AssetDescriptor<? extends BuildingAsset> descriptor) {
+        super(name, descriptor);
+    }
+
     public BuildingAsset(String name) {
         super(name, DESCRIPTOR);
     }

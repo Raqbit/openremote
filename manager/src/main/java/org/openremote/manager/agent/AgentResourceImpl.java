@@ -69,7 +69,7 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
 
         if (parentId != null) {
             // Check parent is in the correct realm
-            Asset asset = assetStorageService.find(parentId, false);
+            Asset<?> asset = assetStorageService.find(parentId, false);
             if (asset == null) {
                 throw new NotFoundException("Parent asset does not exist");
             }
@@ -166,7 +166,7 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
     }
 
     // TODO: Allow user to select which assets/attributes are actually added to the DB
-    protected void persistAssets(AssetTreeNode[] assets, Asset parentAsset, String realm) {
+    protected void persistAssets(AssetTreeNode[] assets, Asset<?> parentAsset, String realm) {
         try {
 
             if (assets == null || assets.length == 0) {
@@ -205,7 +205,7 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
         }
     }
 
-    protected Asset getParent(String parentId, String realm) throws WebApplicationException {
+    protected Asset<?> getParent(String parentId, String realm) throws WebApplicationException {
         if (!isSuperUser() && !realm.equals(getAuthenticatedRealm())) {
             throw new ForbiddenException();
         }
@@ -215,7 +215,7 @@ public class AgentResourceImpl extends ManagerWebResource implements AgentResour
         }
 
         // Assets must be added in the same realm as the user (unless super user)
-        Asset parentAsset = assetStorageService.find(parentId);
+        Asset<?> parentAsset = assetStorageService.find(parentId);
 
         if (parentAsset == null || (!TextUtil.isNullOrEmpty(realm) && parentAsset.getRealm().equals(realm))) {
             throw new NotFoundException("Parent asset doesn't exist in the requested realm '" + realm + "'");

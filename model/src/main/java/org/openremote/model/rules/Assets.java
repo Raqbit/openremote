@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  */
 public abstract class Assets {
 
-    abstract public Stream<Asset> getResults(AssetQuery assetQuery);
+    abstract public Stream<Asset<?>> getResults(AssetQuery assetQuery);
 
     abstract public Assets dispatch(AttributeEvent... event);
 

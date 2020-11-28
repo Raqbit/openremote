@@ -105,7 +105,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //        if(assetAttribute != null) {
 //            String assetId = assetAttribute.getAssetId().orElse(null);
 //            if(assetId != null) {
-//                Asset parentAsset = assetService.findAsset(assetId);
+//                Asset<?> parentAsset = assetService.findAsset(assetId);
 //                Attribute<?> lightAttribute = parentAsset.getAttribute("Id").orElse(null);
 //                Attribute<?> universeAttribute = parentAsset.getAttribute("Universe").orElse(null);
 //                if(lightAttribute != null && universeAttribute != null) {
@@ -133,7 +133,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //        // TODO check for group later here
 //        AttributeRef attributeRef = event.getAttributeRef();
 //
-//        Asset parentAsset = assetService.findAsset(parentAssetId);
+//        Asset<?> parentAsset = assetService.findAsset(parentAssetId);
 //        Attribute<?> universeAttribute = parentAsset.getAttribute("Universe").orElse(null);
 //        Attribute<?> lightAttribute = parentAsset.getAttribute("Id").orElse(null);
 //        if (universeAttribute != null && lightAttribute != null) {
@@ -258,11 +258,11 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //        List<AssetTreeNode> output = new ArrayList<AssetTreeNode>();
 //
 //        //Fetch all the assets that're connected to the ArtNet agent.
-//        List<Asset> assetsUnderProtocol = assetService.findAssets(protocolConfiguration.getAssetId().orElse(null), new AssetQuery());
+//        List<Asset<?>> assetsUnderProtocol = assetService.findAssets(protocolConfiguration.getAssetId().orElse(null), new AssetQuery());
 //        //Get the instance of the ArtNet agent itself.
-//        Asset parentAgent = assetsUnderProtocol.stream().filter(a -> a.getWellKnownType() == AssetType.AGENT).findFirst().orElse(null);
+//        Asset<?> parentAgent = assetsUnderProtocol.stream().filter(a -> a.getWellKnownType() == AssetType.AGENT).findFirst().orElse(null);
 //        if(parentAgent != null) {
-//            for(Asset asset : assetsUnderProtocol)
+//            for(Asset<?> asset : assetsUnderProtocol)
 //            {
 //                //TODO CHANGE ASSET TYPE THING TO LIGHT
 //                if(asset.getWellKnownType() != AssetType.THING)
@@ -314,7 +314,7 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //            for(ArtnetLight light : lights)
 //            {
 //                boolean lightAssetExistsAlready = false;
-//                for(Asset asset : assetsUnderProtocol)
+//                for(Asset<?> asset : assetsUnderProtocol)
 //                {
 //                    //TODO CHANGE ASSET TYPE THING TO LIGHT
 //                    if((asset.getWellKnownType() != AssetType.THING))
@@ -341,8 +341,8 @@ public class ArtnetProtocol extends AbstractIoClientProtocol<ArtnetProtocol, Art
 //        return null;
 //    }
 //
-//    protected AssetTreeNode formLightAsset(ArtnetLight light, Asset parentAgent) throws JsonProcessingException {
-//        Asset asset = new Asset();
+//    protected AssetTreeNode formLightAsset(ArtnetLight light, Asset<?> parentAgent) throws JsonProcessingException {
+//        Asset<?> asset = new ThingAsset();
 //        asset.setId(UniqueIdentifierGenerator.generateId());
 //        asset.setParent(parentAgent);
 //        asset.setName("ArtNet Light " + light.getLightId());

@@ -33,13 +33,12 @@ import org.openremote.model.syslog.SyslogCategory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static org.openremote.container.concurrent.GlobalLock.withLock;
 import static org.openremote.container.concurrent.GlobalLock.withLockReturning;
@@ -140,19 +139,8 @@ public class SimulatorProtocol extends AbstractProtocol<SimulatorAgent, Simulato
         });
     }
 
-    /**
-     * Get info about all attributes linked to this instance (for frontend usage)
-     */
-    public SimulatorState getSimulatorInfo() {
-        return withLockReturning(getProtocolName() + "::getSimulatorInfo", () -> {
-            LOG.info("Getting simulator info for protocol instance: " + this);
-
-            SimulatorAttributeInfo[] attributeInfos = getLinkedAttributes().entrySet().stream().map(refAttributeEntry ->
-                new SimulatorAttributeInfo("", refAttributeEntry.getKey().getAssetId(), refAttributeEntry.getValue(), replayMap.containsKey(refAttributeEntry.getKey()))
-            ).toArray(SimulatorAttributeInfo[]::new);
-
-            return new SimulatorState(agent.getId(), attributeInfos);
-        });
+    public Map<AttributeRef, ScheduledFuture<?>> getReplayMap() {
+        return replayMap;
     }
 
     protected ScheduledFuture<?> scheduleReplay(AttributeRef attributeRef, SimulatorReplayDatapoint[] simulatorReplayDatapoints) {

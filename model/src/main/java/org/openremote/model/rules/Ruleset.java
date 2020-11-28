@@ -132,6 +132,8 @@ public abstract class Ruleset {
                 ),
         FLOW(".json", "{\"name\":\"\", \"description\": \"\", \"nodes\":[], \"connections\":[]}");
 
+        public static final MetaItemDescriptor<Boolean> SHOW_ON_LIST = new MetaItemDescriptor<>("showOnList", ValueType.BOOLEAN);
+
         final String fileExtension;
         final String emptyRulesExample;
 

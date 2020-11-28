@@ -219,7 +219,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             .filter(isPersistenceEventForEntityType(Asset.class))
             .process(exchange -> {
                 PersistenceEvent persistenceEvent = exchange.getIn().getBody(PersistenceEvent.class);
-                final Asset eventAsset = (Asset) persistenceEvent.getEntity();
+                final Asset<?> eventAsset = (Asset) persistenceEvent.getEntity();
                 processAssetChange(eventAsset, persistenceEvent);
             });
     }
@@ -268,13 +268,13 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             .count();//Needed in order to execute the stream. TODO: can this be done differently?
 
         LOG.info("Loading all assets with fact attributes to initialize state of rules engines");
-        Stream<Pair<Asset, Stream<Attribute<?>>>> stateAttributes = findRuleStateAttributes();
+        Stream<Pair<Asset<?>, Stream<Attribute<?>>>> stateAttributes = findRuleStateAttributes();
 
         // Push each attribute as an asset update through the rule engine chain
         // that will ensure the insert only happens to the engines in scope
         stateAttributes
             .forEach(pair -> {
-                Asset asset = pair.key;
+                Asset<?> asset = pair.key;
                 pair.value.forEach(ruleAttribute -> {
                     AssetState assetState = new AssetState(asset, ruleAttribute, Source.INTERNAL);
                     updateAssetState(assetState);
@@ -320,7 +320,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
 
     @Override
     public boolean processAssetUpdate(EntityManager em,
-                                      Asset asset,
+                                      Asset<?> asset,
                                       Attribute<?> attribute,
                                       Source source) throws AssetProcessingException {
         // We might process two facts for a single attribute update, if that is what the user wants
@@ -414,12 +414,12 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
         });
     }
 
-    protected void processAssetChange(Asset asset, PersistenceEvent<Asset> persistenceEvent) {
+    protected void processAssetChange(Asset<?> asset, PersistenceEvent<Asset<?>> persistenceEvent) {
         withLock(getClass().getSimpleName() + "::processAssetChange", () -> {
 
             // We must load the asset from database (only when required), as the
             // persistence event might not contain a completely loaded asset
-            BiFunction<Asset, Attribute<?>, AssetState> buildAssetState = (loadedAsset, attribute) ->
+            BiFunction<Asset<?>, Attribute<?>, AssetState> buildAssetState = (loadedAsset, attribute) ->
                 new AssetState(loadedAsset, Values.clone(attribute), Source.INTERNAL);
 
             switch (persistenceEvent.getCause()) {
@@ -428,8 +428,8 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
                     List<Attribute<?>> ruleStateAttributes =
                         asset.getAttributes().stream().filter(attribute -> attribute.getMetaValue(MetaItemType.RULE_STATE).orElse(false)).collect(Collectors.toList());
 
-                    // Asset used to be loaded for each attribute which is inefficient
-                    Asset loadedAsset = ruleStateAttributes.isEmpty() ? null : assetStorageService.find(asset.getId(),
+                    // Asset<?> used to be loaded for each attribute which is inefficient
+                    Asset<?> loadedAsset = ruleStateAttributes.isEmpty() ? null : assetStorageService.find(asset.getId(),
                         true);
 
                     // Build an update with a fully loaded asset
@@ -452,7 +452,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
                     }
 
                     // Fully load the asset
-                    Asset loadedAsset = assetStorageService.find(asset.getId(), true);
+                    Asset<?> loadedAsset = assetStorageService.find(asset.getId(), true);
                     // If the asset is now gone it was deleted immediately after being updated, nothing more to do
                     if (loadedAsset == null)
                         return;
@@ -650,7 +650,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
             .entrySet()
             .stream()
             .map(es ->
-                new Pair<>(assetStorageService.find(es.getKey(), true), es.getValue())
+                new Pair<Asset<?>, List<AssetRuleset>>(assetStorageService.find(es.getKey(), true), es.getValue())
             )
             .filter(assetAndRules -> assetAndRules.key != null)
             .collect(Collectors.groupingBy(assetAndRules -> assetAndRules.key.getRealm()))
@@ -667,7 +667,7 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
                 }
             })
             .flatMap(es -> {
-                List<Pair<Asset, List<AssetRuleset>>> tenantAssetAndRules = es.getValue();
+                List<Pair<Asset<?>, List<AssetRuleset>>> tenantAssetAndRules = es.getValue();
 
                 // RT: Not sure we need ordering here for starting engines so removing it
                 // Order rulesets by asset hierarchy within this tenant
@@ -813,15 +813,15 @@ public class RulesService extends RouteBuilder implements ContainerService, Asse
         return rulesEngines;
     }
 
-    protected Stream<Pair<Asset, Stream<Attribute<?>>>> findRuleStateAttributes() {
-        List<Asset> assets = assetStorageService.findAll(
+    protected Stream<Pair<Asset<?>, Stream<Attribute<?>>>> findRuleStateAttributes() {
+        List<Asset<?>> assets = assetStorageService.findAll(
             new AssetQuery()
                 .attributes(
                     new AttributePredicate().meta(
                         new NameValuePredicate(MetaItemType.RULE_STATE).value(new BooleanPredicate(true)))));
 
         return assets.stream()
-            .map((Asset asset) ->
+            .map(asset ->
                 new Pair<>(asset, asset.getAttributes().stream()
                     .filter(attribute -> attribute.getMetaValue(MetaItemType.RULE_STATE).orElse(false)))
             );

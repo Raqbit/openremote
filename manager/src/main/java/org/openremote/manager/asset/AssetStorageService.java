@@ -37,6 +37,7 @@ import org.openremote.manager.gateway.GatewayService;
 import org.openremote.manager.security.ManagerIdentityService;
 import org.openremote.manager.web.ManagerWebService;
 import org.openremote.model.Constants;
+import org.openremote.model.asset.impl.ThingAsset;
 import org.openremote.model.attribute.*;
 import org.openremote.model.asset.*;
 import org.openremote.model.asset.impl.GroupAsset;
@@ -56,6 +57,7 @@ import org.postgresql.util.PGobject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import javax.validation.ConstraintViolation;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
@@ -123,7 +125,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
              @SuppressWarnings("unchecked")
              EventSubscription<T> subscription = (EventSubscription<T>)sub;
 
-             // Only Asset filters allowed
+             // Only Asset<?> filters allowed
              if (subscription.getFilter() != null && !(subscription.getFilter() instanceof AssetFilter)) {
                  return false;
              }
@@ -164,7 +166,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
              if (!skipAssetIdCheck && filter.getAssetIds() != null) {
                  // Client can subscribe to several assets
                  for (String assetId : filter.getAssetIds()) {
-                     Asset asset = assetStorageService.find(assetId, false);
+                     Asset<?> asset = assetStorageService.find(assetId, false);
                      // If the asset doesn't exist, subscription must fail
                      if (asset == null)
                          return false;
@@ -195,7 +197,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * Will evaluate each {@link CalendarEventPredicate} and apply it depending on the {@link LogicGroup} type
      * that each appears in. It tests the recurrence rule as simple start/end is checked in the DB query.
      */
-    protected static boolean calendarEventPredicateMatches(Supplier<Long> currentMillisSupplier, AssetQuery query, Asset asset) {
+    protected static boolean calendarEventPredicateMatches(Supplier<Long> currentMillisSupplier, AssetQuery query, Asset<?> asset) {
 
         if (query.attributes == null) {
             return true;
@@ -204,7 +206,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         return calendarEventPredicateMatches(currentMillisSupplier, query.attributes, asset);
     }
 
-    protected static boolean calendarEventPredicateMatches(Supplier<Long> currentMillisSupplier, LogicGroup<AttributePredicate> group, Asset asset) {
+    protected static boolean calendarEventPredicateMatches(Supplier<Long> currentMillisSupplier, LogicGroup<AttributePredicate> group, Asset<?> asset) {
         boolean isOr = group.operator == LogicGroup.Operator.OR;
         boolean matches = true;
 
@@ -366,7 +368,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
 
                         Access access = authContext.isSuperUser() || !identityService.getIdentityProvider().isRestrictedUser(authContext.getUserId()) ? PRIVATE : PROTECTED;
 
-                        Asset asset = find(
+                        Asset<?> asset = find(
                             new AssetQuery()
                                 .ids(assetId)
                                 .select(new Select().excludePath(true).excludeParentInfo(true))
@@ -416,7 +418,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                         // Set access requirements
                         query.access(access);
 
-                        List<Asset> assets = findAll(query);
+                        List<Asset<?>> assets = findAll(query);
 
                         String messageId = exchange.getIn().getHeader(HEADER_REQUEST_RESPONSE_MESSAGE_ID, String.class);
 
@@ -431,15 +433,15 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             .end();
     }
 
-    public Asset find(String assetId) {
+    public Asset<?> find(String assetId) {
         if (assetId == null)
             throw new IllegalArgumentException("Can't query null asset identifier");
         return find(new AssetQuery().ids(assetId));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Asset> T find(String assetId, Class<T> assetType) {
-        Asset asset = find(assetId);
+    public <T extends Asset<?>> T find(String assetId, Class<T> assetType) {
+        Asset<?> asset = find(assetId);
         if (asset != null && !assetType.isAssignableFrom(asset.getClass())) {
             asset = null;
         }
@@ -449,15 +451,15 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     /**
      * @param loadComplete If the whole asset data (including path and attributes) should be loaded.
      */
-    public Asset find(String assetId, boolean loadComplete) {
+    public Asset<?> find(String assetId, boolean loadComplete) {
         if (assetId == null)
             throw new IllegalArgumentException("Can't query null asset identifier");
         return find(new AssetQuery().select(loadComplete ? null : Select.selectExcludeAll()).ids(assetId));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Asset> T find(String assetId, boolean loadComplete, Class<T> assetType) {
-        Asset asset = find(assetId, loadComplete);
+    public <T extends Asset<?>> T find(String assetId, boolean loadComplete, Class<T> assetType) {
+        Asset<?> asset = find(assetId, loadComplete);
         if (asset != null && !assetType.isAssignableFrom(asset.getClass())) {
             asset = null;
         }
@@ -467,7 +469,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
     /**
      * @param loadComplete If the whole asset data (including path and attributes) should be loaded.
      */
-    public Asset find(EntityManager em, String assetId, boolean loadComplete) {
+    public Asset<?> find(EntityManager em, String assetId, boolean loadComplete) {
         return find(em, assetId, loadComplete, PRIVATE);
     }
 
@@ -475,7 +477,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @param loadComplete If the whole asset data (including path and attributes) should be loaded.
      * @param access       The required access permissions of the asset data.
      */
-    public Asset find(String assetId, boolean loadComplete, Access access) {
+    public Asset<?> find(String assetId, boolean loadComplete, Access access) {
         if (assetId == null)
             throw new IllegalArgumentException("Can't query null asset identifier");
         return find(new AssetQuery()
@@ -486,12 +488,12 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             .access(access));
     }
 
-    public Asset find(AssetQuery query) {
+    public Asset<?> find(AssetQuery query) {
         return persistenceService.doReturningTransaction(em -> find(em, query));
     }
 
-    public Asset find(EntityManager em, AssetQuery query) {
-        List<Asset> result = findAll(em, query);
+    public Asset<?> find(EntityManager em, AssetQuery query) {
+        List<Asset<?>> result = findAll(em, query);
         if (result.size() == 0)
             return null;
         if (result.size() > 1) {
@@ -500,7 +502,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         return result.get(0);
     }
 
-    public List<Asset> findAll(AssetQuery query) {
+    public List<Asset<?>> findAll(AssetQuery query) {
         return persistenceService.doReturningTransaction(em -> findAll(em, query));
     }
 
@@ -531,7 +533,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public <T extends Asset> T merge(T asset) {
+    public <T extends Asset<?>> T merge(T asset) {
         return merge(asset, false);
     }
 
@@ -541,7 +543,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public <T extends Asset> T merge(T asset, boolean overrideVersion) {
+    public <T extends Asset<?>> T merge(T asset, boolean overrideVersion) {
         return merge(asset, overrideVersion, false, null);
     }
 
@@ -550,7 +552,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public <T extends Asset> T merge(T asset, String userName) {
+    public <T extends Asset<?>> T merge(T asset, String userName) {
         return merge(asset, false, false, userName);
     }
 
@@ -565,10 +567,10 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
      * @return The current stored asset state.
      * @throws IllegalArgumentException if the realm or parent is illegal, or other asset constraint is violated.
      */
-    public <T extends Asset> T merge(T asset, boolean overrideVersion, boolean skipGatewayCheck, String userName) {
+    public <T extends Asset<?>> T merge(T asset, boolean overrideVersion, boolean skipGatewayCheck, String userName) {
         return persistenceService.doReturningTransaction(em -> {
 
-            Asset existingAsset = null;
+            T existingAsset = null;
 
             if (asset.getId() != null) {
 
@@ -579,7 +581,8 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                     throw new IllegalStateException(msg);
                 }
 
-                existingAsset = em.find(Asset.class, asset.getId());
+                //noinspection unchecked
+                existingAsset = (T)em.find(Asset.class, asset.getId());
 
                 // Verify type has not been changed
                 if (existingAsset != null && !existingAsset.getType().equals(asset.getType())) {
@@ -605,7 +608,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             // Validate parent
             if (asset.getParentId() != null) {
                 // If this is a not a root asset...
-                Asset parent = find(em, asset.getParentId(), true);
+                Asset<?> parent = find(em, asset.getParentId(), true);
 
                 // .. the parent must exist
                 if (parent == null) {
@@ -655,8 +658,9 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             }
 
             // Validate attributes
-            AttributeValidationFailure[] validationFailures = AssetModelUtil.validateAsset(asset);
-            for (AttributeValidationFailure validationFailure : validationFailures) {
+            ConstraintViolation<?>[] validationFailures = AssetModelUtil.validate(asset);
+
+            for (ConstraintViolation<?> validationFailure : validationFailures) {
                 LOG.warning("Validation failure for asset '" + asset + "': " + validationFailure);
             }
             if (validationFailures.length > 0) {
@@ -810,16 +814,16 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         try {
             persistenceService.doTransaction(em -> {
                 LOG.fine("Removing: " + String.join(", ", ids));
-                List<Asset> assets = em
+                List<Asset<?>> assets = em
                     .createQuery("select a from Asset a where not exists(select child.id from Asset child where child.parentId = a.id and not child.id in :ids) and a.id in :ids", Asset.class)
                     .setParameter("ids", ids)
-                    .getResultList();
+                    .getResultList().stream().map(asset -> (Asset<?>) asset).collect(Collectors.toList());
 
                 if (assetIds.size() != assets.size()) {
                     throw new IllegalArgumentException("Cannot delete one or more requested assets as they either have children or don't exist");
                 }
 
-                assets.sort(Comparator.comparingInt((Asset asset) -> asset.getPath() == null ? 0 : asset.getPath().length).reversed());
+                assets.sort(Comparator.comparingInt((Asset<?> asset) -> asset.getPath() == null ? 0 : asset.getPath().length).reversed());
                 assets.forEach(em::remove);
             });
         } catch (Exception e) {
@@ -997,7 +1001,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         entityManager.merge(userAsset);
     }
 
-    protected Asset find(EntityManager em, String assetId, boolean loadComplete, Access access) {
+    protected Asset<?> find(EntityManager em, String assetId, boolean loadComplete, Access access) {
         if (assetId == null)
             throw new IllegalArgumentException("Can't query null asset identifier");
         return find(
@@ -1011,7 +1015,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         );
     }
 
-    protected List<Asset> findAll(EntityManager em, AssetQuery query) {
+    protected List<Asset<?>> findAll(EntityManager em, AssetQuery query) {
 
         if (query.access == null)
             query.access = PRIVATE;
@@ -1029,18 +1033,18 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
             throw new IllegalArgumentException("Asset query contains a calendar event predicate which requires the attribute values and types to be included in the select (as calendar event predicate is applied post DB query)");
         }
 
-        return em.unwrap(Session.class).doReturningWork(new AbstractReturningWork<List<Asset>>() {
+        return em.unwrap(Session.class).doReturningWork(new AbstractReturningWork<List<Asset<?>>>() {
             @Override
-            public List<Asset> execute(Connection connection) throws SQLException {
+            public List<Asset<?>> execute(Connection connection) throws SQLException {
                 LOG.fine("Executing: " + querySql.querySql);
                 try (PreparedStatement st = connection.prepareStatement(querySql.querySql)) {
                     querySql.apply(st);
 
                     try (ResultSet rs = st.executeQuery()) {
-                        List<Asset> result = new ArrayList<>();
+                        List<Asset<?>> result = new ArrayList<>();
                         if (containsCalendarPredicate) {
                             while (rs.next()) {
-                                Asset asset = mapResultTuple(query, rs);
+                                Asset<?> asset = mapResultTuple(query, rs);
                                 // Apply calendar event filter here (difficult to translate this into a SQL query)
                                 if (calendarEventPredicateMatches(timerService::getCurrentTimeMillis, query, asset)) {
                                     result.add(asset);
@@ -1437,7 +1441,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
                 sb.append(" and type(A) IN (");
                 boolean isFirst = true;
 
-                for (Class<? extends Asset> type : query.types) {
+                for (Class<? extends Asset<?>> type : query.types) {
                     if (!isFirst) {
                         sb.append(",");
                     }
@@ -1887,11 +1891,10 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         }
     }
 
-    protected Asset mapResultTuple(AssetQuery query, ResultSet rs) throws SQLException {
-        Asset asset = new Asset();
+    protected Asset<?> mapResultTuple(AssetQuery query, ResultSet rs) throws SQLException {
+        Asset<?> asset = new ThingAsset(rs.getString("NAME"));
         asset.setId(rs.getString("ID"));
         asset.setType(rs.getString("ASSET_TYPE"));
-        asset.setName(rs.getString("NAME"));
         asset.setVersion(rs.getLong("OBJ_VERSION"));
         asset.setCreatedOn(rs.getTimestamp("CREATED_ON"));
         asset.setAccessPublicRead(rs.getBoolean("ACCESS_PUBLIC_READ"));
@@ -1919,7 +1922,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         return asset;
     }
 
-    public boolean storeAttributeValue(EntityManager em, String assetId, String attributeName, Value value, String timestamp) {
+    public boolean storeAttributeValue(EntityManager em, String assetId, String attributeName, Object value, String timestamp) {
         return em.unwrap(Session.class).doReturningWork(connection -> {
             String update =
                 "update ASSET" +
@@ -1964,12 +1967,12 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         });
     }
 
-    protected void publishModificationEvents(PersistenceEvent<Asset> persistenceEvent) {
-        Asset asset = persistenceEvent.getEntity();
+    protected void publishModificationEvents(PersistenceEvent<Asset<?>> persistenceEvent) {
+        Asset<?> asset = persistenceEvent.getEntity();
         switch (persistenceEvent.getCause()) {
             case CREATE:
                 // Fully load the asset
-                Asset loadedAsset = find(new AssetQuery().ids(asset.getId()));
+                Asset<?> loadedAsset = find(new AssetQuery().ids(asset.getId()));
 
                 clientEventService.publishEvent(
                     new AssetEvent(AssetEvent.Cause.CREATE, loadedAsset, null)
@@ -2058,7 +2061,7 @@ public class AssetStorageService extends RouteBuilder implements ContainerServic
         }
     }
 
-    protected void replyWithAttributeEvents(String sessionKey, String subscriptionId, Asset asset, String[] attributeNames) {
+    protected void replyWithAttributeEvents(String sessionKey, String subscriptionId, Asset<?> asset, String[] attributeNames) {
         List<String> names = attributeNames == null ? Collections.emptyList() : Arrays.asList(attributeNames);
 
         // Client may want to read a subset or all attributes of the asset

@@ -19,6 +19,8 @@
  */
 package org.openremote.model.simulator;
 
+import java.util.Optional;
+
 /**
  * Represents a value at a point in time defined as the number of seconds of the day.
  */
@@ -35,7 +37,7 @@ public class SimulatorReplayDatapoint {
         this.value = value;
     }
 
-    public Optional<long> getTimestamp() {
+    public Optional<Long> getTimestamp() {
         return Optional.ofNullable(timestamp);
     }
 

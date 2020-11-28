@@ -55,7 +55,7 @@ public class AssetsFacade<T extends Ruleset> extends Assets {
     }
 
     @Override
-    public Stream<Asset> getResults(AssetQuery assetQuery) {
+    public Stream<Asset<?>> getResults(AssetQuery assetQuery) {
 
         if (TenantRuleset.class.isAssignableFrom(rulesEngineId.getScope())) {
             // Realm is restricted to rules
@@ -68,7 +68,7 @@ public class AssetsFacade<T extends Ruleset> extends Assets {
                 rulesEngineId.getRealm().orElseThrow(() -> new IllegalArgumentException("Realm missing: " + rulesEngineId))
             );
 
-            Asset restrictedAsset = assetStorageService.find(
+            Asset<?> restrictedAsset = assetStorageService.find(
                 rulesEngineId.getAssetId().orElseThrow(() -> new IllegalStateException("Asset ID missing: " + rulesEngineId)),
                 true);
 

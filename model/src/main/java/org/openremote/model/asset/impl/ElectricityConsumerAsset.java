@@ -20,6 +20,7 @@
 package org.openremote.model.asset.impl;
 
 import org.openremote.model.Constants;
+import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.attribute.MetaItem;
 import org.openremote.model.value.AttributeDescriptor;
@@ -28,7 +29,7 @@ import org.openremote.model.value.ValueType;
 
 import java.util.Optional;
 
-public class ElectricityConsumerAsset extends DeviceAsset {
+public class ElectricityConsumerAsset extends Asset<ElectricityConsumerAsset> {
 
     public static final AttributeDescriptor<String> STATUS = new AttributeDescriptor<>("status", ValueType.STRING,
         new MetaItem<>(MetaItemType.READ_ONLY)
@@ -72,6 +73,10 @@ public class ElectricityConsumerAsset extends DeviceAsset {
     );
 
     public static final AssetDescriptor<ElectricityConsumerAsset> DESCRIPTOR = new AssetDescriptor<>("power-plug", "8A293D", ElectricityConsumerAsset.class);
+
+    protected ElectricityConsumerAsset(String name, AssetDescriptor<? extends ElectricityConsumerAsset> descriptor) {
+        super(name, descriptor);
+    }
 
     public ElectricityConsumerAsset(String name) {
         super(name, DESCRIPTOR);

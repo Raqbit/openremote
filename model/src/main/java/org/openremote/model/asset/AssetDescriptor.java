@@ -40,8 +40,8 @@ import static java.lang.reflect.Modifier.isStatic;
 
 /**
  * Describes a type of {@link Asset}; the {@link #getName()} must be unique within the context of the manager within
- * which the Asset resides; as {@link #getName()} is just {@link Class#getSimpleName()} of {@link #getType()} it is
- * important that Asset class names (excluding the package) do not clash
+ * which the Asset<?> resides; as {@link #getName()} is just {@link Class#getSimpleName()} of {@link #getType()} it is
+ * important that Asset<?> class names (excluding the package) do not clash
  * <p>
  * Each {@link AssetDescriptor} will discover its' own {@link AttributeDescriptor}s using reflection (see
  * {@link #getAttributeDescriptors}) by looking for static public fields of type {@link
@@ -51,7 +51,7 @@ import static java.lang.reflect.Modifier.isStatic;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "descriptorType")
 @JsonTypeName("asset")
-public class AssetDescriptor<T extends Asset> implements NameHolder {
+public class AssetDescriptor<T extends Asset<?>> implements NameHolder {
 
     protected String name;
     protected Class<T> type;
@@ -66,6 +66,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder {
         this.type = type;
         this.attributeDescriptors = extractAttributeDescriptors(type, additionalAttributeDescriptors);
     }
+
     public AssetDescriptor(String icon, String colour, Class<T> type) {
         this(icon, colour, type, null);
     }
@@ -99,7 +100,7 @@ public class AssetDescriptor<T extends Asset> implements NameHolder {
         return colour;
     }
 
-    protected static <T extends Asset> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
+    protected static <T> AttributeDescriptor<?>[] extractAttributeDescriptors(Class<T> type, AttributeDescriptor<?>[] additionalAttributeDescriptors) throws IllegalArgumentException, IllegalStateException {
         Map<String, AttributeDescriptor<?>> descriptors = new HashMap<>();
         Class<?> currentType = type;
 

@@ -72,7 +72,7 @@ public class AssetState implements Comparable<AssetState> {
 
     final protected MetaList meta;
 
-    public AssetState(Asset asset, Attribute<?> attribute, AttributeEvent.Source source) {
+    public AssetState(Asset<?> asset, Attribute<?> attribute, AttributeEvent.Source source) {
         this.attributeName = attribute.getName();
         this.attributeValueType = attribute.getValueType();
         this.value = attribute.getValue().orElse(null);
