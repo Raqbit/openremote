@@ -11,7 +11,6 @@ import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.*
 import org.openremote.model.rules.AssetRuleset
 import org.openremote.model.rules.Ruleset
@@ -156,7 +155,7 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
                 )
             )
         ]
-        asset.setAttributes(attributes)
+        asset.getAttributes().addOrReplace(attributes)
         asset = assetStorageService.merge(asset)
 
         then: "the rules engines should have executed at least once"
@@ -237,7 +236,7 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
             ),
             new Attribute<>("testInteger", ValueType.NUMBER, 0)
         ]
-        asset.setAttributes(attributes)
+        asset.getAttributes().addOrReplace(attributes)
         asset = assetStorageService.merge(asset)
 
         then: "the rules engines should have executed at least one more time"
@@ -273,7 +272,7 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
             ),
             new Attribute<>("testInteger", ValueType.NUMBER, 0)
         ]
-        asset.setAttributes(attributes)
+        asset.getAttributes().addOrReplace(attributes)
         asset = assetStorageService.merge(asset)
 
         then: "the facts should be removed from the rule engines and rules should have fired"
@@ -305,7 +304,7 @@ class BasicRulesProcessingTest extends Specification implements ManagerContainer
                 new MetaItem<>(MetaItemType.RULE_STATE, true)
             )
         ]
-        asset.setAttributes(attributes)
+        asset.getAttributes().addOrReplace(attributes)
         asset = assetStorageService.merge(asset)
 
         then: "the facts should be added to the rule engines and rules should have fired"

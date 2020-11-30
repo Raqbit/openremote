@@ -20,7 +20,6 @@
 package org.openremote.test.assets
 
 import org.openremote.model.asset.AssetModelResource
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.MetaItemType

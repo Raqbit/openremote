@@ -149,7 +149,7 @@ class ResidenceNotifyAlarmTriggerTest extends Specification implements ManagerCo
 
         when: "the alarm is enabled"
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
-                managerTestSetup.apartment1Id, "alarmEnabled", true, getClockTimeOf(container)
+                managerTestSetup.apartment1Id, "alarmEnabled", true
         ))
 
         then: "that value should be stored"
@@ -160,7 +160,7 @@ class ResidenceNotifyAlarmTriggerTest extends Specification implements ManagerCo
 
         when: "the presence is detected in Living room of apartment 1"
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "presenceDetected", true, getClockTimeOf(container)
+                managerTestSetup.apartment1LivingroomId, "presenceDetected", true
         ))
 
         then: "that value should be stored"
@@ -195,7 +195,7 @@ class ResidenceNotifyAlarmTriggerTest extends Specification implements ManagerCo
         when: "time moves on and other events happen that trigger evaluation in the rule engine"
         advancePseudoClock(20, TimeUnit.MINUTES, container)
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "co2Level", 444, getClockTimeOf(container)
+                managerTestSetup.apartment1LivingroomId, "co2Level", 444
         ))
 
         then: "still only one notification should have been sent"
@@ -216,7 +216,7 @@ class ResidenceNotifyAlarmTriggerTest extends Specification implements ManagerCo
         when: "the presence is no longer triggered in Living room of apartment 1"
         advancePseudoClock(5, TimeUnit.SECONDS, container)
         assetProcessingService.sendAttributeEvent(new AttributeEvent(
-                managerTestSetup.apartment1LivingroomId, "presenceDetected", false, getClockTimeOf(container)
+                managerTestSetup.apartment1LivingroomId, "presenceDetected", false
         ))
 
         then: "that value should be stored"

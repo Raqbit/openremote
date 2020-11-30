@@ -9,7 +9,6 @@ import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.MetaItemType
@@ -148,7 +147,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         assets.get(0).id == managerTestSetup.apartment2LivingroomId
         assets.get(0).getAttributes().size() == 1
         assets.get(0).getAttribute("windowOpen").isPresent()
-        !assets.get(0).getAttribute("windowOpen").get().getValueAsBoolean().get()
+        !assets.get(0).getAttribute("windowOpen").flatMap{it.value}.orElse(false)
         !assets.get(0).getAttribute("windowOpen").get().hasMetaItems()
 
         when: "a recursive query is executed to select asset id, name and attribute names for apartment 1 assets"
@@ -923,7 +922,7 @@ class AssetQueryTest extends Specification implements ManagerContainerTrait {
         def lobby = assetStorageService.find(managerTestSetup.lobbyId, true)
 
         lobby.addAttributes(
-                new Attribute<>("openingDate", TIMESTAMP_ISO8601, Values.create("2018-01-28T15:00:00+00:00"))
+                new Attribute<>("openingDate", TIMESTAMP_ISO8601, "2018-01-28T15:00:00+00:00")
         )
         lobby = assetStorageService.merge(lobby)
 

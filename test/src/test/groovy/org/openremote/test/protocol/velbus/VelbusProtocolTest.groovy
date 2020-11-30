@@ -12,7 +12,6 @@ import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.AgentLink
 import org.openremote.model.asset.agent.AgentResource
 import org.openremote.model.attribute.AttributeRef
@@ -30,8 +29,6 @@ import static org.openremote.container.util.MapAccess.getString
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD_DEFAULT
 import static org.openremote.model.Constants.*
-import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration
-
 class VelbusProtocolTest extends Specification implements ManagerContainerTrait {
 
     @Shared
@@ -99,7 +96,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         def agent = new Asset("VELBUS", AssetType.AGENT)
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
-        agent.setAttributes(
+        agent.getAttributes().addOrReplace(
             initProtocolConfiguration(new Attribute<>("protocolConfig"), velbusProtocol.getProtocolName())
         )
 
@@ -107,7 +104,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
 
         and: "a device asset is created"
         def device = new Asset("VELBUS Demo VMBGPOD", AssetType.THING, agent)
-        device.setAttributes(
+        device.getAttributes().addOrReplace(
             new Attribute<>("ch1State", ValueType.STRING)
                 .setMeta(
                     new MetaItem<>(
@@ -161,7 +158,7 @@ class VelbusProtocolTest extends Specification implements ManagerContainerTrait 
         def agent = new Asset("VELBUS", AssetType.AGENT)
         agent.setRealm(MASTER_REALM)
         agent.setType(AssetType.AGENT)
-        agent.setAttributes(
+        agent.getAttributes().addOrReplace(
             initProtocolConfiguration(new Attribute<>("protocolConfig"), VelbusSerialProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem<>(VelbusSerialProtocol.META_VELBUS_SERIAL_PORT, "COM5")

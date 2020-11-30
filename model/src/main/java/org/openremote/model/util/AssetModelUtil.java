@@ -19,14 +19,11 @@
  */
 package org.openremote.model.util;
 
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.openremote.model.attribute.AttributeValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetDescriptor;
 import org.openremote.model.asset.AssetModelProvider;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.AgentDescriptor;
-import org.openremote.model.attribute.Attribute;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.value.*;
 import org.reflections.Reflections;

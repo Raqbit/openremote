@@ -236,6 +236,6 @@ rules.add()
             facts.updateAssetState(
                     stopTime.id,
                     "smartSwitch" + SmartSwitchAttribute.Mode + smartSwitchName,
-                    Values.create(SmartSwitchMode.NOW_ON.name())
+                    SmartSwitchMode.NOW_ON.name()
             )
         })

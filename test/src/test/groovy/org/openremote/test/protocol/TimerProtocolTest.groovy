@@ -10,7 +10,6 @@ import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.query.AssetQuery
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.AgentLink
 import org.openremote.model.attribute.AttributeEvent
 import org.openremote.model.attribute.AttributeRef
@@ -116,7 +115,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a trigger time is modified"
-        def modifyTime = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneTimeFRIDAY", Values.create("04:00:00"))
+        def modifyTime = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneTimeFRIDAY", "04:00:00")
         assetProcessingService.sendAttributeEvent(modifyTime)
 
         then: "the quartz job should have the new trigger time"
@@ -150,7 +149,7 @@ class TimerProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the trigger cron expression is modified"
-        def modifyCron = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneCronFRIDAY", Values.create("0 0 4 ? * MON,FRI *"))
+        def modifyCron = new AttributeEvent(managerTestSetup.apartment1Id, "daySceneCronFRIDAY", "0 0 4 ? * MON,FRI *")
         assetProcessingService.sendAttributeEvent(modifyCron)
 
         then: "the quartz job should have the new cron expression"

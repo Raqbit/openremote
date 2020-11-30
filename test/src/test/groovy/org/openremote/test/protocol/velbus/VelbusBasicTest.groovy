@@ -887,7 +887,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "an input channel is locked indefinitely"
-        device.writeProperty("CH8_LOCK", Values.create(-1d))
+        device.writeProperty("CH8_LOCK", -1d)
 
         then: "the channel should become locked"
         conditions.eventually {
@@ -1064,7 +1064,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "an input channel is locked indefinitely"
-        device.writeProperty("CH8_LOCK", Values.create(-1d))
+        device.writeProperty("CH8_LOCK", -1d)
 
         then: "the channel should become locked"
         conditions.eventually {
@@ -1343,7 +1343,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we update the heat night temperature property"
-        device.writeProperty("TEMP_TARGET_HEAT_NIGHT", Values.create(20.5))
+        device.writeProperty("TEMP_TARGET_HEAT_NIGHT", 20.5)
 
         then: "the heat night temp should be updated"
         conditions.eventually {
@@ -1485,7 +1485,7 @@ class VelbusBasicTest extends Specification {
             "0F FB 30 08 EA C2 00 1A 37 2A 00 00 97 04"
         ]
 
-        device.writeProperty("TEMP_MODE_COOL_COMFORT_MINS", Values.create(-1d))
+        device.writeProperty("TEMP_MODE_COOL_COMFORT_MINS", -1d)
 
         then: "the current temp mode should change"
         conditions.eventually {
@@ -1636,8 +1636,8 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "the master alarm 1 wake and sleep times are updated"
-        device.writeProperty("ALARM1_WAKE_TIME", Values.create("04:00"))
-        device.writeProperty("ALARM1_BED_TIME", Values.create("20:00"))
+        device.writeProperty("ALARM1_WAKE_TIME", "04:00")
+        device.writeProperty("ALARM1_BED_TIME", "20:00")
 
         then: "the properties should update"
         conditions.eventually {
@@ -1654,8 +1654,8 @@ class VelbusBasicTest extends Specification {
             device.writeProperty("ALL" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, true)
             device.writeProperty("CH13" + ProgramsProcessor.PROGRAM_STEPS_ENABLED_SUFFIX, false)
             device.writeProperty("PROGRAM", ProgramsProcessor.Program.SUMMER.toValue(ValueType.STRING))
-            device.writeProperty("ALARM1_WAKE_TIME", Values.create("16:00"))
-            device.writeProperty("ALARM1_BED_TIME", Values.create("22:00"))
+            device.writeProperty("ALARM1_WAKE_TIME", "16:00")
+            device.writeProperty("ALARM1_BED_TIME", "22:00")
         }
     }
 
@@ -1818,7 +1818,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is set to intermittent indefinitely"
-        device.writeProperty("CH2_INTERMITTENT", Values.create(-1d))
+        device.writeProperty("CH2_INTERMITTENT", -1d)
 
         then: "the relay should be in intermittent state"
         conditions.eventually {
@@ -1854,7 +1854,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is inhibited indefinitely"
-        device.writeProperty("CH2_INHIBIT", Values.create(-1d))
+        device.writeProperty("CH2_INHIBIT", -1d)
 
         then: "the relay should be inhibited"
         conditions.eventually {
@@ -1931,7 +1931,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is switched on indefinitely"
-        device.writeProperty("CH1_ON", Values.create(-1d))
+        device.writeProperty("CH1_ON", -1d)
 
         then: "the relay should be on and in normal state"
         conditions.eventually {
@@ -1967,7 +1967,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a relay is locked indefinitely"
-        device.writeProperty("CH2_LOCK", Values.create(-1d))
+        device.writeProperty("CH2_LOCK", -1d)
 
         then: "the relay should be locked"
         conditions.eventually {
@@ -2260,7 +2260,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is set to 75% over 7s"
-        device.writeProperty("CH2_LEVEL_AND_SPEED", Values.create("75:7"))
+        device.writeProperty("CH2_LEVEL_AND_SPEED", "75:7")
 
         then: "the dimmer should reach 75% after 7s"
         conditions.eventually {
@@ -2309,7 +2309,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is set to 50% over 60s"
-        device.writeProperty("CH2_LEVEL_AND_SPEED", Values.create("50:60"))
+        device.writeProperty("CH2_LEVEL_AND_SPEED", "50:60")
 
         then: "the dimmer should start ramping up"
         conditions.eventually {
@@ -2319,7 +2319,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "we cancel the current dimming operation"
-        device.writeProperty("CH2_LEVEL", Values.create(-1d))
+        device.writeProperty("CH2_LEVEL", -1d)
 
         then: "the dimmer level should be somewhere between 0-50% and be on"
         conditions.eventually {
@@ -2347,7 +2347,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is inhibited indefinitely"
-        device.writeProperty("CH3_INHIBIT", Values.create(-1d))
+        device.writeProperty("CH3_INHIBIT", -1d)
 
         then: "the dimmer should be inhibited"
         conditions.eventually {
@@ -2409,7 +2409,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is switched on indefinitely"
-        device.writeProperty("CH3_ON", Values.create(-1d))
+        device.writeProperty("CH3_ON", -1d)
 
         then: "the dimmer should be on and in normal state"
         conditions.eventually {
@@ -2445,7 +2445,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a dimmer is locked indefinitely"
-        device.writeProperty("CH3_LOCK", Values.create(-1d))
+        device.writeProperty("CH3_LOCK", -1d)
 
         then: "the dimmer should be locked"
         conditions.eventually {
@@ -2637,7 +2637,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is inhibited indefinitely"
-        device.writeProperty("CH2_INHIBIT", Values.create(-1d))
+        device.writeProperty("CH2_INHIBIT", -1d)
 
         then: "the blind should be inhibited"
         conditions.eventually {
@@ -2655,7 +2655,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is inhibited down indefinitely"
-        device.writeProperty("CH2_INHIBIT_DOWN", Values.create(-1d))
+        device.writeProperty("CH2_INHIBIT_DOWN", -1d)
 
         then: "the blind should be inhibited from going down"
         conditions.eventually {
@@ -2708,7 +2708,7 @@ class VelbusBasicTest extends Specification {
         }
 
         when: "a blind is locked indefinitely"
-        device.writeProperty("CH2_LOCK", Values.create(-1d))
+        device.writeProperty("CH2_LOCK", -1d)
 
         then: "the blind should be locked"
         conditions.eventually {

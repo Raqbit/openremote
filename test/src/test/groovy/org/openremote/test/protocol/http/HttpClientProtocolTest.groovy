@@ -36,7 +36,6 @@ import org.openremote.model.Constants
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.attribute.AttributeEvent
 import org.openremote.model.attribute.AttributeRef
@@ -55,8 +54,6 @@ import javax.ws.rs.HttpMethod
 import javax.ws.rs.client.ClientRequestContext
 import javax.ws.rs.client.ClientRequestFilter
 import javax.ws.rs.core.*
-
-import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration
 
 class HttpClientProtocolTest extends Specification implements ManagerContainerTrait {
 
@@ -301,12 +298,12 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
         agent.setRealm(Constants.MASTER_REALM)
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
-        agent.setAttributes(
+        agent.getAttributes().addOrReplace(
             initProtocolConfiguration(new Attribute<>("protocolConfig"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem<>(
                         HttpClientProtocol.META_PROTOCOL_BASE_URI,
-                        Values.create("https://mockapi")
+                        "https://mockapi"
                     ),
                     new MetaItem<>(
                         Protocol.META_PROTOCOL_OAUTH_GRANT,
@@ -377,7 +374,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 .addMeta(
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
-                    Values.create("https://mockapi")
+                    "https://mockapi"
                 ),
                 new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
@@ -406,7 +403,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 ),
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_CONTENT_TYPE,
-                    Values.create(MediaType.APPLICATION_JSON)
+                    MediaType.APPLICATION_JSON
                 ),
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_MILLIS,
@@ -414,7 +411,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 ),
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_METHOD,
-                    Values.create(HttpMethod.POST)
+                    HttpMethod.POST
                 ),
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_BODY,
@@ -440,7 +437,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
             it.addMeta(
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_PING_CONTENT_TYPE,
-                    Values.create(MediaType.APPLICATION_XML)
+                    MediaType.APPLICATION_XML
                 )
             )}
 
@@ -463,24 +460,24 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
 
         when: "an asset is created with attributes linked to the http protocol configuration"
         def asset = new Asset("Test Asset", AssetType.THING, agent)
-        asset.setAttributes(
+        asset.getAttributes().addOrReplace(
             // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
             new Attribute<>("putRequestWithHeaders", ValueType.OBJECT)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
                     new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, "put_request_with_headers"),
-                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_METHOD, Values.create(HttpMethod.PUT)),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_METHOD, HttpMethod.PUT),
                     new MetaItem<>(
                         Protocol.META_ATTRIBUTE_WRITE_VALUE,
-                        Values.create('{"prop1": {$value}, "prop2": "prop2Value"}')
+                        '{"prop1": {$value}, "prop2": "prop2Value"}'
                     ),
                     new MetaItem<>(
                         HttpClientProtocol.META_ATTRIBUTE_CONTENT_TYPE,
-                        Values.create(MediaType.APPLICATION_JSON)
+                        MediaType.APPLICATION_JSON
                     ),
                     new MetaItem<>(
                         HttpClientProtocol.META_HEADERS,
-                        Values.createObject().put("header1", (Value)null)
+                        Values.JSON.createObjectNode().put("header1", (Value)null)
                     ),
                     new MetaItem<>(
                         HttpClientProtocol.META_QUERY_PARAMETERS,
@@ -491,7 +488,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
             new Attribute<>("getRequestWithDynamicPath", ValueType.BOOLEAN)
                 .addMeta(
                     new MetaItem<>(MetaItemType.AGENT_LINK, new AttributeRef(agent.id, "protocolConfig").toArrayValue()),
-                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, Values.create('value/{$value}/set')),
+                    new MetaItem<>(HttpClientProtocol.META_ATTRIBUTE_PATH, 'value/{$value}/set'),
                     new MetaItem<>(Protocol.META_ATTRIBUTE_WRITE_VALUE_CONVERTER, Values.parse("{\n" +
                         "    \"TRUE\": \"on\",\n" +
                         "    \"FALSE\": \"off\"\n" +
@@ -585,7 +582,7 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 .addMeta(
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
-                    Values.create("https://mockapi")
+                    "https://mockapi"
                 ),
                 new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
@@ -599,15 +596,15 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 new MetaItem<>(
                     HttpClientProtocol.META_FAILURE_CODES,
                     Values.createArray()
-                        .add(Values.create(Response.Status.UNAUTHORIZED.statusCode))
-                        .add(Values.create(Response.Status.FORBIDDEN.statusCode))
+                        .add(Response.Status.UNAUTHORIZED.statusCode)
+                        .add(Response.Status.FORBIDDEN.statusCode)
                 )
             ),
             initProtocolConfiguration(new Attribute<>("protocolConfig3"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
-                    Values.create("https://mockapi")
+                    "https://mockapi"
                 ),
                 new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,
@@ -621,15 +618,15 @@ class HttpClientProtocolTest extends Specification implements ManagerContainerTr
                 new MetaItem<>(
                     HttpClientProtocol.META_FAILURE_CODES,
                     Values.createArray()
-                        .add(Values.create(Response.Status.UNAUTHORIZED.statusCode))
-                        .add(Values.create(Response.Status.FORBIDDEN.statusCode))
+                        .add(Response.Status.UNAUTHORIZED.statusCode)
+                        .add(Response.Status.FORBIDDEN.statusCode)
                 )
             ),
             initProtocolConfiguration(new Attribute<>("protocolConfig4"), HttpClientProtocol.PROTOCOL_NAME)
                 .addMeta(
                 new MetaItem<>(
                     HttpClientProtocol.META_PROTOCOL_BASE_URI,
-                    Values.create("https://mockapi")
+                    "https://mockapi"
                 ),
                 new MetaItem<>(
                     Protocol.META_PROTOCOL_OAUTH_GRANT,

@@ -44,7 +44,7 @@ import java.util.Random;
 
 import static java.time.temporal.ChronoField.SECOND_OF_DAY;
 import static org.openremote.model.Constants.UNITS_POWER_KILOWATT;
-import static org.openremote.model.value.MetaItemType.ATTRIBUTE_LINK;
+import static org.openremote.model.value.MetaItemType.ATTRIBUTE_LINKS;
 import static org.openremote.model.value.MetaItemType.*;
 import static org.openremote.model.value.ValueType.*;
 
@@ -759,10 +759,12 @@ public class ManagerDemoSetup extends AbstractManagerSetup {
                                 new MetaItem<>(AGENT_LINK, agentLink),
                                 new MetaItem<>(LABEL, "Open Weather Map API weather end point"),
                                 new MetaItem<>(READ_ONLY, true),
-                                new MetaItem<>(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "main", "temp", "temperature")),
-                                new MetaItem<>(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "main", "humidity", "humidity")),
-                                new MetaItem<>(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "wind", "speed", "windSpeed")),
-                                new MetaItem<>(ATTRIBUTE_LINK, createWeatherApiAttributeLink(weather.getId(), "wind", "deg", "windDirection"))
+                                new MetaItem<>(ATTRIBUTE_LINKS, new AttributeLink[] {
+                                    createWeatherApiAttributeLink(weather.getId(), "main", "temp", "temperature"),
+                                    createWeatherApiAttributeLink(weather.getId(), "main", "humidity", "humidity"),
+                                    createWeatherApiAttributeLink(weather.getId(), "wind", "speed", "windSpeed"),
+                                    createWeatherApiAttributeLink(weather.getId(), "wind", "deg", "windDirection")
+                                })
                         ));
         new Attribute<>(Asset.LOCATION, new GeoJSONPoint(4.463250, 51.918849));
         weather = assetStorageService.merge(weather);

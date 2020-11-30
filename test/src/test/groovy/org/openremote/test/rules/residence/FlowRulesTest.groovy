@@ -73,7 +73,7 @@ class FlowRulesTest extends Specification implements ManagerContainerTrait {
         conditions.eventually {
             def bedroomTargetTemp = assetStorageService.
                     find(managerTestSetup.apartment1Bedroom1Id).
-                    getAttribute("targetTemperature").get().getValueAsNumber().get()
+                    getAttribute("targetTemperature").flatMap{it.value}.orElse(0d)
             assert bedroomTargetTemp.intValue() == (startTemperature.intValue() + 10) : ("it was actually " +  bedroomTargetTemp.intValue())//convert to int considering floating point inaccuracy
         }
 

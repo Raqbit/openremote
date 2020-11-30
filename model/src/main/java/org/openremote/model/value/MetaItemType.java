@@ -44,7 +44,7 @@ public final class MetaItemType {
      * Links the attribute to another attribute, so an attribute event on the attribute triggers the same attribute
      * event on the linked attribute.
      */
-    public static final MetaItemDescriptor<AttributeLink> ATTRIBUTE_LINK = new MetaItemDescriptor<>("attributeLink", ValueType.ATTRIBUTE_LINK);
+    public static final MetaItemDescriptor<AttributeLink[]> ATTRIBUTE_LINKS = new MetaItemDescriptor<>("attributeLinks", ValueType.ATTRIBUTE_LINK.asArray());
 
 
     /* ACCESS PERMISSION META */

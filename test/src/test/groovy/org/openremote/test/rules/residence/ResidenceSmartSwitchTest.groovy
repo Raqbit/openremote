@@ -110,10 +110,10 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
         conditions.eventually {
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "ON_AT"
-            assert kitchen.getAttribute("smartSwitchBeginEndA").get().getValueAsNumber().get() == (double)oneMinuteInFutureMillis
-            assert kitchen.getAttribute("smartSwitchStartTimeA").get().getValueAsNumber().get() == Math.floor((double)oneMinuteInFutureMillis/1000)
-            assert kitchen.getAttribute("smartSwitchStopTimeA").get().getValueAsNumber().get() == Math.floor((double)oneMinuteInFutureMillis/1000) + CYCLE_TIME_SECONDS
-            assert kitchen.getAttribute("smartSwitchEnabledA").get().getValueAsNumber().get() == 1
+            assert kitchen.getAttribute("smartSwitchBeginEndA").flatMap{it.value}.orElse(0d) == (double)oneMinuteInFutureMillis
+            assert kitchen.getAttribute("smartSwitchStartTimeA").flatMap{it.value}.orElse(0d) == Math.floor((double)oneMinuteInFutureMillis/1000)
+            assert kitchen.getAttribute("smartSwitchStopTimeA").flatMap{it.value}.orElse(0d) == Math.floor((double)oneMinuteInFutureMillis/1000) + CYCLE_TIME_SECONDS
+            assert kitchen.getAttribute("smartSwitchEnabledA").flatMap{it.value}.orElse(0d) == 1
             assert !kitchen.getAttribute("smartSwitchModeB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchBeginEndB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStartTimeB").get().getValue().isPresent()
@@ -134,9 +134,9 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "NOW_ON"
             assert !kitchen.getAttribute("smartSwitchBeginEndA").get().getValue().isPresent()
-            assert kitchen.getAttribute("smartSwitchStartTimeA").get().getValueAsNumber().get() == 0
-            assert kitchen.getAttribute("smartSwitchStopTimeA").get().getValueAsNumber().get() == 0
-            assert kitchen.getAttribute("smartSwitchEnabledA").get().getValueAsNumber().get() == 0
+            assert kitchen.getAttribute("smartSwitchStartTimeA").flatMap{it.value}.orElse(0d) == 0
+            assert kitchen.getAttribute("smartSwitchStopTimeA").flatMap{it.value}.orElse(0d) == 0
+            assert kitchen.getAttribute("smartSwitchEnabledA").flatMap{it.value}.orElse(0d) == 0
             assert !kitchen.getAttribute("smartSwitchModeB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchBeginEndB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStartTimeB").get().getValue().isPresent()
@@ -332,10 +332,10 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
         conditions.eventually {
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "READY_AT"
-            assert kitchen.getAttribute("smartSwitchBeginEndA").get().getValueAsNumber().get() == (double)threeHoursInFutureMillis
-            assert kitchen.getAttribute("smartSwitchStartTimeA").get().getValueAsNumber().get() == Math.floor((double)getClockTimeOf(container)/1000)
-            assert kitchen.getAttribute("smartSwitchStopTimeA").get().getValueAsNumber().get() == Math.floor((double)(threeHoursInFutureMillis/1000))
-            assert kitchen.getAttribute("smartSwitchEnabledA").get().getValueAsNumber().get() == 1
+            assert kitchen.getAttribute("smartSwitchBeginEndA").flatMap{it.value}.orElse(0d) == (double)threeHoursInFutureMillis
+            assert kitchen.getAttribute("smartSwitchStartTimeA").flatMap{it.value}.orElse(0d) == Math.floor((double)getClockTimeOf(container)/1000)
+            assert kitchen.getAttribute("smartSwitchStopTimeA").flatMap{it.value}.orElse(0d) == Math.floor((double)(threeHoursInFutureMillis/1000))
+            assert kitchen.getAttribute("smartSwitchEnabledA").flatMap{it.value}.orElse(0d) == 1
             assert !kitchen.getAttribute("smartSwitchModeB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStartTimeB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStopTimeB").get().getValue().isPresent()
@@ -354,9 +354,9 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "NOW_ON"
             assert !kitchen.getAttribute("smartSwitchBeginEndA").get().getValue().isPresent()
-            assert kitchen.getAttribute("smartSwitchStartTimeA").get().getValueAsNumber().get() == 0
-            assert kitchen.getAttribute("smartSwitchStopTimeA").get().getValueAsNumber().get() == 0
-            assert kitchen.getAttribute("smartSwitchEnabledA").get().getValueAsNumber().get() == 0
+            assert kitchen.getAttribute("smartSwitchStartTimeA").flatMap{it.value}.orElse(0d) == 0
+            assert kitchen.getAttribute("smartSwitchStopTimeA").flatMap{it.value}.orElse(0d) == 0
+            assert kitchen.getAttribute("smartSwitchEnabledA").flatMap{it.value}.orElse(0d) == 0
             assert !kitchen.getAttribute("smartSwitchModeB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchBeginEndB").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStartTimeB").get().getValue().isPresent()
@@ -454,7 +454,7 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
         conditions.eventually {
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "READY_AT"
-            assert kitchen.getAttribute("smartSwitchBeginEndA").get().getValueAsNumber().get() == (double)fiveMinutesInPastMillis
+            assert kitchen.getAttribute("smartSwitchBeginEndA").flatMap{it.value}.orElse(0d) == (double)fiveMinutesInPastMillis
             assert !kitchen.getAttribute("smartSwitchStartTimeA").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStopTimeA").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchEnabledA").get().getValue().isPresent()
@@ -553,7 +553,7 @@ class ResidenceSmartSwitchTest extends Specification implements ManagerContainer
         conditions.eventually {
             def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId, true)
             assert kitchen.getAttribute("smartSwitchModeA").get().getValueAsString().get() == "READY_AT"
-            assert kitchen.getAttribute("smartSwitchBeginEndA").get().getValueAsNumber().get() == (double)fiveMinutesInFuture
+            assert kitchen.getAttribute("smartSwitchBeginEndA").flatMap{it.value}.orElse(0d) == (double)fiveMinutesInFuture
             assert !kitchen.getAttribute("smartSwitchStartTimeA").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchStopTimeA").get().getValue().isPresent()
             assert !kitchen.getAttribute("smartSwitchEnabledA").get().getValue().isPresent()

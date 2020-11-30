@@ -35,23 +35,59 @@ public abstract class IoAgent<T extends IoAgent<T, U, V>, U extends AbstractIoCl
         return getAttributes().getValue(MESSAGE_CONVERT_HEX);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setMessageConvertHex(Boolean value) {
+        getAttributes().getOrCreate(MESSAGE_CONVERT_HEX).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Boolean> getMessageConvertBinary() {
         return getAttributes().getValue(MESSAGE_CONVERT_BINARY);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setMessageConvertBinary(Boolean value) {
+        getAttributes().getOrCreate(MESSAGE_CONVERT_BINARY).setValue(value);
+        return (T)this;
     }
 
     public Optional<String> getMessageCharset() {
         return getAttributes().getValue(MESSAGE_CHARSET);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setMessageCharset(String value) {
+        getAttributes().getOrCreate(MESSAGE_CHARSET).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Integer> getMessageMaxLength() {
         return getAttributes().getValue(MESSAGE_MAX_LENGTH);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setMessageMaxLength(Integer value) {
+        getAttributes().getOrCreate(MESSAGE_MAX_LENGTH).setValue(value);
+        return (T)this;
     }
 
     public Optional<String[]> getMessageDelimiters() {
         return getAttributes().getValue(MESSAGE_DELIMITERS);
     }
 
+    @SuppressWarnings("unchecked")
+    public T setMessageDelimiters(String[] value) {
+        getAttributes().getOrCreate(MESSAGE_DELIMITERS).setValue(value);
+        return (T)this;
+    }
+
     public Optional<Boolean> getMessageStripDelimiter() {
         return getAttributes().getValue(MESSAGE_STRIP_DELIMITER);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setMessageStripDelimiter(Boolean value) {
+        getAttributes().getOrCreate(MESSAGE_STRIP_DELIMITER).setValue(value);
+        return (T)this;
     }
 }

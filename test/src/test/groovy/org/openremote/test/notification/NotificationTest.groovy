@@ -506,16 +506,16 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
 
         when: "notifications are retrieved only for the past day"
         notifications = []
-        notifications.addAll(adminNotificationResource.getNotifications(null, null, null, getClockTimeOf(container)-(3600000*24), null, null, null, testuser3Console1.id))
-        notifications.addAll(adminNotificationResource.getNotifications(null, null, null, getClockTimeOf(container)-(3600000*24), null, null, null, testuser3Console2.id))
+        notifications.addAll(adminNotificationResource.getNotifications(null, null, null-(3600000*24), null, null, null, testuser3Console1.id))
+        notifications.addAll(adminNotificationResource.getNotifications(null, null, null-(3600000*24), null, null, null, testuser3Console2.id))
 
         then: "only the relevant notifications should have been returned"
         assert notifications.size() == 2
 
         when: "notifications are retrieved for the past 40 days"
         notifications = []
-        notifications.addAll(adminNotificationResource.getNotifications(null, null, null, getClockTimeOf(container)-(3600000L*24*40), null, null, null, testuser3Console1.id))
-        notifications.addAll(adminNotificationResource.getNotifications(null, null, null, getClockTimeOf(container)-(3600000L*24*40), null, null, null, testuser3Console2.id))
+        notifications.addAll(adminNotificationResource.getNotifications(null, null, null-(3600000L*24*40), null, null, null, testuser3Console1.id))
+        notifications.addAll(adminNotificationResource.getNotifications(null, null, null-(3600000L*24*40), null, null, null, testuser3Console2.id))
 
         then: "only the relevant notifications should have been returned"
         assert notifications.size() == 8
@@ -567,7 +567,7 @@ class NotificationTest extends Specification implements ManagerContainerTrait {
 
         when: "an email attribute is added to an asset"
         def kitchen = assetStorageService.find(managerTestSetup.apartment1KitchenId)
-        kitchen.addAttributes(new Attribute<>(AttributeType.EMAIL, Values.create("kitchen@openremote.local")))
+        kitchen.addAttributes(new Attribute<>(AttributeType.EMAIL, "kitchen@openremote.local"))
         kitchen = assetStorageService.merge(kitchen)
 
         and: "an email notification is sent to a parent asset"

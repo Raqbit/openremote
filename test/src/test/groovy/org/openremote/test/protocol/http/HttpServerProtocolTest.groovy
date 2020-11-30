@@ -31,7 +31,6 @@ import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.MetaItem
 import org.openremote.model.geo.GeoJSONPoint
@@ -52,8 +51,6 @@ import static org.openremote.container.util.MapAccess.getString
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD
 import static org.openremote.manager.security.ManagerIdentityProvider.SETUP_ADMIN_PASSWORD_DEFAULT
 import static org.openremote.model.Constants.*
-import static org.openremote.model.asset.agent.ProtocolConfiguration.initProtocolConfiguration
-
 class HttpServerProtocolTest extends Specification implements ManagerContainerTrait {
 
     @Shared
@@ -304,7 +301,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         agent.setRealm(MASTER_REALM)
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
-        agent.setAttributes(
+        agent.getAttributes().addOrReplace(
             initProtocolConfiguration(new Attribute<>("protocolConfig"), TestHttpServerProtocol.PROTOCOL_NAME)
                 .addMeta(
                     new MetaItem<>(
@@ -329,7 +326,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         when: "the authenticated test resource is used to post an asset"
         def testAsset = new Asset("Test Asset", AssetType.THING)
         testAsset.setId("12345")
-        testAsset.setAttributes(
+        testAsset.getAttributes().addOrReplace(
             new Attribute<>("attribute1", ValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(1d, 2d))
@@ -387,7 +384,7 @@ class HttpServerProtocolTest extends Specification implements ManagerContainerTr
         when: "the new test resource is used to post an asset"
         testAsset = new Asset("Test Asset 2", AssetType.THING)
         testAsset.setId("67890")
-        testAsset.setAttributes(
+        testAsset.getAttributes().addOrReplace(
             new Attribute<>("attribute2", ValueType.STRING, "Test")
         )
         testAsset.setCoordinates(new GeoJSONPoint(3d, 4d))

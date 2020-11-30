@@ -269,7 +269,7 @@ public class AssetQuery {
     public PathPredicate[] paths;
     public TenantPredicate tenant;
     public String[] userIds;
-    public Class<? extends Asset>[] types;
+    public Class<? extends Asset<?>>[] types;
     public LogicGroup<AttributePredicate> attributes;
     // Ordering
     public OrderBy orderBy;
@@ -362,13 +362,13 @@ public class AssetQuery {
         }
 
         this.types = Arrays.stream(types).map(AssetDescriptor::getType)
-            .toArray(size -> (Class<? extends Asset>[])new Class<?>[size]);
+            .toArray(size -> (Class<? extends Asset<?>>[])new Class<?>[size]);
 
         return this;
     }
 
     @SafeVarargs
-    public final AssetQuery types(Class<? extends Asset>... types) {
+    public final <T extends Asset<?>> AssetQuery types(Class<T>... types) {
         if (types == null || types.length == 0) {
             this.types = null;
             return this;

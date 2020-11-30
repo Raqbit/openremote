@@ -2,7 +2,6 @@ package demo.rules
 
 import org.openremote.manager.rules.RulesBuilder
 import org.openremote.manager.setup.builtin.ManagerTestSetup
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.notification.Notification
 import org.openremote.model.notification.PushNotificationMessage

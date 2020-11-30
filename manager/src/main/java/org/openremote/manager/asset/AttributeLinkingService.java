@@ -33,6 +33,7 @@ import org.openremote.model.value.MetaItemType;
 import org.openremote.model.value.Values;
 
 import javax.persistence.EntityManager;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -41,10 +42,10 @@ import static org.openremote.model.attribute.AttributeEvent.Source.ATTRIBUTE_LIN
 import static org.openremote.model.query.AssetQuery.Select;
 
 /**
- * This service processes asset updates on attributes that have one or more {@link MetaItemType#ATTRIBUTE_LINK} meta items.
+ * This service processes asset updates on attributes that have one or more {@link MetaItemType#ATTRIBUTE_LINKS} meta items.
  * <p>
  * If such an event occurs then the event is 'forwarded' to the linked attribute; an attribute can contain multiple
- * {@link MetaItemType#ATTRIBUTE_LINK} meta items; optionally the value forwarded to the linked attribute can be modified
+ * {@link MetaItemType#ATTRIBUTE_LINKS} meta items; optionally the value forwarded to the linked attribute can be modified
  * by configuring the converter property in the meta item's value:
  * <p>
  * By default the exact value of the attribute is forwarded unless a key exists in the converter JSON Object that
@@ -55,7 +56,7 @@ import static org.openremote.model.query.AssetQuery.Select;
  * <p>
  * To convert null values the converter key of "NULL" can be used.
  * <p>
- * Example {@link MetaItemType#ATTRIBUTE_LINK} meta items:
+ * Example {@link MetaItemType#ATTRIBUTE_LINKS} meta items:
  * <blockquote><pre>{@code
  * [
  * "name": "urn:openremote:asset:meta:attributeLink",
@@ -119,8 +120,10 @@ public class AttributeLinkingService implements ContainerService, AssetUpdatePro
             return false;
         }
 
-        attribute.getMetaValue(MetaItemType.ATTRIBUTE_LINK)
-            .ifPresent(attributeLink -> processLinkedAttributeUpdate(em, attributeLink, new AttributeState(asset.getId(), attribute)));
+        attribute.getMetaValue(MetaItemType.ATTRIBUTE_LINKS)
+            .ifPresent(attributeLinks ->
+                Arrays.stream(attributeLinks).forEach(attributeLink ->
+                    processLinkedAttributeUpdate(em, attributeLink, new AttributeState(asset.getId(), attribute))));
 
         return false;
     }

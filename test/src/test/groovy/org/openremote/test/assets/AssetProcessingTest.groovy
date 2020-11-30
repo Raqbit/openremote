@@ -10,7 +10,6 @@ import org.openremote.manager.setup.SetupService
 import org.openremote.manager.setup.builtin.KeycloakTestSetup
 import org.openremote.manager.setup.builtin.ManagerTestSetup
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
 import org.openremote.model.value.Value
@@ -162,7 +161,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
         def mockAgent = new Asset()
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
-        mockAgent.setAttributes(
+        mockAgent.getAttributes().addOrReplace(
                 ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mock123"), mockProtocolName)
         )
         mockAgent.setRealm(keycloakTestSetup.masterTenant.realm)
@@ -170,7 +169,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
 
         and: "a mock thing asset is created with a valid protocol attribute, an invalid protocol attribute and a plain attribute"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
-        mockThing.setAttributes(
+        mockThing.getAttributes().addOrReplace(
                 new Attribute<>("light1Toggle", ValueType.BOOLEAN, true)
                         .setMeta(
                         new MetaItem<>(
@@ -225,7 +224,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
             assert updatesPassedAttributeLinkingService.size() == 0
             // Light toggle should still be on in database
             def asset = assetStorageService.find(mockThing.getId(), true)
-            assert asset.getAttribute("light1Toggle").get().getValueAsBoolean().get()
+            assert asset.getAttribute("light1Toggle").flatMap{it.value}.orElse(false)
         }
 
         when: "the protocol updates the attributes value with the value it just received"
@@ -247,7 +246,7 @@ class AssetProcessingTest extends Specification implements ManagerContainerTrait
             assert updatesPassedAttributeLinkingService.size() == 1
             // Light toggle should be off in database
             def asset = assetStorageService.find(mockThing.getId(), true)
-            assert !asset.getAttribute("light1Toggle").get().getValueAsBoolean().get()
+            assert !asset.getAttribute("light1Toggle").flatMap{it.value}.orElse(false)
         }
 
         when: "an attribute event occurs for the invalid protocol attribute"

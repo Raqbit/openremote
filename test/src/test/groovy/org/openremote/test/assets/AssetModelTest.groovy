@@ -18,7 +18,7 @@ class AssetModelTest extends Specification {
     def "Modifying asset identifier"() {
 
         when: "an asset is created without identifier"
-        Asset asset = new Asset("foo", THING).setAttributes(
+        Asset asset = new Asset("foo", THING).getAttributes().addOrReplace(
                 new Attribute<>("foo1", STRING, "foo111"),
                 new Attribute<>("foo2", STRING, "foo222")
         )

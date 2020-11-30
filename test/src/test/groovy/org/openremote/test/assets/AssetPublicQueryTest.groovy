@@ -52,7 +52,7 @@ class AssetPublicQueryTest extends Specification implements ManagerContainerTrai
             Asset somePublicAsset = new Asset("Some Public Asset", THING)
             somePublicAsset.setParentId(managerTestSetup.smartOfficeId)
             somePublicAsset.setAccessPublicRead(true)
-            somePublicAsset.setAttributes(
+            somePublicAsset.getAttributes().addOrReplace(
                     new Attribute<>("somePrivateAttribute", NUMBER, 123).addMeta(
                             new MetaItem<>(LABEL, "Some Private Attribute")
                     ),

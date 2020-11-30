@@ -2,7 +2,6 @@ package org.openremote.test.rules
 
 import org.openremote.manager.rules.RulesBuilder
 import org.openremote.model.query.AssetQuery
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeValueType
 
 RulesBuilder rules = binding.rules

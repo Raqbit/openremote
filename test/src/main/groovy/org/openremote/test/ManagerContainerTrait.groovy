@@ -3,11 +3,11 @@ package org.openremote.test
 import com.google.common.collect.Lists
 import org.apache.camel.spi.BrowsableEndpoint
 import org.openremote.container.Container
-import org.openremote.container.ContainerService
 import org.openremote.container.message.MessageBrokerService
 import org.openremote.container.timer.TimerService
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.rules.RulesService
+import org.openremote.model.ContainerService
 import spock.util.concurrent.PollingConditions
 
 import java.util.concurrent.TimeUnit

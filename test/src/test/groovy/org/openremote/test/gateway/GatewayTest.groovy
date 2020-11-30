@@ -170,10 +170,10 @@ class GatewayTest extends Specification implements ManagerContainerTrait {
                     "master",
                     (String[])[agentAssetIds[i-1]].toArray(new String[0]),
                     null).addAttributes(
-                    new Attribute<>("protocolConfig", ValueType.STRING, Values.create(HttpClientProtocol.PROTOCOL_NAME))
+                    new Attribute<>("protocolConfig", ValueType.STRING, HttpClientProtocol.PROTOCOL_NAME)
                         .addMeta(
                             new MetaItem<>(MetaItemType.PROTOCOL_CONFIGURATION),
-                            new MetaItem<>(HttpClientProtocol.META_PROTOCOL_BASE_URI, Values.create("https://google.co.uk")),
+                            new MetaItem<>(HttpClientProtocol.META_PROTOCOL_BASE_URI, "https://google.co.uk"),
                             new MetaItem<>(HttpClientProtocol.META_PROTOCOL_PING_PATH, "")
                         ),
                     new Attribute<>(AttributeType.SURFACE_AREA, 1000)

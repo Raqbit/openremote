@@ -65,7 +65,7 @@ class ResidenceAllLightsOffTest extends Specification implements ManagerContaine
 
         when: "the ALL LIGHTS OFF push-button is pressed for an apartment"
         def lightsOffEvent = new AttributeEvent(
-                managerTestSetup.apartment2Id, "allLightsOffSwitch", true, getClockTimeOf(container)
+                managerTestSetup.apartment2Id, "allLightsOffSwitch", true
         )
         assetProcessingService.sendAttributeEvent(lightsOffEvent)
 

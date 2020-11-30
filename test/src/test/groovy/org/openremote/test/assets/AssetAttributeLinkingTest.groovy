@@ -1,15 +1,15 @@
 package org.openremote.test.assets
 
-import org.openremote.container.Container
+
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.Constants
-import org.openremote.model.asset.Asset
-import org.openremote.model.attribute.Attribute
-import org.openremote.model.asset.AssetType
+import org.openremote.model.asset.impl.ThingAsset
 import org.openremote.model.attribute.*
 import org.openremote.model.value.JsonPathFilter
+import org.openremote.model.value.MetaItemType
 import org.openremote.model.value.ValueFilter
+import org.openremote.model.value.ValueType
 import org.openremote.model.value.Values
 import org.openremote.test.ManagerContainerTrait
 import spock.lang.Specification
@@ -35,16 +35,19 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         }
 
         when: "assets are created"
-        def asset1 = new Asset("Asset 1", AssetType.THING, null, Constants.MASTER_REALM)
-        asset1.setAttributes(
-            new Attribute<>("button", ValueType.STRING, "RELEASED", getClockTimeOf(container)),
-            new Attribute<>("array", ValueType.ARRAY, null)
+        def asset1 = new ThingAsset("Asset 1")
+        asset1.setRealm(Constants.MASTER_REALM)
+        asset1.getAttributes().addOrReplace(
+            new Attribute<>("button", ValueType.STRING, "RELEASED"),
+            new Attribute<>("array", ValueType.JSON_ARRAY, null)
         )
         asset1 = assetStorageService.merge(asset1)
-        def asset2 = new Asset("Asset 2", AssetType.THING, null, Constants.MASTER_REALM)
-        asset2.setAttributes(
-            new Attribute<>("lightOnOff", ValueType.BOOLEAN, false, getClockTimeOf(container)),
-            new Attribute<>("counter", ValueType.NUMBER, 0, getClockTimeOf(container)),
+
+        def asset2 = new ThingAsset("Asset 2")
+            .setRealm(Constants.MASTER_REALM)
+            .getAttributes().addOrReplace(
+            new Attribute<>("lightOnOff", ValueType.BOOLEAN, false),
+            new Attribute<>("counter", ValueType.NUMBER, 0d),
             new Attribute<>("item2Prop1", ValueType.BOOLEAN, null)
         )
         asset2 = assetStorageService.merge(asset2)
@@ -54,26 +57,24 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         assert asset2.id != null
 
         when: "attributes from one asset is linked to attributes on the other"
-        def converterOnOff = Values.createObject()
+        def converterOnOff = Values.JSON.createObjectNode()
         converterOnOff.put("PRESSED", "@TOGGLE")
         converterOnOff.put("RELEASED", "@IGNORE")
         converterOnOff.put("LONG_PRESSED", "@IGNORE")
-        def attributeLinkOnOff = Values.convertToValue(new AttributeLink(new AttributeRef(asset2.id, "lightOnOff"), converterOnOff, null), Container.JSON.writer()).orElse(null)
+        def attributeLinkOnOff = new AttributeLink(new AttributeRef(asset2.id, "lightOnOff"), converterOnOff, null)
 
-        def converterCounter = Values.createObject()
+        def converterCounter = Values.JSON.createObjectNode()
         converterCounter.put("PRESSED", "@INCREMENT")
         converterCounter.put("RELEASED", "@DECREMENT")
         converterCounter.put("LONG_PRESSED", "@IGNORE")
-        def attributeLinkCounter = Values.convertToValue(new AttributeLink(new AttributeRef(asset2.id, "counter"), converterCounter, null), Container.JSON.writer()).orElse(null)
+        def attributeLinkCounter = new AttributeLink(new AttributeRef(asset2.id, "counter"), converterCounter, null)
 
-        def attributeLinkProp = Values.convertToValue(new AttributeLink(
-            new AttributeRef(asset2.id, "item2Prop1"), null, [
+        def attributeLinkProp = new AttributeLink(new AttributeRef(asset2.id, "item2Prop1"), null, [
             new JsonPathFilter("\$[1].prop1", true, false)
-        ] as ValueFilter[]), Container.JSON.writer()).orElse(null)
+        ] as ValueFilter[])
 
-        asset1.getAttribute("button").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkOnOff))
-        asset1.getAttribute("button").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkCounter))
-        asset1.getAttribute("array").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINK, attributeLinkProp))
+        asset1.getAttribute("button").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINKS, [attributeLinkOnOff, attributeLinkCounter] as AttributeLink[]))
+        asset1.getAttribute("array").get().addMeta(new MetaItem<>(MetaItemType.ATTRIBUTE_LINKS, [attributeLinkProp] as AttributeLink[]))
         asset1 = assetStorageService.merge(asset1)
 
         and: "the button is pressed for a short period"
@@ -90,7 +91,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the linked attribute value should be toggled on"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert asset2.getAttribute("lightOnOff").get().getValueAsBoolean().get()
+            assert asset2.getAttribute("lightOnOff", Boolean.class).flatMap{it.value}.orElse(false)
         }
 
         when: "the button is pressed again for a short period"
@@ -107,7 +108,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the linked attribute value should be toggled off"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert !asset2.getAttribute("lightOnOff").get().getValueAsBoolean().get()
+            assert !asset2.getAttribute("lightOnOff", Boolean.class).flatMap{it.value}.orElse(false)
         }
         when: "a long button press occurs"
         def buttonLongPressed = new AttributeEvent(
@@ -123,7 +124,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the linked attribute value should not have changed and the system has settled down"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert !asset2.getAttribute("lightOnOff").get().getValueAsBoolean().get()
+            assert !asset2.getAttribute("lightOnOff").flatMap{it.value}.orElse(false)
             assert noEventProcessedIn(assetProcessingService, 500)
         }
 
@@ -131,8 +132,8 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         // each press event had a corresponding release event)
         when: "the counter is reset"
         def attr = asset2.getAttribute("counter").get()
-        attr.setValue(Values.create(0.0))
-        asset2.replaceAttribute(attr)
+        attr.setValue(0.0)
+        asset2.getAttributes().addOrReplace(attr)
         asset2 = assetStorageService.merge(asset2)
 
         and: "A button press event occurs without a release event"
@@ -144,7 +145,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the counter should increment"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert asset2.getAttribute("counter").get().getValueAsNumber().get() == 1.0
+            assert asset2.getAttribute("counter").flatMap{it.value}.orElse(0d) == 1.0
         }
 
         when: "A button release event occur"
@@ -156,15 +157,15 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the counter should decrement"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert asset2.getAttribute("counter").get().getValueAsNumber().get() == 0.0
+            assert asset2.getAttribute("counter").flatMap{it.value}.orElse(0d) == 0.0
         }
 
         /* TODO Test has timing issues, fails in line 182 when run from CLI gradle clean build, works in IDE!
         when: "the linked attribute is linked back to the source attribute (to create circular reference)"
-        def converterLoop = Values.createObject()
+        def converterLoop = Values.JSON.createObjectNode()
         converterLoop.put("TRUE", "PRESSED")
         converterLoop.put("FALSE", "PRESSED")
-        def attributeLinkLoop = Values.createObject()
+        def attributeLinkLoop = Values.JSON.createObjectNode()
         attributeLinkLoop.put("attributeRef", new AttributeRef(asset1.id, "button").toArrayValue())
         attributeLinkLoop.put("converter", converterLoop)
         asset2.getAttribute("lightOnOff").get().addMeta(new MetaItem<>(AssetMeta.ATTRIBUTE_LINK, attributeLinkLoop))
@@ -184,7 +185,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the linked attribute value should be toggled on"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert asset2.getAttribute("lightOnOff").get().getValueAsBoolean().get()
+            assert asset2.getAttribute("lightOnOff").flatMap{it.value}.orElse(false)
         }
 
         and: "no more events should be processed"
@@ -199,7 +200,7 @@ class AttributeLinkingTest extends Specification implements ManagerContainerTrai
         then: "the linked attribute on the other asset should contain the value from the json path"
         conditions.eventually {
             asset2 = assetStorageService.find(asset2.id, true)
-            assert !asset2.getAttribute("item2Prop1").get().getValueAsBoolean().orElse(true)
+            assert !asset2.getAttribute("item2Prop1").flatMap{it.value}.orElse(true)
         }
     }
 }

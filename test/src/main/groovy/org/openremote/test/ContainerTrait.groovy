@@ -27,7 +27,6 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget
 import org.keycloak.representations.AccessTokenResponse
 import org.openremote.container.Container
-import org.openremote.container.ContainerService
 import org.openremote.container.message.MessageBrokerService
 import org.openremote.container.security.IdentityService
 import org.openremote.container.security.PasswordAuthForm
@@ -41,6 +40,7 @@ import org.openremote.manager.rules.RulesService
 import org.openremote.manager.rules.RulesetStorageService
 import org.openremote.manager.web.ManagerWebService
 import org.openremote.model.Constants
+import org.openremote.model.ContainerService
 import org.openremote.model.asset.Asset
 import org.openremote.model.asset.UserAsset
 import org.openremote.model.query.AssetQuery

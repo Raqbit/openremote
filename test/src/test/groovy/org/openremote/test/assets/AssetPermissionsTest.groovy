@@ -9,7 +9,6 @@ import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.AttributeType
 import org.openremote.model.query.AssetQuery
-import org.openremote.model.asset.AssetType
 import org.openremote.model.attribute.AttributeValueType
 import org.openremote.model.attribute.Meta
 import org.openremote.model.attribute.MetaItem
@@ -656,10 +655,10 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         Meta resultMeta = currentTemperature.getMeta()
         resultMeta.size() == 7
         resultMeta.stream().filter(isMetaNameEqualTo(LABEL)).findFirst().get().getValueAsString().get() == "Current temperature"
-        resultMeta.stream().filter(isMetaNameEqualTo(READ_ONLY)).findFirst().get().getValueAsBoolean().get()
-        resultMeta.stream().filter(isMetaNameEqualTo(RULE_STATE)).findFirst().get().getValueAsBoolean().get()
-        resultMeta.stream().filter(isMetaNameEqualTo(STORE_DATA_POINTS)).findFirst().get().getValueAsBoolean().get()
-        resultMeta.stream().filter(isMetaNameEqualTo(SHOW_ON_DASHBOARD)).findFirst().get().getValueAsBoolean().get()
+        resultMeta.stream().filter(isMetaNameEqualTo(READ_ONLY)).findFirst().flatMap{it.value}.orElse(false)
+        resultMeta.stream().filter(isMetaNameEqualTo(RULE_STATE)).findFirst().flatMap{it.value}.orElse(false)
+        resultMeta.stream().filter(isMetaNameEqualTo(STORE_DATA_POINTS)).findFirst().flatMap{it.value}.orElse(false)
+        resultMeta.stream().filter(isMetaNameEqualTo(SHOW_ON_DASHBOARD)).findFirst().flatMap{it.value}.orElse(false)
         resultMeta.stream().filter(isMetaNameEqualTo(FORMAT)).findFirst().get().getValueAsString().get() == "%0.1f° C"
         resultMeta.stream().filter(isMetaNameEqualTo(UNIT_TYPE)).findFirst().get().getValueAsString().get() == Constants.UNITS_TEMPERATURE_CELSIUS
 
@@ -746,7 +745,7 @@ class AssetPermissionsTest extends Specification implements ManagerContainerTrai
         ex.response.status == 404
 
         when: "a restricted read-only asset attribute is written on a user asset"
-        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "currentTemperature", Values.create(22.123d).toJson())
+        assetResource.writeAttributeValue(null, managerTestSetup.apartment1LivingroomId, "currentTemperature", 22.123d).toJson()
 
         then: "the request should be forbidden"
         ex = thrown()

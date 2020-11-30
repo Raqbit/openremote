@@ -27,7 +27,6 @@ import org.openremote.manager.agent.AgentService
 import org.openremote.manager.asset.AssetProcessingService
 import org.openremote.manager.asset.AssetStorageService
 import org.openremote.model.asset.Asset
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.*
@@ -131,7 +130,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
                         updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), true))
                     } else if (attributeName.startsWith("tempTarget")) {
                         // Set target temps to 25.5
-                        updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), Values.create(25.5d)))
+                        updateLinkedAttribute(new AttributeState(attribute.getReferenceOrThrow(), 25.5d))
                     }
                 }
             }
@@ -175,7 +174,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         def mockAgent = new Asset()
         mockAgent.setName("Mock Agent")
         mockAgent.setType(AssetType.AGENT)
-        mockAgent.setAttributes(
+        mockAgent.getAttributes().addOrReplace(
             ProtocolConfiguration.initProtocolConfiguration(new Attribute<>("mockConfig1"), mockProtocolName)
                 .addMeta(
                     new MetaItem<>("MOCK_REQUIRED_META", true)
@@ -213,7 +212,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
 
         when: "a mock thing asset is created that links to the mock protocol configurations"
         def mockThing = new Asset("Mock Thing Asset", AssetType.THING, mockAgent)
-        mockThing.setAttributes(
+        mockThing.getAttributes().addOrReplace(
             new Attribute<>("lightToggle1", ValueType.BOOLEAN)
                 .setMeta(
                     new MetaItem<>("MOCK_ATTRIBUTE_REQUIRED_META", true),
@@ -368,7 +367,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         conditions.eventually {
             def mockAsset = assetStorageService.find(mockThing.getId(), true)
             // Check all valid linked attributes have the new values
-            assert mockAsset.getAttribute("lightToggle1").get().getValueAsBoolean().orElse(false)
+            assert mockAsset.getAttribute("lightToggle1").flatMap{it.value}.orElse(false)
             assert mockAsset.getAttribute("tempTarget1").get().getValueAsNumber().orElse(0d) == 25.5d
             // Check disabled linked attributes don't have the new values
             assert !mockAsset.getAttribute("lightToggle4").get().getValue().isPresent()
@@ -458,7 +457,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
 
         when: "the same attribute receives a sensor value that doesn't match the regex filter (no match)"
         def lastUpdate = mockThing.getAttribute("filterRegex").get().valueTimestamp.get()
-        state = new AttributeState(mockThing.id, "filterRegex", Values.create("no match to be found!"))
+        state = new AttributeState(mockThing.id, "filterRegex", "no match to be found!")
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated to null"
@@ -489,7 +488,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "a sensor value is received that links to an attribute using a regex and substring filter"
-        state = new AttributeState(mockThing.id, "filterRegexSubstring", Values.create('{"prop1":true,"prop2":"volume is at 90%"}'))
+        state = new AttributeState(mockThing.id, "filterRegexSubstring", '{"prop1":true,"prop2":"volume is at 90%"}')
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated with the filtered result"
@@ -499,7 +498,7 @@ class BasicProtocolTest extends Specification implements ManagerContainerTrait {
         }
 
         when: "the same attribute receives a sensor value that doesn't match the substring filter"
-        state = new AttributeState(mockThing.id, "filterRegexSubstring", Values.create('"volume is at 90%"}'))
+        state = new AttributeState(mockThing.id, "filterRegexSubstring", '"volume is at 90%"}')
         mockProtocol.updateReceived(state)
 
         then: "the linked attributes value should be updated to null"

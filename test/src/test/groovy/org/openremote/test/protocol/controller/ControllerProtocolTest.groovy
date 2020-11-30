@@ -29,7 +29,6 @@ import org.openremote.model.Constants
 import org.openremote.model.asset.Asset
 import org.openremote.model.attribute.Attribute
 import org.openremote.model.attribute.MetaItemType
-import org.openremote.model.asset.AssetType
 import org.openremote.model.asset.agent.ConnectionStatus
 import org.openremote.model.asset.agent.ProtocolConfiguration
 import org.openremote.model.attribute.AttributeEvent
@@ -187,12 +186,12 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
         agent.setRealm(Constants.MASTER_REALM)
         agent.setName("Test Agent")
         agent.setType(AssetType.AGENT)
-        agent.setAttributes(
+        agent.getAttributes().addOrReplace(
                 ProtocolConfiguration.initProtocolConfiguration(new Attribute<>(CONTROLLER_PROTOCOL_ATTRIBUTE_NAME), ControllerProtocol.PROTOCOL_NAME)
                         .addMeta(
                         new MetaItem<>(
                                 ControllerProtocol.META_PROTOCOL_BASE_URI,
-                                Values.create("http://mockapi:8688/controller")
+                                "http://mockapi:8688/controller"
                         )
                 )
         )
@@ -208,7 +207,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         when: "an asset is created with attributes linked to the controller protocol configuration"
         def asset = new Asset("Test Asset", AssetType.THING, agent)
-        asset.setAttributes(
+        asset.getAttributes().addOrReplace(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
                 new Attribute<>("sensor", ValueType.STRING)
                         .addMeta(
@@ -248,7 +247,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
                 .addMeta(
                 new MetaItem<>(
                         ControllerProtocol.META_PROTOCOL_BASE_URI,
-                        Values.create("http://disconnectedmockapi:8688/controller")
+                        "http://disconnectedmockapi:8688/controller"
                 )
         ))
 
@@ -272,7 +271,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
                 .addMeta(
                 new MetaItem<>(
                         ControllerProtocol.META_PROTOCOL_BASE_URI,
-                        Values.create("http://mockapi:8688/controller")
+                        "http://mockapi:8688/controller"
                 )
         ))
 
@@ -292,7 +291,7 @@ class ControllerProtocolTest extends Specification implements ManagerContainerTr
 
         when: "an asset is created with attributes linked to the controller protocol configuration"
         def asset2 = new Asset("Test Asset2", AssetType.THING, agent)
-        asset2.setAttributes(
+        asset2.getAttributes().addOrReplace(
                 // attribute that sends requests to the server using PUT with dynamic body and custom header to override parent
                 new Attribute<>("command", ValueType.STRING, "command1")
                         .addMeta(

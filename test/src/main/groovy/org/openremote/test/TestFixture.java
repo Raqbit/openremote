@@ -19,7 +19,7 @@
  */
 package org.openremote.test;
 
-import org.openremote.model.Container;
+import org.openremote.container.Container;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.UserAsset;
 import org.openremote.model.rules.Ruleset;
