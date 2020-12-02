@@ -13,3 +13,4 @@ org.openremote.agent.protocol.serial.SerialClientProtocol
 org.openremote.agent.protocol.event.ClientEventProtocol
 org.openremote.agent.protocol.tradfri.TradfriProtocol
 org.openremote.agent.protocol.zwave.ZWProtocol
+org.openremote.agent.protocol.bluetooth.BluetoothLEProtocol
