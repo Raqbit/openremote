@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import static org.openremote.container.concurrent.GlobalLock.withLock;
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
@@ -201,7 +202,8 @@ public class BluetoothLEProtocol extends AbstractProtocol {
 
     @Override
     protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
-        String btAddressParam = protocolConfiguration.getMetaItem(META_BLE_ADDRESS).flatMap(AbstractValueHolder::getValueAsString).orElse("");
+        // TODO: validate btAddress is set in here or in the validation callback
+        String btAddressParam = protocolConfiguration.getMetaItem(META_BLE_ADDRESS).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
 
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
 
@@ -213,6 +215,8 @@ public class BluetoothLEProtocol extends AbstractProtocol {
             }
 
             updateStatus(protocolRef, ConnectionStatus.CONNECTING);
+
+            // Todo: possibly wrap in protocol lock?
             Consumer<ConnectionStatus> statusConsumer = status -> updateStatus(protocolRef, status);
 
             BluetoothLEConnection bleConnection = bluetoothConnections.computeIfAbsent(btAddressParam, btAddress ->
@@ -316,7 +320,7 @@ public class BluetoothLEProtocol extends AbstractProtocol {
 
         String btAddress = protocolConfiguration.getMetaItem(META_BLE_ADDRESS).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
         Optional<String> serviceUuid = attribute.getMetaItem(META_BLE_SERVICE_UUID).flatMap(AbstractValueHolder::getValueAsString);
-        Optional<String> charUuid = attribute.getMetaItem(META_BLE_SERVICE_UUID).flatMap(AbstractValueHolder::getValueAsString);
+        Optional<String> charUuid = attribute.getMetaItem(META_BLE_CHARACTERISTIC_UUID).flatMap(AbstractValueHolder::getValueAsString);
 
         if (!serviceUuid.isPresent()) {
             LOG.severe("No META_BLE_SERVICE_UUID for protocol attribute: " + attributeRef);
@@ -324,13 +328,14 @@ public class BluetoothLEProtocol extends AbstractProtocol {
         }
 
         if (!charUuid.isPresent()) {
-            LOG.severe("No META_BLE_SERVICE_UUID for protocol attribute: " + attributeRef);
+            LOG.severe("No META_BLE_CHARACTERISTIC_UUID for protocol attribute: " + attributeRef);
             return;
         }
 
         BluetoothLEConnection bleConnection = getConnection(btAddress);
 
         if (bleConnection == null) {
+            LOG.fine("Attribute being linked to configuration without connection");
             // The protocol configuration is disabled
             return;
         }
@@ -352,6 +357,7 @@ public class BluetoothLEProtocol extends AbstractProtocol {
                     (value) -> handleBLEValueChange(attributeRef, value)
             );
 
+            // TODO: being called before we have an actual connection
             bleConnection.addCharacteristicValueConsumer(consumer);
 
             attributeLinkMap.put(attributeRef, new Pair<>(bleConnection, consumer));
@@ -360,8 +366,11 @@ public class BluetoothLEProtocol extends AbstractProtocol {
     }
 
     private void handleBLEValueChange(AttributeRef attributeRef, Value value) {
-        LOG.fine("BLE protocol received value '" + value + "' for : " + attributeRef);
-        updateLinkedAttribute(new AttributeState(attributeRef, value));
+        // Get protocol lock
+        withLock(getProtocolName(), () -> {
+            LOG.fine("BLE protocol received value '" + value + "' for : " + attributeRef);
+            updateLinkedAttribute(new AttributeState(attributeRef, value));
+        });
     }
 
     @Override
@@ -369,17 +378,41 @@ public class BluetoothLEProtocol extends AbstractProtocol {
         final AttributeRef attributeRef = attribute.getReferenceOrThrow();
 
         synchronized (attributeLinkMap) {
-            Pair<BluetoothLEConnection, CharacteristicValueConsumer> data = attributeLinkMap.remove(attributeRef);
-            if (data != null) {
-                data.key.removeCharacteristicValueConsumer(data.value);
+            Pair<BluetoothLEConnection, CharacteristicValueConsumer> link = attributeLinkMap.remove(attributeRef);
+            if (link != null) {
+                link.key.removeCharacteristicValueConsumer(link.value);
             }
         }
     }
 
     @Override
     protected void processLinkedAttributeWrite(AttributeEvent event, Value processedValue, AssetAttribute protocolConfiguration) {
-        LOG.info("processLinkedAttributeWrite");
-        // TODO: handle writes
+        if (!protocolConfiguration.isEnabled()) {
+            LOG.fine("Protocol configuration is disabled so ignoring write request");
+            return;
+        }
+
+        synchronized (attributeLinkMap) {
+            Pair<BluetoothLEConnection, CharacteristicValueConsumer> link = attributeLinkMap.get(event.getAttributeRef());
+
+            if (link == null) {
+                LOG.fine("Attribute isn't linked to a BLE consumer so cannot process write: " + event);
+                return;
+            }
+
+            Optional<Value> value = event.getValue();
+
+            if (!value.isPresent()) {
+                LOG.fine("Attribute Event has no value: " + event);
+                return;
+            }
+
+            link.key.writeCharacteristic(link.value.serviceUuid, link.value.charUuid, event.getValue().get());
+
+            updateLinkedAttribute(event.getAttributeState());
+        }
     }
+
+
 
 }

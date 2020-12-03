@@ -11,6 +11,7 @@ import org.openremote.model.value.Values;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -77,14 +78,17 @@ public class BluetoothLEConnection {
                     return;
                 }
 
-                // Update the state map and notify consumers
-                charValueStateMap.compute(new MultiKey<>(service.getUuid(), characteristic.getUuid()), (ga, oldValue) -> value);
+                // Update the state map
+                charValueStateMap.put(service.getUuid(), characteristic.getUuid(), value);
+
+                // Update consumers
+                updateAllConsumers(service.getUuid(), characteristic.getUuid(), value);
             }
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothPeripheral peripheral, byte[] value, BluetoothGattCharacteristic characteristic, BluetoothCommandStatus status) {
-            // TODO: handle
+            // TODO: Handle characteristic write callbacks? atm it's "fire-and-forget"
         }
     };
 
@@ -162,6 +166,12 @@ public class BluetoothLEConnection {
      */
     public synchronized void onConnection() {
         onConnectionStatusChanged(ConnectionStatus.CONNECTED);
+        synchronized (charValueConsumerMap) {
+            charValueConsumerMap.forEach((k, v) -> {
+                setCharNotifyEnabled(k.getKey(0), k.getKey(1), true);
+                requestCharValue(k.getKey(0), k.getKey(1));
+            });
+        }
     }
 
     /**
@@ -205,6 +215,13 @@ public class BluetoothLEConnection {
         central.connectPeripheral(device, callbacks);
     }
 
+    public void updateAllConsumers(UUID serviceUuid, UUID characteristicUuid, byte[] data) {
+        synchronized (charValueConsumerMap) {
+            List<CharacteristicValueConsumer> consumers = charValueConsumerMap.get(serviceUuid, characteristicUuid);
+            consumers.forEach(c -> updateConsumer(data, c));
+        }
+    }
+
     /**
      * Add a consumer for the specified characteristic.
      */
@@ -220,16 +237,37 @@ public class BluetoothLEConnection {
                 charValueStateMap.compute(new MultiKey<>(consumer.serviceUuid, consumer.charUuid), (groupAddress, stateValue) -> {
                     if (stateValue != null) {
                         updateConsumer(stateValue, consumer);
-                    } else {
-                        // State not available for this group address so request it
-                        // TODO: Request & subscribe
-//                        getGroupAddressValue(datapoint.getMainAddress(), datapoint.getPriority());
+                    } else if (connectionStatus == ConnectionStatus.CONNECTED) {
+                        // FIXME: this is done twice if device was connected
+                        setCharNotifyEnabled(consumer.serviceUuid, consumer.charUuid, true);
+                        requestCharValue(consumer.serviceUuid, consumer.charUuid);
                     }
-
                     return stateValue;
                 });
             }
         }
+    }
+
+    /**
+     * Enable notifications for the given characteristic
+     *
+     * @param serviceUuid
+     * @param charUuid
+     * @param enabled
+     */
+    private void setCharNotifyEnabled(UUID serviceUuid, UUID charUuid, boolean enabled) {
+        LOG.fine(String.format("Notify %s", charUuid.toString()));
+        device.setNotify(serviceUuid, charUuid, enabled);
+    }
+
+    /**
+     * Request the value of the given characteristic
+     *
+     * @param serviceUuid - Service UUID
+     * @param charUuid    - Characteristic UUID
+     */
+    private void requestCharValue(UUID serviceUuid, UUID charUuid) {
+        device.readCharacteristic(serviceUuid, charUuid);
     }
 
     /**
@@ -268,5 +306,30 @@ public class BluetoothLEConnection {
         }
 
         consumer.send(value);
+    }
+
+    public void writeCharacteristic(UUID serviceUuid, UUID charUuid, Value value) {
+        if (this.connectionStatus == ConnectionStatus.CONNECTED) {
+            Optional<String> stringValue = Values.getString(value);
+
+            if (!stringValue.isPresent()) {
+                return;
+            }
+
+
+            LOG.fine(String.format("Write to %s", charUuid.toString()));
+
+            // TODO: cache characteristics?
+            BluetoothGattCharacteristic btChar = device.getCharacteristic(serviceUuid, charUuid);
+
+            // FIXME: could not find after adding second attribute
+            if (btChar == null) {
+                LOG.fine("Could not find characteristic for write");
+                return;
+            }
+
+            // TODO: Handle result, handle callback
+            device.writeCharacteristic(btChar, stringValue.get().getBytes(StandardCharsets.UTF_8), BluetoothGattCharacteristic.WriteType.withResponse);
+        }
     }
 }
