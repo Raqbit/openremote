@@ -224,6 +224,7 @@ public class BluetoothLEConnection {
 
     /**
      * Add a consumer for the specified characteristic.
+     * @param consumer - The consumer to add to
      */
     public void addCharacteristicValueConsumer(CharacteristicValueConsumer consumer) {
         synchronized (charValueConsumerMap) {
@@ -234,7 +235,7 @@ public class BluetoothLEConnection {
 
             // Look for existing value for this characteristic
             synchronized (charValueStateMap) {
-                charValueStateMap.compute(new MultiKey<>(consumer.serviceUuid, consumer.charUuid), (groupAddress, stateValue) -> {
+                charValueStateMap.compute(new MultiKey<>(consumer.serviceUuid, consumer.charUuid), (key, stateValue) -> {
                     if (stateValue != null) {
                         updateConsumer(stateValue, consumer);
                     } else if (connectionStatus == ConnectionStatus.CONNECTED) {
@@ -328,7 +329,7 @@ public class BluetoothLEConnection {
                 return;
             }
 
-            // TODO: Handle result, handle callback
+            // TODO: Handle result, handle callback or fire-and-forget?
             device.writeCharacteristic(btChar, stringValue.get().getBytes(StandardCharsets.UTF_8), BluetoothGattCharacteristic.WriteType.withResponse);
         }
     }
