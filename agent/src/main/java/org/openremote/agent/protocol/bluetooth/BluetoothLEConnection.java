@@ -6,12 +6,9 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.syslog.SyslogCategory;
 import org.openremote.model.value.Value;
-import org.openremote.model.value.Values;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -224,6 +221,7 @@ public class BluetoothLEConnection {
 
     /**
      * Add a consumer for the specified characteristic.
+     *
      * @param consumer - The consumer to add to
      */
     public void addCharacteristicValueConsumer(CharacteristicValueConsumer consumer) {
@@ -299,10 +297,10 @@ public class BluetoothLEConnection {
 
         if (data != null) {
             try {
-                // TODO: support more data types than string
-                value = Values.create(new String(data, StandardCharsets.UTF_8));
+                value = BluetoothTypeMapper.getValueFromBytes(consumer.targetType, data);
             } catch (Exception ex) {
-                LOG.warning("Couldn't translate BLE value to OR Value: ");
+                LOG.warning("Couldn't translate BLE value to OR Value");
+                ex.printStackTrace();
             }
         }
 
@@ -311,26 +309,20 @@ public class BluetoothLEConnection {
 
     public void writeCharacteristic(UUID serviceUuid, UUID charUuid, Value value) {
         if (this.connectionStatus == ConnectionStatus.CONNECTED) {
-            Optional<String> stringValue = Values.getString(value);
-
-            if (!stringValue.isPresent()) {
-                return;
-            }
-
-
             LOG.fine(String.format("Write to %s", charUuid.toString()));
 
             // TODO: cache characteristics?
             BluetoothGattCharacteristic btChar = device.getCharacteristic(serviceUuid, charUuid);
 
-            // FIXME: could not find after adding second attribute
             if (btChar == null) {
                 LOG.fine("Could not find characteristic for write");
                 return;
             }
 
+            byte[] data = BluetoothTypeMapper.getBytesFromValue(value);
+
             // TODO: Handle result, handle callback or fire-and-forget?
-            device.writeCharacteristic(btChar, stringValue.get().getBytes(StandardCharsets.UTF_8), BluetoothGattCharacteristic.WriteType.withResponse);
+            device.writeCharacteristic(btChar, data, BluetoothGattCharacteristic.WriteType.withResponse);
         }
     }
 }

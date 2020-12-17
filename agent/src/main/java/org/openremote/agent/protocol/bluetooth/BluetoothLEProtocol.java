@@ -4,6 +4,7 @@ import com.welie.blessed.*;
 import org.openremote.agent.protocol.AbstractProtocol;
 import org.openremote.container.Container;
 import org.openremote.model.AbstractValueHolder;
+import org.openremote.model.ValidationFailure;
 import org.openremote.model.asset.Asset;
 import org.openremote.model.asset.AssetAttribute;
 import org.openremote.model.asset.agent.ConnectionStatus;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
 import static org.openremote.container.concurrent.GlobalLock.withLock;
 import static org.openremote.model.Constants.PROTOCOL_NAMESPACE;
 import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
+import static org.openremote.model.util.TextUtil.isNullOrEmpty;
 
 /**
  * Bluetooth Low Energy (LE) Protocol
@@ -201,8 +203,30 @@ public class BluetoothLEProtocol extends AbstractProtocol {
     }
 
     @Override
+    public AttributeValidationResult validateProtocolConfiguration(AssetAttribute protocolConfiguration) {
+        AttributeValidationResult result = super.validateProtocolConfiguration(protocolConfiguration);
+
+        if (result.isValid()) {
+            Optional<MetaItem> bleMetaItem = protocolConfiguration.getMetaItem(META_BLE_ADDRESS);
+
+            if (!bleMetaItem.isPresent()) {
+                result.addMetaFailure(
+                        new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
+                );
+            } else {
+                if (isNullOrEmpty(bleMetaItem.get().getValueAsString().orElse(null))) {
+                    result.addMetaFailure(
+                            new ValidationFailure(MetaItem.MetaItemFailureReason.META_ITEM_VALUE_IS_REQUIRED, ValueType.STRING.name())
+                    );
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     protected void doLinkProtocolConfiguration(Asset agent, AssetAttribute protocolConfiguration) {
-        // TODO: validate btAddress is set in here or in the validation callback
         String btAddressParam = protocolConfiguration.getMetaItem(META_BLE_ADDRESS).flatMap(AbstractValueHolder::getValueAsString).orElse(null);
 
         AttributeRef protocolRef = protocolConfiguration.getReferenceOrThrow();
@@ -340,24 +364,23 @@ public class BluetoothLEProtocol extends AbstractProtocol {
             return;
         }
 
-        // TODO: support various attribute types
-//        ValueType type;
-//
-//        if (attribute.getType().isPresent()) {
-//            type = attribute.getType().get().getValueType();
-//        } else {
-//            type = DEFAULT_VALUE_TYPE;
-//        }
+        ValueType targetType;
+
+        if (attribute.getType().isPresent()) {
+            targetType = attribute.getType().get().getValueType();
+        } else {
+            targetType = DEFAULT_VALUE_TYPE;
+        }
 
         synchronized (attributeLinkMap) {
             CharacteristicValueConsumer consumer = new CharacteristicValueConsumer(
                     attributeRef.getEntityId(),
+                    targetType,
                     UUID.fromString(serviceUuid.get()),
                     UUID.fromString(charUuid.get()),
                     (value) -> handleBLEValueChange(attributeRef, value)
             );
 
-            // TODO: being called before we have an actual connection
             bleConnection.addCharacteristicValueConsumer(consumer);
 
             attributeLinkMap.put(attributeRef, new Pair<>(bleConnection, consumer));
@@ -412,7 +435,6 @@ public class BluetoothLEProtocol extends AbstractProtocol {
             updateLinkedAttribute(event.getAttributeState());
         }
     }
-
 
 
 }
