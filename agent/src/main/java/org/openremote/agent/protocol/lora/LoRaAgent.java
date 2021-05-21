@@ -4,6 +4,7 @@ import org.openremote.agent.protocol.io.IoAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.value.AttributeDescriptor;
+import org.openremote.model.value.ValueConstraint;
 import org.openremote.model.value.ValueType;
 
 import javax.persistence.Entity;
@@ -24,8 +25,17 @@ public class LoRaAgent extends IoAgent<LoRaAgent, LoRaProtocol, LoRaAgent.RadioA
             LoRaAgent.class, LoRaProtocol.class, RadioAgentLink.class
     );
 
-    public static final AttributeDescriptor<Integer> FREQUENCY = new AttributeDescriptor<>("frequency", ValueType.INTEGER).withUnits("Hz");
-    public static final AttributeDescriptor<Integer> NODE_ID = new AttributeDescriptor<>("nodeId", ValueType.INTEGER);
+    public static final AttributeDescriptor<Integer> FREQUENCY = new AttributeDescriptor<>("frequency", ValueType.INTEGER)
+            .withUnits("Hz")
+            .withConstraints(
+                    new ValueConstraint.NotEmpty()
+            );
+    public static final AttributeDescriptor<Integer> NODE_ID = new AttributeDescriptor<>("nodeId", ValueType.INTEGER)
+            .withConstraints(
+                    new ValueConstraint.Min(1),
+                    new ValueConstraint.Max(254),
+                    new ValueConstraint.NotEmpty()
+            );
 
     /**
      * For use by hydrators (i.e. JPA/Jackson)
