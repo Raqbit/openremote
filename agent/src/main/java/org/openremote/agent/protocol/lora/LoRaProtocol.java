@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAgent, LoRaAgent.RadioAgentLink, LoRaMessage, TcpIoClient<LoRaMessage>> {
+public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAgent, LoRaAgent.LoRaAgentLink, LoRaMessage, TcpIoClient<LoRaMessage>> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "LoRa";
 
@@ -45,7 +45,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
 
 
     @Override
-    protected void doLinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.RadioAgentLink agentLink) throws RuntimeException {
+    protected void doLinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink) throws RuntimeException {
         nodeIdLinks.put(
                 agentLink.fromId,
                 new Pair<>(
@@ -56,13 +56,13 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
     }
 
     @Override
-    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.RadioAgentLink agentLink) {
+    protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
         nodeIdLinks.entries().removeIf(consumer -> consumer.getValue().key.equals(attributeRef));
     }
 
     @Override
-    protected void doLinkedAttributeWrite(Attribute<?> attribute, LoRaAgent.RadioAgentLink agentLink, AttributeEvent event, Object processedValue) {
+    protected void doLinkedAttributeWrite(Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink, AttributeEvent event, Object processedValue) {
         // We don't support this
     }
 
@@ -97,7 +97,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
     }
 
     @Override
-    protected LoRaMessage createWriteMessage(Attribute<?> attribute, LoRaAgent.RadioAgentLink agentLink, AttributeEvent event, Object processedValue) {
+    protected LoRaMessage createWriteMessage(Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink, AttributeEvent event, Object processedValue) {
         return null;
     }
 

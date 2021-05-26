@@ -13,16 +13,16 @@ import javax.validation.constraints.Min;
 import java.util.Optional;
 
 @Entity
-public class LoRaAgent extends IoAgent<LoRaAgent, LoRaProtocol, LoRaAgent.RadioAgentLink> {
+public class LoRaAgent extends IoAgent<LoRaAgent, LoRaProtocol, LoRaAgent.LoRaAgentLink> {
 
-    public static class RadioAgentLink extends AgentLink<RadioAgentLink> {
+    public static class LoRaAgentLink extends AgentLink<LoRaAgentLink> {
         @Min(1)
         @Max(245)
         protected int fromId;
     }
 
-    public static final AgentDescriptor<LoRaAgent, LoRaProtocol, RadioAgentLink> DESCRIPTOR = new AgentDescriptor<>(
-            LoRaAgent.class, LoRaProtocol.class, RadioAgentLink.class
+    public static final AgentDescriptor<LoRaAgent, LoRaProtocol, LoRaAgentLink> DESCRIPTOR = new AgentDescriptor<>(
+            LoRaAgent.class, LoRaProtocol.class, LoRaAgentLink.class
     );
 
     public static final AttributeDescriptor<Integer> FREQUENCY = new AttributeDescriptor<>("frequency", ValueType.INTEGER)
@@ -32,7 +32,7 @@ public class LoRaAgent extends IoAgent<LoRaAgent, LoRaProtocol, LoRaAgent.RadioA
             );
     public static final AttributeDescriptor<Integer> NODE_ID = new AttributeDescriptor<>("nodeId", ValueType.INTEGER)
             .withConstraints(
-                    new ValueConstraint.Min(1),
+                    new ValueConstraint.Min(0),
                     new ValueConstraint.Max(254),
                     new ValueConstraint.NotEmpty()
             );
