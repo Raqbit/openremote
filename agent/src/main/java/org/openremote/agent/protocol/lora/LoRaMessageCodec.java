@@ -45,7 +45,7 @@ public class LoRaMessageCodec extends ByteToMessageCodec<LoRaMessage> {
 
         switch (type) {
             case HANDSHAKE:
-            case HANDSHAKE_OK:
+            case CONFIGURE_OK:
                 out.add(this.mapper.treeToValue(tree, LoRaMessage.class));
                 break;
             case RECEIVED_MESSAGE:

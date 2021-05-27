@@ -17,9 +17,9 @@ public class LoRaMessage {
     }
 
     public enum Type {
-        @JsonProperty("handshake") HANDSHAKE,
-        @JsonProperty("configure") CONFIGURE,
-        @JsonProperty("handshake_ok") HANDSHAKE_OK,
-        @JsonProperty("received_msg") RECEIVED_MESSAGE;
+        @JsonProperty("HANDSHAKE") HANDSHAKE,
+        @JsonProperty("CONFIGURE") CONFIGURE,
+        @JsonProperty("CONFIGURE_OK") CONFIGURE_OK,
+        @JsonProperty("RECEIVED_MESSAGE") RECEIVED_MESSAGE;
     }
 }

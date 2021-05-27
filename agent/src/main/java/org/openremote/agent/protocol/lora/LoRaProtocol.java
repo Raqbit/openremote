@@ -1,5 +1,6 @@
 package org.openremote.agent.protocol.lora;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -84,7 +85,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
                 this.client.ioClient.sendMessage(new ConfigureLoRaMessage(this.frequency, this.nodeId));
                 this.setConnectionStatus(ConnectionStatus.WAITING);
                 break;
-            case HANDSHAKE_OK:
+            case CONFIGURE_OK:
                 // Handshake complete, we are connected
                 this.setConnectionStatus(ConnectionStatus.CONNECTED);
                 break;
