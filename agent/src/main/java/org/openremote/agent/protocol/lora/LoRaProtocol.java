@@ -1,6 +1,5 @@
 package org.openremote.agent.protocol.lora;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -35,7 +34,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
     private final int nodeId;
     private final int frequency;
 
-    protected final Multimap<Integer, Pair<AttributeRef, Consumer<Map<String, Object>>>> nodeIdLinks = HashMultimap.create();
+    protected final Multimap<Integer, Pair<AttributeRef, Consumer<Map<String, Object>>>> attrLinks = HashMultimap.create();
 
 
     public LoRaProtocol(LoRaAgent agent) {
@@ -47,7 +46,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
 
     @Override
     protected void doLinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink) throws RuntimeException {
-        nodeIdLinks.put(
+        attrLinks.put(
                 agentLink.fromId,
                 new Pair<>(
                         new AttributeRef(assetId, attribute.getName()),
@@ -59,7 +58,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
     @Override
     protected void doUnlinkAttribute(String assetId, Attribute<?> attribute, LoRaAgent.LoRaAgentLink agentLink) {
         AttributeRef attributeRef = new AttributeRef(assetId, attribute.getName());
-        nodeIdLinks.entries().removeIf(consumer -> consumer.getValue().key.equals(attributeRef));
+        attrLinks.entries().removeIf(consumer -> consumer.getValue().key.equals(attributeRef));
     }
 
     @Override
@@ -90,10 +89,12 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
                 this.setConnectionStatus(ConnectionStatus.CONNECTED);
                 break;
             case RECEIVED_MESSAGE:
-                for (Pair<AttributeRef, Consumer<Map<String, Object>>> consumer : nodeIdLinks.get(((LoRaReceivedMessage) message).fromId)) {
+                for (Pair<AttributeRef, Consumer<Map<String, Object>>> consumer : attrLinks.get(((LoRaReceivedMessage) message).fromId)) {
                     consumer.value.accept(((LoRaReceivedMessage) message).data);
                 }
                 break;
+            default:
+                LOG.warning("Unhandled decoded LoRa message ");
         }
     }
 

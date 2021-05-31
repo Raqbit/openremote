@@ -1,5 +1,6 @@
 package org.openremote.agent.protocol.lora;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
@@ -7,15 +8,22 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import org.openremote.model.syslog.SyslogCategory;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.logging.Logger;
+
+import static org.openremote.model.syslog.SyslogCategory.PROTOCOL;
 
 public class LoRaMessageCodec extends ByteToMessageCodec<LoRaMessage> {
     private final ObjectMapper mapper;
 
+    public static final Logger LOG = SyslogCategory.getLogger(PROTOCOL, LoRaMessageCodec.class);
+
     public LoRaMessageCodec(ObjectMapper mapper) {
         this.mapper = mapper;
+        this.mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
     }
 
     @Override
@@ -52,7 +60,10 @@ public class LoRaMessageCodec extends ByteToMessageCodec<LoRaMessage> {
                 out.add(this.mapper.treeToValue(tree, LoRaReceivedMessage.class));
                 break;
             case CONFIGURE:
-                throw new RadioMessageCodecException("should not receive this message");
+                LOG.warning(String.format("Received send-only message from LoRa driver daemon: %s", type));
+                break;
+            default:
+                LOG.warning(String.format("Received unknown message from LoRa driver daemon: %s", type));
         }
     }
 

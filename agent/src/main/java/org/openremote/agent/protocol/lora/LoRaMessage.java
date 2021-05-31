@@ -1,5 +1,6 @@
 package org.openremote.agent.protocol.lora;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LoRaMessage {
@@ -20,6 +21,7 @@ public class LoRaMessage {
         @JsonProperty("HANDSHAKE") HANDSHAKE,
         @JsonProperty("CONFIGURE") CONFIGURE,
         @JsonProperty("CONFIGURE_OK") CONFIGURE_OK,
-        @JsonProperty("RECEIVED_MESSAGE") RECEIVED_MESSAGE;
+        @JsonProperty("RECEIVED_MESSAGE") RECEIVED_MESSAGE,
+        @JsonEnumDefaultValue() UNKNOWN;
     }
 }
