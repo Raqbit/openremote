@@ -5,9 +5,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import org.openremote.agent.protocol.io.AbstractNettyIoClient;
-import org.openremote.agent.protocol.tcp.AbstractTcpClientProtocol;
-import org.openremote.agent.protocol.tcp.TcpIoClient;
+import org.openremote.agent.protocol.io.AbstractNettyIOClient;
+import org.openremote.agent.protocol.tcp.AbstractTCPClientProtocol;
+import org.openremote.agent.protocol.tcp.TCPIOClient;
 import org.openremote.model.asset.agent.Agent;
 import org.openremote.model.asset.agent.ConnectionStatus;
 import org.openremote.model.attribute.Attribute;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAgent, LoRaAgent.LoRaAgentLink, LoRaMessage, TcpIoClient<LoRaMessage>> {
+public class LoRaProtocol extends AbstractTCPClientProtocol<LoRaProtocol, LoRaAgent, LoRaAgent.LoRaAgentLink, LoRaMessage, TCPIOClient<LoRaMessage>> {
 
     public static final String PROTOCOL_DISPLAY_NAME = "LoRa";
 
@@ -72,7 +72,7 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
                 new LineBasedFrameDecoder(Integer.MAX_VALUE),
                 new LoRaMessageCodec(this.mapper),
                 new LoRaMessageCodec(this.mapper),
-                new AbstractNettyIoClient.MessageToMessageDecoder<>(LoRaMessage.class, this.client.ioClient)
+                new AbstractNettyIOClient.MessageToMessageDecoder<>(LoRaMessage.class, this.client.ioClient)
         };
     }
 
@@ -110,10 +110,10 @@ public class LoRaProtocol extends AbstractTcpClientProtocol<LoRaProtocol, LoRaAg
     }
 
     @Override
-    protected TcpIoClient<LoRaMessage> doCreateIoClient() {
+    protected TCPIOClient<LoRaMessage> doCreateIoClient() {
         String host = agent.getAttributes().getValue(Agent.HOST).orElse(DEFAULT_HOST);
         int port = agent.getAttributes().getValue(Agent.PORT).orElse(DEFAULT_PORT);
 
-        return new TcpIoClient<>(host, port);
+        return new TCPIOClient<>(host, port);
     }
 }

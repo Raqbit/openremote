@@ -1,6 +1,6 @@
 package org.openremote.agent.protocol.lora;
 
-import org.openremote.agent.protocol.io.IoAgent;
+import org.openremote.agent.protocol.io.IOAgent;
 import org.openremote.model.asset.agent.AgentDescriptor;
 import org.openremote.model.asset.agent.AgentLink;
 import org.openremote.model.value.AttributeDescriptor;
@@ -13,7 +13,7 @@ import javax.validation.constraints.Min;
 import java.util.Optional;
 
 @Entity
-public class LoRaAgent extends IoAgent<LoRaAgent, LoRaProtocol, LoRaAgent.LoRaAgentLink> {
+public class LoRaAgent extends IOAgent<LoRaAgent, LoRaProtocol, LoRaAgent.LoRaAgentLink> {
 
     public static class LoRaAgentLink extends AgentLink<LoRaAgentLink> {
         @Min(1)
