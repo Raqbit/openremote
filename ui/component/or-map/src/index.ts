@@ -312,6 +312,10 @@ export const geoJsonPointInputTemplateProvider: ValueInputProviderGenerator = (a
 @customElement("or-map")
 export class OrMap extends LitElement {
 
+    public addRouteToMap(uploadedRoute: any) {
+       this._map!.addRouteToMap(uploadedRoute);
+    }
+
     public static styles = style;
 
     @property({type: String})
@@ -374,7 +378,7 @@ export class OrMap extends LitElement {
             this.loadMap();
         }
     }
-    
+
     protected onManagerEvent = (event: OREvent) => {
         switch (event) {
             case OREvent.READY:
@@ -458,7 +462,7 @@ export class OrMap extends LitElement {
 
         this._loaded = true;
     }
-    
+
     public resize() {
         if (this._map) {
             this._map.resize();

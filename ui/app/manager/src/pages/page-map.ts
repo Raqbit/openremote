@@ -126,6 +126,12 @@ export class PageMap<S extends MapStateKeyed> extends Page<S> {
                 height: 100%;
                 width: 100%;
             }
+            
+            .routeLoader {
+                position: absolute;
+                right: 20px;
+                bottom: 20px;
+            }
         
             @media only screen and (min-width: 415px){
                 or-map-asset-card {
@@ -292,7 +298,7 @@ export class PageMap<S extends MapStateKeyed> extends Page<S> {
             
             ${this._currentAsset ? html `<or-map-asset-card .config="${this.config?.card}" .assetId="${this._currentAsset.id}"></or-map-asset-card>` : ``}
             
-            <or-map id="map" class="or-map">
+            <or-map id="map" class="or-map" @or-map-loaded="${this.loadPredefinedRoute}">
                 ${
                     this._assets.filter((asset) => {
                         const attr = asset.attributes[WellknownAttributes.LOCATION] as Attribute<GeoJSONPoint>;
@@ -305,6 +311,10 @@ export class PageMap<S extends MapStateKeyed> extends Page<S> {
                     })
                 }
             </or-map>
+            <div class="routeLoader">
+                <input type="file" name="files[]" id="fileUploadRoute">
+                <button @click="${this.uploadRouteLocalstorage}">Add predefined route</button>
+            </div>
         `;
     }
 
@@ -353,5 +363,34 @@ export class PageMap<S extends MapStateKeyed> extends Page<S> {
 
     protected onLoadAssetEvent(loadAssetEvent: OrMapAssetCardLoadAssetEvent) {
         router.navigate(getAssetsRoute(false, loadAssetEvent.detail));
+    }
+
+    private uploadRouteLocalstorage() {
+        // Key for local storage, use to save and access.
+        let FILE_KEY = 'save.json';
+
+        let uploadedRoute = this.shadowRoot!.getElementById('fileUploadRoute')! as HTMLInputElement;
+        let uploadedRouteFile = uploadedRoute.files[0];
+
+        let reader = new FileReader();
+        reader.onload = handleFileRead;
+        reader.readAsText(uploadedRouteFile);
+
+        function handleFileRead(event){
+            let save = JSON.parse(event.target.result);
+            //console.log(save)
+            window.localStorage.removeItem(FILE_KEY);
+            window.localStorage.setItem(FILE_KEY, JSON.stringify(save));
+        }
+
+        //reload webpage
+        location.reload();
+
+    }
+
+    private loadPredefinedRoute() {
+        try {
+            this._map?.addRouteToMap(JSON.parse(localStorage.getItem("save.json")));
+        } catch(e){console.error(e)}
     }
 }

@@ -501,4 +501,21 @@ export class MapWidget {
             this._clickHandlers.delete(marker);
         }
     }
+
+    public addRouteToMap(uploadedRoute: any) {
+        console.log(uploadedRoute)
+        this._mapGl!.addLayer({
+            'id': 'outline',
+            'type': 'line',
+            'source': {
+                "type": "geojson",
+                "data": uploadedRoute,
+            },
+            'layout': {},
+            'paint': {
+                'line-color': '#ff0000',
+                'line-width': 3
+            }
+        });
+    }
 }
