@@ -27,7 +27,7 @@ public class LoRaProtocol extends AbstractTCPClientProtocol<LoRaProtocol, LoRaAg
     private static final String DEFAULT_HOST = "127.0.0.1";
     private static final int DEFAULT_PORT = 9230;
     public static final int DEFAULT_NODE_ID = 1;
-    private static final int DEFAULT_FREQUENCY = 915;
+    private static final int DEFAULT_FREQUENCY = 868;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
