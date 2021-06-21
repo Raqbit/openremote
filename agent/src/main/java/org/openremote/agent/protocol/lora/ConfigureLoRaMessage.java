@@ -6,7 +6,7 @@ public class ConfigureLoRaMessage extends LoRaMessage {
     @JsonProperty("frequency")
     public float frequency;
 
-    @JsonProperty("nodeId")
+    @JsonProperty("node_id")
     public int nodeId;
 
     public ConfigureLoRaMessage(float frequency, int nodeId) {

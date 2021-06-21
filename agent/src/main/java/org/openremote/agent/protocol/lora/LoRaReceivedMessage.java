@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
 public class LoRaReceivedMessage extends LoRaMessage {
-    @JsonProperty("fromId")
+    @JsonProperty("from_id")
     public int fromId;
 
     @JsonProperty("data")
